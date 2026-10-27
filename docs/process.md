@@ -32,7 +32,7 @@
 
 ## Environments
 - **dev:** local SQLite with `seed.py` fake data
-- **staging:** Fly.io (or Render) with Postgres; auto-deploys from `main`
+- **staging:** Render with Postgres (ADR 0005); auto-deploys from `main`
 - **prod:** promoted from release tags, from v0.2-beta onward
 
 ## Labels
