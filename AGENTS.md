@@ -54,11 +54,12 @@ flask --app app run
 - Every form needs a CSRF token. Passwords are hashed. Logins are rate-limited.
 
 ## Current state (2026-10-27)
-- **Sprint 0 (foundation)** is nearly done. The repo, tooling, CI, templates, docs, and the `/health` skeleton are finished, and tests pass at 100% coverage.
+- **Sprint 0 (foundation)** is done. The repo, tooling, CI, templates, docs, the `/health` skeleton, and staging are finished, and tests pass at 100% coverage.
 - The private GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
 - **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
 - **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
-- **Remaining Sprint 0 item:** deploy `/health` to staging on Render (ADR 0005, `render.yaml`, issue #9).
+- **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The free Postgres expires 30 days after creation (around 2026-11-26), so recreate or upgrade it before then.
+- The Sprint 0 Review and Retro are left for the owner to write on Sunday.
 - **Sprint 1, "Users can sign up and post":** issues #1–#7 (23 points), all in Ready. Start with **#1 (S1-7), the data model and migrations**, because the other stories depend on it.
 
 ## Coordination
