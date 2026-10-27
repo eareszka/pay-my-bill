@@ -11,6 +11,8 @@ python -m venv .venv
 pip install -e ".[dev]"
 pre-commit install
 cp .env.example .env
+flask --app app db upgrade      # create or upgrade the local SQLite DB
+flask --app app seed            # optional: 10 fake users + 20 posts (password: password123)
 flask --app app run
 pytest
 ```
@@ -22,6 +24,7 @@ Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yam
 
 - A free Python web service runs `gunicorn "app:create_app()"`, with a health check on `/health`.
 - A free Postgres database supplies `DATABASE_URL`. Render generates `SECRET_KEY`.
+- On each start, `flask db upgrade` applies any new migrations before gunicorn starts.
 - Every push to `main` deploys automatically. There are no manual steps after the first Blueprint sync.
 
 Config comes only from environment variables (see `.env.example`). Never commit secrets.

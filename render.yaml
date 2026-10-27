@@ -6,7 +6,7 @@ services:
     branch: main
     autoDeploy: true
     buildCommand: pip install .
-    startCommand: gunicorn --bind 0.0.0.0:$PORT "app:create_app()"
+    startCommand: flask --app app db upgrade && gunicorn --bind 0.0.0.0:$PORT "app:create_app()"
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION

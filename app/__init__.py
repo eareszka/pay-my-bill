@@ -17,6 +17,16 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     if config:
         app.config.update(config)
 
+    from app import models  # noqa: F401
+    from app.extensions import db, migrate
+
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from app import seed
+
+    seed.register(app)
+
     from app.routes.health import bp as health_bp
 
     app.register_blueprint(health_bp)
