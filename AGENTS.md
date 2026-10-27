@@ -55,13 +55,11 @@ flask --app app run
 
 ## Current state (2026-10-27)
 - **Sprint 0 (foundation)** is nearly done. The repo, tooling, CI, templates, docs, and the `/health` skeleton are finished, and tests pass at 100% coverage.
-- The GitHub repo `eareszka/pay-my-bill` (private) exists and has labels. **Waiting on:** the owner running `powershell -File scripts/bootstrap_github.ps1` to push `main` and create the milestones.
-- **Remaining Sprint 0 items:**
-  - Confirm CI is green on GitHub
-  - Create the GitHub Projects board (columns: Backlog → Ready → In Progress → In Review → Done)
-  - Create the Sprint 1 stories from `docs/backlog/sprint-01.md` as issues, labelled with `type:story`, `points:N`, `priority:PN`, `epic:*`, and `sprint:01`, under milestone `v0.1-alpha`
-  - Deploy `/health` to staging (Fly.io or Render; the owner hasn't chosen yet)
-- **Next sprint:** Sprint 1, "Users can sign up and post" (S1-1 … S1-7, 23 points). Start with **S1-7, the data model and migrations**, because the other stories depend on it.
+- The private GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
+- **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
+- **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
+- **Remaining Sprint 0 item:** deploy `/health` to staging (Fly.io or Render; the owner hasn't chosen yet).
+- **Sprint 1, "Users can sign up and post":** issues #1–#7 (23 points), all in Ready. Start with **#1 (S1-7), the data model and migrations**, because the other stories depend on it.
 
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:
