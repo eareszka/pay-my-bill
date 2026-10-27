@@ -15,6 +15,17 @@ flask --app app run
 pytest
 ```
 
+## Deploy (staging)
+Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yaml) Blueprint (see [ADR 0005](docs/adr/0005-render-staging.md)):
+
+- A free Python web service runs `gunicorn "app:create_app()"`, with a health check on `/health`.
+- A free Postgres database supplies `DATABASE_URL`. Render generates `SECRET_KEY`.
+- Every push to `main` deploys automatically. There are no manual steps after the first Blueprint sync.
+
+Config comes only from environment variables (see `.env.example`). Never commit secrets.
+
+Free-tier caveats: the service sleeps after about 15 minutes idle, so the first request can take up to a minute. The free database expires 30 days after creation.
+
 ## Docs
 - [Product requirements](docs/PRD.md)
 - [Development process](docs/process.md): sprints, Definition of Ready and Done, git workflow

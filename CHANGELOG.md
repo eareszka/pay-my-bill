@@ -5,3 +5,4 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Added
 - Project foundation: tooling, CI, templates, PRD, ADRs, threat model, and a Flask skeleton with `/health`.
+- Render staging blueprint (`render.yaml`) with gunicorn and free Postgres; ADR 0005.

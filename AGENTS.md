@@ -58,7 +58,7 @@ flask --app app run
 - The private GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
 - **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
 - **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
-- **Remaining Sprint 0 item:** deploy `/health` to staging (Fly.io or Render; the owner hasn't chosen yet).
+- **Remaining Sprint 0 item:** deploy `/health` to staging on Render (ADR 0005, `render.yaml`, issue #9).
 - **Sprint 1, "Users can sign up and post":** issues #1–#7 (23 points), all in Ready. Start with **#1 (S1-7), the data model and migrations**, because the other stories depend on it.
 
 ## Coordination

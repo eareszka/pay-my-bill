@@ -11,12 +11,13 @@
 | PRD, ADRs 0001–0004, threat model, process doc | 3 | Done |
 | App factory + `/health` + first test, CI green | 1 | Done (green on GitHub) |
 | GitHub Projects board | 1 | Done: github.com/users/eareszka/projects/4 |
-| Staging deploy serving `/health` | 2 | To do: host not chosen yet (Fly.io or Render) |
+| Staging deploy serving `/health` | 2 | In progress: Render chosen (ADR 0005); blueprint in PR for #9 |
 | Sprint 1 stories written to the Definition of Ready | 2 | Done: issues #1–#7, all in Ready |
 
 ## Daily log
 - 2026-10-27: Scaffolded the repo, tooling, docs, and skeleton app. Next: GitHub repo, labels, Sprint 1 issues.
 - 2026-10-27: Pushed to the private GitHub repo; CI is green. Milestones, the Projects board, and Sprint 1 issues are created. Blocked: branch protection needs GitHub Pro on a private repo, so PR-only is enforced by convention. Next: staging deploy.
+- 2026-10-27: Merged PR #8. Claimed #9; added `render.yaml` (gunicorn + free Postgres), ADR 0005, and deploy notes. Next: merge, connect the Blueprint in Render, verify `/health`. Blocked: connecting the repo needs Emery's Render account.
 
 ## Review
 _(Sunday)_
