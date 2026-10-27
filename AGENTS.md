@@ -15,12 +15,15 @@ Read this file fully before making any change. The project is run as a professio
    - 0002: link-out payments only (no Stripe or in-app money)
    - 0003: Flask + SQLAlchemy + Jinja/vanilla JS (no SPA framework)
    - 0004: **only recipient-confirmed donations count** toward XP, badges, streaks, leaderboards, and post progress
+   - 0005: Render for staging (`render.yaml`)
+   - 0006: money is stored as integer cents
 4. `docs/threat-model.md`: abuse cases T1–T10 and which sprint mitigates each
 5. `docs/backlog/sprint-01.md`: the current sprint's stories and acceptance criteria
 
 ## Stack and commands
 - Python 3.12, Flask app factory in `app/__init__.py`, blueprints in `app/routes/`
-- Planned modules: `app/models.py`, `app/rewards.py`, `app/leaderboard.py`, `app/moderation.py`, `app/payment_links.py`
+- Models live in `app/models.py` and subclass `Base` from `app/extensions.py` (not `db.Model`, which mypy can't type). Migrations live in `migrations/` (`flask --app app db migrate -m "..."`). Money is integer cents (ADR 0006).
+- Planned modules: `app/rewards.py`, `app/leaderboard.py`, `app/moderation.py`, `app/payment_links.py`
 - Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, from Sprint 4)
 
 ```powershell
@@ -28,6 +31,7 @@ python -m venv .venv; .\.venv\Scripts\activate
 pip install -e ".[dev]"
 pre-commit install
 ruff check . ; ruff format --check . ; mypy ; pytest     # all must pass
+flask --app app db upgrade ; flask --app app seed      # local dev DB + fake data
 flask --app app run
 ```
 
@@ -46,7 +50,7 @@ flask --app app run
 - **Secrets:** never commit `.env`. Config comes from environment variables only (see `.env.example`).
 
 ## Product rules to enforce in code
-- Post `goal_amount` ≤ $1,000. Each user can have at most 2 open posts.
+- Post `goal_cents` ≤ 100,000 ($1,000; `MAX_GOAL_CENTS`, also a DB CHECK). Each user can have at most 2 open posts.
 - New posts are checked against the fundraising keyword list (invest, startup, business, equity, seed, LLC, inventory, pre-order, launch, crowdfund, shares, ROI, …). A match sets the post to `pending_review`, and it's hidden from the feed.
 - Donations go `pending` → `confirmed` | `disputed`. Only the recipient can confirm.
 - Leaderboards only count confirmed donations from verified accounts older than 3 days. Anything over $200/week for one donor→recipient pair is excluded and flagged.
@@ -60,7 +64,7 @@ flask --app app run
 - **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
 - **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The free Postgres expires 30 days after creation (around 2026-11-26), so recreate or upgrade it before then.
 - The Sprint 0 Review and Retro are left for the owner to write on Sunday.
-- **Sprint 1, "Users can sign up and post":** issues #1–#7 (23 points), all in Ready. Start with **#1 (S1-7), the data model and migrations**, because the other stories depend on it.
+- **Sprint 1, "Users can sign up and post":** issues #1–#7 (23 points). #1 (S1-7, data model + migrations) was pulled forward and is in progress. #2–#7 can start once it merges.
 
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:

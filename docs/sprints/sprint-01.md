@@ -1,0 +1,27 @@
+# Sprint 1 — Users can sign up and post
+
+**Dates:** 2026-11-02 → 2026-11-08 · **Goal:** a visitor can sign up, verify, set up a profile, and post a want or need that shows in the feed
+
+Sprint Planning is Monday. #1 was pulled forward on 2026-10-27 because Sprint 0 finished early and every other story depends on it.
+
+## Committed
+| Story | Issue | Points | Status |
+|---|---|---|---|
+| S1-7 Data model + migrations | #1 | 3 | In progress |
+| S1-1 Sign up with email verification | #2 | 5 | Ready |
+| S1-2 Log in / log out | #3 | 2 | Ready |
+| S1-3 Profile with region and payment handles | #4 | 3 | Ready |
+| S1-4 Create a post with moderation | #5 | 5 | Ready |
+| S1-5 Feed of open posts | #6 | 3 | Ready |
+| S1-6 Post detail page | #7 | 2 | Ready |
+
+**Total:** 23 points. There's no velocity history yet, so S1-6 may carry over.
+
+## Daily log
+- 2026-10-27: Claimed #1. Added `User` and `Post` models, migration 0001, and a `flask seed` command (10 users, 20 posts). Money is integer cents (ADR 0006), and staging now runs `db upgrade` on start. Next: PR for #1, then verify staging after merge. Blocked: none.
+
+## Review
+_(Sunday)_
+
+## Retro
+_(Sunday: Keep / Change / Try)_
