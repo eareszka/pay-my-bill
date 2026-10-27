@@ -16,6 +16,8 @@ pytest
 ```
 
 ## Deploy (staging)
+Staging: https://pay-my-bill-staging.onrender.com ([`/health`](https://pay-my-bill-staging.onrender.com/health))
+
 Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yaml) Blueprint (see [ADR 0005](docs/adr/0005-render-staging.md)):
 
 - A free Python web service runs `gunicorn "app:create_app()"`, with a health check on `/health`.
