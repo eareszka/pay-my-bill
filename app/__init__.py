@@ -9,12 +9,22 @@ from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
+def database_url(raw: str) -> str:
+    """Pin Postgres URLs to psycopg 3, whatever scheme the host hands us."""
+    for scheme in ("postgres://", "postgresql://", "postgresql+psycopg2://"):
+        if raw.startswith(scheme):
+            return "postgresql+psycopg://" + raw.removeprefix(scheme)
+    return raw
+
+
 def create_app(config: dict[str, Any] | None = None) -> Flask:
     load_dotenv()
     app = Flask(__name__)
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-not-secret"),
-        SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db"),
+        SQLALCHEMY_DATABASE_URI=database_url(
+            os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db")
+        ),
         MAIL_SERVER=os.environ.get("MAIL_SERVER", ""),
         MAIL_PORT=int(os.environ.get("MAIL_PORT") or 587),
         MAIL_USERNAME=os.environ.get("MAIL_USERNAME", ""),
