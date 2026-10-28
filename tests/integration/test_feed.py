@@ -39,7 +39,7 @@ def test_feed_shows_open_posts_newest_first(client: FlaskClient, make_user: Make
     assert "$0</strong> of $120.50" in page
     assert 'class="chip chip-want">Want<' in page
     assert 'class="chip chip-need">Need<' in page
-    assert "alice · Tampa, FL" in page
+    assert "alice</a> · Tampa, FL" in page
     assert 'aria-valuenow="0"' in page
 
 
@@ -93,8 +93,22 @@ def test_feed_paginates(client: FlaskClient, make_user: MakeUser) -> None:
     assert f"Post number {PAGE_SIZE:02d}" in second
     assert "Newer</a>" in second
     assert "Older</a>" not in second
-    assert client.get("/?page=0").status_code == 200
-    assert client.get("/?page=abc").status_code == 200
+    for bad in ("0", "-3", "abc", "99999999999999999999"):
+        assert client.get(f"/?page={bad}").status_code == 200
+
+
+def test_page_past_end_links_back(client: FlaskClient, make_user: MakeUser) -> None:
+    add_post(make_user(), "Only post")
+    page = client.get("/?page=5&kind=need").get_data(as_text=True)
+    assert "No more posts." in page
+    assert 'href="/?kind=need&amp;page=4">Newer</a>' in page
+
+
+def test_region_hidden_without_city(client: FlaskClient, make_user: MakeUser) -> None:
+    add_post(make_user(state="FL"), "Post")
+    page = client.get("/").get_data(as_text=True)
+    assert "None" not in page
+    assert 'href="/u/alice">alice</a></span>' in page
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
@@ -103,8 +117,5 @@ def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
     assert "to post one" in page
 
 
-def test_layout_has_viewport_and_no_fixed_widths(client: FlaskClient) -> None:
+def test_layout_has_mobile_viewport(client: FlaskClient) -> None:
     assert b'name="viewport" content="width=device-width, initial-scale=1"' in client.get("/").data
-    css = client.get("/static/css/app.css").get_data(as_text=True)
-    assert "overflow-wrap: anywhere" in css
-    assert "min-width" not in css

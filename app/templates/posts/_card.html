@@ -1,6 +1,6 @@
 <div class="card-head">
   <span class="chip chip-{{ post.kind.value }}">{{ post.kind.value | capitalize }}</span>
-  <span class="muted">{{ post.user.username }}{% if post.user.state %} · {{ post.user.city }}, {{ post.user.state }}{% endif %}</span>
+  <span class="muted"><a href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a>{% if post.user.region %} · {{ post.user.region }}{% endif %}</span>
 </div>
 <h2 class="card-title">{{ post.title }}</h2>
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ post.progress_percent }}" aria-label="Progress toward goal">

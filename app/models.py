@@ -69,6 +69,10 @@ class User(Base):
         return self.email_verified_at is not None
 
     @property
+    def region(self) -> str | None:
+        return f"{self.city}, {self.state}" if self.city and self.state else None
+
+    @property
     def has_payment_handle(self) -> bool:
         return any((self.cashapp_handle, self.venmo_handle, self.paypal_handle))
 

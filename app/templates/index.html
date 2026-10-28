@@ -14,12 +14,16 @@
         </li>
       {% endfor %}
     </ul>
-    <nav class="pager" aria-label="Pages">
-      {% if page > 1 %}<a href="{{ url_for('main.index', kind=kind, page=page - 1) }}">Newer</a>{% endif %}
-      {% if has_next %}<a href="{{ url_for('main.index', kind=kind, page=page + 1) }}">Older</a>{% endif %}
-    </nav>
+  {% elif page > 1 %}
+    <p class="empty">No more posts.</p>
   {% else %}
     <p class="empty">No open posts here yet.
       {% if current_user.is_authenticated %}<a href="{{ url_for('posts.new') }}">Post a want or need</a>{% else %}<a href="{{ url_for('auth.signup') }}">Sign up</a> to post one{% endif %}.</p>
+  {% endif %}
+  {% if page > 1 or has_next %}
+    <nav class="pager" aria-label="Pages">
+      {% if page > 1 %}<a href="{{ url_for('main.index', kind=kind, page=page - 1) }}">Newer</a>{% endif %}
+      {% if has_next %}<a class="pager-next" href="{{ url_for('main.index', kind=kind, page=page + 1) }}">Older</a>{% endif %}
+    </nav>
   {% endif %}
 {% endblock %}
