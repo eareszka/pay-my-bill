@@ -171,7 +171,7 @@ def test_verified_required_prompts_unverified_user() -> None:
         unverified_id, verified_id = unverified.id, verified.id
 
     client = app.test_client()
-    assert client.get("/protected").status_code == 401
+    assert "/login?next=" in client.get("/protected").location
     with client.session_transaction() as session:
         session["_user_id"] = str(unverified_id)
     resp = client.get("/protected")

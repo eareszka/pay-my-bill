@@ -12,7 +12,12 @@
     <nav>
       {% if current_user.is_authenticated %}
         <span class="who">{{ current_user.username }}</span>
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-link">Log out</button>
+        </form>
       {% else %}
+        <a href="{{ url_for('auth.login') }}">Log in</a>
         <a href="{{ url_for('auth.signup') }}">Sign up</a>
       {% endif %}
     </nav>

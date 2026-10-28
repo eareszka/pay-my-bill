@@ -86,4 +86,5 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
   border-radius: 8px;
   cursor: pointer;
 }
+.btn-link { padding: 0; font: inherit; color: var(--accent); background: none; border: 0; cursor: pointer; }
 .btn-secondary { color: var(--text); background: var(--surface); border: 1px solid var(--border); }

@@ -94,3 +94,14 @@ class Post(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="posts")
+
+
+class LoginAttempt(Base):
+    __tablename__ = "login_attempts"
+    __table_args__ = (Index("ix_login_attempts_identifier_created_at", "identifier", "created_at"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    identifier: Mapped[str] = mapped_column(String(254))
+    ip: Mapped[str | None] = mapped_column(String(45))
+    succeeded: Mapped[bool]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

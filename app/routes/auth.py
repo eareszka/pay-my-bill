@@ -1,20 +1,36 @@
 import smtplib
+from functools import cache
+from urllib.parse import urlsplit
 
-from flask import Blueprint, current_app, flash, redirect, render_template, url_for
-from flask_login import current_user, login_user
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.wrappers import Response
 
-from app.auth import login_required
+from app.auth import LOGIN_WINDOW, begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
-from app.forms import EmptyForm, SignupForm
+from app.forms import EmptyForm, LoginForm, SignupForm
 from app.mail import send_email
 from app.models import User, utcnow
 from app.tokens import VERIFY_EMAIL, VERIFY_MAX_AGE, make_token, read_token
 
 bp = Blueprint("auth", __name__)
+
+
+@cache
+def _dummy_hash() -> str:
+    # Checked when no user matches, so a miss takes as long as a wrong password.
+    return generate_password_hash("not-a-real-password")
+
+
+def safe_next(target: str | None) -> str:
+    if target and target.startswith("/") and "\\" not in target:
+        parts = urlsplit(target)
+        if not parts.scheme and not parts.netloc:
+            return target
+    return url_for("main.index")
 
 
 def send_verification(user: User) -> None:
@@ -105,4 +121,38 @@ def verify(token: str) -> Response:
         user.email_verified_at = utcnow()
         db.session.commit()
     flash("Your email is verified. Welcome!", "success")
+    return redirect(url_for("main.index"))
+
+
+@bp.route("/login", methods=["GET", "POST"])
+def login() -> str | Response | tuple[str, int, dict[str, str]]:
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+    form = LoginForm()
+    if form.validate_on_submit():
+        identifier = form.identifier.data or ""
+        user = db.session.scalar(
+            select(User).where(or_(User.username == identifier, User.email == identifier))
+        )
+        if user is not None:
+            identifier = user.username
+        attempt = begin_login_attempt(identifier, request.remote_addr)
+        if attempt is None:
+            form.password.errors.append("Too many failed attempts. Try again later.")
+            retry_after = str(int(LOGIN_WINDOW.total_seconds()))
+            return render_template("auth/login.html", form=form), 429, {"Retry-After": retry_after}
+        password = form.password.data or ""
+        ok = check_password_hash(user.password_hash if user else _dummy_hash(), password)
+        if user is not None and ok:
+            mark_login_succeeded(attempt)
+            login_user(user)
+            return redirect(safe_next(request.args.get("next")))
+        form.password.errors.append("Wrong username, email, or password.")
+    return render_template("auth/login.html", form=form)
+
+
+@bp.post("/logout")
+def logout() -> Response:
+    logout_user()
+    flash("You're logged out.", "info")
     return redirect(url_for("main.index"))
