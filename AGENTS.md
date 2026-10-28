@@ -62,9 +62,9 @@ flask --app app run
 
 ## Current state (2026-10-28)
 - **Sprint 0 (foundation)** is done. The repo, tooling, CI, templates, docs, the `/health` skeleton, and staging are finished, and tests pass at 100% coverage.
-- The private GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
+- The public GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
 - **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
-- **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
+- **`main` is protected:** changes only land through a PR, the `checks` CI job must pass with the branch up to date, and force-pushes and deletion are blocked, admins included. The repo is public, so never commit secrets (gitleaks runs in pre-commit).
 - **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The free Postgres expires 30 days after creation (around 2026-11-26), so recreate or upgrade it before then.
 - The Sprint 0 Review and Retro are left for the owner to write on Sunday.
 - **Sprint 1, "Users can sign up and post"** is done: issues #1–#7 (23 points) merged through PRs #12, #13, #16–#20. The app has sign-up with email verification, log in and out with a DB-backed lockout (migration 0002, ADR 0007), a profile with region and payment handles, post creation with the $1,000 cap, 2 open posts, Community Rules, and the fundraising keyword flag, a feed, and post detail pages. Tests: 199, 100% coverage.
