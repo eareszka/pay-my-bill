@@ -11,7 +11,10 @@ from app.models import User
 
 
 def load_user(user_id: str) -> User | None:
-    return db.session.get(User, int(user_id))
+    try:
+        return db.session.get(User, int(user_id))
+    except ValueError:
+        return None
 
 
 login_manager.user_loader(load_user)

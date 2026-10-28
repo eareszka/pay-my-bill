@@ -1,7 +1,10 @@
 import smtplib
+import ssl
 from email.message import EmailMessage
 
 from flask import current_app
+
+SMTPS_PORT = 465
 
 
 def send_email(to: str, subject: str, body: str) -> None:
@@ -12,10 +15,19 @@ def send_email(to: str, subject: str, body: str) -> None:
     msg["Subject"] = subject
     msg.set_content(body)
     if not cfg["MAIL_SERVER"]:
-        current_app.logger.info("Email (console backend)\n%s", msg)
+        current_app.logger.info(
+            "Email (console backend)\nTo: %s\nSubject: %s\n\n%s", to, subject, body
+        )
         return
-    with smtplib.SMTP(cfg["MAIL_SERVER"], cfg["MAIL_PORT"], timeout=10) as smtp:
-        smtp.starttls()
+    context = ssl.create_default_context()
+    smtp: smtplib.SMTP
+    if cfg["MAIL_PORT"] == SMTPS_PORT:
+        smtp = smtplib.SMTP_SSL(cfg["MAIL_SERVER"], cfg["MAIL_PORT"], timeout=10, context=context)
+    else:
+        smtp = smtplib.SMTP(cfg["MAIL_SERVER"], cfg["MAIL_PORT"], timeout=10)
+    with smtp as conn:
+        if cfg["MAIL_PORT"] != SMTPS_PORT:
+            conn.starttls(context=context)
         if cfg["MAIL_USERNAME"]:
-            smtp.login(cfg["MAIL_USERNAME"], cfg["MAIL_PASSWORD"])
-        smtp.send_message(msg)
+            conn.login(cfg["MAIL_USERNAME"], cfg["MAIL_PASSWORD"])
+        conn.send_message(msg)

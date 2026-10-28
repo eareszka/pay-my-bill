@@ -1,4 +1,6 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+import smtplib
+
+from flask import Blueprint, current_app, flash, redirect, render_template, url_for
 from flask_login import current_user, login_user
 from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
@@ -16,13 +18,24 @@ bp = Blueprint("auth", __name__)
 
 
 def send_verification(user: User) -> None:
-    link = url_for("auth.verify", token=make_token(user.id, VERIFY_EMAIL), _external=True)
+    token = make_token(user.id, user.email, VERIFY_EMAIL)
+    link = url_for("auth.verify", token=token, _external=True)
     send_email(
         user.email,
         "Verify your Pay My Bill email",
         f"Hi {user.username},\n\nConfirm your email to start posting and donating:\n{link}\n\n"
         "This link expires in 48 hours.",
     )
+
+
+def try_send_verification(user: User) -> bool:
+    try:
+        send_verification(user)
+    except (smtplib.SMTPException, OSError):
+        current_app.logger.exception("Could not send the verification email to user %s", user.id)
+        flash("We couldn't send your verification email. Try resending it in a minute.", "error")
+        return False
+    return True
 
 
 @bp.route("/signup", methods=["GET", "POST"])
@@ -54,9 +67,9 @@ def signup() -> str | Response:
                 db.session.rollback()
                 form.username.errors.append("That username or email is already in use.")
             else:
-                send_verification(user)
                 login_user(user)
-                flash("Account created. Check your email to verify it.", "success")
+                if try_send_verification(user):
+                    flash("Account created. Check your email to verify it.", "success")
                 return redirect(url_for("auth.verify_pending"))
     return render_template("auth/signup.html", form=form)
 
@@ -72,17 +85,20 @@ def verify_pending() -> str | Response:
 @bp.post("/verify/resend")
 @login_required
 def verify_resend() -> Response:
-    if EmptyForm().validate_on_submit() and not current_user.is_verified:
-        send_verification(current_user)
+    if (
+        EmptyForm().validate_on_submit()
+        and not current_user.is_verified
+        and try_send_verification(current_user)
+    ):
         flash("We sent you a new verification link.", "success")
     return redirect(url_for("auth.verify_pending"))
 
 
 @bp.get("/verify/<token>")
 def verify(token: str) -> Response:
-    user_id = read_token(token, VERIFY_EMAIL, VERIFY_MAX_AGE)
-    user = db.session.get(User, user_id) if user_id is not None else None
-    if user is None:
+    payload = read_token(token, VERIFY_EMAIL, VERIFY_MAX_AGE)
+    user = db.session.get(User, payload[0]) if payload else None
+    if user is None or payload is None or user.email != payload[1]:
         flash("That verification link is invalid or has expired.", "error")
         return redirect(url_for("main.index"))
     if not user.is_verified:

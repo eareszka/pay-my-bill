@@ -1,5 +1,6 @@
 import logging
 import re
+import smtplib
 
 import pytest
 from flask import Flask
@@ -35,8 +36,7 @@ def test_signup_page_renders(client: FlaskClient) -> None:
 def test_signup_creates_hashed_user_and_sends_verification(
     client: FlaskClient, caplog: pytest.LogCaptureFixture
 ) -> None:
-    with caplog.at_level(logging.INFO):
-        resp = client.post("/signup", data=FORM)
+    resp = client.post("/signup", data=FORM)
     assert resp.status_code == 302
     assert resp.location.endswith("/verify/pending")
     user = db.session.scalars(select(User)).one()
@@ -107,7 +107,7 @@ def test_verify_bad_token(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user(verified=False)
     resp = client.get("/verify/not-a-token", follow_redirects=True)
     assert b"invalid or has expired" in resp.data
-    wrong_purpose = make_token(user.id, "reset-password")
+    wrong_purpose = make_token(user.id, user.email, "reset-password")
     client.get(f"/verify/{wrong_purpose}")
     assert not user.is_verified
 
@@ -116,7 +116,7 @@ def test_verify_expired_token(
     client: FlaskClient, make_user: MakeUser, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     user = make_user(verified=False)
-    token = make_token(user.id, VERIFY_EMAIL)
+    token = make_token(user.id, user.email, VERIFY_EMAIL)
     monkeypatch.setattr("app.routes.auth.VERIFY_MAX_AGE", -1)
     resp = client.get(f"/verify/{token}", follow_redirects=True)
     assert b"invalid or has expired" in resp.data
@@ -126,7 +126,7 @@ def test_verify_expired_token(
 def test_verify_already_verified_is_idempotent(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user()
     verified_at = user.email_verified_at
-    client.get(f"/verify/{make_token(user.id, VERIFY_EMAIL)}")
+    client.get(f"/verify/{make_token(user.id, user.email, VERIFY_EMAIL)}")
     assert user.email_verified_at == verified_at
 
 
@@ -197,3 +197,42 @@ def test_csrf_token_required() -> None:
 
 def test_index_renders(app: Flask, client: FlaskClient) -> None:
     assert client.get("/").status_code == 200
+
+
+def test_verify_token_bound_to_email(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user(verified=False)
+    token = make_token(user.id, "old@example.com", VERIFY_EMAIL)
+    resp = client.get(f"/verify/{token}", follow_redirects=True)
+    assert b"invalid or has expired" in resp.data
+    assert not user.is_verified
+
+
+def test_signup_survives_mail_failure(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    def fail(*_: object) -> None:
+        raise smtplib.SMTPServerDisconnected("down")
+
+    monkeypatch.setattr("app.routes.auth.send_email", fail)
+    resp = client.post("/signup", data=FORM, follow_redirects=True)
+    assert b"couldn&#39;t send your verification email" in resp.data
+    assert b"Verify your email" in resp.data
+    assert user_count() == 1
+    assert "Could not send the verification email" in caplog.text
+    resp = client.post("/verify/resend", follow_redirects=True)
+    assert b"new verification link" not in resp.data
+
+
+def test_malformed_session_user_id_is_anonymous(client: FlaskClient) -> None:
+    with client.session_transaction() as session:
+        session["_user_id"] = "not-a-number"
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert b"Sign up" in resp.data
+
+
+def test_proxy_headers_make_https_links(
+    client: FlaskClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    client.post("/signup", data=FORM, headers={"X-Forwarded-Proto": "https"})
+    assert "https://localhost/verify/" in caplog.text
