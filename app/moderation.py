@@ -4,10 +4,6 @@ import re
 # the post to the review queue, so the list can lean toward false positives.
 FUNDRAISING_KEYWORDS = (
     "invest",
-    "investing",
-    "investment",
-    "investor",
-    "investors",
     "startup",
     "start-up",
     "business",
@@ -19,18 +15,23 @@ FUNDRAISING_KEYWORDS = (
     "preorder",
     "launch",
     "crowdfund",
-    "crowdfunding",
     "shares",
     "roi",
     "venture",
     "franchise",
     "stock",
-    "stocks",
     "crypto",
 )
 
+# Inflections ("invested", "startups", "businesses", "launching") still match. Hyphens
+# count as word breaks, so "small-business" and "seed-funding" match too.
+_SUFFIXES = r"(?:s|es|ed|d|ing|ment|ments|or|ors|er|ers)?"
 _PATTERN = re.compile(
-    r"(?<![\w-])(?:" + "|".join(re.escape(k) for k in FUNDRAISING_KEYWORDS) + r")(?![\w-])",
+    r"(?<![a-z0-9])(?:"
+    + "|".join(re.escape(k) for k in FUNDRAISING_KEYWORDS)
+    + r")"
+    + _SUFFIXES
+    + r"(?![a-z0-9])",
     re.IGNORECASE,
 )
 

@@ -53,4 +53,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     from app.money import format_cents
 
     app.add_template_filter(format_cents, "cents")
+    app.jinja_env.globals.update(
+        MAX_GOAL=format_cents(models.MAX_GOAL_CENTS), MAX_OPEN_POSTS=models.MAX_OPEN_POSTS
+    )
     return app

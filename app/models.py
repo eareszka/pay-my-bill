@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.extensions import Base
 
 MAX_GOAL_CENTS = 100_000
+MAX_OPEN_POSTS = 2
 
 
 def utcnow() -> datetime:

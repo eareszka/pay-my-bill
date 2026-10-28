@@ -131,6 +131,14 @@ class PostForm(FlaskForm):
 
     goal_cents = 0
 
+    def __init__(self, *args: Any, require_rules: bool = False, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.require_rules = require_rules
+
+    def validate_accept_rules(self, field: Field) -> None:
+        if self.require_rules and not field.data:
+            raise ValidationError("You need to agree to the Community Rules to post.")
+
     def validate_goal(self, field: Field) -> None:
         try:
             cents = parse_dollars(field.data)

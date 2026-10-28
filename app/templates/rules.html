@@ -3,11 +3,11 @@
 {% block content %}
   <h1>Community Rules</h1>
   <ol class="rules">
-    <li><strong>Everyday wants and needs only.</strong> Rent, bills, groceries, a game you've been wanting. Goals are capped at $1,000.</li>
+    <li><strong>Everyday wants and needs only.</strong> Rent, bills, groceries, a game you've been wanting. Goals are capped at {{ MAX_GOAL }}.</li>
     <li><strong>No business fundraising.</strong> No startups, products, inventory, pre-orders, investments, or anything that promises a return. Posts like that go to review and get removed.</li>
     <li><strong>Be honest.</strong> Tell the real story. Your post history is visible, and scam posts get you banned.</li>
     <li><strong>Be kind.</strong> No harassment, hate, or pressure, in posts or in thank-yous.</li>
     <li><strong>Gifts, not loans.</strong> Money goes straight from the donor to you through Cash App, Venmo, or PayPal. Pay My Bill never holds money, and donors get nothing back but thanks.</li>
-    <li><strong>Two open posts at a time.</strong> Finish or close one before you post again.</li>
+    <li><strong>{{ MAX_OPEN_POSTS }} open posts at a time.</strong> Finish or close one before you post again.</li>
   </ol>
 {% endblock %}

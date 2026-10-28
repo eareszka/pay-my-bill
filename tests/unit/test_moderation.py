@@ -14,6 +14,13 @@ from app.moderation import flagged_keywords, is_flagged
         "Restock inventory for my shop",
         "Buying shares",
         "start-up costs",
+        "Help my small-business",
+        "seed-funding round",
+        "I invested in a rig",
+        "Two businesses to fund",
+        "Launching my brand",
+        "My LLCs need cash",
+        "crypto-mining rig",
     ],
 )
 def test_flags_fundraising(text: str) -> None:

@@ -4,7 +4,7 @@
 {% block content %}
   <h1>Ask for a hand</h1>
   {% if at_limit %}
-    <p class="flash flash-error">You already have 2 open posts. Close or finish one before posting again.</p>
+    <p class="flash flash-error">You already have {{ MAX_OPEN_POSTS }} open posts. Close or finish one before posting again.</p>
   {% else %}
     <form method="post" class="form" novalidate>
       {{ form.hidden_tag() }}
@@ -18,9 +18,9 @@
         {% for error in form.kind.errors %}<small class="error">{{ error }}</small>{% endfor %}
       </fieldset>
       {{ field(form.title, maxlength=80) }}
-      {{ field(form.body, rows=6) }}
+      {{ field(form.body, rows=6, maxlength=2000) }}
       {{ field(form.goal, inputmode="decimal", placeholder="$120") }}
-      {% if needs_rules %}
+      {% if form.require_rules %}
         <label class="choice">
           {{ form.accept_rules() }}
           <span>I agree to the <a href="{{ url_for('main.rules') }}" target="_blank">Community Rules</a></span>

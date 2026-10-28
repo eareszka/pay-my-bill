@@ -3,7 +3,7 @@ from flask.testing import FlaskClient
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import MAX_GOAL_CENTS, Post, PostKind, PostStatus, User, utcnow
+from app.models import MAX_GOAL_CENTS, MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, utcnow
 from tests.conftest import MakeUser, login_as
 
 FORM = {
@@ -134,10 +134,22 @@ def test_fundraising_post_goes_to_review(client: FlaskClient, poster: User) -> N
         data={**FORM, "title": "Small shop", "body": "Need seed money for my LLC inventory."},
         follow_redirects=True,
     )
-    assert b"waiting for review" in resp.data
+    assert b"after a quick review" in resp.data
     assert posts()[0].status is PostStatus.PENDING_REVIEW
 
 
 def test_rules_page(client: FlaskClient) -> None:
     page = client.get("/rules").get_data(as_text=True)
     assert "No business fundraising." in page
+
+
+def test_rules_and_field_errors_reported_together(client: FlaskClient, poster: User) -> None:
+    resp = client.post("/posts/new", data={**FORM, "accept_rules": "", "goal": "5000"})
+    assert b"You need to agree to the Community Rules" in resp.data
+    assert b"Goals are capped at $1,000." in resp.data
+
+
+def test_limit_text_uses_constant(client: FlaskClient, poster: User) -> None:
+    for _ in range(MAX_OPEN_POSTS):
+        client.post("/posts/new", data=FORM)
+    assert f"You already have {MAX_OPEN_POSTS} open posts".encode() in client.get("/posts/new").data
