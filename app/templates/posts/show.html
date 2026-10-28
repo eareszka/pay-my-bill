@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} · Pay My Bill{% endblock %}
+{% block content %}
+  {% if post.status.value == "pending_review" %}
+    <p class="flash">Only you and moderators can see this post while it's waiting for review.</p>
+  {% elif post.status.value == "removed" %}
+    <p class="flash flash-error">This post was removed for breaking the Community Rules. Only you and moderators can see it.</p>
+  {% elif post.status.value in ("funded", "closed") %}
+    <p class="flash">This post is {{ post.status.value }} and isn't taking donations.</p>
+  {% endif %}
+  <article class="post">
+    <div class="card-head">
+      <span class="chip chip-{{ post.kind.value }}">{{ post.kind.value | capitalize }}</span>
+      <span class="muted"><a href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a>{% if post.user.region %} · {{ post.user.region }}{% endif %}</span>
+    </div>
+    <h1>{{ post.title }}</h1>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ post.progress_percent }}" aria-label="Progress toward goal">
+      <span style="width: {{ post.progress_percent }}%"></span>
+    </div>
+    <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
+    <p class="post-body">{{ post.body }}</p>
+    {% if post.status.value == "open" %}
+      <section class="group">
+        <h2 class="section-title">Chip in</h2>
+        <p class="hint">Send money straight to {{ post.user.username }}. Pay My Bill never holds it.</p>
+        {% with user = post.user %}{% include "profile/_handles.html" %}{% endwith %}
+      </section>
+    {% endif %}
+  </article>
+{% endblock %}

@@ -2,7 +2,7 @@
   <span class="chip chip-{{ post.kind.value }}">{{ post.kind.value | capitalize }}</span>
   <span class="muted"><a href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a>{% if post.user.region %} · {{ post.user.region }}{% endif %}</span>
 </div>
-<h2 class="card-title">{{ post.title }}</h2>
+<h2 class="card-title"><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h2>
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ post.progress_percent }}" aria-label="Progress toward goal">
   <span style="width: {{ post.progress_percent }}%"></span>
 </div>

@@ -51,6 +51,7 @@ a { color: var(--accent); }
 }
 
 .topbar nav { display: flex; align-items: center; gap: 12px; }
+.topbar a { text-decoration: none; }
 .brand { font-weight: 700; text-decoration: none; color: var(--text); }
 .who { color: var(--muted); }
 
@@ -123,6 +124,9 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 .progress { height: 8px; overflow: hidden; background: var(--border); border-radius: 999px; }
 .progress span { display: block; height: 100%; background: var(--accent); }
 .amounts { margin: 8px 0 0; }
+.post h1 { margin-top: 10px; }
+.post-body { margin: 16px 0; white-space: pre-line; }
+.section-title { margin: 0; font-size: 1.125rem; }
 .pager { display: flex; justify-content: space-between; margin-top: 16px; }
 .pager-next { margin-left: auto; }
 .empty { color: var(--muted); }
