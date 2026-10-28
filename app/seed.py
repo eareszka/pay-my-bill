@@ -82,7 +82,9 @@ def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tupl
             email_verified_at=now,
             city=city,
             state=state,
-            cashapp_handle=f"${username.replace('.', '')}" if i % 3 != 2 else None,
+            cashapp_handle="$" + "".join(c for c in username if c.isalnum())
+            if i % 3 != 2
+            else None,
             venmo_handle=f"@{username}" if i % 3 != 0 else None,
             paypal_handle=username if i % 3 == 2 else None,
             rules_accepted_at=now,

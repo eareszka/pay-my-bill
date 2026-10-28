@@ -1,0 +1,9 @@
+{% if user.has_payment_handle %}
+  <dl class="handles">
+    {% if user.cashapp_handle %}<dt>Cash App</dt><dd>{{ user.cashapp_handle }}</dd>{% endif %}
+    {% if user.venmo_handle %}<dt>Venmo</dt><dd>{{ user.venmo_handle }}</dd>{% endif %}
+    {% if user.paypal_handle %}<dt>PayPal</dt><dd>paypal.me/{{ user.paypal_handle }}</dd>{% endif %}
+  </dl>
+{% else %}
+  <p class="muted">No payment handles yet.</p>
+{% endif %}

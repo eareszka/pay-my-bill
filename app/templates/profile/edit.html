@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_field.html" import field %}
+{% block title %}Your profile · Pay My Bill{% endblock %}
+{% block content %}
+  <h1>Your profile</h1>
+  <form method="post" class="form" novalidate>
+    {{ form.hidden_tag() }}
+    <fieldset class="group">
+      <legend>Region</legend>
+      <p class="hint">Just your city and state. We never use GPS.</p>
+      {{ field(form.city, autocomplete="address-level2") }}
+      {{ field(form.state) }}
+    </fieldset>
+    <fieldset class="group">
+      <legend>How people pay you</legend>
+      <p class="hint">Add at least one to post. Donations go straight to you; we never hold money.</p>
+      {{ field(form.cashapp_handle, placeholder="$cashtag") }}
+      {{ field(form.venmo_handle, placeholder="@username") }}
+      {{ field(form.paypal_handle, placeholder="paypal.me name") }}
+    </fieldset>
+    <button type="submit" class="btn">Save</button>
+  </form>
+  <p><a href="{{ url_for('profile.show', username=current_user.username) }}">View your public profile</a></p>
+{% endblock %}

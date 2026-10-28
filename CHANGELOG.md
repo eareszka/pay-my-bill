@@ -11,6 +11,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Sign up with email verification (#2): CSRF-protected forms (Flask-WTF), hashed passwords, signed 48-hour verification links, a resend option, and a `verified_required` guard. Emails are logged to the console unless `MAIL_SERVER` is set (ADR 0007).
 - Mobile-first base layout and stylesheet.
 - Log in and log out (#3). More than five failed logins for one account from one IP, or twenty from one IP overall, within 15 minutes returns 429. Attempts are stored in a new `login_attempts` table (migration 0002), and `next` redirects must be local.
+- Profile (#4): self-reported city and state (no GPS), plus Cash App, Venmo, and PayPal handles, validated and normalized in `app/payment_links.py`. Changing a handle emails a notice to the account. Public profile at `/u/<username>`.
 
 ### Changed
 - Staging runs `flask db upgrade` before starting gunicorn.
