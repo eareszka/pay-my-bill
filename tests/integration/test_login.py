@@ -4,7 +4,7 @@ import pytest
 from flask.testing import FlaskClient
 from sqlalchemy import select, update
 
-from app.auth import LOGIN_WINDOW, MAX_FAILED_LOGINS
+from app.auth import LOGIN_WINDOW, MAX_FAILED_LOGINS, MAX_FAILED_LOGINS_PER_IP
 from app.extensions import db
 from app.models import LoginAttempt, utcnow
 from tests.conftest import PASSWORD, MakeUser, login_as
@@ -57,7 +57,9 @@ def test_login_rate_limited_after_five_failures(client: FlaskClient, make_user: 
     make_user("alice")
     for _ in range(MAX_FAILED_LOGINS):
         assert log_in(client, "alice", "wrong-pass") == 200
-    assert log_in(client, "alice") == 429
+    resp = client.post("/login", data={"identifier": "alice", "password": PASSWORD})
+    assert resp.status_code == 429
+    assert resp.headers["Retry-After"] == str(int(LOGIN_WINDOW.total_seconds()))
     assert logged_in_as(client) is None
     assert log_in(client, "Alice@Example.com") == 429
     make_user("bob")
@@ -110,3 +112,40 @@ def test_logout_ends_session(client: FlaskClient, make_user: MakeUser) -> None:
 
 def test_logout_requires_post(client: FlaskClient) -> None:
     assert client.get("/logout").status_code == 405
+
+
+def test_success_resets_failure_count(client: FlaskClient, make_user: MakeUser) -> None:
+    make_user("alice")
+    for _ in range(MAX_FAILED_LOGINS - 1):
+        log_in(client, "alice", "wrong-pass")
+    assert log_in(client, "alice") == 302
+    client.post("/logout")
+    for _ in range(MAX_FAILED_LOGINS - 1):
+        log_in(client, "alice", "wrong-pass")
+    assert log_in(client, "alice") == 302
+
+
+def test_lockout_is_per_ip(client: FlaskClient, make_user: MakeUser) -> None:
+    make_user("alice")
+    attacker = {"REMOTE_ADDR": "203.0.113.9"}
+    for _ in range(MAX_FAILED_LOGINS + 3):
+        client.post("/login", data={"identifier": "alice", "password": "x"}, environ_base=attacker)
+    assert log_in(client, "alice") == 302
+
+
+def test_password_spraying_limited_per_ip(client: FlaskClient) -> None:
+    for i in range(MAX_FAILED_LOGINS_PER_IP):
+        assert log_in(client, f"user{i}", "password123") == 200
+    assert log_in(client, "another", "password123") == 429
+
+
+def test_locked_attempts_are_recorded(client: FlaskClient, make_user: MakeUser) -> None:
+    make_user("alice")
+    for _ in range(MAX_FAILED_LOGINS + 2):
+        log_in(client, "alice", "wrong-pass")
+    assert len(db.session.scalars(select(LoginAttempt)).all()) == MAX_FAILED_LOGINS + 2
+
+
+def test_unauthorized_get_keeps_next_post_drops_it(client: FlaskClient) -> None:
+    assert client.get("/verify/pending").location == "/login?next=/verify/pending"
+    assert client.post("/verify/resend").location == "/login"
