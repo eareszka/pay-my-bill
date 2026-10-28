@@ -1,20 +1,32 @@
 import smtplib
+from urllib.parse import urlsplit
 
-from flask import Blueprint, current_app, flash, redirect, render_template, url_for
-from flask_login import current_user, login_user
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.wrappers import Response
 
-from app.auth import login_required
+from app.auth import is_locked_out, login_required, record_login_attempt
 from app.extensions import db
-from app.forms import EmptyForm, SignupForm
+from app.forms import EmptyForm, LoginForm, SignupForm
 from app.mail import send_email
 from app.models import User, utcnow
 from app.tokens import VERIFY_EMAIL, VERIFY_MAX_AGE, make_token, read_token
 
 bp = Blueprint("auth", __name__)
+
+# Compared against when the identifier matches no user, so both paths take the same time.
+_DUMMY_HASH = generate_password_hash("not-a-real-password")
+
+
+def safe_next(target: str | None) -> str:
+    if target and target.startswith("/") and "\\" not in target:
+        parts = urlsplit(target)
+        if not parts.scheme and not parts.netloc:
+            return target
+    return url_for("main.index")
 
 
 def send_verification(user: User) -> None:
@@ -105,4 +117,37 @@ def verify(token: str) -> Response:
         user.email_verified_at = utcnow()
         db.session.commit()
     flash("Your email is verified. Welcome!", "success")
+    return redirect(url_for("main.index"))
+
+
+@bp.route("/login", methods=["GET", "POST"])
+def login() -> str | Response | tuple[str, int]:
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+    form = LoginForm()
+    if form.validate_on_submit():
+        identifier = form.identifier.data or ""
+        user = db.session.scalar(
+            select(User).where(or_(User.username == identifier, User.email == identifier))
+        )
+        if user is not None:
+            identifier = user.username
+        if is_locked_out(identifier):
+            form.password.errors.append("Too many failed attempts. Try again in 15 minutes.")
+            return render_template("auth/login.html", form=form), 429
+        password = form.password.data or ""
+        ok = check_password_hash(user.password_hash if user else _DUMMY_HASH, password)
+        record_login_attempt(identifier, request.remote_addr, ok and user is not None)
+        if user is not None and ok:
+            login_user(user)
+            return redirect(safe_next(request.args.get("next")))
+        form.password.errors.append("Wrong username, email, or password.")
+    return render_template("auth/login.html", form=form)
+
+
+@bp.post("/logout")
+def logout() -> Response:
+    if EmptyForm().validate_on_submit():
+        logout_user()
+        flash("You're logged out.", "info")
     return redirect(url_for("main.index"))

@@ -8,8 +8,8 @@ Sprint Planning is Monday. #1 was pulled forward on 2026-10-27 because Sprint 0 
 | Story | Issue | Points | Status |
 |---|---|---|---|
 | S1-7 Data model + migrations | #1 | 3 | Done |
-| S1-1 Sign up with email verification | #2 | 5 | In review |
-| S1-2 Log in / log out | #3 | 2 | Ready |
+| S1-1 Sign up with email verification | #2 | 5 | Done |
+| S1-2 Log in / log out | #3 | 2 | In review |
 | S1-3 Profile with region and payment handles | #4 | 3 | Ready |
 | S1-4 Create a post with moderation | #5 | 5 | Ready |
 | S1-5 Feed of open posts | #6 | 3 | Ready |
@@ -20,6 +20,7 @@ Sprint Planning is Monday. #1 was pulled forward on 2026-10-27 because Sprint 0 
 ## Daily log
 - 2026-10-27: Claimed #1. Added `User` and `Post` models, migration 0001, and a `flask seed` command (10 users, 20 posts). Money is integer cents (ADR 0006), and staging now runs `db upgrade` on start. Next: PR for #1, then verify staging after merge. Blocked: none.
 - 2026-10-28: #1 merged. Pulled #2–#7 forward to run back to back, one PR each. Did #2: sign up, email verification, base layout, ADR 0007 (auth stack), and wireframes for the UI stories. Next: #3 log in / log out. Blocked: none.
+- 2026-10-28: #2 merged (#13). The review fixes covered email-bound tokens, safe failure when mail can't send, verified TLS, and ProxyFix. The resend cooldown and async mail are filed as #14 and #15. Did #3: log in and log out, with a DB-backed lockout per account (migration 0002) and safe `next`. Next: #4 profile. Blocked: none.
 
 ## Review
 _(Sunday)_

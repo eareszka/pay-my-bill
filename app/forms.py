@@ -29,5 +29,12 @@ class SignupForm(FlaskForm):
     )
 
 
+class LoginForm(FlaskForm):
+    identifier = StringField(
+        "Username or email", filters=[_lower], validators=[DataRequired(), Length(max=254)]
+    )
+    password = PasswordField("Password", validators=[DataRequired(), Length(max=128)])
+
+
 class EmptyForm(FlaskForm):
     pass
