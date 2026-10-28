@@ -56,6 +56,13 @@ class User(Base):
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")
 
+    is_authenticated = True
+    is_active = True
+    is_anonymous = False
+
+    def get_id(self) -> str:
+        return str(self.id)
+
     @property
     def is_verified(self) -> bool:
         return self.email_verified_at is not None
