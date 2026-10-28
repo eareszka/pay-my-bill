@@ -6,3 +6,8 @@ bp = Blueprint("main", __name__)
 @bp.get("/")
 def index() -> str:
     return render_template("index.html")
+
+
+@bp.get("/rules")
+def rules() -> str:
+    return render_template("rules.html")
