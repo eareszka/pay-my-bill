@@ -16,5 +16,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - Feed of open posts at `/` (#6): newest first, All/Wants/Needs filter, 20 per page, and cards with a kind chip, poster, region, goal, and progress bar. Progress is $0 until confirmed donations arrive in Sprint 2 (ADR 0004).
 - Post detail page `/posts/<id>` (#7): story, poster and region, goal, progress, and the poster's payment handles while the post is open. Pending-review and removed posts return 404 to everyone except the owner and admins. Feed cards and new posts link here.
 
+### Fixed
+- Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
+
 ### Changed
 - Staging runs `flask db upgrade` before starting gunicorn.
