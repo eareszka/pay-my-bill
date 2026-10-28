@@ -83,12 +83,24 @@ def test_hidden_post_visibility(
     resp = client.get(f"/posts/{post.id}")
     assert resp.status_code == expected
     if expected == 200:
-        assert b"Only you and moderators can see" in resp.data
+        banner = (
+            b"Only you and moderators can see" if viewer == "owner" else b"hidden from everyone"
+        )
+        assert banner in resp.data
         assert b"Chip in" not in resp.data
 
 
 def test_missing_post_404(client: FlaskClient) -> None:
     assert client.get("/posts/999").status_code == 404
+    assert client.get("/posts/99999999999999999999").status_code == 404
+
+
+def test_open_post_without_handles(client: FlaskClient, make_user: MakeUser) -> None:
+    post = add_post(make_user("bob"))
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Chip in" in page
+    assert "hasn't added a way to get paid yet" in page
+    assert "Send money straight" not in page
 
 
 def test_feed_card_links_to_detail(client: FlaskClient, owner: User) -> None:

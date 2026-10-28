@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import current_user
 from sqlalchemy import func, select
+from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
 from app.auth import verified_required
@@ -13,6 +14,7 @@ bp = Blueprint("posts", __name__, url_prefix="/posts")
 
 ACTIVE_STATUSES = (PostStatus.OPEN, PostStatus.PENDING_REVIEW)
 PUBLIC_STATUSES = (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
+MAX_DB_INT = 2**31 - 1
 
 
 def active_post_count(user: User) -> int:
@@ -69,7 +71,11 @@ def can_view(post: Post) -> bool:
 
 @bp.get("/<int:post_id>")
 def show(post_id: int) -> str:
-    post = db.session.get(Post, post_id)
+    post = (
+        db.session.get(Post, post_id, options=[joinedload(Post.user)])
+        if post_id <= MAX_DB_INT
+        else None
+    )
     if post is None or not can_view(post):
         abort(404)
     return render_template("posts/show.html", post=post)

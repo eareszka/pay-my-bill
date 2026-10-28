@@ -1,0 +1,4 @@
+<div class="card-head">
+  <span class="chip chip-{{ post.kind.value }}">{{ post.kind.value | capitalize }}</span>
+  <span class="muted"><a href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a>{% if post.user.region %} · {{ post.user.region }}{% endif %}</span>
+</div>
