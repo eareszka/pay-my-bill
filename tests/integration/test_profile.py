@@ -26,6 +26,7 @@ def test_profile_form_renders(client: FlaskClient, make_user: MakeUser) -> None:
     assert 'value="@alice"' in page
     assert '<option selected value="FL">' in page
     assert "never use GPS" in page
+    assert "5 to 30 letters" in page
 
 
 def test_save_profile_normalizes_and_shows_handles(
@@ -43,6 +44,7 @@ def test_save_profile_normalizes_and_shows_handles(
     )
     assert "Your payment handles changed" in caplog.text
     assert "Cash App: (none) -> $maria" in caplog.text
+    assert "PayPal: (none) -> paypal.me/MariaG" in caplog.text
 
     page = client.get("/u/ALICE").get_data(as_text=True)
     assert "Sarasota, FL" in page
@@ -123,5 +125,19 @@ def test_public_profile_without_handles(client: FlaskClient, make_user: MakeUser
     assert "No payment handles yet." in page
 
 
-def test_public_profile_404(client: FlaskClient) -> None:
+def test_public_profile_404(client: FlaskClient, make_user: MakeUser) -> None:
+    make_user("bob", verified=False, venmo_handle="@bobby")
     assert client.get("/u/nobody").status_code == 404
+    assert client.get("/u/bob").status_code == 404
+
+
+@pytest.mark.parametrize("blank", ["   ", "	"])
+def test_whitespace_handle_saved_as_none(
+    client: FlaskClient, make_user: MakeUser, blank: str
+) -> None:
+    user = make_user()
+    login_as(client, user)
+    client.post("/profile", data={**FORM, "cashapp_handle": blank, "city": "  ", "state": ""})
+    assert user.cashapp_handle is None
+    assert user.city is None
+    assert user.paypal_handle == "MariaG"

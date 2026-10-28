@@ -1,6 +1,6 @@
 import re
 
-CASHAPP_RE = re.compile(r"^\$?([A-Za-z0-9_-]{1,20})$")
+CASHAPP_RE = re.compile(r"^\$?((?=[A-Za-z0-9]*[A-Za-z])[A-Za-z0-9]{1,20})$")
 VENMO_RE = re.compile(r"^@?([A-Za-z0-9_-]{5,30})$")
 PAYPAL_RE = re.compile(r"^(?:(?:https?://)?(?:www\.)?paypal\.me/)?([A-Za-z0-9]{1,20})/?$", re.I)
 

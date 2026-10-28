@@ -5,7 +5,7 @@ from app.payment_links import normalize_cashapp, normalize_paypal, normalize_ven
 
 @pytest.mark.parametrize(
     ("raw", "expected"),
-    [("$maria", "$maria"), (" maria_g ", "$maria_g"), ("", None), (None, None)],
+    [("$maria", "$maria"), (" maria88 ", "$maria88"), ("", None), (None, None)],
 )
 def test_cashapp(raw: str | None, expected: str | None) -> None:
     assert normalize_cashapp(raw) == expected
@@ -35,6 +35,8 @@ def test_paypal(raw: str, expected: str) -> None:
     [
         (normalize_cashapp, "$has space"),
         (normalize_cashapp, "$" + "a" * 21),
+        (normalize_cashapp, "$maria_g"),
+        (normalize_cashapp, "$12345"),
         (normalize_venmo, "@abc"),
         (normalize_venmo, "@bad!name"),
         (normalize_paypal, "paypal.com/me/x"),

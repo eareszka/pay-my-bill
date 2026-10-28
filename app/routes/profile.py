@@ -13,6 +13,8 @@ from app.models import User
 
 bp = Blueprint("profile", __name__)
 
+DISPLAY_PREFIX = {"PayPal": "paypal.me/"}
+
 HANDLE_FIELDS = {
     "cashapp_handle": "Cash App",
     "venmo_handle": "Venmo",
@@ -23,8 +25,11 @@ HANDLE_FIELDS = {
 def send_handle_change_notice(
     user: User, changes: dict[str, tuple[str | None, str | None]]
 ) -> None:
+    def show(label: str, handle: str | None) -> str:
+        return DISPLAY_PREFIX.get(label, "") + handle if handle else "(none)"
+
     lines = [
-        f"- {label}: {old or '(none)'} -> {new or '(none)'}"
+        f"- {label}: {show(label, old)} -> {show(label, new)}"
         for label, (old, new) in changes.items()
     ]
     body = (
@@ -63,6 +68,6 @@ def edit() -> str | Response:
 @bp.get("/u/<username>")
 def show(username: str) -> str:
     user = db.session.scalar(select(User).where(User.username == username.lower()))
-    if user is None:
+    if user is None or not user.is_verified:
         abort(404)
     return render_template("profile/show.html", user=user)

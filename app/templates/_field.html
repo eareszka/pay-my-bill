@@ -2,6 +2,7 @@
   <label class="field">
     <span>{{ f.label.text }}</span>
     {{ f(**kwargs) }}
+    {% if f.description and not f.errors %}<small>{{ f.description }}</small>{% endif %}
     {% for error in f.errors %}<small class="error">{{ error }}</small>{% endfor %}
   </label>
 {% endmacro %}

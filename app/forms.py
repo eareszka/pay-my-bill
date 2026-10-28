@@ -21,6 +21,10 @@ def _lower(value: str | None) -> str | None:
     return value.strip().lower() if value else value
 
 
+def _strip_to_none(value: str | None) -> str | None:
+    return (value or "").strip() or None
+
+
 class SignupForm(FlaskForm):
     username = StringField(
         "Username",
@@ -57,13 +61,13 @@ def _handle_field(label: str, normalize: Callable[[str | None], str | None], hin
         except ValueError:
             raise ValidationError(hint) from None
 
-    return StringField(label, validators=[Optional(), check], description=hint)
+    return StringField(
+        label, filters=[_strip_to_none], validators=[Optional(), check], description=hint
+    )
 
 
 class ProfileForm(FlaskForm):
-    city = StringField(
-        "City", filters=[lambda v: v.strip() if v else None], validators=[Length(max=80)]
-    )
+    city = StringField("City", filters=[_strip_to_none], validators=[Length(max=80)])
     state = SelectField(
         "State",
         choices=[SelectChoice("", "Choose a state")]
@@ -71,7 +75,9 @@ class ProfileForm(FlaskForm):
         validate_choice=True,
     )
     cashapp_handle = _handle_field(
-        "Cash App", normalize_cashapp, "Your $cashtag: up to 20 letters or numbers."
+        "Cash App",
+        normalize_cashapp,
+        "Your $cashtag: up to 20 letters or numbers, with at least one letter.",
     )
     venmo_handle = _handle_field(
         "Venmo", normalize_venmo, "Your @username: 5 to 30 letters, numbers, - or _."
