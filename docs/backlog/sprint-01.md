@@ -46,4 +46,33 @@ As a **visitor**, I want to **open a post** so that **I can read the full story 
 - [ ] User and Post models with Alembic migration 0001.
 - [ ] `seed.py` creates 10 users and 20 posts for dev.
 
+---
+
+## Wireframes (phone width, 360px)
+
+```
+S1-1 /signup            S1-2 /login             S1-3 /profile
++------------------+    +------------------+    +------------------+
+| Pay My Bill  [..]|    | Pay My Bill  [..]|    | Pay My Bill  [..]|
+| Create account   |    | Log in           |    | Your profile     |
+| [username      ] |    | [user or email ] |    | [city          ] |
+| [email         ] |    | [password      ] |    | [state  v]       |
+| [password      ] |    | [ Log in       ] |    | [$cashtag      ] |
+| [confirm       ] |    | New? Sign up     |    | [@venmo        ] |
+| [ Sign up      ] |    +------------------+    | [paypal.me/    ] |
++------------------+                            | [ Save         ] |
+                                                +------------------+
+S1-4 /posts/new         S1-5 /                  S1-6 /posts/<id>
++------------------+    +------------------+    +------------------+
+| New post         |    | [All][Want][Need]|    | Car battery died |
+| (o) Need ( ) Want|    | +--------------+ |    | (NEED)           |
+| [title         ] |    | | Title  (NEED)| |    | @maria_g · Tampa |
+| [story         ] |    | | $0 of $120   | |    | $0 of $120       |
+| [goal $        ] |    | | [==        ] | |    | [==          ]   |
+| [x] I agree to   |    | +--------------+ |    | Story text ...   |
+|     the Rules    |    | +--------------+ |    | Pay with:        |
+| [ Post         ] |    | | ...          | |    | Cash App $maria  |
++------------------+    +------------------+    +------------------+
+```
+
 **Total: 23 pts.** This is a first-sprint guess with no velocity history yet. Expect to carry over S1-6 if needed.
