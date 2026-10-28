@@ -25,14 +25,14 @@ A feel-good community where anyone can post an everyday want or need, and anyone
 
 ## Success metrics (closed beta)
 - At least 50% of posts receive one or more confirmed donations
-- At least 40% of funded posts get a thank-you
 - At least 30% of donors give again within 2 weeks
 - Under 2% of published posts are removed for violating the fundraising rule
+- At least 70% of funded posts get a results update within 7 days (ADR 0008)
 
 ## Scope by release
 | Release | Scope |
 |---|---|
-| v0.1-alpha | Auth, posts, link-out donations with confirmation, XP/levels/badges/streaks, leaderboards, thank-yous, kudos, reports and admin queue, PWA |
+| v0.1-alpha | Auth (18+), posts, link-out donations with confirmation, XP/levels/badges/streaks, leaderboards ranked by people helped (ADR 0009), required results updates (ADR 0008), kudos, reports and admin queue, post and account deletion, ToS/Privacy pages, PWA |
 | v0.2-beta | Production deploy, closed beta, notifications, fixes from beta feedback |
 | v1.0 | Public launch after legal review; possibly an iOS wrapper |
 
@@ -43,4 +43,11 @@ A feel-good community where anyone can post an everyday want or need, and anyone
 | Scam or fundraising posts | Medium | High | $1,000 ask cap; keyword flag queue; reports; admin removal and bans |
 | Payment app deep-link formats change | Medium | Medium | Isolated in `payment_links.py` with its own tests |
 | Scope creep | High | Medium | Release scope is frozen here; new ideas go into the backlog |
-| Legal exposure (ToS, privacy, harassment) | Low | High | Draft policies; lawyer review before v1.0 |
+| Legal exposure (ToS, privacy, harassment, scam liability) | Medium | High | ToS/Privacy pages and 18+ rule in v0.1; consider an LLC; lawyer review before v1.0 |
+| Posters vanish after being funded | Medium | High | Required results updates; overdue blocks new posts (ADR 0008) |
+| Recipients never confirm donations, so donors get no credit | High | Medium | Confirm reminders; auto-expire pending after 14 days; results-update loop |
+| Payment apps' terms restrict soliciting personal payments | Medium | High | Spike to review Cash App, Venmo, and PayPal terms before beta |
+| Recipients surprised by tax forms (1099-K) | Low | Medium | Note in the FAQ to send as personal/friends payments; not tax advice |
+| Free staging Postgres expires (~2026-11-26) | High | Low | Paid plan or documented re-create before the date |
+| Cold start: no donors at launch | High | High | Beta recruitment plan; seed with a known community before opening up |
+| "Pay My Bill" is generic and collides with utility billing pages (search, trademark) | High | Medium | Spike to choose a distinctive name and domain before launch |
