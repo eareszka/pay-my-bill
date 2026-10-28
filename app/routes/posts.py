@@ -1,6 +1,7 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import current_user
 from sqlalchemy import func, select
+from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
 from app.auth import verified_required
@@ -12,6 +13,8 @@ from app.moderation import is_flagged
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
 ACTIVE_STATUSES = (PostStatus.OPEN, PostStatus.PENDING_REVIEW)
+PUBLIC_STATUSES = (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
+MAX_DB_INT = 2**31 - 1
 
 
 def active_post_count(user: User) -> int:
@@ -39,22 +42,40 @@ def new() -> str | Response | tuple[str, int]:
         if form.require_rules:
             user.rules_accepted_at = utcnow()
         flagged = is_flagged(form.title.data, form.body.data)
-        db.session.add(
-            Post(
-                user=user,
-                kind=PostKind(form.kind.data),
-                title=form.title.data,
-                body=form.body.data,
-                goal_cents=form.goal_cents,
-                status=PostStatus.PENDING_REVIEW if flagged else PostStatus.OPEN,
-            )
+        post = Post(
+            user=user,
+            kind=PostKind(form.kind.data),
+            title=form.title.data,
+            body=form.body.data,
+            goal_cents=form.goal_cents,
+            status=PostStatus.PENDING_REVIEW if flagged else PostStatus.OPEN,
         )
+        db.session.add(post)
         db.session.commit()
         if flagged:
             flash("Thanks! Your post will show in the feed after a quick review.", "info")
         else:
             flash("Your post is live.", "success")
-        return redirect(url_for("main.index"))
+        return redirect(url_for("posts.show", post_id=post.id))
     db.session.rollback()
     page = render_template("posts/new.html", form=form, at_limit=at_limit)
     return page, 409 if at_limit and form.is_submitted() else 200
+
+
+def can_view(post: Post) -> bool:
+    if post.status in PUBLIC_STATUSES:
+        return True
+    viewer: User | None = current_user if current_user.is_authenticated else None
+    return viewer is not None and (viewer.id == post.user_id or viewer.is_admin)
+
+
+@bp.get("/<int:post_id>")
+def show(post_id: int) -> str:
+    post = (
+        db.session.get(Post, post_id, options=[joinedload(Post.user)])
+        if post_id <= MAX_DB_INT
+        else None
+    )
+    if post is None or not can_view(post):
+        abort(404)
+    return render_template("posts/show.html", post=post)
