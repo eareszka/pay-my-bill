@@ -11,7 +11,7 @@
     <a class="brand" href="{{ url_for('main.index') }}">Pay My Bill</a>
     <nav>
       {% if current_user.is_authenticated %}
-        <span class="who">{{ current_user.username }}</span>
+        <a href="{{ url_for('profile.edit') }}">{{ current_user.username }}</a>
         <form method="post" action="{{ url_for('auth.logout') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn-link">Log out</button>
