@@ -69,6 +69,10 @@ class User(Base):
         return self.email_verified_at is not None
 
     @property
+    def region(self) -> str | None:
+        return f"{self.city}, {self.state}" if self.city and self.state else None
+
+    @property
     def has_payment_handle(self) -> bool:
         return any((self.cashapp_handle, self.venmo_handle, self.paypal_handle))
 
@@ -95,6 +99,15 @@ class Post(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="posts")
+
+    @property
+    def raised_cents(self) -> int:
+        # Only recipient-confirmed donations count (ADR 0004); donations arrive in Sprint 2.
+        return 0
+
+    @property
+    def progress_percent(self) -> int:
+        return min(100, self.raised_cents * 100 // self.goal_cents)
 
 
 class LoginAttempt(Base):

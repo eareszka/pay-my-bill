@@ -2,6 +2,6 @@
 {% block title %}{{ user.username }} · Pay My Bill{% endblock %}
 {% block content %}
   <h1>{{ user.username }}</h1>
-  {% if user.city and user.state %}<p class="muted">{{ user.city }}, {{ user.state }}</p>{% endif %}
+  {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
   {% include "profile/_handles.html" %}
 {% endblock %}

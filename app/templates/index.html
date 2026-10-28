@@ -1,5 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Pay My Bill</h1>
-  <p>Post an everyday want or need, or chip in to help someone else.</p>
+  <h1>Help someone out</h1>
+  <nav class="tabs" aria-label="Filter posts">
+    {% for value, label in [(None, "All"), ("want", "Wants"), ("need", "Needs")] %}
+      <a href="{{ url_for('main.index', kind=value) }}" {% if kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  {% if posts %}
+    <ul class="cards">
+      {% for post in posts %}
+        <li class="card">
+          {% include "posts/_card.html" %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% elif page > 1 %}
+    <p class="empty">No more posts.</p>
+  {% else %}
+    <p class="empty">No open posts here yet.
+      {% if current_user.is_authenticated %}<a href="{{ url_for('posts.new') }}">Post a want or need</a>{% else %}<a href="{{ url_for('auth.signup') }}">Sign up</a> to post one{% endif %}.</p>
+  {% endif %}
+  {% if page > 1 or has_next %}
+    <nav class="pager" aria-label="Pages">
+      {% if page > 1 %}<a href="{{ url_for('main.index', kind=kind, page=page - 1) }}">Newer</a>{% endif %}
+      {% if has_next %}<a class="pager-next" href="{{ url_for('main.index', kind=kind, page=page + 1) }}">Older</a>{% endif %}
+    </nav>
+  {% endif %}
 {% endblock %}

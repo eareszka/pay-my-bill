@@ -64,6 +64,11 @@ def test_post_enums_stored_as_values(app: Flask) -> None:
     assert tuple(row) == ("need", "open")
 
 
+def test_post_progress_starts_at_zero(app: Flask) -> None:
+    post = make_post(make_user())
+    assert (post.raised_cents, post.progress_percent) == (0, 0)
+
+
 def test_post_goal_at_cap_is_allowed(app: Flask) -> None:
     db.session.add(make_post(make_user(), goal_cents=MAX_GOAL_CENTS))
     db.session.commit()
