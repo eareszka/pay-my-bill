@@ -41,10 +41,16 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     from app.routes.auth import bp as auth_bp
     from app.routes.health import bp as health_bp
     from app.routes.main import bp as main_bp
+    from app.routes.posts import bp as posts_bp
     from app.routes.profile import bp as profile_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(posts_bp)
+
+    from app.money import format_cents
+
+    app.add_template_filter(format_cents, "cents")
     return app

@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Mobile-first base layout and stylesheet.
 - Log in and log out (#3). More than five failed logins for one account from one IP, or twenty from one IP overall, within 15 minutes returns 429. Attempts are stored in a new `login_attempts` table (migration 0002), and `next` redirects must be local.
 - Profile (#4): self-reported city and state (no GPS), plus Cash App, Venmo, and PayPal handles, validated and normalized in `app/payment_links.py`. Changing a handle emails a notice to the account. Public profile at `/u/<username>`.
+- Create a post (#5): a Want or Need with a goal up to $1,000 (parsed to cents in `app/money.py`), at most 2 open or in-review posts per user, a payment handle required, and Community Rules (`/rules`) accepted before the first post. Text matching the fundraising keyword list (`app/moderation.py`) goes to `pending_review`.
 
 ### Changed
 - Staging runs `flask db upgrade` before starting gunicorn.

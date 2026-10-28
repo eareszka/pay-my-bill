@@ -2,7 +2,17 @@ from collections.abc import Callable
 from typing import Any
 
 from flask_wtf import FlaskForm
-from wtforms import EmailField, Field, PasswordField, SelectChoice, SelectField, StringField
+from wtforms import (
+    BooleanField,
+    EmailField,
+    Field,
+    PasswordField,
+    RadioField,
+    SelectChoice,
+    SelectField,
+    StringField,
+    TextAreaField,
+)
 from wtforms.validators import (
     DataRequired,
     Email,
@@ -13,6 +23,8 @@ from wtforms.validators import (
     ValidationError,
 )
 
+from app.models import MAX_GOAL_CENTS, PostKind
+from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo
 from app.regions import US_STATES
 
@@ -89,6 +101,49 @@ class ProfileForm(FlaskForm):
     def validate_state(self, field: Field) -> None:
         if bool(self.city.data) != bool(field.data):
             raise ValidationError("Enter both a city and a state, or neither.")
+
+
+class PostForm(FlaskForm):
+    kind = RadioField(
+        "This is a",
+        choices=[
+            SelectChoice(PostKind.NEED.value, "Need"),
+            SelectChoice(PostKind.WANT.value, "Want"),
+        ],
+        validators=[DataRequired(message="Choose Need or Want.")],
+    )
+    title = StringField(
+        "Title", filters=[_strip_to_none], validators=[DataRequired(), Length(min=3, max=80)]
+    )
+    body = TextAreaField(
+        "Your story",
+        filters=[_strip_to_none],
+        validators=[DataRequired(), Length(min=10, max=2000)],
+        description="What it's for and why. Be honest; people can see your history.",
+    )
+    goal = StringField(
+        "Goal amount",
+        filters=[_strip_to_none],
+        validators=[DataRequired()],
+        description=f"Up to {format_cents(MAX_GOAL_CENTS)}.",
+    )
+    accept_rules = BooleanField("I agree to the Community Rules")
+
+    goal_cents = 0
+
+    def validate_goal(self, field: Field) -> None:
+        try:
+            cents = parse_dollars(field.data)
+        except ValueError:
+            raise ValidationError("Enter a dollar amount, like 120 or 45.50.") from None
+        if cents <= 0:
+            raise ValidationError("The goal has to be more than $0.")
+        if cents > MAX_GOAL_CENTS:
+            raise ValidationError(
+                f"Goals are capped at {format_cents(MAX_GOAL_CENTS)}. Pay My Bill is for "
+                "everyday wants and needs."
+            )
+        self.goal_cents = cents
 
 
 class EmptyForm(FlaskForm):
