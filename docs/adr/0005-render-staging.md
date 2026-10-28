@@ -18,3 +18,6 @@ Render was chosen over Fly.io because:
 - Free Postgres databases expire 30 days after creation. Recreate the database or upgrade the plan before then, and keep no data worth losing on staging.
 - `psycopg2-binary` and `gunicorn` become runtime dependencies.
 - Revisit hosting for prod at v0.2-beta in a new ADR.
+
+## Amendment (2026-10-28, #23)
+SQLAlchemy 2.1 made psycopg 3 the default driver for `postgresql://` URLs, so the psycopg2-only install crashed at boot and every staging deploy after #12 failed. The driver is now `psycopg[binary]` (v3). `create_app` rewrites any Postgres URL scheme to `postgresql+psycopg://`, and SQLAlchemy is pinned to `>=2.1,<2.2` so a future default change can't silently break deploys again. The hosting decision is unchanged.

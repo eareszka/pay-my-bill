@@ -11,9 +11,9 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 def database_url(raw: str) -> str:
     """Pin Postgres URLs to psycopg 3, whatever scheme the host hands us."""
-    for scheme in ("postgres://", "postgresql://", "postgresql+psycopg2://"):
-        if raw.startswith(scheme):
-            return "postgresql+psycopg://" + raw.removeprefix(scheme)
+    scheme, sep, rest = raw.partition("://")
+    if sep and scheme.lower().split("+")[0] in {"postgres", "postgresql"}:
+        return f"postgresql+psycopg://{rest}"
     return raw
 
 
@@ -22,9 +22,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app = Flask(__name__)
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-not-secret"),
-        SQLALCHEMY_DATABASE_URI=database_url(
-            os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db")
-        ),
+        SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db"),
         MAIL_SERVER=os.environ.get("MAIL_SERVER", ""),
         MAIL_PORT=int(os.environ.get("MAIL_PORT") or 587),
         MAIL_USERNAME=os.environ.get("MAIL_USERNAME", ""),
@@ -33,6 +31,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     )
     if config:
         app.config.update(config)
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url(app.config["SQLALCHEMY_DATABASE_URI"])
     app.logger.setLevel(logging.INFO)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
 

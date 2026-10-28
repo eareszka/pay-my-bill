@@ -45,7 +45,7 @@ def test_seed_refuses_twice(app: Flask) -> None:
 
 
 def test_seed_refuses_non_sqlite(app: Flask) -> None:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://staging/db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg://staging/db"
     with pytest.raises(SeedError, match="SQLite"):
         seed()
 
