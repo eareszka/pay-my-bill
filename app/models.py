@@ -96,6 +96,15 @@ class Post(Base):
 
     user: Mapped[User] = relationship(back_populates="posts")
 
+    @property
+    def raised_cents(self) -> int:
+        # Only recipient-confirmed donations count (ADR 0004); donations arrive in Sprint 2.
+        return 0
+
+    @property
+    def progress_percent(self) -> int:
+        return min(100, self.raised_cents * 100 // self.goal_cents)
+
 
 class LoginAttempt(Base):
     __tablename__ = "login_attempts"

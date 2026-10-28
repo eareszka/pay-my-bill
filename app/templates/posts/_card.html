@@ -1,0 +1,9 @@
+<div class="card-head">
+  <span class="chip chip-{{ post.kind.value }}">{{ post.kind.value | capitalize }}</span>
+  <span class="muted">{{ post.user.username }}{% if post.user.state %} · {{ post.user.city }}, {{ post.user.state }}{% endif %}</span>
+</div>
+<h2 class="card-title">{{ post.title }}</h2>
+<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ post.progress_percent }}" aria-label="Progress toward goal">
+  <span style="width: {{ post.progress_percent }}%"></span>
+</div>
+<p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
