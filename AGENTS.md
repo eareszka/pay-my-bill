@@ -54,6 +54,9 @@ flask --app app run
 - New posts are checked against the fundraising keyword list (invest, startup, business, equity, seed, LLC, inventory, pre-order, launch, crowdfund, shares, ROI, …). A match sets the post to `pending_review`, and it's hidden from the feed.
 - Donations go `pending` → `confirmed` | `disputed`. Only the recipient can confirm.
 - Leaderboards only count confirmed donations from verified accounts older than 3 days. Anything over $200/week for one donor→recipient pair is excluded and flagged.
+- Leaderboards rank by **distinct recipients helped**, never by dollars (ADR 0009).
+- A post that closes with any confirmed donation owes a **results update** within 7 days (note ≥ 20 chars, optional photo, never a required receipt). While one is overdue, that user can't create posts (ADR 0008).
+- `pending` donations auto-expire after 14 days with no credit (T15). Users must attest they're 18+ at signup (T13).
 - Region is self-reported city and state. No GPS.
 - Every form needs a CSRF token. Passwords are hashed. Logins are rate-limited.
 
@@ -68,6 +71,7 @@ flask --app app run
 - Key modules: `app/auth.py` (typed `login_required`, `verified_required`, login throttle), `app/mail.py` (console unless `MAIL_SERVER` is set), `app/tokens.py`, `app/moderation.py`, `app/money.py` (dollars ↔ cents), `app/payment_links.py` (handle normalization; Sprint 2 adds deep links), and `app/regions.py`. Templates live in `app/templates/` and use `_field.html` and `posts/_meta.html`/`_progress.html` partials.
 - Testing gotchas: use `tests.conftest.login_as` and the `make_user` fixture. Requests made inside an already-pushed app context share `g`, so build test apps outside it. `migrations/env.py` keeps existing loggers enabled. Headless Edge can't go below a 492px viewport, so check 360px by rendering pages inside 360px iframes.
 - **Backlog follow-ups from reviews:** #14 resend cooldown, #15 async mail + `login_attempts` pruning, #21 keep a handle while a post is open. Payment deep links, donations, and confirmation belong to Sprint 2.
+- **Product backlog:** `docs/backlog/product-backlog.md` lists the stories and spikes from ADRs 0008/0009 and threat-model cases T11–T15, each with a GitHub issue. Pull from it at Sprint Planning.
 
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:
