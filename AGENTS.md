@@ -23,7 +23,7 @@ Read this file fully before making any change. The project is run as a professio
 ## Stack and commands
 - Python 3.12, Flask app factory in `app/__init__.py`, blueprints in `app/routes/`
 - Models live in `app/models.py` and subclass `Base` from `app/extensions.py` (not `db.Model`, which mypy can't type). Migrations live in `migrations/` (`flask --app app db migrate -m "..."`). Money is integer cents (ADR 0006).
-- Planned modules: `app/rewards.py`, `app/leaderboard.py`, `app/moderation.py`, `app/payment_links.py`
+- Planned modules: `app/rewards.py`, `app/leaderboard.py` (`app/moderation.py` and `app/payment_links.py` exist now)
 - Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, from Sprint 4)
 
 ```powershell
@@ -57,14 +57,17 @@ flask --app app run
 - Region is self-reported city and state. No GPS.
 - Every form needs a CSRF token. Passwords are hashed. Logins are rate-limited.
 
-## Current state (2026-10-27)
+## Current state (2026-10-28)
 - **Sprint 0 (foundation)** is done. The repo, tooling, CI, templates, docs, the `/health` skeleton, and staging are finished, and tests pass at 100% coverage.
 - The private GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
 - **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
 - **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
 - **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The free Postgres expires 30 days after creation (around 2026-11-26), so recreate or upgrade it before then.
 - The Sprint 0 Review and Retro are left for the owner to write on Sunday.
-- **Sprint 1, "Users can sign up and post":** issues #1–#7 (23 points). #1 (S1-7, data model + migrations) was pulled forward and is in progress. #2–#7 can start once it merges.
+- **Sprint 1, "Users can sign up and post"** is done: issues #1–#7 (23 points) merged through PRs #12, #13, #16–#20. The app has sign-up with email verification, log in and out with a DB-backed lockout (migration 0002, ADR 0007), a profile with region and payment handles, post creation with the $1,000 cap, 2 open posts, Community Rules, and the fundraising keyword flag, a feed, and post detail pages. Tests: 199, 100% coverage.
+- Key modules: `app/auth.py` (typed `login_required`, `verified_required`, login throttle), `app/mail.py` (console unless `MAIL_SERVER` is set), `app/tokens.py`, `app/moderation.py`, `app/money.py` (dollars ↔ cents), `app/payment_links.py` (handle normalization; Sprint 2 adds deep links), and `app/regions.py`. Templates live in `app/templates/` and use `_field.html` and `posts/_meta.html`/`_progress.html` partials.
+- Testing gotchas: use `tests.conftest.login_as` and the `make_user` fixture. Requests made inside an already-pushed app context share `g`, so build test apps outside it. `migrations/env.py` keeps existing loggers enabled. Headless Edge can't go below a 492px viewport, so check 360px by rendering pages inside 360px iframes.
+- **Backlog follow-ups from reviews:** #14 resend cooldown, #15 async mail + `login_attempts` pruning, #21 keep a handle while a post is open. Payment deep links, donations, and confirmation belong to Sprint 2.
 
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:

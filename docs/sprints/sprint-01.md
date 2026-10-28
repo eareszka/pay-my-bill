@@ -13,7 +13,7 @@ Sprint Planning is Monday. #1 was pulled forward on 2026-10-27 because Sprint 0 
 | S1-3 Profile with region and payment handles | #4 | 3 | Done |
 | S1-4 Create a post with moderation | #5 | 5 | Done |
 | S1-5 Feed of open posts | #6 | 3 | Done |
-| S1-6 Post detail page | #7 | 2 | In review |
+| S1-6 Post detail page | #7 | 2 | Done |
 
 **Total:** 23 points. There's no velocity history yet, so S1-6 may carry over.
 
@@ -25,6 +25,7 @@ Sprint Planning is Monday. #1 was pulled forward on 2026-10-27 because Sprint 0 
 - 2026-10-28: #4 merged (#17). The review fixed whitespace-only handles being saved and tightened the cashtag rules. Did #5: post form, $1,000 cap, 2 open posts per user, handle and rules gates, and the fundraising keyword flag that sends posts to review. After a post it redirects to `/` until #7 adds the detail page. Next: #6 feed. Blocked: none.
 - 2026-10-28: #5 merged (#18). The review closed the open-post race with a row lock and the hyphen/inflection bypasses in the keyword filter. Did #6: the feed at `/` with a Want/Need filter, pagination, and progress cards. Next: #7 post detail, then a 360px browser check of every page. Blocked: none.
 - 2026-10-28: #6 merged (#19). The review fixed a `?page` overflow 500 and the region display. Did #7: post detail with a visibility matrix and handles, and linked it from feed cards and new posts. 360px check: feed, rules, signup, login, public profile, post detail, new post, and profile edit were rendered in real 360px iframes (headless Edge), with no horizontal scroll. The Chrome extension wasn't connected. That check also led to dropping underlines in the top bar, because they hid the underscores in usernames. Next: sprint close-out docs. Blocked: none.
+- 2026-10-28: #7 merged (#20). All 23 committed points are done before the official sprint start (2026-11-02), so planning on Monday can pull Sprint 2 forward or take on the backlog follow-ups from the reviews: #14 resend cooldown, #15 async mail and `login_attempts` pruning, #21 keep a handle while a post is open. Review and Retro are left for the owner on Sunday. Blocked: none.
 
 ## Review
 _(Sunday)_
