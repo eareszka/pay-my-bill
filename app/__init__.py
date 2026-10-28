@@ -9,6 +9,14 @@ from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
+def database_url(raw: str) -> str:
+    """Pin Postgres URLs to psycopg 3, whatever scheme the host hands us."""
+    scheme, sep, rest = raw.partition("://")
+    if sep and scheme.lower().split("+")[0] in {"postgres", "postgresql"}:
+        return f"postgresql+psycopg://{rest}"
+    return raw
+
+
 def create_app(config: dict[str, Any] | None = None) -> Flask:
     load_dotenv()
     app = Flask(__name__)
@@ -23,6 +31,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     )
     if config:
         app.config.update(config)
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url(app.config["SQLALCHEMY_DATABASE_URI"])
     app.logger.setLevel(logging.INFO)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
 
