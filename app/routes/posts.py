@@ -6,7 +6,7 @@ from werkzeug.wrappers import Response
 
 from app.auth import verified_required
 from app.extensions import db
-from app.forms import PostForm
+from app.forms import GiftForm, PostForm
 from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, utcnow
 from app.moderation import is_flagged
 from app.payment_links import pay_options
@@ -79,4 +79,10 @@ def show(post_id: int) -> str:
     )
     if post is None or not can_view(post):
         abort(404)
-    return render_template("posts/show.html", post=post, pay_options=pay_options(post.user))
+    return render_post(post, GiftForm.for_poster(post.user))
+
+
+def render_post(post: Post, form: GiftForm) -> str:
+    return render_template(
+        "posts/show.html", post=post, pay_options=pay_options(post.user), form=form
+    )

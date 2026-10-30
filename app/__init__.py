@@ -48,6 +48,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     seed.register(app)
 
     from app.routes.auth import bp as auth_bp
+    from app.routes.gifts import bp as gifts_bp
     from app.routes.health import bp as health_bp
     from app.routes.main import bp as main_bp
     from app.routes.posts import bp as posts_bp
@@ -58,6 +59,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(posts_bp)
+    app.register_blueprint(gifts_bp)
 
     from app.money import format_cents
 

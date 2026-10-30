@@ -12,7 +12,7 @@ function sync() {
     const suffix = valid ? link.dataset.amountSep + value.toFixed(2) : "";
     link.setAttribute("href", link.dataset.base + suffix);
   });
-  error.hidden = valid || text === "";
+  if (error) error.hidden = valid || text === "";
 }
 
 if (amount) {
