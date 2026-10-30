@@ -21,6 +21,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - `Donation` model and migration 0003 (#46): a gift's post, donor, amount in cents (capped at $1,000), payment app, and status (`pending`, `confirmed`, `disputed`). Post progress now sums confirmed gifts only (ADR 0004), and `flask seed` adds a few gifts.
 
+- Pay-app buttons on open posts (#43): type an amount once and the Cash App, Venmo, and PayPal buttons open prefilled (`app/static/js/chip-in.js`). Without JS they open the poster's page in each app. Only the poster's apps are shown.
+
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 

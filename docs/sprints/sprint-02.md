@@ -7,8 +7,8 @@ Pulled forward on 2026-10-30, because Sprint 1 finished early. The owner picked 
 ## Committed
 | Story | Issue | Points | Status |
 |---|---|---|---|
-| S2-1 Donation model + migration | #46 | 2 | In progress |
-| S2-2 Pay-app buttons with the amount prefilled | #43 | 2 | To do |
+| S2-1 Donation model + migration | #46 | 2 | Done |
+| S2-2 Pay-app buttons with the amount prefilled | #43 | 2 | In review |
 | S2-3 Record a gift with "I sent it" | #45 | 3 | To do |
 | S2-4 Confirm or dispute gifts on /gifts | #44 | 3 | To do |
 | Auto-expire pending gifts after 14 days | #29 | 2 | To do |
@@ -21,3 +21,4 @@ Pulled forward on 2026-10-30, because Sprint 1 finished early. The owner picked 
 
 ## Daily log
 - 2026-10-30: Merged the roadmap (#41) and the staging DB steps (#42). Planned Sprint 2 and filed #43–#46. Claimed #46. Next: the Donation model. Blocked: none.
+- 2026-10-30: #46 merged (#47). The review added delete-with-post for gifts, a single selectin load, and seed timestamps in order. Skipped for now: a SQL aggregate and extra CHECKs. Did #43: pay-app buttons with the amount prefilled by a small script. Next: #45 "I sent it". Blocked: none.

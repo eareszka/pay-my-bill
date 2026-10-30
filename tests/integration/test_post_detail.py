@@ -38,8 +38,11 @@ def test_open_post_shows_story_poster_goal_progress_and_handles(
     assert "<strong>$0</strong> raised of $250" in page
     assert 'aria-valuenow="0"' in page
     assert "Chip in" in page
-    assert "$mariag" in page
-    assert "paypal.me/MariaG" in page
+    assert 'href="https://cash.app/$mariag" data-amount-sep="/"' in page
+    assert 'href="https://paypal.me/MariaG" data-amount-sep="/"' in page
+    assert "Venmo" not in page
+    assert 'id="chip-amount"' in page
+    assert "js/chip-in.js" in page
 
 
 def test_body_is_escaped(client: FlaskClient, owner: User) -> None:
