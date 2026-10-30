@@ -18,10 +18,13 @@
     {% if post.status == PostStatus.OPEN %}
       <section class="group">
         <h2 class="section-title">Chip in</h2>
-        {% if pay_options %}
+        {% if is_owner %}
+          <p class="hint">This is your post. Share it so people can chip in.</p>
+        {% elif pay_options %}
           <label class="field">
             <span>Amount</span>
             <input id="chip-amount" name="amount" inputmode="decimal" autocomplete="off" placeholder="$20.00">
+            <small id="chip-amount-error" class="error" hidden>Enter an amount like 20 or 12.50, up to {{ MAX_GOAL }}.</small>
           </label>
           <div class="pay-buttons">
             {% for option in pay_options %}

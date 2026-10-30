@@ -54,7 +54,13 @@ def test_pay_options_only_for_set_handles() -> None:
     options = pay_options(user)
     assert [(o.method, o.label, o.handle, o.url, o.amount_sep) for o in options] == [
         (PaymentMethod.CASHAPP, "Cash App", "$mariag", "https://cash.app/$mariag", "/"),
-        (PaymentMethod.VENMO, "Venmo", "@maria-g", "https://venmo.com/maria-g?txn=pay", "&amount="),
+        (
+            PaymentMethod.VENMO,
+            "Venmo",
+            "@maria-g",
+            "https://venmo.com/?txn=pay&recipients=maria-g",
+            "&amount=",
+        ),
     ]
 
 
