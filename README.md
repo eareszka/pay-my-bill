@@ -31,6 +31,16 @@ Config comes only from environment variables (see `.env.example`). Never commit 
 
 Free-tier caveats: the service sleeps after about 15 minutes idle, so the first request can take up to a minute. The free database expires 30 days after creation.
 
+### When the free staging database expires
+The current database expires around 2026-11-26. Staging data is disposable, so recreating it is fine:
+
+1. In the Render dashboard, delete `pay-my-bill-staging-db`.
+2. Open the Blueprint and click **Manual Sync**. Render creates a fresh database from `render.yaml` and reconnects `DATABASE_URL` to the web service.
+3. Redeploy the web service. `flask db upgrade` builds the schema on start.
+4. Check that [`/health`](https://pay-my-bill-staging.onrender.com/health) returns 200.
+
+To keep the data instead, upgrade the database to a paid plan before it expires.
+
 ## Docs
 - [Product requirements](docs/PRD.md)
 - [Development process](docs/process.md): sprints, Definition of Ready and Done, git workflow
