@@ -50,10 +50,11 @@ a { color: var(--accent); }
   border-bottom: 1px solid var(--border);
 }
 
-.topbar nav { display: flex; align-items: center; gap: 12px; }
+.topbar nav { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.topbar nav > * { flex: none; white-space: nowrap; }
+.topbar nav > .nav-user { flex: 0 1 auto; min-width: 2.5rem; overflow: hidden; text-overflow: ellipsis; }
 .topbar a { text-decoration: none; }
-.brand { font-weight: 700; text-decoration: none; color: var(--text); }
-.who { color: var(--muted); }
+.brand { flex: none; font-weight: 700; text-decoration: none; color: var(--text); }
 
 .container { max-width: 640px; margin: 0 auto; padding: 16px; }
 
@@ -135,11 +136,37 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
   background: var(--accent);
   border-radius: 999px;
 }
-.gift-section { margin-bottom: 24px; }
-.gift-section .section-title { margin-bottom: 8px; }
-.gift-line { margin: 0 0 4px; }
-.gift-actions { display: flex; gap: 8px; margin-top: 10px; }
-.gift-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.count { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.gift-section { margin-bottom: 32px; }
+.gift-section > .section-title { margin-bottom: 4px; }
+.gift-section > .hint { margin-bottom: 12px; }
+.gift p { margin: 0; }
+.gift-amount { font-size: 1.5rem; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.gift-meta { margin-top: 2px; }
+.gift-prompt { margin-top: 14px; font-weight: 600; }
+.gift-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.gift-prompt + .gift-actions { margin-top: 10px; }
+.gift-actions form { margin: 0; }
+
+.gift-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.gift-list li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  padding: 12px 14px;
+}
+.gift-list li + li { border-top: 1px solid var(--border); }
+.gift-list-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+.gift-list-for { grid-column: 2 / -1; }
 .progress { height: 8px; overflow: hidden; background: var(--border); border-radius: 999px; }
 .progress span { display: block; height: 100%; background: var(--accent); }
 .amounts { margin: 8px 0 0; }
@@ -174,9 +201,12 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 .pay-buttons small { display: block; font-weight: 400; color: var(--muted); }
 
 .btn {
+  display: inline-block;
   padding: 12px 16px;
   font: inherit;
   font-weight: 600;
+  text-align: center;
+  text-decoration: none;
   color: var(--accent-text);
   background: var(--accent);
   border: 0;
@@ -185,3 +215,4 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 }
 .btn-link { padding: 0; font: inherit; color: var(--accent); background: none; border: 0; cursor: pointer; }
 .btn-secondary { color: var(--text); background: var(--surface); border: 1px solid var(--border); }
+.btn-danger { color: var(--surface); background: var(--error); }

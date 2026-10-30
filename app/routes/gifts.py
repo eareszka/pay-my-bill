@@ -1,6 +1,15 @@
 import smtplib
 
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
@@ -118,7 +127,12 @@ def index() -> str:
         .order_by(Donation.created_at.desc(), Donation.id.desc())
         .limit(MY_GIFTS_LIMIT)
     )
-    return render_template("gifts/index.html", to_confirm=pending_for(user), sent=list(sent))
+    return render_template(
+        "gifts/index.html",
+        to_confirm=pending_for(user),
+        sent=list(sent),
+        disputing=request.args.get("dispute", type=int),
+    )
 
 
 @bp.post("/gifts/<int:donation_id>/<any(confirm, dispute):action>")

@@ -46,6 +46,7 @@ flask --app app run
   - CHANGELOG `[Unreleased]` is updated
   - An ADR is added for any architectural decision
 - **Update the sprint record** in `docs/sprints/sprint-NN.md`: add a daily-log line with what you did, what's next, and any blockers, and update the story status.
+- **Frontend design uses the Impeccable skill** (the owner requires it; `npx impeccable install` sets it up for Claude Code, Codex, or Cursor). `PRODUCT.md` holds the product context, and `.impeccable/surfaces/` holds each screen's brief. Ask the owner before deciding user stories, backend approach, or how the frontend looks.
 - Keep code style consistent with the existing code: typed functions, small modules, no unnecessary comments.
 - **Secrets:** never commit `.env`. Config comes from environment variables only (see `.env.example`).
 

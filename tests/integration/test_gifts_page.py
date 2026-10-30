@@ -54,18 +54,36 @@ def test_lists_gifts_to_confirm_and_my_gifts(
     login_as(client, poster)
     page = client.get("/gifts").get_data(as_text=True)
     to_confirm, sent = page.split("My gifts")
-    assert "<strong>$20</strong> via Venmo from" in to_confirm
+    assert '<span class="count">1</span>' in to_confirm
+    assert '<p class="gift-amount">$20</p>' in to_confirm
+    assert "via Venmo from" in to_confirm
     assert "$7" not in to_confirm
     assert "$9" not in to_confirm
-    assert f'action="/gifts/{rent.donations[0].id}/confirm"' in to_confirm
-    assert "<strong>$15</strong> to" in sent
-    assert 'chip-disputed">disputed' in sent
+    gift_id = rent.donations[0].id
+    assert f'action="/gifts/{gift_id}/confirm"' in to_confirm
+    assert f'href="/gifts?dispute={gift_id}#gift-{gift_id}">Didn\'t get it</a>' in to_confirm
+    assert "Dispute this gift?" not in to_confirm
+    assert '<span class="gift-list-amount">$15</span>' in sent
+    assert 'chip-disputed">Not received' in sent
+
+
+def test_dispute_asks_before_acting(client: FlaskClient, poster: User, donor: User) -> None:
+    first = add_gift(add_post(poster), donor, 2_000)
+    second = add_gift(first.post, donor, 500)
+    login_as(client, poster)
+    page = client.get(f"/gifts?dispute={first.id}").get_data(as_text=True)
+    assert "Dispute this gift? dev_tom won't get credit for $20." in page
+    assert f'action="/gifts/{first.id}/dispute"' in page
+    assert f'action="/gifts/{first.id}/confirm"' not in page
+    assert f'href="/gifts#gift-{first.id}">Cancel</a>' in page
+    assert f'action="/gifts/{second.id}/confirm"' in page
+    assert first.status is DonationStatus.PENDING
 
 
 def test_empty_states(client: FlaskClient, poster: User) -> None:
     login_as(client, poster)
     page = client.get("/gifts").get_data(as_text=True)
-    assert "Nothing to confirm right now." in page
+    assert "To confirm" not in page
     assert "No gifts yet." in page
 
 

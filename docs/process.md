@@ -20,6 +20,7 @@
 - Merged to `main` through a PR, with CI green (ruff, mypy, pytest, pip-audit)
 - New logic is unit tested and coverage isn't lowered (≥80% overall)
 - Acceptance criteria demonstrated at phone width
+- UI changes are designed with the Impeccable skill: `PRODUCT.md` is the product context, and each new screen gets a surface brief and a finish review
 - README / ADR / CHANGELOG updated as needed
 - No open P0 or P1 bugs against the story
 

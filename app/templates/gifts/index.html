@@ -1,45 +1,57 @@
 {% extends "base.html" %}
 {% block title %}Gifts · Pay My Bill{% endblock %}
 {% block content %}
+  {% set status_labels = {"pending": "Waiting", "confirmed": "Confirmed", "disputed": "Not received"} %}
   <h1>Gifts</h1>
-  <section class="gift-section">
-    <h2 class="section-title">To confirm</h2>
-    {% if to_confirm %}
+  {% if to_confirm %}
+    <section class="gift-section" aria-labelledby="to-confirm">
+      <h2 class="section-title" id="to-confirm">To confirm <span class="count">{{ to_confirm | length }}</span></h2>
       <p class="hint">Check your app first. Only confirm money that actually arrived.</p>
       <ul class="cards">
         {% for gift in to_confirm %}
-          <li class="card">
-            <p class="gift-line"><strong>{{ gift.amount_cents | cents }}</strong> via {{ gift.method.label }} from <a href="{{ url_for('profile.show', username=gift.donor.username) }}">{{ gift.donor.username }}</a></p>
-            <p class="hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a> · {{ gift.created_at.strftime("%b %d") }}</p>
-            <div class="gift-actions">
-              {% for action, label, style in [("confirm", "Confirm", "btn"), ("dispute", "Didn't get it", "btn btn-secondary")] %}
-                <form method="post" action="{{ url_for('gifts.resolve', donation_id=gift.id, action=action) }}">
+          {% set amount = gift.amount_cents | cents %}
+          <li class="card gift" id="gift-{{ gift.id }}">
+            <p class="gift-amount">{{ amount }}</p>
+            <p class="gift-meta">via {{ gift.method.label }} from <a href="{{ url_for('profile.show', username=gift.donor.username) }}">{{ gift.donor.username }}</a></p>
+            <p class="hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a> · <time datetime="{{ gift.created_at.isoformat() }}">{{ gift.created_at.strftime("%b %d") }}</time></p>
+            {% if disputing == gift.id %}
+              <p class="gift-prompt">Dispute this gift? {{ gift.donor.username }} won't get credit for {{ amount }}.</p>
+              <div class="gift-actions">
+                <form method="post" action="{{ url_for('gifts.resolve', donation_id=gift.id, action='dispute') }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="{{ style }}">{{ label }}</button>
+                  <button type="submit" class="btn btn-danger">Yes, dispute</button>
                 </form>
-              {% endfor %}
-            </div>
+                <a class="btn btn-secondary" href="{{ url_for('gifts.index') }}#gift-{{ gift.id }}">Cancel</a>
+              </div>
+            {% else %}
+              <div class="gift-actions">
+                <form method="post" action="{{ url_for('gifts.resolve', donation_id=gift.id, action='confirm') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn">Confirm</button>
+                </form>
+                <a class="btn btn-secondary" href="{{ url_for('gifts.index', dispute=gift.id) }}#gift-{{ gift.id }}">Didn't get it</a>
+              </div>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>
-    {% else %}
-      <p class="empty">Nothing to confirm right now.</p>
-    {% endif %}
-  </section>
-  <section class="gift-section">
-    <h2 class="section-title">My gifts</h2>
+    </section>
+  {% endif %}
+  <section class="gift-section" aria-labelledby="my-gifts">
+    <h2 class="section-title" id="my-gifts">My gifts</h2>
     {% if sent %}
-      <ul class="cards">
+      <ul class="gift-list">
         {% for gift in sent %}
-          <li class="card gift-row">
-            <span><strong>{{ gift.amount_cents | cents }}</strong> to <a href="{{ url_for('profile.show', username=gift.post.user.username) }}">{{ gift.post.user.username }}</a>
-              <span class="hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a></span></span>
-            <span class="chip chip-{{ gift.status.value }}">{{ gift.status.value }}</span>
+          <li>
+            <span class="gift-list-amount">{{ gift.amount_cents | cents }}</span>
+            <span>to <a href="{{ url_for('profile.show', username=gift.post.user.username) }}">{{ gift.post.user.username }}</a></span>
+            <span class="chip chip-{{ gift.status.value }}">{{ status_labels[gift.status.value] }}</span>
+            <span class="gift-list-for hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a></span>
           </li>
         {% endfor %}
       </ul>
     {% else %}
-      <p class="empty">No gifts yet. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
+      <p class="empty">No gifts yet. After you chip in on a post, tap “I sent it” and your gift shows up here until the poster confirms it. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
     {% endif %}
   </section>
 {% endblock %}
