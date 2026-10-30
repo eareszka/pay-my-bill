@@ -71,6 +71,7 @@ flask --app app run
 - Key modules: `app/auth.py` (typed `login_required`, `verified_required`, login throttle), `app/mail.py` (console unless `MAIL_SERVER` is set), `app/tokens.py`, `app/moderation.py`, `app/money.py` (dollars ↔ cents), `app/payment_links.py` (handle normalization; Sprint 2 adds deep links), and `app/regions.py`. Templates live in `app/templates/` and use `_field.html` and `posts/_meta.html`/`_progress.html` partials.
 - Testing gotchas: use `tests.conftest.login_as` and the `make_user` fixture. Requests made inside an already-pushed app context share `g`, so build test apps outside it. `migrations/env.py` keeps existing loggers enabled. Headless Edge can't go below a 492px viewport, so check 360px by rendering pages inside 360px iframes.
 - **Backlog follow-ups from reviews:** #14 resend cooldown, #15 async mail + `login_attempts` pruning, #21 keep a handle while a post is open. Payment deep links, donations, and confirmation belong to Sprint 2.
+- **Roadmap:** `docs/roadmap.md` lists the phases from staging to App Store approval. PB-12 to PB-19 in the backlog cover the App Store requirements.
 - **Product backlog:** `docs/backlog/product-backlog.md` lists the stories and spikes from ADRs 0008/0009 and threat-model cases T11–T15, each with a GitHub issue. Pull from it at Sprint Planning.
 
 ## Coordination

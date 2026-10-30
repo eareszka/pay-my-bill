@@ -17,6 +17,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Post detail page `/posts/<id>` (#7): story, poster and region, goal, progress, and the poster's payment handles while the post is open. Pending-review and removed posts return 404 to everyone except the owner and admins. Feed cards and new posts link here.
 
 - ADR 0008 (required results updates) and ADR 0009 (leaderboards rank by people helped), threat-model cases T11–T15, new PRD risks and metric, and a product backlog with issues #26–#36 (#25).
+- Release roadmap from staging to the App Store (`docs/roadmap.md`) and backlog items PB-12 to PB-19 for the App Store requirements.
 
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
