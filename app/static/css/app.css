@@ -149,6 +149,9 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 
 .pay-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 .pay-buttons .btn { flex: 1 1 96px; text-align: center; text-decoration: none; }
+.chip-in { display: flex; flex-direction: column; gap: 12px; }
+.sent-row { display: flex; align-items: flex-end; gap: 8px; }
+.sent-row .field { flex: 1; }
 .pay-buttons small { display: block; font-weight: 400; color: var(--muted); }
 
 .btn {

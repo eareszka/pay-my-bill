@@ -21,17 +21,33 @@
         {% if is_owner %}
           <p class="hint">This is your post. Share it so people can chip in.</p>
         {% elif pay_options %}
-          <label class="field">
-            <span>Amount</span>
-            <input id="chip-amount" name="amount" inputmode="decimal" autocomplete="off" placeholder="$20.00">
-            <small id="chip-amount-error" class="error" hidden>Enter an amount like 20 or 12.50, up to {{ MAX_GOAL }}.</small>
-          </label>
-          <div class="pay-buttons">
-            {% for option in pay_options %}
-              <a class="btn btn-secondary" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
-            {% endfor %}
-          </div>
-          <p class="hint">Opens {{ post.user.username }}'s page in the app. Pay My Bill never holds money.</p>
+          <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in">
+            {{ form.csrf_token }}
+            {# The first submit button is the default one; disabled, so Enter in the amount box never records a gift. #}
+            <button type="submit" disabled hidden aria-hidden="true"></button>
+            <label class="field">
+              <span>Amount</span>
+              {{ form.amount(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100) }}
+              {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
+              <small id="chip-amount-error" class="error" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
+            </label>
+            <div class="pay-buttons">
+              {% for option in pay_options %}
+                <a class="btn btn-secondary" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
+              {% endfor %}
+            </div>
+            <p class="hint">Opens {{ post.user.username }}'s page in the app. Pay My Bill never holds money.</p>
+            <h3 class="section-title">Sent it?</h3>
+            {% if current_user.is_authenticated %}
+              <div class="sent-row">
+                <label class="field"><span>via</span>{{ form.method() }}{% for error in form.method.errors %}<small class="error">{{ error }}</small>{% endfor %}</label>
+                <button type="submit" class="btn">I sent it</button>
+              </div>
+              <p class="hint">It counts once {{ post.user.username }} confirms it came through.</p>
+            {% else %}
+              <p class="hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
+            {% endif %}
+          </form>
           <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
         {% else %}
           <p class="hint">{{ post.user.username }} hasn't added a way to get paid yet. Check back soon.</p>

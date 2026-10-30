@@ -23,9 +23,9 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app.models import MAX_GOAL_CENTS, PostKind
+from app.models import MAX_GOAL_CENTS, Post, PostKind
 from app.money import format_cents, parse_dollars
-from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo
+from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
 from app.regions import US_STATES
 
 
@@ -152,6 +152,38 @@ class PostForm(FlaskForm):
                 "everyday wants and needs."
             )
         self.goal_cents = cents
+
+
+class GiftForm(FlaskForm):
+    amount = StringField("Amount", filters=[_strip_to_none], validators=[DataRequired()])
+    method = SelectField(
+        "via", validators=[DataRequired(message="Pick the app you used.")], validate_choice=True
+    )
+
+    amount_cents = 0
+    max_cents = MAX_GOAL_CENTS
+
+    def validate_amount(self, field: Field) -> None:
+        try:
+            cents = parse_dollars(field.data)
+        except ValueError:
+            raise ValidationError("Enter an amount like 20 or 12.50.") from None
+        if cents <= 0:
+            raise ValidationError("The amount has to be more than $0.")
+        if cents > self.max_cents:
+            raise ValidationError(
+                f"Gifts to this post can be up to {format_cents(self.max_cents)}."
+            )
+        self.amount_cents = cents
+
+    @classmethod
+    def for_post(cls, post: Post) -> "GiftForm":
+        form = cls()
+        form.method.choices = [SelectChoice("", "Choose app")] + [
+            SelectChoice(o.method.value, o.label) for o in pay_options(post.user)
+        ]
+        form.max_cents = post.goal_cents
+        return form
 
 
 class EmptyForm(FlaskForm):
