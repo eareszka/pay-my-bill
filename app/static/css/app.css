@@ -147,6 +147,10 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 .handles dt { color: var(--muted); }
 .handles dd { margin: 0; font-weight: 600; }
 
+.pay-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.pay-buttons .btn { flex: 1 1 96px; text-align: center; text-decoration: none; }
+.pay-buttons small { display: block; font-weight: 400; color: var(--muted); }
+
 .btn {
   padding: 12px 16px;
   font: inherit;

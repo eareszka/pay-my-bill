@@ -38,8 +38,11 @@ def test_open_post_shows_story_poster_goal_progress_and_handles(
     assert "<strong>$0</strong> raised of $250" in page
     assert 'aria-valuenow="0"' in page
     assert "Chip in" in page
-    assert "$mariag" in page
-    assert "paypal.me/MariaG" in page
+    assert 'href="https://cash.app/$mariag" data-amount-sep="/"' in page
+    assert 'href="https://paypal.me/MariaG" data-amount-sep="/"' in page
+    assert "venmo.com" not in page
+    assert 'id="chip-amount"' in page
+    assert "js/chip-in.js" in page
 
 
 def test_body_is_escaped(client: FlaskClient, owner: User) -> None:
@@ -122,3 +125,11 @@ def test_new_post_redirects_to_detail(client: FlaskClient, owner: User) -> None:
     )
     post = db.session.scalars(db.select(Post)).one()
     assert resp.location == f"/posts/{post.id}"
+
+
+def test_owner_sees_no_pay_buttons(client: FlaskClient, owner: User) -> None:
+    post = add_post(owner)
+    login_as(client, owner)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "This is your post" in page
+    assert "cash.app" not in page

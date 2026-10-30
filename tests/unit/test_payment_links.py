@@ -1,6 +1,7 @@
 import pytest
 
-from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo
+from app.models import PaymentMethod, User
+from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
 
 
 @pytest.mark.parametrize(
@@ -46,3 +47,25 @@ def test_paypal(raw: str, expected: str) -> None:
 def test_invalid(normalize: object, raw: str) -> None:
     with pytest.raises(ValueError, match="."):
         normalize(raw)  # type: ignore[operator]
+
+
+def test_pay_options_only_for_set_handles() -> None:
+    user = User(cashapp_handle="$mariag", venmo_handle="@maria-g")
+    options = pay_options(user)
+    assert [(o.method, o.label, o.handle, o.url, o.amount_sep) for o in options] == [
+        (PaymentMethod.CASHAPP, "Cash App", "$mariag", "https://cash.app/$mariag", "/"),
+        (
+            PaymentMethod.VENMO,
+            "Venmo",
+            "@maria-g",
+            "https://venmo.com/?txn=pay&recipients=maria-g",
+            "&amount=",
+        ),
+    ]
+
+
+def test_pay_options_paypal_and_none() -> None:
+    assert [o.url for o in pay_options(User(paypal_handle="MariaG"))] == [
+        "https://paypal.me/MariaG"
+    ]
+    assert pay_options(User()) == []

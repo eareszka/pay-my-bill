@@ -9,6 +9,7 @@ from app.extensions import db
 from app.forms import PostForm
 from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, utcnow
 from app.moderation import is_flagged
+from app.payment_links import pay_options
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
@@ -78,4 +79,4 @@ def show(post_id: int) -> str:
     )
     if post is None or not can_view(post):
         abort(404)
-    return render_template("posts/show.html", post=post)
+    return render_template("posts/show.html", post=post, pay_options=pay_options(post.user))
