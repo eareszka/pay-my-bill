@@ -4,7 +4,17 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
-from app.models import MAX_GOAL_CENTS, Post, PostKind, PostStatus, User, utcnow
+from app.models import (
+    MAX_GOAL_CENTS,
+    Donation,
+    DonationStatus,
+    PaymentMethod,
+    Post,
+    PostKind,
+    PostStatus,
+    User,
+    utcnow,
+)
 
 
 def make_user(username: str = "alice", email: str = "alice@example.com") -> User:
@@ -79,3 +89,63 @@ def test_post_goal_out_of_range_rejected(app: Flask, goal_cents: int) -> None:
     db.session.add(make_post(make_user(), goal_cents=goal_cents))
     with pytest.raises(IntegrityError):
         db.session.commit()
+
+
+def make_donation(post: Post, donor: User, cents: int, status: DonationStatus) -> Donation:
+    return Donation(
+        post=post, donor=donor, amount_cents=cents, method=PaymentMethod.CASHAPP, status=status
+    )
+
+
+def test_donation_defaults_to_pending(app: Flask) -> None:
+    post = make_post(make_user())
+    donation = Donation(
+        post=post,
+        donor=make_user("bob", "bob@example.com"),
+        amount_cents=500,
+        method=PaymentMethod.VENMO,
+    )
+    db.session.add(donation)
+    db.session.commit()
+    assert donation.status is DonationStatus.PENDING
+    assert donation.resolved_at is None
+    assert post.donations == [donation]
+
+
+def test_raised_counts_only_confirmed(app: Flask) -> None:
+    post = make_post(make_user(), goal_cents=10_000)
+    donor = make_user("bob", "bob@example.com")
+    for cents, status in [
+        (2_000, DonationStatus.CONFIRMED),
+        (500, DonationStatus.CONFIRMED),
+        (4_000, DonationStatus.PENDING),
+        (3_000, DonationStatus.DISPUTED),
+    ]:
+        make_donation(post, donor, cents, status)
+    assert (post.raised_cents, post.progress_percent) == (2_500, 25)
+
+
+def test_progress_caps_at_100(app: Flask) -> None:
+    post = make_post(make_user(), goal_cents=1_000)
+    make_donation(post, make_user("bob", "bob@example.com"), 1_500, DonationStatus.CONFIRMED)
+    assert post.progress_percent == 100
+
+
+@pytest.mark.parametrize("cents", [0, -1, MAX_GOAL_CENTS + 1])
+def test_donation_amount_out_of_range_rejected(app: Flask, cents: int) -> None:
+    post = make_post(make_user())
+    db.session.add(
+        make_donation(post, make_user("bob", "bob@example.com"), cents, DonationStatus.PENDING)
+    )
+    with pytest.raises(IntegrityError):
+        db.session.commit()
+
+
+def test_deleting_post_deletes_its_gifts(app: Flask) -> None:
+    post = make_post(make_user())
+    make_donation(post, make_user("bob", "bob@example.com"), 500, DonationStatus.PENDING)
+    db.session.add(post)
+    db.session.commit()
+    db.session.delete(post)
+    db.session.commit()
+    assert db.session.scalar(text("SELECT count(*) FROM donations")) == 0
