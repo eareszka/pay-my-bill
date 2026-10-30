@@ -32,6 +32,17 @@ class PaymentMethod(StrEnum):
     VENMO = "venmo"
     PAYPAL = "paypal"
 
+    @property
+    def label(self) -> str:
+        return PAYMENT_LABELS[self]
+
+
+PAYMENT_LABELS = {
+    PaymentMethod.CASHAPP: "Cash App",
+    PaymentMethod.VENMO: "Venmo",
+    PaymentMethod.PAYPAL: "PayPal",
+}
+
 
 class DonationStatus(StrEnum):
     PENDING = "pending"

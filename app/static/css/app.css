@@ -121,6 +121,25 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 }
 .chip-need { background: var(--error-bg); }
 .chip-want { background: var(--success-bg); }
+.chip-confirmed { background: var(--success-bg); }
+.chip-disputed { background: var(--error-bg); }
+.badge {
+  display: inline-block;
+  min-width: 20px;
+  padding: 0 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  color: var(--accent-text);
+  background: var(--accent);
+  border-radius: 999px;
+}
+.gift-section { margin-bottom: 24px; }
+.gift-section .section-title { margin-bottom: 8px; }
+.gift-line { margin: 0 0 4px; }
+.gift-actions { display: flex; gap: 8px; margin-top: 10px; }
+.gift-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .progress { height: 8px; overflow: hidden; background: var(--border); border-radius: 999px; }
 .progress span { display: block; height: 100%; background: var(--accent); }
 .amounts { margin: 8px 0 0; }

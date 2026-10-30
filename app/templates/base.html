@@ -12,6 +12,7 @@
     <nav>
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('posts.new') }}">Post</a>
+        <a href="{{ url_for('gifts.index') }}">Gifts{% if pending_gift_count %} <span class="badge" aria-label="{{ pending_gift_count }} to confirm">{{ pending_gift_count }}</span>{% endif %}</a>
         <a href="{{ url_for('profile.edit') }}">{{ current_user.username }}</a>
         <form method="post" action="{{ url_for('auth.logout') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
