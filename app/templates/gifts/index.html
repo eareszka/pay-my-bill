@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Gifts · Pay My Bill{% endblock %}
 {% block content %}
-  {% set status_labels = {"pending": "Waiting", "confirmed": "Confirmed", "disputed": "Not received"} %}
   <h1>Gifts</h1>
   {% if to_confirm %}
     <section class="gift-section" aria-labelledby="to-confirm">
@@ -13,7 +12,7 @@
           <li class="card gift" id="gift-{{ gift.id }}">
             <p class="gift-amount">{{ amount }}</p>
             <p class="gift-meta">via {{ gift.method.label }} from <a href="{{ url_for('profile.show', username=gift.donor.username) }}">{{ gift.donor.username }}</a></p>
-            <p class="hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a> · <time datetime="{{ gift.created_at.isoformat() }}">{{ gift.created_at.strftime("%b %d") }}</time></p>
+            <p class="hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a></p>
             {% if disputing == gift.id %}
               <p class="gift-prompt">Dispute this gift? {{ gift.donor.username }} won't get credit for {{ amount }}.</p>
               <div class="gift-actions">
@@ -45,13 +44,14 @@
           <li>
             <span class="gift-list-amount">{{ gift.amount_cents | cents }}</span>
             <span>to <a href="{{ url_for('profile.show', username=gift.post.user.username) }}">{{ gift.post.user.username }}</a></span>
-            <span class="chip chip-{{ gift.status.value }}">{{ status_labels[gift.status.value] }}</span>
+            <span class="chip chip-{{ gift.status.value }}">{{ gift.status.label }}</span>
             <span class="gift-list-for hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a></span>
           </li>
         {% endfor %}
       </ul>
+      {% if sent | length == sent_limit %}<p class="hint gift-list-note">Showing your latest {{ sent_limit }} gifts.</p>{% endif %}
     {% else %}
-      <p class="empty">No gifts yet. After you chip in on a post, tap “I sent it” and your gift shows up here until the poster confirms it. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
+      <p class="empty">No gifts yet. After you chip in on a post, tap “I sent it” and your gift shows up here as Waiting until the poster confirms it. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
     {% endif %}
   </section>
 {% endblock %}

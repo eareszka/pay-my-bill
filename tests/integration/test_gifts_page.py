@@ -46,7 +46,7 @@ def test_lists_gifts_to_confirm_and_my_gifts(
     client: FlaskClient, poster: User, donor: User, make_user: MakeUser
 ) -> None:
     rent = add_post(poster)
-    add_gift(rent, donor, 2_000)
+    waiting = add_gift(rent, donor, 2_000)
     add_gift(rent, donor, 700, DonationStatus.CONFIRMED)
     other = add_post(make_user("kayla.r"), "Textbook")
     add_gift(other, donor, 900)
@@ -59,7 +59,7 @@ def test_lists_gifts_to_confirm_and_my_gifts(
     assert "via Venmo from" in to_confirm
     assert "$7" not in to_confirm
     assert "$9" not in to_confirm
-    gift_id = rent.donations[0].id
+    gift_id = waiting.id
     assert f'action="/gifts/{gift_id}/confirm"' in to_confirm
     assert f'href="/gifts?dispute={gift_id}#gift-{gift_id}">Didn\'t get it</a>' in to_confirm
     assert "Dispute this gift?" not in to_confirm
@@ -166,9 +166,13 @@ def test_nav_badge_counts_gifts_waiting(client: FlaskClient, poster: User, donor
     first = add_gift(post, donor)
     add_gift(post, donor, 500)
     login_as(client, poster)
-    assert 'aria-label="2 to confirm">2</span>' in client.get("/").get_data(as_text=True)
+    badge = (
+        '<span class="badge" aria-hidden="true">{n}</span>'
+        '<span class="sr-only">, {n} to confirm</span>'
+    )
+    assert badge.format(n=2) in client.get("/").get_data(as_text=True)
     resolve(client, first)
-    assert 'aria-label="1 to confirm">1</span>' in client.get("/").get_data(as_text=True)
+    assert badge.format(n=1) in client.get("/").get_data(as_text=True)
 
 
 def test_no_badge_for_the_donor(client: FlaskClient, poster: User, donor: User) -> None:
@@ -181,3 +185,30 @@ def test_no_badge_for_the_donor(client: FlaskClient, poster: User, donor: User) 
 
 def test_no_gifts_link_when_logged_out(client: FlaskClient) -> None:
     assert 'href="/gifts"' not in client.get("/").get_data(as_text=True)
+
+
+def test_removed_posts_drop_out(client: FlaskClient, poster: User, donor: User) -> None:
+    gift = add_gift(add_post(poster), donor)
+    gift.post.status = PostStatus.REMOVED
+    db.session.commit()
+    login_as(client, poster)
+    page = client.get("/gifts").get_data(as_text=True)
+    assert "To confirm" not in page
+    assert 'class="badge"' not in page
+    assert resolve(client, gift).status_code == 404
+    assert gift.status is DonationStatus.PENDING
+
+
+def test_my_gifts_says_when_it_is_cut_off(
+    client: FlaskClient, poster: User, donor: User, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.routes.gifts.MY_GIFTS_LIMIT", 2)
+    post = add_post(poster)
+    add_gift(post, donor)
+    login_as(client, donor)
+    assert "Showing your latest" not in client.get("/gifts").get_data(as_text=True)
+    add_gift(post, donor, 500)
+    add_gift(post, donor, 700)
+    page = client.get("/gifts").get_data(as_text=True)
+    assert page.count('class="gift-list-amount"') == 2
+    assert "Showing your latest 2 gifts." in page

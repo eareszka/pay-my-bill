@@ -49,6 +49,17 @@ class DonationStatus(StrEnum):
     CONFIRMED = "confirmed"
     DISPUTED = "disputed"
 
+    @property
+    def label(self) -> str:
+        return DONATION_STATUS_LABELS[self]
+
+
+DONATION_STATUS_LABELS = {
+    DonationStatus.PENDING: "Waiting",
+    DonationStatus.CONFIRMED: "Confirmed",
+    DonationStatus.DISPUTED: "Not received",
+}
+
 
 def _enum_column(enum: type[StrEnum], name: str) -> Enum:
     return Enum(

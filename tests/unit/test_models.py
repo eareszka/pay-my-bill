@@ -149,3 +149,8 @@ def test_deleting_post_deletes_its_gifts(app: Flask) -> None:
     db.session.delete(post)
     db.session.commit()
     assert db.session.scalar(text("SELECT count(*) FROM donations")) == 0
+
+
+def test_status_and_method_labels() -> None:
+    assert [s.label for s in DonationStatus] == ["Waiting", "Confirmed", "Not received"]
+    assert [m.label for m in PaymentMethod] == ["Cash App", "Venmo", "PayPal"]

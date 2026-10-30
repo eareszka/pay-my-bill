@@ -11,7 +11,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
-from sqlalchemy import func, select
+from sqlalchemy import Select, func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
@@ -92,13 +92,24 @@ def create(post_id: int) -> Response | tuple[str, int]:
 MY_GIFTS_LIMIT = 50
 
 
+def waiting_for(user: User) -> Select[Donation]:
+    # Pending gifts to the user's posts; gifts on removed posts never count.
+    return (
+        select(Donation)
+        .join(Donation.post)
+        .where(
+            Post.user_id == user.id,
+            Post.status != PostStatus.REMOVED,
+            Donation.status == DonationStatus.PENDING,
+        )
+    )
+
+
 def pending_for(user: User) -> list[Donation]:
     return list(
         db.session.scalars(
-            select(Donation)
-            .join(Donation.post)
+            waiting_for(user)
             .options(joinedload(Donation.donor), joinedload(Donation.post))
-            .where(Post.user_id == user.id, Donation.status == DonationStatus.PENDING)
             .order_by(Donation.created_at, Donation.id)
         )
     )
@@ -109,9 +120,7 @@ def pending_gift_count() -> dict[str, int]:
     if not current_user.is_authenticated:
         return {}
     count = db.session.scalar(
-        select(func.count(Donation.id))
-        .join(Donation.post)
-        .where(Post.user_id == current_user.id, Donation.status == DonationStatus.PENDING)
+        select(func.count()).select_from(waiting_for(current_user).subquery())
     )
     return {"pending_gift_count": count or 0}
 
@@ -131,6 +140,7 @@ def index() -> str:
         "gifts/index.html",
         to_confirm=pending_for(user),
         sent=list(sent),
+        sent_limit=MY_GIFTS_LIMIT,
         disputing=request.args.get("dispute", type=int),
     )
 
@@ -144,7 +154,12 @@ def resolve(donation_id: int, action: str) -> Response:
         if donation_id <= MAX_DB_INT
         else None
     )
-    if donation is None or donation.post.user_id != current_user.id:
+    if (
+        donation is None
+        or donation.post.user_id != current_user.id
+        or donation.post.status == PostStatus.REMOVED
+    ):
+        db.session.rollback()
         abort(404)
     if donation.status != DonationStatus.PENDING:
         db.session.rollback()
@@ -158,11 +173,19 @@ def resolve(donation_id: int, action: str) -> Response:
     if not confirmed:
         flash(f"Marked {amount} from {donor} as not received.", "info")
         return redirect(url_for("gifts.index"))
-    # Re-read after the commit so gifts confirmed in parallel are counted too.
-    post = donation.post
-    if post.status == PostStatus.OPEN and post.raised_cents >= post.goal_cents:
+    # Lock the post as create() does, and re-read it after the commit so gifts
+    # confirmed in parallel count and a post closed meanwhile stays closed.
+    post = db.session.scalars(
+        select(Post)
+        .where(Post.id == donation.post_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).one()
+    funded = post.status == PostStatus.OPEN and post.raised_cents >= post.goal_cents
+    if funded:
         post.status = PostStatus.FUNDED
-        db.session.commit()
+    db.session.commit()
+    if funded:
         flash(f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success")
     else:
         flash(f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success")
