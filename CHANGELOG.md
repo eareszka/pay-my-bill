@@ -23,4 +23,5 @@ All notable changes to this project are documented here. The format follows [Kee
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 
 ### Changed
+- README: steps for recreating the staging database before the free tier expires (#33).
 - Staging runs `flask db upgrade` before starting gunicorn.
