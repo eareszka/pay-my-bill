@@ -139,3 +139,13 @@ def test_donation_amount_out_of_range_rejected(app: Flask, cents: int) -> None:
     )
     with pytest.raises(IntegrityError):
         db.session.commit()
+
+
+def test_deleting_post_deletes_its_gifts(app: Flask) -> None:
+    post = make_post(make_user())
+    make_donation(post, make_user("bob", "bob@example.com"), 500, DonationStatus.PENDING)
+    db.session.add(post)
+    db.session.commit()
+    db.session.delete(post)
+    db.session.commit()
+    assert db.session.scalar(text("SELECT count(*) FROM donations")) == 0

@@ -111,12 +111,14 @@ class Post(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="posts")
-    donations: Mapped[list["Donation"]] = relationship(back_populates="post")
+    donations: Mapped[list["Donation"]] = relationship(
+        back_populates="post", cascade="all, delete-orphan", lazy="selectin"
+    )
 
     @property
     def raised_cents(self) -> int:
         # Only recipient-confirmed donations count (ADR 0004).
-        return sum(d.amount_cents for d in self.donations if d.status is DonationStatus.CONFIRMED)
+        return sum(d.amount_cents for d in self.donations if d.status == DonationStatus.CONFIRMED)
 
     @property
     def progress_percent(self) -> int:

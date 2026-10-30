@@ -92,6 +92,7 @@ def seed_donations(users: list[User], posts: list[Post]) -> list[Donation]:
                 amount_cents=amount,
                 method=PaymentMethod.VENMO,
                 status=status,
+                created_at=now - timedelta(days=1),
                 resolved_at=None if status is DonationStatus.PENDING else now,
             )
         )

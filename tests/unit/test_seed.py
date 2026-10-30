@@ -39,6 +39,7 @@ def test_seed_adds_gifts_without_funding_open_posts(app: Flask) -> None:
     assert {d.status for d in donations} == set(DonationStatus)
     assert all(d.donor_id != d.post.user_id for d in donations)
     assert all(d.post.raised_cents < d.post.goal_cents for d in donations)
+    assert all(d.resolved_at is None or d.resolved_at > d.created_at for d in donations)
 
 
 def test_seed_extra_users_get_unique_names(app: Flask) -> None:

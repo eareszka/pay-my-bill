@@ -18,7 +18,7 @@ Read this file fully before making any change. The project is run as a professio
    - 0005: Render for staging (`render.yaml`)
    - 0006: money is stored as integer cents
 4. `docs/threat-model.md`: abuse cases T1–T10 and which sprint mitigates each
-5. `docs/backlog/sprint-01.md`: the current sprint's stories and acceptance criteria
+5. `docs/backlog/sprint-02.md`: the current sprint's stories and acceptance criteria
 
 ## Stack and commands
 - Python 3.12, Flask app factory in `app/__init__.py`, blueprints in `app/routes/`
