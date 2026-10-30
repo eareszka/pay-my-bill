@@ -27,6 +27,8 @@ Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yam
 - On each start, `flask db upgrade` applies any new migrations before gunicorn starts.
 - Every push to `main` deploys automatically. There are no manual steps after the first Blueprint sync.
 
+Daily job: `flask --app app gifts remind` emails posters about gifts waiting 3 or more days to be confirmed. Free staging has no cron, so run it by hand there. In production it becomes a scheduled job (roadmap Phase 2).
+
 Config comes only from environment variables (see `.env.example`). Never commit secrets.
 
 Free-tier caveats: the service sleeps after about 15 minutes idle, so the first request can take up to a minute. The free database expires 30 days after creation.

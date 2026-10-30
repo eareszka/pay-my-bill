@@ -133,6 +133,7 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 .chip-want { background: var(--success-bg); }
 .chip-confirmed { background: var(--success-bg); }
 .chip-disputed { background: var(--error-bg); }
+.chip-expired { background: var(--border); }
 .badge {
   display: inline-block;
   min-width: 20px;

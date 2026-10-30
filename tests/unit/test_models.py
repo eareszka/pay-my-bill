@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import pytest
 from flask import Flask
 from sqlalchemy import text
@@ -154,3 +156,23 @@ def test_deleting_post_deletes_its_gifts(app: Flask) -> None:
 def test_status_and_method_labels() -> None:
     assert [s.label for s in DonationStatus] == ["Waiting", "Confirmed", "Not received"]
     assert [m.label for m in PaymentMethod] == ["Cash App", "Venmo", "PayPal"]
+
+
+@pytest.mark.parametrize(
+    ("days_old", "status", "expired"),
+    [
+        (13.9, DonationStatus.PENDING, False),
+        (14.1, DonationStatus.PENDING, True),
+        (30, DonationStatus.CONFIRMED, False),
+        (30, DonationStatus.DISPUTED, False),
+    ],
+)
+def test_gift_expiry(days_old: float, status: DonationStatus, expired: bool) -> None:
+    created = utcnow() - timedelta(days=days_old)
+    for created_at in (created, created.replace(tzinfo=None)):
+        gift = Donation(
+            amount_cents=500, method=PaymentMethod.VENMO, status=status, created_at=created_at
+        )
+        assert gift.is_expired is expired
+        assert gift.status_label == ("Expired" if expired else status.label)
+        assert gift.status_class == ("expired" if expired else status.value)
