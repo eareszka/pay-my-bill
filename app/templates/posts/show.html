@@ -23,14 +23,17 @@
         {% elif pay_options %}
           <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in">
             {{ form.csrf_token }}
+            {# The first submit button is the default one; disabled, so Enter in the amount box never records a gift. #}
+            <button type="submit" disabled hidden aria-hidden="true"></button>
             <label class="field">
               <span>Amount</span>
-              {{ form.amount(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00") }}
-              {% for error in form.amount.errors %}<small class="error">{{ error }}</small>{% else %}<small id="chip-amount-error" class="error" hidden>Enter an amount like 20 or 12.50, up to {{ MAX_GOAL }}.</small>{% endfor %}
+              {{ form.amount(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100) }}
+              {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
+              <small id="chip-amount-error" class="error" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
             </label>
             <div class="pay-buttons">
               {% for option in pay_options %}
-                <a class="btn btn-secondary" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
+                <a class="btn btn-secondary" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
               {% endfor %}
             </div>
             <p class="hint">Opens {{ post.user.username }}'s page in the app. Pay My Bill never holds money.</p>

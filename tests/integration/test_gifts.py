@@ -1,4 +1,5 @@
 import logging
+import re
 import smtplib
 
 import pytest
@@ -58,7 +59,10 @@ def test_form_shown_to_logged_in_donor(client: FlaskClient, post: Post, donor: U
     login_as(client, donor)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert f'action="/posts/{post.id}/gifts"' in page
+    assert '<select id="method" name="method" required><option value="">Choose app</option>' in page
     assert '<option value="cashapp">Cash App</option>' in page
+    assert '<button type="submit" disabled hidden aria-hidden="true"></button>' in page
+    assert 'data-method="venmo"' in page
     assert "I sent it" in page
 
 
@@ -104,11 +108,12 @@ def test_missing_post(client: FlaskClient, donor: User) -> None:
 @pytest.mark.parametrize(
     ("amount", "method", "message"),
     [
-        ("0", "venmo", "Gifts can be up to $1,000"),
-        ("1000.01", "venmo", "Gifts can be up to $1,000"),
+        ("0", "venmo", "The amount has to be more than $0"),
+        ("300.01", "venmo", "Gifts to this post can be up to $300"),
         ("5,50", "venmo", "Enter an amount like 20 or 12.50"),
         ("", "venmo", "This field is required"),
         ("20", "paypal", "Not a valid choice"),
+        ("20", "", "Pick the app you used"),
     ],
 )
 def test_bad_gift_rejected(
@@ -119,7 +124,7 @@ def test_bad_gift_rejected(
     page = resp.get_data(as_text=True)
     assert resp.status_code == 400
     assert message in page
-    assert page.count('class="error">') == 1
+    assert len(re.findall(r'class="error"[^>]*(?<! hidden)>', page)) == 1
     assert gifts() == []
 
 
@@ -138,3 +143,26 @@ def test_gift_saved_when_email_fails(
     assert send(client, post).status_code == 302
     assert len(gifts()) == 1
     assert "Could not send the gift notice" in caplog.text
+
+
+def test_gift_up_to_goal_allowed(client: FlaskClient, post: Post, donor: User) -> None:
+    login_as(client, donor)
+    assert send(client, post, "300").status_code == 302
+    assert [g.amount_cents for g in gifts()] == [30_000]
+
+
+def test_one_pending_gift_per_donor_per_post(client: FlaskClient, post: Post, donor: User) -> None:
+    login_as(client, donor)
+    assert send(client, post, "10").status_code == 302
+    resp = send(client, post, "5")
+    assert resp.location == f"/posts/{post.id}"
+    assert len(gifts()) == 1
+    assert "already have a gift waiting" in client.get(resp.location).get_data(as_text=True)
+    gifts()[0].status = DonationStatus.CONFIRMED
+    db.session.commit()
+    assert send(client, post, "5").status_code == 302
+    assert len(gifts()) == 2
+
+
+def test_csrf_tokens_do_not_expire(client: FlaskClient) -> None:
+    assert client.application.config["WTF_CSRF_TIME_LIMIT"] is None

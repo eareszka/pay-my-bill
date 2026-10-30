@@ -23,11 +23,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Pay-app buttons on open posts (#43): type an amount once and the Cash App, Venmo, and PayPal buttons open prefilled (`app/static/js/chip-in.js`). Without JS they open the poster's page in each app. Only the poster's apps are shown.
 
-- Record a gift (#45): on an open post, a verified donor who isn't the poster can say "I sent $X via <app>". This saves a `pending` gift and emails the poster. Logged-out visitors get a log-in link. Pending gifts don't move the progress bar until the poster confirms them.
+- Record a gift (#45): on an open post, a verified donor who isn't the poster can say "I sent $X via <app>". This saves a `pending` gift and emails the poster. Logged-out visitors get a log-in link. Pending gifts don't move the progress bar until the poster confirms them. A gift can be at most the post's goal, the donor must pick the app they used (tapping an app's pay button picks it), and each donor can have one pending gift per post. Pressing Enter in the amount box doesn't record a gift.
 
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 
 ### Changed
+- CSRF tokens last for the browser session instead of one hour, because donors leave for their payment app in the middle of the form (#45).
 - README: steps for recreating the staging database before the free tier expires (#33).
 - Staging runs `flask db upgrade` before starting gunicorn.

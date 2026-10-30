@@ -79,7 +79,7 @@ def show(post_id: int) -> str:
     )
     if post is None or not can_view(post):
         abort(404)
-    return render_post(post, GiftForm.for_poster(post.user))
+    return render_post(post, GiftForm.for_post(post))
 
 
 def render_post(post: Post, form: GiftForm) -> str:
