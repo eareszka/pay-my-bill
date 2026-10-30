@@ -27,6 +27,18 @@ class PostStatus(StrEnum):
     REMOVED = "removed"
 
 
+class PaymentMethod(StrEnum):
+    CASHAPP = "cashapp"
+    VENMO = "venmo"
+    PAYPAL = "paypal"
+
+
+class DonationStatus(StrEnum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    DISPUTED = "disputed"
+
+
 def _enum_column(enum: type[StrEnum], name: str) -> Enum:
     return Enum(
         enum,
@@ -99,15 +111,39 @@ class Post(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="posts")
+    donations: Mapped[list["Donation"]] = relationship(back_populates="post")
 
     @property
     def raised_cents(self) -> int:
-        # Only recipient-confirmed donations count (ADR 0004); donations arrive in Sprint 2.
-        return 0
+        # Only recipient-confirmed donations count (ADR 0004).
+        return sum(d.amount_cents for d in self.donations if d.status is DonationStatus.CONFIRMED)
 
     @property
     def progress_percent(self) -> int:
         return min(100, self.raised_cents * 100 // self.goal_cents)
+
+
+class Donation(Base):
+    __tablename__ = "donations"
+    __table_args__ = (
+        CheckConstraint(
+            f"amount_cents > 0 AND amount_cents <= {MAX_GOAL_CENTS}", name="amount_range"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), index=True)
+    donor_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    amount_cents: Mapped[int]
+    method: Mapped[PaymentMethod] = mapped_column(_enum_column(PaymentMethod, "payment_method"))
+    status: Mapped[DonationStatus] = mapped_column(
+        _enum_column(DonationStatus, "donation_status"), default=DonationStatus.PENDING
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    post: Mapped[Post] = relationship(back_populates="donations")
+    donor: Mapped[User] = relationship()
 
 
 class LoginAttempt(Base):

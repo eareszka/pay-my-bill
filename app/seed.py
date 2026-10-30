@@ -7,7 +7,16 @@ from sqlalchemy import func, select
 from werkzeug.security import generate_password_hash
 
 from app.extensions import db
-from app.models import Post, PostKind, PostStatus, User, utcnow
+from app.models import (
+    Donation,
+    DonationStatus,
+    PaymentMethod,
+    Post,
+    PostKind,
+    PostStatus,
+    User,
+    utcnow,
+)
 
 SEED_PASSWORD = "password123"  # noqa: S105 - dev-only fake accounts
 
@@ -57,8 +66,36 @@ FLAGGED = ("Help launch my startup", "Looking for seed money for my small busine
 SECONDARY_STATUSES = [PostStatus.FUNDED, PostStatus.CLOSED, PostStatus.PENDING_REVIEW]
 
 
+# Confirmed amounts stay under the smallest seeded goal ($20) so open posts stay open.
+SEED_GIFTS = [
+    (500, DonationStatus.CONFIRMED),
+    (1000, DonationStatus.PENDING),
+    (300, DonationStatus.DISPUTED),
+]
+
+
 class SeedError(Exception):
     pass
+
+
+def seed_donations(users: list[User], posts: list[Post]) -> list[Donation]:
+    now = utcnow()
+    open_posts = [p for p in posts if p.status is PostStatus.OPEN]
+    donations = []
+    for i, post in enumerate(open_posts):
+        donor = next(u for u in users[i + 1 :] + users if u is not post.user)
+        amount, status = SEED_GIFTS[i % len(SEED_GIFTS)]
+        donations.append(
+            Donation(
+                post=post,
+                donor=donor,
+                amount_cents=amount,
+                method=PaymentMethod.VENMO,
+                status=status,
+                resolved_at=None if status is DonationStatus.PENDING else now,
+            )
+        )
+    return donations
 
 
 def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tuple[int, int]:
@@ -112,7 +149,7 @@ def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tupl
                     created_at=now - timedelta(hours=rng.randrange(1, 24 * 14)),
                 )
             )
-    db.session.add_all([*users, *posts])
+    db.session.add_all([*users, *posts, *seed_donations(users, posts)])
     db.session.commit()
     return len(users), len(posts)
 

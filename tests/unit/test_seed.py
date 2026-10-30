@@ -5,7 +5,7 @@ from flask import Flask
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import MAX_GOAL_CENTS, Post, PostStatus, User
+from app.models import MAX_GOAL_CENTS, Donation, DonationStatus, Post, PostStatus, User
 from app.seed import SeedError, seed
 
 
@@ -31,6 +31,14 @@ def test_seed_includes_pending_review_post(app: Flask) -> None:
     seed()
     statuses = set(db.session.scalars(select(Post.status)))
     assert PostStatus.PENDING_REVIEW in statuses
+
+
+def test_seed_adds_gifts_without_funding_open_posts(app: Flask) -> None:
+    seed()
+    donations = db.session.scalars(select(Donation)).all()
+    assert {d.status for d in donations} == set(DonationStatus)
+    assert all(d.donor_id != d.post.user_id for d in donations)
+    assert all(d.post.raised_cents < d.post.goal_cents for d in donations)
 
 
 def test_seed_extra_users_get_unique_names(app: Flask) -> None:

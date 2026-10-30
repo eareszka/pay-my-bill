@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.extensions import db
 from app.models import Post, PostKind, PostStatus
@@ -17,7 +17,7 @@ def index() -> str:
     page = min(max(request.args.get("page", 1, type=int), 1), MAX_PAGE)
     query = (
         select(Post)
-        .options(joinedload(Post.user))
+        .options(joinedload(Post.user), selectinload(Post.donations))
         .where(Post.status == PostStatus.OPEN)
         .order_by(Post.created_at.desc(), Post.id.desc())
     )
