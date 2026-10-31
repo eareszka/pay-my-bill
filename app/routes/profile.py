@@ -21,7 +21,7 @@ from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
 from app.mail import send_email
 from app.models import User
-from app.rewards import confirmed_gifts, progress, streak
+from app.rewards import badges, confirmed_gifts, progress, streak
 
 bp = Blueprint("profile", __name__)
 
@@ -106,6 +106,11 @@ def show(username: str) -> str:
     if user is None or not user.is_verified:
         abort(404)
     gifts = confirmed_gifts(user)
+    stats = progress(gifts)
     return render_template(
-        "profile/show.html", user=user, progress=progress(gifts), streak=streak(gifts)
+        "profile/show.html",
+        user=user,
+        progress=stats,
+        streak=streak(gifts),
+        badges=badges(user, gifts, stats.people_helped),
     )

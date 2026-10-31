@@ -43,6 +43,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Weekly giving streak (#58): consecutive Monday-to-Sunday (UTC) weeks with a confirmed gift that counts toward rewards, ending this week or last. The profile shows "N-week streak".
 
+- Badges (#57): First gift, Helped 5, Helped 25, Local hero (3 people in your own city and state), and On a roll (a 4-week streak). They're computed from confirmed gifts that count toward rewards, and only earned badges show on the profile.
+
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 

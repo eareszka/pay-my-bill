@@ -10,6 +10,11 @@
     </div>
     <p class="hint rewards-stats">{{ "{:,}".format(progress.xp) }} / {{ "{:,}".format(progress.next_level_at) }} XP · {{ progress.people_helped }} {{ "person" if progress.people_helped == 1 else "people" }} helped</p>
     {% if streak %}<p class="rewards-streak">{{ streak }}-week streak</p>{% endif %}
+    {% if badges %}
+      <ul class="badge-list" aria-label="Badges">
+        {% for badge in badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
+      </ul>
+    {% endif %}
   </section>
   {% include "profile/_handles.html" %}
 {% endblock %}

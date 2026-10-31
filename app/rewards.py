@@ -3,7 +3,7 @@ from datetime import UTC, date, datetime, timedelta
 from functools import cached_property
 
 from sqlalchemy import select
-from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.orm import aliased, contains_eager, lazyload
 
 from app.extensions import db
 from app.models import Donation, DonationStatus, Post, PostStatus, User, as_utc, utcnow
@@ -56,7 +56,11 @@ def confirmed_gifts(user: User) -> list[Donation]:
             select(Donation)
             .join(Donation.post)
             .join(recipient, Post.user)
-            .options(joinedload(Donation.post).lazyload(Post.donations))
+            .options(
+                contains_eager(Donation.post).options(
+                    lazyload(Post.donations), contains_eager(Post.user.of_type(recipient))
+                )
+            )
             .where(
                 Donation.donor_id == user.id,
                 Donation.status == DonationStatus.CONFIRMED,
@@ -81,13 +85,15 @@ def week_of(moment: datetime) -> date:
     return day - timedelta(days=day.weekday())
 
 
-def streak(gifts: list[Donation], now: datetime | None = None) -> int:
-    """Consecutive weeks with a confirmed gift, ending this week or last week.
+def gift_weeks(gifts: list[Donation]) -> set[date]:
+    # A gift counts in the week it was confirmed, so a batch of old claims
+    # confirmed together can't backfill a streak.
+    return {week_of(gift.resolved_at or gift.created_at) for gift in gifts}
 
-    A gift counts in the week it was confirmed, so a batch of old claims confirmed
-    together can't backfill a streak.
-    """
-    weeks = {week_of(gift.resolved_at or gift.created_at) for gift in gifts}
+
+def streak(gifts: list[Donation], now: datetime | None = None) -> int:
+    """Consecutive weeks with a confirmed gift, ending this week or last week."""
+    weeks = gift_weeks(gifts)
     week = week_of(now or utcnow())
     if week not in weeks:
         week -= timedelta(weeks=1)
@@ -96,3 +102,41 @@ def streak(gifts: list[Donation], now: datetime | None = None) -> int:
         count += 1
         week -= timedelta(weeks=1)
     return count
+
+
+def longest_streak(gifts: list[Donation]) -> int:
+    weeks = gift_weeks(gifts)
+    best = 0
+    for week in weeks:
+        if week - timedelta(weeks=1) in weeks:
+            continue
+        run = 1
+        while week + timedelta(weeks=run) in weeks:
+            run += 1
+        best = max(best, run)
+    return best
+
+
+def _place(person: User) -> tuple[str, str] | None:
+    if not (person.city and person.state):
+        return None
+    return person.city.strip().casefold(), person.state.casefold()
+
+
+@dataclass(frozen=True)
+class Badge:
+    name: str
+    description: str
+
+
+def badges(user: User, gifts: list[Donation], people_helped: int) -> list[Badge]:
+    home = _place(user)
+    local = {g.post.user_id for g in gifts if home and _place(g.post.user) == home}
+    earned = [
+        (len(gifts) >= 1, Badge("First gift", "Had a gift confirmed")),
+        (people_helped >= 5, Badge("Helped 5", "Helped 5 different people")),
+        (people_helped >= 25, Badge("Helped 25", "Helped 25 different people")),
+        (len(local) >= 3, Badge("Local hero", "Helped 3 people in their own city")),
+        (longest_streak(gifts) >= 4, Badge("On a roll", "Gave 4 weeks in a row")),
+    ]
+    return [badge for won, badge in earned if won]
