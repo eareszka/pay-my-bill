@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from functools import cached_property
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.orm import aliased, contains_eager, lazyload
 
 from app.extensions import db
@@ -44,32 +44,34 @@ class Progress:
         return (self.xp - start) * 100 // (self.next_level_at - start)
 
 
-def confirmed_gifts(user: User) -> list[Donation]:
-    """Gifts that earn rewards (ADR 0004, ADR 0010).
+def rewardable_gifts() -> Select[Donation]:
+    """Gifts that earn rewards and rank on leaderboards (ADR 0004, ADR 0010).
 
     Confirmed, not on a removed post, and to a verified recipient whose account
-    is at least 3 days old, so throwaway accounts can't farm XP (T2).
+    is at least 3 days old, so throwaway accounts can't farm XP (T2). Each gift
+    comes with its post and recipient loaded.
     """
     recipient = aliased(User)
-    return list(
-        db.session.scalars(
-            select(Donation)
-            .join(Donation.post)
-            .join(recipient, Post.user)
-            .options(
-                contains_eager(Donation.post).options(
-                    lazyload(Post.donations), contains_eager(Post.user.of_type(recipient))
-                )
-            )
-            .where(
-                Donation.donor_id == user.id,
-                Donation.status == DonationStatus.CONFIRMED,
-                Post.status != PostStatus.REMOVED,
-                recipient.email_verified_at.is_not(None),
-                recipient.created_at <= utcnow() - timedelta(days=RECIPIENT_MIN_AGE_DAYS),
+    return (
+        select(Donation)
+        .join(Donation.post)
+        .join(recipient, Post.user)
+        .options(
+            contains_eager(Donation.post).options(
+                lazyload(Post.donations), contains_eager(Post.user.of_type(recipient))
             )
         )
+        .where(
+            Donation.status == DonationStatus.CONFIRMED,
+            Post.status != PostStatus.REMOVED,
+            recipient.email_verified_at.is_not(None),
+            recipient.created_at <= utcnow() - timedelta(days=RECIPIENT_MIN_AGE_DAYS),
+        )
     )
+
+
+def confirmed_gifts(user: User) -> list[Donation]:
+    return list(db.session.scalars(rewardable_gifts().where(Donation.donor_id == user.id)))
 
 
 def progress(gifts: list[Donation]) -> Progress:

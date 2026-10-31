@@ -13,12 +13,10 @@
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('posts.new') }}">Post</a>
         <a href="{{ url_for('gifts.index') }}">Gifts{% if pending_gift_count %} <span class="badge" aria-hidden="true">{{ pending_gift_count }}</span><span class="sr-only">, {{ pending_gift_count }} to confirm</span>{% endif %}</a>
+        <a href="{{ url_for('leaders.index') }}">Leaders</a>
         <a class="nav-user" href="{{ url_for('profile.edit') }}">{{ current_user.username }}</a>
-        <form method="post" action="{{ url_for('auth.logout') }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn-link">Log out</button>
-        </form>
       {% else %}
+        <a href="{{ url_for('leaders.index') }}">Leaders</a>
         <a href="{{ url_for('auth.login') }}">Log in</a>
         <a href="{{ url_for('auth.signup') }}">Sign up</a>
       {% endif %}

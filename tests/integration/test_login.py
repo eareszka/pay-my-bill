@@ -103,7 +103,7 @@ def test_login_redirects_when_logged_in(client: FlaskClient, make_user: MakeUser
 
 def test_logout_ends_session(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user())
-    assert b"Log out" in client.get("/").data
+    assert b"Log out" in client.get("/profile").data
     resp = client.post("/logout", follow_redirects=True)
     assert b"logged out" in resp.data
     assert logged_in_as(client) is None
