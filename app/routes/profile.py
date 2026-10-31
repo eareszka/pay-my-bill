@@ -1,13 +1,22 @@
 import smtplib
 
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, logout_user
 from sqlalchemy import select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
 from app.accounts import anonymize
-from app.auth import login_required
+from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
 from app.mail import send_email
@@ -73,13 +82,19 @@ def delete_account() -> str | Response | tuple[str, int]:
     user: User = current_user
     delete_form = DeleteAccountForm()
     if delete_form.validate_on_submit():
-        if check_password_hash(user.password_hash, delete_form.password.data or ""):
+        # Same throttle as login, so a stolen session can't guess the password.
+        attempt = begin_login_attempt(user.username, request.remote_addr)
+        if attempt is None:
+            delete_form.password.errors.append("Too many failed attempts. Try again later.")
+        elif check_password_hash(user.password_hash, delete_form.password.data or ""):
+            mark_login_succeeded(attempt)
             anonymize(user)
             db.session.commit()
             logout_user()
             flash("Your account was deleted.", "success")
             return redirect(url_for("main.index"))
-        delete_form.password.errors.append("That password isn't right.")
+        else:
+            delete_form.password.errors.append("That password isn't right.")
     page = render_template("profile/edit.html", form=ProfileForm(obj=user), delete_form=delete_form)
     return page, 400
 

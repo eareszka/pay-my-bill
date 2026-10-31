@@ -236,6 +236,8 @@ def send_reminders() -> int:
     link = current_app.config["APP_URL"].rstrip("/") + "/gifts"
     emails = []
     for poster, gifts in by_poster.items():
+        if poster.is_deleted:
+            continue
         lines = "\n".join(
             f"- {format_cents(g.amount_cents)} via {g.method.label} "
             f'from {g.donor.username} for "{g.post.title}"'

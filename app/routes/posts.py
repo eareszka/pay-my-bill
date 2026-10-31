@@ -92,8 +92,19 @@ def render_post(post: Post, form: GiftForm) -> str:
 @bp.post("/<int:post_id>/delete")
 @login_required
 def delete(post_id: int) -> Response:
-    post = db.session.get(Post, post_id) if post_id <= MAX_DB_INT else None
+    # Lock the post so a gift confirmed or recorded at the same moment can't be lost.
+    post = (
+        db.session.scalars(
+            select(Post)
+            .where(Post.id == post_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        ).one_or_none()
+        if post_id <= MAX_DB_INT
+        else None
+    )
     if post is None or post.user_id != current_user.id:
+        db.session.rollback()
         abort(404)
     delete_post(post)
     db.session.commit()

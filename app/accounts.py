@@ -1,29 +1,37 @@
+from sqlalchemy import delete
+
 from app.extensions import db
-from app.models import DonationStatus, Post, PostStatus, User
-
-DELETED_TITLE = "Deleted post"
-DELETED_BODY = "The poster deleted this post."
-
-
-def has_confirmed_gifts(post: Post) -> bool:
-    return any(d.status == DonationStatus.CONFIRMED for d in post.donations)
+from app.models import (
+    DELETED_EMAIL_DOMAIN,
+    DELETED_POST_BODY,
+    DELETED_POST_TITLE,
+    LoginAttempt,
+    Post,
+    PostStatus,
+    User,
+)
 
 
 def delete_post(post: Post) -> None:
-    # Donors keep credit for confirmed gifts, so those posts lose their story but stay (T14).
-    if has_confirmed_gifts(post):
-        post.title = DELETED_TITLE
-        post.body = DELETED_BODY
-        post.status = PostStatus.CLOSED
-    else:
+    # Any recorded gift keeps the post as a scrubbed shell, so donors keep their
+    # credit and their "I sent it" record (T14). Only gift-free posts are removed.
+    if not post.donations:
         db.session.delete(post)
+        return
+    post.title = DELETED_POST_TITLE
+    post.body = DELETED_POST_BODY
+    if post.status == PostStatus.OPEN:
+        post.status = PostStatus.CLOSED
 
 
 def anonymize(user: User) -> None:
     for post in list(user.posts):
         delete_post(post)
+    db.session.execute(
+        delete(LoginAttempt).where(LoginAttempt.identifier.in_((user.username, user.email)))
+    )
     user.username = f"deleted-{user.id}"
-    user.email = f"deleted-{user.id}@deleted.invalid"
+    user.email = f"deleted-{user.id}{DELETED_EMAIL_DOMAIN}"
     user.password_hash = "!"  # noqa: S105 - not a hash, so no password matches
     user.email_verified_at = None
     user.city = user.state = None

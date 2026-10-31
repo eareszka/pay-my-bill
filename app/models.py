@@ -9,6 +9,9 @@ from app.extensions import Base
 MAX_GOAL_CENTS = 100_000
 MAX_OPEN_POSTS = 2
 PENDING_GIFT_DAYS = 14
+DELETED_EMAIL_DOMAIN = "@deleted.invalid"
+DELETED_POST_TITLE = "Deleted post"
+DELETED_POST_BODY = "The poster deleted this post."
 
 
 def utcnow() -> datetime:
@@ -119,6 +122,10 @@ class User(Base):
         return f"{self.city}, {self.state}" if self.city and self.state else None
 
     @property
+    def is_deleted(self) -> bool:
+        return self.email.endswith(DELETED_EMAIL_DOMAIN)
+
+    @property
     def has_payment_handle(self) -> bool:
         return any((self.cashapp_handle, self.venmo_handle, self.paypal_handle))
 
@@ -148,6 +155,10 @@ class Post(Base):
     donations: Mapped[list["Donation"]] = relationship(
         back_populates="post", cascade="all, delete-orphan", lazy="selectin"
     )
+
+    @property
+    def is_deleted(self) -> bool:
+        return self.title == DELETED_POST_TITLE and self.body == DELETED_POST_BODY
 
     @property
     def raised_cents(self) -> int:

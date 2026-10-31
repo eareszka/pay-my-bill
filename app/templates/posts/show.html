@@ -55,10 +55,10 @@
       </section>
     {% endif %}
   </article>
-  {% if is_owner %}
+  {% if is_owner and not post.is_deleted %}
     <section class="danger-zone" id="delete">
       {% if request.args.get("delete") %}
-        <p class="confirm-prompt">Delete this post? {% if post.raised_cents %}Its story is removed, but donors keep credit for their confirmed gifts.{% else %}It's removed for good.{% endif %}</p>
+        <p class="confirm-prompt">Delete this post? {% if post.donations %}Its story is removed, but donors keep credit for their gifts.{% else %}It's removed for good.{% endif %}</p>
         <div class="actions">
           <form method="post" action="{{ url_for('posts.delete', post_id=post.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
