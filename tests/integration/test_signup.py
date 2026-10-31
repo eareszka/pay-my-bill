@@ -253,3 +253,11 @@ def test_signup_stores_adult_attestation(client: FlaskClient) -> None:
     assert user is not None
     assert user.adult_attested_at is not None
     assert utcnow() - as_utc(user.adult_attested_at) < timedelta(seconds=30)
+
+
+def test_field_errors_are_linked_for_screen_readers(client: FlaskClient) -> None:
+    page = client.post("/signup", data={**FORM, "username": "x"}).get_data(as_text=True)
+    assert 'aria-describedby="username-error" aria-invalid="true"' in page
+    assert (
+        '<small class="error" id="username-error">Usernames are 3 to 30 characters.</small>' in page
+    )

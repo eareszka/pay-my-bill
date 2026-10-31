@@ -30,6 +30,15 @@ All notable changes to this project are documented here. The format follows [Kee
 - Delete a post or your account (#31, T14), each with an inline "Are you sure?" step. A post with no gifts is removed. One with any recorded gift loses its story but stays, so donors keep credit and their records; an open post closes, and funded or moderated posts keep their status. Deleting the account needs your password and has the same rate limit as login. It removes or scrubs your posts, anonymizes you as `deleted-<id>`, clears your email, handles, region, and login history, and ends your sessions on every device.
 - Design context for Impeccable: `PRODUCT.md` (product truth for design work) and the `/gifts` surface brief in `.impeccable/surfaces/`.
 
+- Beta-ready design polish with Impeccable (#54), keeping the existing colors, themes, layout, and wording:
+  - Every form field shows its error state and links it for screen readers.
+  - Native controls follow dark mode (`color-scheme`, `accent-color`).
+  - Buttons and tabs get hover, focus, active, and disabled states.
+  - Selection, caret, placeholder, and link underlines are themed, and money uses tabular figures.
+  - Notices use a tint instead of a colored side border.
+  - Top-bar links have 44px touch targets at the same height, and flash messages are announced.
+  - Owner-approved copy: "donate" wording became gift and chip-in wording, and form errors are written plainly.
+
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 

@@ -2,7 +2,7 @@
 {% block title %}Verify your email · Pay My Bill{% endblock %}
 {% block content %}
   <h1>Verify your email</h1>
-  <p>You need to verify your email before you can post or donate. We sent a link to
+  <p>You need to verify your email before you can post or chip in. We sent a link to
     <strong>{{ current_user.email }}</strong>.</p>
   <form method="post" action="{{ url_for('auth.verify_resend') }}">
     {{ form.hidden_tag() }}

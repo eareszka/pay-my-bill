@@ -112,7 +112,7 @@ def test_missing_post(client: FlaskClient, donor: User) -> None:
         ("0", "venmo", "The amount has to be more than $0"),
         ("300.01", "venmo", "Gifts to this post can be up to $300"),
         ("5,50", "venmo", "Enter an amount like 20 or 12.50"),
-        ("", "venmo", "This field is required"),
+        ("", "venmo", "Enter an amount."),
         ("20", "paypal", "Not a valid choice"),
         ("20", "", "Pick the app you used"),
     ],
@@ -167,3 +167,13 @@ def test_one_pending_gift_per_donor_per_post(client: FlaskClient, post: Post, do
 
 def test_csrf_tokens_do_not_expire(client: FlaskClient) -> None:
     assert client.application.config["WTF_CSRF_TIME_LIMIT"] is None
+
+
+def test_gift_field_errors_are_linked(client: FlaskClient, post: Post, donor: User) -> None:
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "aria-invalid" not in page
+    page = send(client, post, "0", "").get_data(as_text=True)
+    assert 'aria-describedby="chip-amount-error" aria-invalid="true"' in page
+    assert 'aria-describedby="method-error" aria-invalid="true"' in page
+    assert '<small class="error" id="method-error">Pick the app you used.</small>' in page

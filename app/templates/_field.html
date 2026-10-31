@@ -1,8 +1,20 @@
 {% macro field(f) %}
   <label class="field">
     <span>{{ f.label.text }}</span>
-    {{ f(**kwargs) }}
-    {% if f.description and not f.errors %}<small>{{ f.description }}</small>{% endif %}
-    {% for error in f.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    {% if f.errors %}
+      {{ f(**dict(kwargs, aria_invalid="true", aria_describedby=f.id ~ "-error")) }}
+      <small class="error" id="{{ f.id }}-error">{{ f.errors | join(" ") }}</small>
+    {% else %}
+      {{ f(**kwargs) }}
+      {% if f.description %}<small>{{ f.description }}</small>{% endif %}
+    {% endif %}
   </label>
+{% endmacro %}
+
+{% macro choice(f) %}
+  <label class="choice">
+    {% if f.errors %}{{ f(aria_invalid="true", aria_describedby=f.id ~ "-error") }}{% else %}{{ f() }}{% endif %}
+    <span>{% if caller %}{{ caller() }}{% else %}{{ f.label.text }}{% endif %}</span>
+  </label>
+  {% if f.errors %}<small class="error" id="{{ f.id }}-error">{{ f.errors | join(" ") }}</small>{% endif %}
 {% endmacro %}

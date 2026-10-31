@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_field.html" import field %}
+{% from "_field.html" import choice, field %}
 {% block title %}Sign up · Pay My Bill{% endblock %}
 {% block content %}
   <h1>Create your account</h1>
@@ -9,11 +9,7 @@
     {{ field(form.email, autocomplete="email") }}
     {{ field(form.password, autocomplete="new-password") }}
     {{ field(form.confirm, autocomplete="new-password") }}
-    <label class="choice">
-      {{ form.adult() }}
-      <span>{{ form.adult.label.text }}</span>
-    </label>
-    {% for error in form.adult.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    {{ choice(form.adult) }}
     <button type="submit" class="btn">Sign up</button>
   </form>
 {% endblock %}
