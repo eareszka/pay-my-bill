@@ -1,9 +1,25 @@
+from datetime import timedelta
+
+import pytest
 from flask.testing import FlaskClient
 
 from app.extensions import db
-from app.models import Donation, DonationStatus, PaymentMethod, Post, PostKind, User
+from app.models import (
+    Donation,
+    DonationStatus,
+    PaymentMethod,
+    Post,
+    PostKind,
+    PostStatus,
+    User,
+    utcnow,
+)
 from app.rewards import confirmed_gifts, progress
 from tests.conftest import MakeUser
+
+
+def recipient(make_user: MakeUser, name: str, **fields: object) -> User:
+    return make_user(name, created_at=utcnow() - timedelta(days=5), **fields)
 
 
 def add_post(owner: User) -> Post:
@@ -24,21 +40,35 @@ def give(post: Post, donor: User, status: DonationStatus = DonationStatus.CONFIR
 
 def test_xp_counts_confirmed_gifts_and_new_people(make_user: MakeUser) -> None:
     donor = make_user("dev_tom")
-    maria, kayla = make_user("maria_g"), make_user("kayla.r")
-    rent, book = add_post(maria), add_post(kayla)
+    rent = add_post(recipient(make_user, "maria_g"))
+    book = add_post(recipient(make_user, "kayla.r"))
     give(rent, donor)
     give(rent, donor)
     give(book, donor)
     for status in (DonationStatus.PENDING, DonationStatus.DISPUTED):
-        give(add_post(make_user(f"x_{status.value}")), donor, status)
+        give(add_post(recipient(make_user, f"x_{status.value}")), donor, status)
     p = progress(confirmed_gifts(donor))
     assert (p.xp, p.people_helped) == (3 * 10 + 2 * 25, 2)
+
+
+@pytest.mark.parametrize("case", ["removed_post", "new_account", "unverified"])
+def test_gifts_that_earn_nothing(make_user: MakeUser, case: str) -> None:
+    donor = make_user("dev_tom")
+    if case == "new_account":
+        owner = make_user("maria_g")
+    else:
+        owner = recipient(make_user, "maria_g", verified=case != "unverified")
+    post = add_post(owner)
+    if case == "removed_post":
+        post.status = PostStatus.REMOVED
+    give(post, donor)
+    assert progress(confirmed_gifts(donor)).xp == 0
 
 
 def test_profile_shows_level_and_people_helped(client: FlaskClient, make_user: MakeUser) -> None:
     donor = make_user("dev_tom")
     for i in range(4):
-        give(add_post(make_user(f"friend{i}")), donor)
+        give(add_post(recipient(make_user, f"friend{i}")), donor)
     page = client.get("/u/dev_tom").get_data(as_text=True)
     assert '<p class="rewards-level">Level 2</p>' in page
     assert "140 / 300 XP · 4 people helped" in page

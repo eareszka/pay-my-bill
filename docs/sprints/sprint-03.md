@@ -1,6 +1,6 @@
 # Sprint 3: Giving feels rewarding
 
-**Dates:** 2026-11-16 → 2026-11-22 · **Goal:** donors see XP, levels, badges, and streaks on their profile, and where they rank by people helped
+**Dates:** 2026-10-31 → 2026-11-06 (pulled forward) · **Goal:** donors see XP, levels, badges, and streaks on their profile, and where they rank by people helped
 
 Pulled forward on 2026-10-31, because Sprint 2 finished early. The owner chose the scope, the XP rule, and the screens.
 

@@ -15,7 +15,7 @@ Reporting, blocking, and in-app account deletion are App Store requirements (Gui
 **Done when:** a real pledge goes from post → Cash App/Venmo/PayPal → confirmed, end to end, on a phone against staging.
 
 ## Phase 2: Production (v0.2-beta)
-- Paid hosting, a custom domain, and HTTPS (PB-13, ADR 0010). The staging Postgres expiry (PB-8) is handled first.
+- Paid hosting, a custom domain, and HTTPS (PB-13, ADR 0011). The staging Postgres expiry (PB-8) is handled first.
 - A transactional email provider so verification emails arrive (PB-14).
 - Error monitoring, an uptime check, and database backups (PB-15).
 - A daily scheduled job runs `flask gifts remind` (#29).
@@ -31,7 +31,7 @@ Reporting, blocking, and in-app account deletion are App Store requirements (Gui
 **Done when:** the beta exit criteria from PB-11 are met, and the legal review is done.
 
 ## Phase 4: iOS wrapper (v1.0)
-- A Capacitor shell around the production site (PB-16, ADR 0011). Guideline 4.2 rejects thin web wrappers, so it adds native value: push notifications (pledge received, confirm reminders, results update due), the native share sheet, and an offline screen.
+- A Capacitor shell around the production site (PB-16, ADR 0012). Guideline 4.2 rejects thin web wrappers, so it adds native value: push notifications (pledge received, confirm reminders, results update due), the native share sheet, and an offline screen.
 - Builds need macOS and Xcode. CI builds and signs on a GitHub Actions macOS runner (PB-17), so no Mac is needed locally.
 - Apple Developer Program, $99/year (PB-18). An organization account (LLC) needs a D-U-N-S number and takes a few weeks to set up, so start early.
 

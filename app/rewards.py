@@ -1,13 +1,16 @@
 from dataclasses import dataclass
+from datetime import timedelta
+from functools import cached_property
 
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import aliased, joinedload
 
 from app.extensions import db
-from app.models import Donation, DonationStatus, User
+from app.models import Donation, DonationStatus, Post, PostStatus, User, utcnow
 
 GIFT_XP = 10
 NEW_PERSON_XP = 25
+RECIPIENT_MIN_AGE_DAYS = 3
 
 
 def level_start(level: int) -> int:
@@ -27,7 +30,7 @@ class Progress:
     xp: int
     people_helped: int
 
-    @property
+    @cached_property
     def level(self) -> int:
         return level_for(self.xp)
 
@@ -42,13 +45,25 @@ class Progress:
 
 
 def confirmed_gifts(user: User) -> list[Donation]:
-    # Only recipient-confirmed gifts earn anything (ADR 0004).
+    """Gifts that earn rewards (ADR 0004, ADR 0010).
+
+    Confirmed, not on a removed post, and to a verified recipient whose account
+    is at least 3 days old, so throwaway accounts can't farm XP (T2).
+    """
+    recipient = aliased(User)
     return list(
         db.session.scalars(
             select(Donation)
-            .options(joinedload(Donation.post))
-            .where(Donation.donor_id == user.id, Donation.status == DonationStatus.CONFIRMED)
-            .order_by(Donation.created_at, Donation.id)
+            .join(Donation.post)
+            .join(recipient, Post.user)
+            .options(joinedload(Donation.post).lazyload(Post.donations))
+            .where(
+                Donation.donor_id == user.id,
+                Donation.status == DonationStatus.CONFIRMED,
+                Post.status != PostStatus.REMOVED,
+                recipient.email_verified_at.is_not(None),
+                recipient.created_at <= utcnow() - timedelta(days=RECIPIENT_MIN_AGE_DAYS),
+            )
         )
     )
 
