@@ -22,10 +22,10 @@
       {{ field(form.goal, inputmode="decimal", placeholder="$120") }}
       {% if form.require_rules %}
         <label class="choice">
-          {{ form.accept_rules() }}
+          {% if form.accept_rules.errors %}{{ form.accept_rules(aria_invalid="true", aria_describedby="accept_rules-error") }}{% else %}{{ form.accept_rules() }}{% endif %}
           <span>I agree to the <a href="{{ url_for('main.rules') }}" target="_blank">Community Rules</a></span>
         </label>
-        {% for error in form.accept_rules.errors %}<small class="error">{{ error }}</small>{% endfor %}
+        {% if form.accept_rules.errors %}<small class="error" id="accept_rules-error">{{ form.accept_rules.errors | join(" ") }}</small>{% endif %}
       {% endif %}
       <button type="submit" class="btn">Post</button>
     </form>

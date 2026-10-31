@@ -10,10 +10,10 @@
     {{ field(form.password, autocomplete="new-password") }}
     {{ field(form.confirm, autocomplete="new-password") }}
     <label class="choice">
-      {{ form.adult() }}
+      {% if form.adult.errors %}{{ form.adult(aria_invalid="true", aria_describedby="adult-error") }}{% else %}{{ form.adult() }}{% endif %}
       <span>{{ form.adult.label.text }}</span>
     </label>
-    {% for error in form.adult.errors %}<small class="error">{{ error }}</small>{% endfor %}
+    {% if form.adult.errors %}<small class="error" id="adult-error">{{ form.adult.errors | join(" ") }}</small>{% endif %}
     <button type="submit" class="btn">Sign up</button>
   </form>
 {% endblock %}

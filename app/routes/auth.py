@@ -39,7 +39,7 @@ def send_verification(user: User) -> None:
     send_email(
         user.email,
         "Verify your Pay My Bill email",
-        f"Hi {user.username},\n\nConfirm your email to start posting and donating:\n{link}\n\n"
+        f"Hi {user.username},\n\nConfirm your email to start posting and chipping in:\n{link}\n\n"
         "This link expires in 48 hours.",
     )
 

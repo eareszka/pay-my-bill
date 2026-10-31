@@ -13,7 +13,7 @@ Pulled forward on 2026-10-30, because Sprint 1 finished early. The owner picked 
 | S2-4 Confirm or dispute gifts on /gifts | #44 | 3 | Done |
 | Auto-expire pending gifts after 14 days | #29 | 2 | Done |
 | 18+ attestation at signup | #30 | 1 | Done |
-| Delete my post and my account | #31 | 3 | In review |
+| Delete my post and my account | #31 | 3 | Done |
 
 **Total:** 16 points (Sprint 1 velocity: 23).
 
@@ -27,3 +27,4 @@ Pulled forward on 2026-10-30, because Sprint 1 finished early. The owner picked 
 - 2026-10-31: #44 merged (#50). The code review added a post-row lock before funding, dropped removed posts, and dropped the UTC date. Impeccable's finish reviewer moved the dispute spacing, button heights, the badge's screen-reader text, the empty-state copy, and the ledger columns, then shipped. Did #29: expiry worked out from the gift's date, an Expired status, and `flask gifts remind` with `reminded_at` (migration 0004). Next: #30, then #31. Blocked: none.
 - 2026-10-31: #29 merged (#51). The review made reminders commit per poster (no repeats after a failure), took links straight from `APP_URL`, and let expired gifts still be disputed. Did #30: the 18+ checkbox at signup, stored in `adult_attested_at`. Next: #31. Blocked: none.
 - 2026-10-31: #30 merged (#52). Did #31: delete a post or the account, with inline confirms (the owner chose anonymizing and inline steps). Next: the review for #31, then the beta-ready polish pass. Blocked: none.
+- 2026-10-31: #31 merged (#53). The review added a post lock, kept gifted posts as scrubbed shells, ended deleted accounts' sessions, rate-limited the password, and cleared login history. All 16 points are done. Did #54: the beta-ready Impeccable polish pass across every page. Two inspection rounds at 360 in both themes, and the detector is clean on the rendered pages. Next: Sprint Review and Retro (owner), then Sprint 3 planning. Blocked: none.

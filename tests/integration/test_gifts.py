@@ -112,7 +112,7 @@ def test_missing_post(client: FlaskClient, donor: User) -> None:
         ("0", "venmo", "The amount has to be more than $0"),
         ("300.01", "venmo", "Gifts to this post can be up to $300"),
         ("5,50", "venmo", "Enter an amount like 20 or 12.50"),
-        ("", "venmo", "This field is required"),
+        ("", "venmo", "Enter an amount."),
         ("20", "paypal", "Not a valid choice"),
         ("20", "", "Pick the app you used"),
     ],

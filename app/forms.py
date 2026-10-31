@@ -42,20 +42,33 @@ class SignupForm(FlaskForm):
         "Username",
         filters=[_lower],
         validators=[
-            DataRequired(),
-            Length(min=3, max=30),
+            DataRequired(message="Choose a username."),
+            Length(min=3, max=30, message="Usernames are 3 to 30 characters."),
             Regexp(r"^[a-z0-9_.]+$", message="Use letters, numbers, dots, and underscores."),
         ],
     )
     email = EmailField(
         "Email",
         filters=[_lower],
-        validators=[DataRequired(), Email(check_deliverability=False), Length(max=254)],
+        validators=[
+            DataRequired(message="Enter your email."),
+            Email(check_deliverability=False, message="Enter a valid email address."),
+            Length(max=254, message="Emails are up to 254 characters."),
+        ],
     )
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=8, max=128)])
+    password = PasswordField(
+        "Password",
+        validators=[
+            DataRequired(message="Choose a password."),
+            Length(min=8, max=128, message="Passwords are 8 to 128 characters."),
+        ],
+    )
     confirm = PasswordField(
         "Confirm password",
-        validators=[DataRequired(), EqualTo("password", message="Passwords must match.")],
+        validators=[
+            DataRequired(message="Type your password again."),
+            EqualTo("password", message="Passwords must match."),
+        ],
     )
     adult = BooleanField(
         "I'm 18 or older",
@@ -65,9 +78,13 @@ class SignupForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     identifier = StringField(
-        "Username or email", filters=[_lower], validators=[DataRequired(), Length(max=254)]
+        "Username or email",
+        filters=[_lower],
+        validators=[DataRequired(message="Enter your username or email."), Length(max=254)],
     )
-    password = PasswordField("Password", validators=[DataRequired(), Length(max=128)])
+    password = PasswordField(
+        "Password", validators=[DataRequired(message="Enter your password."), Length(max=128)]
+    )
 
 
 def _handle_field(label: str, normalize: Callable[[str | None], str | None], hint: str) -> Any:
@@ -83,7 +100,11 @@ def _handle_field(label: str, normalize: Callable[[str | None], str | None], hin
 
 
 class ProfileForm(FlaskForm):
-    city = StringField("City", filters=[_strip_to_none], validators=[Length(max=80)])
+    city = StringField(
+        "City",
+        filters=[_strip_to_none],
+        validators=[Length(max=80, message="City names are up to 80 characters.")],
+    )
     state = SelectField(
         "State",
         choices=[SelectChoice("", "Choose a state")]
@@ -117,18 +138,26 @@ class PostForm(FlaskForm):
         validators=[DataRequired(message="Choose Need or Want.")],
     )
     title = StringField(
-        "Title", filters=[_strip_to_none], validators=[DataRequired(), Length(min=3, max=80)]
+        "Title",
+        filters=[_strip_to_none],
+        validators=[
+            DataRequired(message="Give your post a title."),
+            Length(min=3, max=80, message="Titles are 3 to 80 characters."),
+        ],
     )
     body = TextAreaField(
         "Your story",
         filters=[_strip_to_none],
-        validators=[DataRequired(), Length(min=10, max=2000)],
+        validators=[
+            DataRequired(message="Tell people what it's for."),
+            Length(min=10, max=2000, message="Your story needs 10 to 2,000 characters."),
+        ],
         description="What it's for and why. Be honest; people can see your history.",
     )
     goal = StringField(
         "Goal amount",
         filters=[_strip_to_none],
-        validators=[DataRequired()],
+        validators=[DataRequired(message="Enter a goal amount.")],
         description=f"Up to {format_cents(MAX_GOAL_CENTS)}.",
     )
     accept_rules = BooleanField("I agree to the Community Rules")
@@ -159,7 +188,9 @@ class PostForm(FlaskForm):
 
 
 class GiftForm(FlaskForm):
-    amount = StringField("Amount", filters=[_strip_to_none], validators=[DataRequired()])
+    amount = StringField(
+        "Amount", filters=[_strip_to_none], validators=[DataRequired(message="Enter an amount.")]
+    )
     method = SelectField(
         "via", validators=[DataRequired(message="Pick the app you used.")], validate_choice=True
     )
@@ -191,7 +222,9 @@ class GiftForm(FlaskForm):
 
 
 class DeleteAccountForm(FlaskForm):
-    password = PasswordField("Your password", validators=[DataRequired(), Length(max=128)])
+    password = PasswordField(
+        "Your password", validators=[DataRequired(message="Enter your password."), Length(max=128)]
+    )
 
 
 class EmptyForm(FlaskForm):

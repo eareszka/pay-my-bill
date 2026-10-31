@@ -7,7 +7,7 @@
   {% elif post.status == PostStatus.REMOVED %}
     <p class="notice notice-error">{% if is_owner %}This post was removed for breaking the Community Rules. Only you and moderators can see it.{% else %}Removed: hidden from everyone except the poster and moderators.{% endif %}</p>
   {% elif post.status in (PostStatus.FUNDED, PostStatus.CLOSED) %}
-    <p class="notice">This post is {{ post.status.value }} and isn't taking donations.</p>
+    <p class="notice">This post is {{ post.status.value }} and isn't taking gifts.</p>
   {% endif %}
   <article class="post">
     {% include "posts/_meta.html" %}
@@ -27,7 +27,7 @@
             <button type="submit" disabled hidden aria-hidden="true"></button>
             <label class="field">
               <span>Amount</span>
-              {{ form.amount(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100) }}
+              {{ form.amount(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100, aria_describedby="chip-amount-error") }}
               {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
               <small id="chip-amount-error" class="error" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
             </label>
