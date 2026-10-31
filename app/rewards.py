@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import UTC, date, datetime, timedelta
 from functools import cached_property
 
 from sqlalchemy import select
 from sqlalchemy.orm import aliased, joinedload
 
 from app.extensions import db
-from app.models import Donation, DonationStatus, Post, PostStatus, User, utcnow
+from app.models import Donation, DonationStatus, Post, PostStatus, User, as_utc, utcnow
 
 GIFT_XP = 10
 NEW_PERSON_XP = 25
@@ -73,3 +73,26 @@ def progress(gifts: list[Donation]) -> Progress:
     return Progress(
         xp=GIFT_XP * len(gifts) + NEW_PERSON_XP * len(people), people_helped=len(people)
     )
+
+
+def week_of(moment: datetime) -> date:
+    """The Monday (UTC) of the week a moment falls in."""
+    day = as_utc(moment).astimezone(UTC).date()
+    return day - timedelta(days=day.weekday())
+
+
+def streak(gifts: list[Donation], now: datetime | None = None) -> int:
+    """Consecutive weeks with a confirmed gift, ending this week or last week.
+
+    A gift counts in the week it was confirmed, so a batch of old claims confirmed
+    together can't backfill a streak.
+    """
+    weeks = {week_of(gift.resolved_at or gift.created_at) for gift in gifts}
+    week = week_of(now or utcnow())
+    if week not in weeks:
+        week -= timedelta(weeks=1)
+    count = 0
+    while week in weeks:
+        count += 1
+        week -= timedelta(weeks=1)
+    return count

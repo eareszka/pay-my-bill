@@ -41,6 +41,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - XP and levels (#56): each confirmed gift earns 10 XP, plus 25 the first time you help a new person, and the amount doesn't matter (ADR 0010). Only gifts to verified recipients with accounts at least 3 days old count, and gifts on removed posts don't. Level L starts at 50 × L × (L − 1) XP. The public profile shows the level, an XP bar, and people helped. Everything is computed from confirmed gifts in `app/rewards.py`.
 
+- Weekly giving streak (#58): consecutive Monday-to-Sunday (UTC) weeks with a confirmed gift that counts toward rewards, ending this week or last. The profile shows "N-week streak".
+
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 
