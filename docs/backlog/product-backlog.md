@@ -69,7 +69,7 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 - [ ] Blocking is silent: the blocked user isn't notified.
 
 ### PB-13 Production hosting, domain, and HTTPS · #TBD · 3 pts · P0 · chore · v0.2-beta
-- [ ] ADR 0010 records the production host, plan, and monthly cost.
+- [ ] ADR 0011 records the production host, plan, and monthly cost.
 - [ ] Production auto-deploys from tagged releases, separate from staging, on the domain chosen in PB-10, with HTTPS.
 - [ ] `SESSION_COOKIE_SECURE` and the other production settings come from env vars and are listed in `.env.example`.
 
@@ -85,7 +85,7 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 ### PB-16 Spike: Capacitor iOS wrapper · #TBD · 3 pts · P1 · spike · v1.0
 - [ ] A Capacitor project that loads the production site, with a write-up in `docs/research/`.
 - [ ] A plan for the native features that clear Guideline 4.2: push notifications, the share sheet, and an offline screen.
-- [ ] ADR 0011 records the decision.
+- [ ] ADR 0012 records the decision.
 
 ### PB-17 Spike: iOS builds on macOS CI · #TBD · 2 pts · P1 · spike · v1.0
 - [ ] A GitHub Actions macOS workflow builds and signs the app and uploads it to TestFlight, with the signing secrets in GitHub secrets.

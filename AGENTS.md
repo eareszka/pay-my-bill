@@ -17,13 +17,14 @@ Read this file fully before making any change. The project is run as a professio
    - 0004: **only recipient-confirmed donations count** toward XP, badges, streaks, leaderboards, and post progress
    - 0005: Render for staging (`render.yaml`)
    - 0006: money is stored as integer cents
+   - 0010: XP per person helped (amount-blind)
 4. `docs/threat-model.md`: abuse cases T1–T10 and which sprint mitigates each
-5. `docs/backlog/sprint-02.md`: the current sprint's stories and acceptance criteria
+5. `docs/backlog/sprint-03.md`: the current sprint's stories and acceptance criteria
 
 ## Stack and commands
 - Python 3.12, Flask app factory in `app/__init__.py`, blueprints in `app/routes/`
 - Models live in `app/models.py` and subclass `Base` from `app/extensions.py` (not `db.Model`, which mypy can't type). Migrations live in `migrations/` (`flask --app app db migrate -m "..."`). Money is integer cents (ADR 0006).
-- Planned modules: `app/rewards.py`, `app/leaderboard.py` (`app/moderation.py` and `app/payment_links.py` exist now)
+- `app/rewards.py` computes XP, levels, streaks, and badges from confirmed gifts (ADR 0010). Planned: `app/leaderboard.py` (`app/moderation.py` and `app/payment_links.py` exist now)
 - Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, from Sprint 4)
 
 ```powershell

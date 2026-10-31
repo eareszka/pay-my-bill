@@ -3,5 +3,12 @@
 {% block content %}
   <h1>{{ user.username }}</h1>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
+  <section class="rewards" aria-label="Giving">
+    <p class="rewards-level">Level {{ progress.level }}</p>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress.percent }}" aria-label="XP toward level {{ progress.level + 1 }}">
+      <span style="width: {{ progress.percent }}%"></span>
+    </div>
+    <p class="hint rewards-stats">{{ "{:,}".format(progress.xp) }} / {{ "{:,}".format(progress.next_level_at) }} XP · {{ progress.people_helped }} {{ "person" if progress.people_helped == 1 else "people" }} helped</p>
+  </section>
   {% include "profile/_handles.html" %}
 {% endblock %}

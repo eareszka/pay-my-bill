@@ -21,6 +21,7 @@ from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
 from app.mail import send_email
 from app.models import User
+from app.rewards import confirmed_gifts, progress
 
 bp = Blueprint("profile", __name__)
 
@@ -104,4 +105,4 @@ def show(username: str) -> str:
     user = db.session.scalar(select(User).where(User.username == username.lower()))
     if user is None or not user.is_verified:
         abort(404)
-    return render_template("profile/show.html", user=user)
+    return render_template("profile/show.html", user=user, progress=progress(confirmed_gifts(user)))
