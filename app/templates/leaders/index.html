@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Leaders · Pay My Bill{% endblock %}
+{% block content %}
+  <h1>Leaders</h1>
+  <p class="hint leaders-hint">Ranked by how many different people each donor has helped. Only confirmed gifts count.</p>
+  {% if tabs | length > 1 %}
+    <nav class="tabs" aria-label="Where">
+      {% for value, label in tabs.items() %}
+        <a href="{{ url_for('leaders.index', scope=value, period=period) }}" {% if scope == value %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </nav>
+  {% endif %}
+  <nav class="tabs" aria-label="When">
+    {% for value, label in [(Period.WEEK, "This week"), (Period.ALL, "All time")] %}
+      <a href="{{ url_for('leaders.index', scope=scope, period=value) }}" {% if period == value %}aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  {% if rows %}
+    <ol class="leader-list">
+      {% for row in rows %}
+        <li{% if row.user.id == viewer_id %} class="is-you" aria-current="true"{% endif %}>
+          <span class="leader-rank">{{ row.rank }}</span>
+          <a href="{{ url_for('profile.show', username=row.user.username) }}">{{ row.user.username }}</a>{% if row.user.id == viewer_id %}<span class="sr-only">, you</span>{% endif %}
+          <span class="leader-people">{{ row.people }} {{ "person" if row.people == 1 else "people" }}</span>
+        </li>
+      {% endfor %}
+    </ol>
+    {% if mine %}<p class="leader-you">You: #{{ mine.rank }} · {{ mine.people }} {{ "person" if mine.people == 1 else "people" }}</p>{% endif %}
+  {% else %}
+    <p class="empty">No one's on this board yet{% if period == Period.WEEK %} this week{% endif %}. Chip in on a post, and once it's confirmed you'll show up here. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
+  {% endif %}
+{% endblock %}
