@@ -106,11 +106,11 @@ def show(username: str) -> str:
     if user is None or not user.is_verified:
         abort(404)
     gifts = confirmed_gifts(user)
-    weeks = streak(gifts)
+    stats = progress(gifts)
     return render_template(
         "profile/show.html",
         user=user,
-        progress=progress(gifts),
-        streak=weeks,
-        badges=badges(user, gifts, weeks),
+        progress=stats,
+        streak=streak(gifts),
+        badges=badges(user, gifts, stats.people_helped),
     )

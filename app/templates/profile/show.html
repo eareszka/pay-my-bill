@@ -12,7 +12,7 @@
     {% if streak %}<p class="rewards-streak">{{ streak }}-week streak</p>{% endif %}
     {% if badges %}
       <ul class="badge-list" aria-label="Badges">
-        {% for badge in badges %}<li title="{{ badge.description }}">{{ badge.name }}</li>{% endfor %}
+        {% for badge in badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
       </ul>
     {% endif %}
   </section>
