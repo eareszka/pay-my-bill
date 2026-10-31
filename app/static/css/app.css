@@ -98,7 +98,7 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
   outline-offset: 0;
   border-color: var(--accent);
 }
-.field [aria-invalid="true"] { border-color: var(--error); }
+.field [aria-invalid="true"], .field [aria-invalid="true"]:focus-visible { border-color: var(--error); }
 .field textarea { min-height: 120px; }
 .error { color: var(--error); }
 .muted, .hint, .field small:not(.error) { color: var(--muted); }

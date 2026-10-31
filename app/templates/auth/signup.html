@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_field.html" import field %}
+{% from "_field.html" import choice, field %}
 {% block title %}Sign up · Pay My Bill{% endblock %}
 {% block content %}
   <h1>Create your account</h1>
@@ -9,11 +9,7 @@
     {{ field(form.email, autocomplete="email") }}
     {{ field(form.password, autocomplete="new-password") }}
     {{ field(form.confirm, autocomplete="new-password") }}
-    <label class="choice">
-      {% if form.adult.errors %}{{ form.adult(aria_invalid="true", aria_describedby="adult-error") }}{% else %}{{ form.adult() }}{% endif %}
-      <span>{{ form.adult.label.text }}</span>
-    </label>
-    {% if form.adult.errors %}<small class="error" id="adult-error">{{ form.adult.errors | join(" ") }}</small>{% endif %}
+    {{ choice(form.adult) }}
     <button type="submit" class="btn">Sign up</button>
   </form>
 {% endblock %}

@@ -27,7 +27,8 @@
             <button type="submit" disabled hidden aria-hidden="true"></button>
             <label class="field">
               <span>Amount</span>
-              {{ form.amount(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100, aria_describedby="chip-amount-error") }}
+              {% set amount_attrs = dict(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100, aria_describedby="chip-amount-error") %}
+              {% if form.amount.errors %}{{ form.amount(aria_invalid="true", **amount_attrs) }}{% else %}{{ form.amount(**amount_attrs) }}{% endif %}
               {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
               <small id="chip-amount-error" class="error" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
             </label>
@@ -40,7 +41,7 @@
             <h3 class="section-title">Sent it?</h3>
             {% if current_user.is_authenticated %}
               <div class="sent-row">
-                <label class="field"><span>via</span>{{ form.method() }}{% for error in form.method.errors %}<small class="error">{{ error }}</small>{% endfor %}</label>
+                <label class="field"><span>via</span>{% if form.method.errors %}{{ form.method(aria_invalid="true", aria_describedby="method-error") }}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% else %}{{ form.method() }}{% endif %}</label>
                 <button type="submit" class="btn">I sent it</button>
               </div>
               <p class="hint">It counts once {{ post.user.username }} confirms it came through.</p>

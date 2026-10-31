@@ -167,3 +167,13 @@ def test_one_pending_gift_per_donor_per_post(client: FlaskClient, post: Post, do
 
 def test_csrf_tokens_do_not_expire(client: FlaskClient) -> None:
     assert client.application.config["WTF_CSRF_TIME_LIMIT"] is None
+
+
+def test_gift_field_errors_are_linked(client: FlaskClient, post: Post, donor: User) -> None:
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "aria-invalid" not in page
+    page = send(client, post, "0", "").get_data(as_text=True)
+    assert 'aria-describedby="chip-amount-error" aria-invalid="true"' in page
+    assert 'aria-describedby="method-error" aria-invalid="true"' in page
+    assert '<small class="error" id="method-error">Pick the app you used.</small>' in page

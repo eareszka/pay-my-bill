@@ -80,10 +80,17 @@ class LoginForm(FlaskForm):
     identifier = StringField(
         "Username or email",
         filters=[_lower],
-        validators=[DataRequired(message="Enter your username or email."), Length(max=254)],
+        validators=[
+            DataRequired(message="Enter your username or email."),
+            Length(max=254, message="That's longer than any username or email here."),
+        ],
     )
     password = PasswordField(
-        "Password", validators=[DataRequired(message="Enter your password."), Length(max=128)]
+        "Password",
+        validators=[
+            DataRequired(message="Enter your password."),
+            Length(max=128, message="Passwords are up to 128 characters."),
+        ],
     )
 
 
@@ -223,7 +230,11 @@ class GiftForm(FlaskForm):
 
 class DeleteAccountForm(FlaskForm):
     password = PasswordField(
-        "Your password", validators=[DataRequired(message="Enter your password."), Length(max=128)]
+        "Your password",
+        validators=[
+            DataRequired(message="Enter your password."),
+            Length(max=128, message="Passwords are up to 128 characters."),
+        ],
     )
 
 
