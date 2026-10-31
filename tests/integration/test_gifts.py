@@ -53,6 +53,7 @@ def test_record_gift_emails_poster(
     assert post.raised_cents == 0
     assert "dev_tom sent you a gift" in caplog.text
     assert 'dev_tom says they sent you $12.50 via Venmo for "Rent"' in caplog.text
+    assert "http://localhost/gifts" in caplog.text
 
 
 def test_form_shown_to_logged_in_donor(client: FlaskClient, post: Post, donor: User) -> None:

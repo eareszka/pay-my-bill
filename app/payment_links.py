@@ -40,9 +40,9 @@ class PayOption(NamedTuple):
 
 # Base pay URL per app and how an amount is appended to it (done in the browser).
 PAY_URLS = {
-    PaymentMethod.CASHAPP: ("Cash App", "https://cash.app/{}", "/"),
-    PaymentMethod.VENMO: ("Venmo", "https://venmo.com/?txn=pay&recipients={}", "&amount="),
-    PaymentMethod.PAYPAL: ("PayPal", "https://paypal.me/{}", "/"),
+    PaymentMethod.CASHAPP: ("https://cash.app/{}", "/"),
+    PaymentMethod.VENMO: ("https://venmo.com/?txn=pay&recipients={}", "&amount="),
+    PaymentMethod.PAYPAL: ("https://paypal.me/{}", "/"),
 }
 
 
@@ -55,6 +55,8 @@ def pay_options(user: User) -> list[PayOption]:
     options = []
     for method, handle in handles.items():
         if handle:
-            label, url, sep = PAY_URLS[method]
-            options.append(PayOption(method, label, handle, url.format(handle.lstrip("@")), sep))
+            url, sep = PAY_URLS[method]
+            options.append(
+                PayOption(method, method.label, handle, url.format(handle.lstrip("@")), sep)
+            )
     return options
