@@ -57,6 +57,10 @@ class SignupForm(FlaskForm):
         "Confirm password",
         validators=[DataRequired(), EqualTo("password", message="Passwords must match.")],
     )
+    adult = BooleanField(
+        "I'm 18 or older",
+        validators=[DataRequired(message="You need to be 18 or older to join.")],
+    )
 
 
 class LoginForm(FlaskForm):

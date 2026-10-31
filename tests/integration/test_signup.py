@@ -20,6 +20,7 @@ FORM = {
     "email": "New@Example.com",
     "password": "s3cret-pass",
     "confirm": "s3cret-pass",
+    "adult": "y",
 }
 
 
@@ -236,3 +237,17 @@ def test_proxy_headers_make_https_links(
 ) -> None:
     client.post("/signup", data=FORM, headers={"X-Forwarded-Proto": "https"})
     assert "https://localhost/verify/" in caplog.text
+
+
+def test_signup_requires_18_plus(client: FlaskClient) -> None:
+    resp = client.post("/signup", data={k: v for k, v in FORM.items() if k != "adult"})
+    assert resp.status_code == 200
+    assert "You need to be 18 or older to join." in resp.get_data(as_text=True)
+    assert user_count() == 0
+
+
+def test_signup_stores_adult_attestation(client: FlaskClient) -> None:
+    client.post("/signup", data=FORM)
+    user = db.session.scalar(select(User))
+    assert user is not None
+    assert user.adult_attested_at is not None

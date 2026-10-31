@@ -97,6 +97,7 @@ class User(Base):
     venmo_handle: Mapped[str | None] = mapped_column(String(40))
     paypal_handle: Mapped[str | None] = mapped_column(String(40))
     rules_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    adult_attested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_admin: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
