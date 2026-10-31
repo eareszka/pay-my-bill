@@ -148,6 +148,12 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 }
 .count { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 
+.danger-zone { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); }
+.danger-zone .section-title { margin-bottom: 8px; }
+.confirm-prompt { margin: 0 0 10px; font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions form { margin: 0; }
+
 .gift-section { margin-bottom: 32px; }
 .gift-section > .section-title { margin-bottom: 4px; }
 .gift-section > .hint { margin-bottom: 12px; }

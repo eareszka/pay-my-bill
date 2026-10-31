@@ -55,4 +55,20 @@
       </section>
     {% endif %}
   </article>
+  {% if is_owner %}
+    <section class="danger-zone" id="delete">
+      {% if request.args.get("delete") %}
+        <p class="confirm-prompt">Delete this post? {% if post.raised_cents %}Its story is removed, but donors keep credit for their confirmed gifts.{% else %}It's removed for good.{% endif %}</p>
+        <div class="actions">
+          <form method="post" action="{{ url_for('posts.delete', post_id=post.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger">Yes, delete</button>
+          </form>
+          <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id) }}#delete">Cancel</a>
+        </div>
+      {% else %}
+        <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete post</a>
+      {% endif %}
+    </section>
+  {% endif %}
 {% endblock %}
