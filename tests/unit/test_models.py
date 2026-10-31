@@ -176,3 +176,8 @@ def test_gift_expiry(days_old: float, status: DonationStatus, expired: bool) -> 
         assert gift.is_expired is expired
         assert gift.status_label == ("Expired" if expired else status.label)
         assert gift.status_class == ("expired" if expired else status.value)
+
+
+def test_unsaved_gift_is_not_expired() -> None:
+    gift = Donation(amount_cents=500, method=PaymentMethod.VENMO, status=DonationStatus.PENDING)
+    assert (gift.is_expired, gift.status_label) == (False, "Waiting")

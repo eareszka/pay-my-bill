@@ -154,3 +154,20 @@ def test_remind_retries_after_email_failure(
     monkeypatch.undo()
     assert run_remind(app) == "Reminder emails sent: 1\n"
     assert db.session.scalar(select(Donation.reminded_at)) is not None
+
+
+def test_expired_gift_can_still_be_disputed(client: FlaskClient, poster: User, donor: User) -> None:
+    gift = add_gift(add_post(poster), donor, days_old=15)
+    login_as(client, poster)
+    assert client.post(f"/gifts/{gift.id}/dispute").location == "/gifts"
+    assert gift.status is DonationStatus.DISPUTED
+
+
+def test_remind_links_use_app_url(
+    app: Flask, poster: User, donor: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    app.config["APP_URL"] = "https://pmb.example/"
+    add_gift(add_post(poster), donor, days_old=4)
+    with caplog.at_level(logging.INFO):
+        run_remind(app)
+    assert "https://pmb.example/gifts" in caplog.text

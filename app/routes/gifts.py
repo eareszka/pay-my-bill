@@ -14,7 +14,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
-from sqlalchemy import Select, func, select
+from sqlalchemy import Select, func, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
@@ -180,7 +180,7 @@ def resolve(donation_id: int, action: str) -> Response:
         db.session.rollback()
         flash("That gift was already handled.", "info")
         return redirect(url_for("gifts.index"))
-    if donation.is_expired:
+    if action == "confirm" and donation.is_expired:
         db.session.rollback()
         flash(f"That gift expired after {PENDING_GIFT_DAYS} days, so it can't count.", "info")
         return redirect(url_for("gifts.index"))
@@ -225,7 +225,7 @@ def send_reminders() -> int:
             Donation.status == DonationStatus.PENDING,
             Donation.reminded_at.is_(None),
             Donation.created_at <= now - timedelta(days=REMIND_AFTER_DAYS),
-            Donation.created_at > gift_expiry_cutoff(),
+            Donation.created_at > gift_expiry_cutoff(now),
             Post.status != PostStatus.REMOVED,
         )
         .order_by(Donation.created_at, Donation.id)
@@ -233,9 +233,8 @@ def send_reminders() -> int:
     by_poster: defaultdict[User, list[Donation]] = defaultdict(list)
     for gift in due:
         by_poster[gift.post.user].append(gift)
-    with current_app.test_request_context(base_url=current_app.config["APP_URL"]):
-        link = url_for("gifts.index", _external=True)
-    sent = 0
+    link = current_app.config["APP_URL"].rstrip("/") + "/gifts"
+    emails = []
     for poster, gifts in by_poster.items():
         lines = "\n".join(
             f"- {format_cents(g.amount_cents)} via {g.method.label} "
@@ -249,15 +248,22 @@ def send_reminders() -> int:
             f"Gifts nobody confirms expire after {PENDING_GIFT_DAYS} days, "
             "and the donor gets no credit."
         )
+        emails.append((poster.id, poster.email, body, [g.id for g in gifts]))
+    # End the read transaction before slow SMTP sends; mark each poster as soon as
+    # their email goes out so a later failure can't cause a repeat.
+    db.session.rollback()
+    sent = 0
+    for poster_id, address, body, gift_ids in emails:
         try:
-            send_email(poster.email, "Gifts waiting for you to confirm", body)
+            send_email(address, "Gifts waiting for you to confirm", body)
         except (smtplib.SMTPException, OSError):
-            current_app.logger.exception("Could not send the gift reminder to user %s", poster.id)
+            current_app.logger.exception("Could not send the gift reminder to user %s", poster_id)
             continue
-        for gift in gifts:
-            gift.reminded_at = now
+        db.session.execute(
+            update(Donation).where(Donation.id.in_(gift_ids)).values(reminded_at=now)
+        )
+        db.session.commit()
         sent += 1
-    db.session.commit()
     return sent
 
 

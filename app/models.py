@@ -20,9 +20,9 @@ def as_utc(value: datetime) -> datetime:
     return value if value.tzinfo else value.replace(tzinfo=UTC)
 
 
-def gift_expiry_cutoff() -> datetime:
+def gift_expiry_cutoff(now: datetime | None = None) -> datetime:
     # Pending gifts created at or before this moment have expired (T15).
-    return utcnow() - timedelta(days=PENDING_GIFT_DAYS)
+    return (now or utcnow()) - timedelta(days=PENDING_GIFT_DAYS)
 
 
 class PostKind(StrEnum):
@@ -185,6 +185,7 @@ class Donation(Base):
     def is_expired(self) -> bool:
         return (
             self.status == DonationStatus.PENDING
+            and self.created_at is not None
             and as_utc(self.created_at) <= gift_expiry_cutoff()
         )
 
