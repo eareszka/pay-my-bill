@@ -1,6 +1,7 @@
 import logging
 import re
 import smtplib
+from datetime import timedelta
 
 import pytest
 from flask import Flask
@@ -11,7 +12,7 @@ from werkzeug.security import check_password_hash
 from app import create_app
 from app.auth import verified_required
 from app.extensions import db
-from app.models import User, utcnow
+from app.models import User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
 from tests.conftest import MakeUser, login_as
 
@@ -251,3 +252,4 @@ def test_signup_stores_adult_attestation(client: FlaskClient) -> None:
     user = db.session.scalar(select(User))
     assert user is not None
     assert user.adult_attested_at is not None
+    assert utcnow() - as_utc(user.adult_attested_at) < timedelta(seconds=30)
