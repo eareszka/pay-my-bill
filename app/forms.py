@@ -190,5 +190,9 @@ class GiftForm(FlaskForm):
         return form
 
 
+class DeleteAccountForm(FlaskForm):
+    password = PasswordField("Your password", validators=[DataRequired(), Length(max=128)])
+
+
 class EmptyForm(FlaskForm):
     pass

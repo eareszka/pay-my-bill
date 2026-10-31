@@ -4,7 +4,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
-from app.auth import verified_required
+from app.accounts import delete_post
+from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm, PostForm
 from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, utcnow
@@ -86,3 +87,26 @@ def render_post(post: Post, form: GiftForm) -> str:
     return render_template(
         "posts/show.html", post=post, pay_options=pay_options(post.user), form=form
     )
+
+
+@bp.post("/<int:post_id>/delete")
+@login_required
+def delete(post_id: int) -> Response:
+    # Lock the post so a gift confirmed or recorded at the same moment can't be lost.
+    post = (
+        db.session.scalars(
+            select(Post)
+            .where(Post.id == post_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        ).one_or_none()
+        if post_id <= MAX_DB_INT
+        else None
+    )
+    if post is None or post.user_id != current_user.id:
+        db.session.rollback()
+        abort(404)
+    delete_post(post)
+    db.session.commit()
+    flash("Your post was deleted.", "success")
+    return redirect(url_for("main.index"))

@@ -19,9 +19,11 @@ LOGIN_WINDOW = timedelta(minutes=15)
 
 def load_user(user_id: str) -> User | None:
     try:
-        return db.session.get(User, int(user_id))
+        user = db.session.get(User, int(user_id))
     except ValueError:
         return None
+    # A deleted account's other sessions end on their next request.
+    return None if user is None or user.is_deleted else user
 
 
 def unauthorized() -> Response:
