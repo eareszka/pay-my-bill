@@ -3,7 +3,7 @@ from datetime import UTC, date, datetime, timedelta
 from functools import cached_property
 
 from sqlalchemy import select
-from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.orm import aliased, joinedload, lazyload
 
 from app.extensions import db
 from app.models import Donation, DonationStatus, Post, PostStatus, User, as_utc, utcnow
@@ -56,7 +56,9 @@ def confirmed_gifts(user: User) -> list[Donation]:
             select(Donation)
             .join(Donation.post)
             .join(recipient, Post.user)
-            .options(joinedload(Donation.post).lazyload(Post.donations))
+            .options(
+                joinedload(Donation.post).options(lazyload(Post.donations), joinedload(Post.user))
+            )
             .where(
                 Donation.donor_id == user.id,
                 Donation.status == DonationStatus.CONFIRMED,
@@ -96,3 +98,29 @@ def streak(gifts: list[Donation], now: datetime | None = None) -> int:
         count += 1
         week -= timedelta(weeks=1)
     return count
+
+
+@dataclass(frozen=True)
+class Badge:
+    name: str
+    description: str
+
+
+def badges(user: User, gifts: list[Donation], weeks: int) -> list[Badge]:
+    people = {gift.post.user_id for gift in gifts}
+    local = {
+        gift.post.user_id
+        for gift in gifts
+        if user.city
+        and gift.post.user.city
+        and (gift.post.user.city.casefold(), gift.post.user.state)
+        == (user.city.casefold(), user.state)
+    }
+    earned = [
+        (len(gifts) >= 1, Badge("First gift", "Had a gift confirmed")),
+        (len(people) >= 5, Badge("Helped 5", "Helped 5 different people")),
+        (len(people) >= 25, Badge("Helped 25", "Helped 25 different people")),
+        (len(local) >= 3, Badge("Local hero", "Helped 3 people in their own city")),
+        (weeks >= 4, Badge("On a roll", "Gave 4 weeks in a row")),
+    ]
+    return [badge for won, badge in earned if won]
