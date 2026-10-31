@@ -80,3 +80,10 @@ def test_new_profile_starts_at_level_1(client: FlaskClient, make_user: MakeUser)
     page = client.get("/u/sam_helps").get_data(as_text=True)
     assert '<p class="rewards-level">Level 1</p>' in page
     assert "0 / 100 XP · 0 people helped" in page
+
+
+def test_profile_shows_streak_only_when_active(client: FlaskClient, make_user: MakeUser) -> None:
+    donor = make_user("dev_tom")
+    assert "week streak" not in client.get("/u/dev_tom").get_data(as_text=True)
+    give(add_post(recipient(make_user, "maria_g")), donor)
+    assert "1-week streak" in client.get("/u/dev_tom").get_data(as_text=True)
