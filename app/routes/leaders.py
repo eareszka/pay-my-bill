@@ -26,11 +26,12 @@ def index() -> str:
         scope = Scope.GLOBAL
     period = request.args.get("period", Period.WEEK, type=Period)
     rows = rank(scope, period, viewer)
+    shown = rows[:TOP]
     mine = next((row for row in rows if viewer and row.user.id == viewer.id), None)
     return render_template(
         "leaders/index.html",
-        rows=rows[:TOP],
-        mine=mine if mine and mine.rank > TOP else None,
+        rows=shown,
+        mine=mine if mine and mine not in shown else None,
         viewer_id=viewer.id if viewer else None,
         tabs=tabs,
         scope=scope,

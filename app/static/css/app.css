@@ -187,7 +187,6 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 }
 
 .leaders-hint { margin: -8px 0 16px; }
-.tabs + .tabs { margin-top: -8px; }
 .leader-list {
   display: grid;
   grid-template-columns: auto 1fr auto;

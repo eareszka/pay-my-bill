@@ -152,3 +152,53 @@ def test_top_bar_links_leaders_and_profile_holds_logout(
     assert 'href="/leaders">Leaders</a>' in home
     assert "Log out" not in home
     assert "Log out" in client.get("/profile").get_data(as_text=True)
+
+
+def test_deleted_recipient_still_counts(make_user: MakeUser) -> None:
+    from app.accounts import anonymize
+
+    tom, maria = person(make_user, "dev_tom"), person(make_user, "maria_g")
+    give(tom, maria)
+    anonymize(maria)
+    db.session.commit()
+    assert board() == [(1, "dev_tom", 1)]
+
+
+def test_cap_counts_gifts_on_removed_posts(make_user: MakeUser) -> None:
+    from app.models import PostStatus
+
+    tom, maria = person(make_user, "dev_tom"), person(make_user, "maria_g")
+    give(tom, maria, cents=15_000)
+    removed = maria.posts[0]
+    give(tom, maria, cents=10_000)
+    removed.status = PostStatus.REMOVED
+    db.session.commit()
+    assert board() == []
+
+
+def test_viewer_tied_past_the_cut_still_sees_their_rank(
+    client: FlaskClient, make_user: MakeUser, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.routes.leaders.TOP", 1)
+    me, other, r1 = person(make_user, "zed"), person(make_user, "alpha"), person(make_user, "r1")
+    give(other, r1)
+    give(me, r1)
+    login_as(client, me)
+    page = client.get("/leaders?period=all").get_data(as_text=True)
+    assert "You: #1 · 1 person" in page
+    assert '<span class="sr-only">, you</span>' not in page
+
+
+def test_viewer_row_is_announced(client: FlaskClient, make_user: MakeUser) -> None:
+    me = person(make_user, "me")
+    give(me, person(make_user, "maria_g"))
+    login_as(client, me)
+    assert '<span class="sr-only">, you</span>' in client.get("/leaders?period=all").get_data(
+        as_text=True
+    )
+
+
+def test_state_board_skips_donors_without_a_region(make_user: MakeUser) -> None:
+    viewer = person(make_user, "me", city="Tampa", state="FL")
+    give(person(make_user, "nowhere"), person(make_user, "r1"))
+    assert board(Scope.STATE, viewer=viewer) == []

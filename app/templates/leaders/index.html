@@ -20,7 +20,7 @@
       {% for row in rows %}
         <li{% if row.user.id == viewer_id %} class="is-you" aria-current="true"{% endif %}>
           <span class="leader-rank">{{ row.rank }}</span>
-          <a href="{{ url_for('profile.show', username=row.user.username) }}">{{ row.user.username }}</a>
+          <a href="{{ url_for('profile.show', username=row.user.username) }}">{{ row.user.username }}</a>{% if row.user.id == viewer_id %}<span class="sr-only">, you</span>{% endif %}
           <span class="leader-people">{{ row.people }} {{ "person" if row.people == 1 else "people" }}</span>
         </li>
       {% endfor %}

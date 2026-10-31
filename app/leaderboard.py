@@ -3,15 +3,17 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from enum import StrEnum
 
+from sqlalchemy import Select, select
 from sqlalchemy.orm import aliased, contains_eager
 
 from app.extensions import db
-from app.models import Donation, User, utcnow
-from app.rewards import rewardable_gifts, week_of
+from app.models import Donation, DonationStatus, User, utcnow
+from app.rewards import MIN_ACCOUNT_AGE_DAYS, place, rewardable_gifts, week_of
 
-DONOR_MIN_AGE_DAYS = 3
 PAIR_WEEKLY_CAP_CENTS = 20_000
 TOP = 20
+
+PairWeek = tuple[int, int, date]
 
 
 class Scope(StrEnum):
@@ -32,6 +34,28 @@ class Row:
     people: int
 
 
+def _since(query: Select[Donation], period: Period, now: datetime) -> Select[Donation]:
+    if period is Period.ALL:
+        return query
+    start = datetime.combine(week_of(now), datetime.min.time(), tzinfo=now.tzinfo)
+    return query.where(Donation.resolved_at >= start)
+
+
+def _pair_week(gift: Donation) -> PairWeek:
+    return gift.donor_id, gift.post.user_id, week_of(gift.resolved_at or gift.created_at)
+
+
+def _over_cap(period: Period, now: datetime) -> set[PairWeek]:
+    # Every confirmed gift counts toward the $200 pair cap, even ones that earn
+    # nothing (a removed post), so the cap can't be dodged (T11).
+    totals: defaultdict[PairWeek, int] = defaultdict(int)
+    query = select(Donation).join(Donation.post).options(contains_eager(Donation.post))
+    query = query.where(Donation.status == DonationStatus.CONFIRMED)
+    for gift in db.session.scalars(_since(query, period, now)):
+        totals[_pair_week(gift)] += gift.amount_cents
+    return {key for key, cents in totals.items() if cents > PAIR_WEEKLY_CAP_CENTS}
+
+
 def _gifts(period: Period, now: datetime) -> list[Donation]:
     donor = aliased(User)
     query = (
@@ -40,39 +64,29 @@ def _gifts(period: Period, now: datetime) -> list[Donation]:
         .options(contains_eager(Donation.donor.of_type(donor)))
         .where(
             donor.email_verified_at.is_not(None),
-            donor.created_at <= now - timedelta(days=DONOR_MIN_AGE_DAYS),
+            donor.created_at <= now - timedelta(days=MIN_ACCOUNT_AGE_DAYS),
         )
     )
-    if period is Period.WEEK:
-        start = datetime.combine(week_of(now), datetime.min.time(), tzinfo=now.tzinfo)
-        query = query.where(Donation.resolved_at >= start)
-    return list(db.session.scalars(query))
+    return list(db.session.scalars(_since(query, period, now)))
 
 
 def _in_scope(person: User, viewer: User | None, scope: Scope) -> bool:
     if scope is Scope.GLOBAL or viewer is None:
         return True
-    if (person.state or "").casefold() != (viewer.state or "").casefold():
+    mine, theirs = place(viewer), place(person)
+    if mine is None or theirs is None:
         return False
-    return scope is Scope.STATE or (
-        (person.city or "").strip().casefold() == (viewer.city or "").strip().casefold()
-    )
+    return theirs[1] == mine[1] if scope is Scope.STATE else theirs == mine
 
 
 def rank(scope: Scope, period: Period, viewer: User | None) -> list[Row]:
     """Donors ranked by distinct people helped (ADR 0009); ties share a rank."""
-    gifts = _gifts(period, utcnow())
-    # A donor->recipient pair over $200 in one week is left out for that week (T11).
-    pair_week: defaultdict[tuple[int, int, date], int] = defaultdict(int)
-    for gift in gifts:
-        when = gift.resolved_at or gift.created_at
-        pair_week[gift.donor_id, gift.post.user_id, week_of(when)] += gift.amount_cents
+    now = utcnow()
+    capped = _over_cap(period, now)
     helped: defaultdict[int, set[int]] = defaultdict(set)
     donors: dict[int, User] = {}
-    for gift in gifts:
-        when = gift.resolved_at or gift.created_at
-        key = (gift.donor_id, gift.post.user_id, week_of(when))
-        if pair_week[key] > PAIR_WEEKLY_CAP_CENTS or not _in_scope(gift.donor, viewer, scope):
+    for gift in _gifts(period, now):
+        if _pair_week(gift) in capped or not _in_scope(gift.donor, viewer, scope):
             continue
         helped[gift.donor_id].add(gift.post.user_id)
         donors[gift.donor_id] = gift.donor

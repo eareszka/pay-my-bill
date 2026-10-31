@@ -2,15 +2,24 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from functools import cached_property
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, or_, select
 from sqlalchemy.orm import aliased, contains_eager, lazyload
 
 from app.extensions import db
-from app.models import Donation, DonationStatus, Post, PostStatus, User, as_utc, utcnow
+from app.models import (
+    DELETED_EMAIL_DOMAIN,
+    Donation,
+    DonationStatus,
+    Post,
+    PostStatus,
+    User,
+    as_utc,
+    utcnow,
+)
 
 GIFT_XP = 10
 NEW_PERSON_XP = 25
-RECIPIENT_MIN_AGE_DAYS = 3
+MIN_ACCOUNT_AGE_DAYS = 3  # T2: verified accounts this old count toward rewards
 
 
 def level_start(level: int) -> int:
@@ -64,8 +73,12 @@ def rewardable_gifts() -> Select[Donation]:
         .where(
             Donation.status == DonationStatus.CONFIRMED,
             Post.status != PostStatus.REMOVED,
-            recipient.email_verified_at.is_not(None),
-            recipient.created_at <= utcnow() - timedelta(days=RECIPIENT_MIN_AGE_DAYS),
+            # A recipient who later deleted their account still counts (T14).
+            or_(
+                recipient.email_verified_at.is_not(None),
+                recipient.email.endswith(DELETED_EMAIL_DOMAIN),
+            ),
+            recipient.created_at <= utcnow() - timedelta(days=MIN_ACCOUNT_AGE_DAYS),
         )
     )
 
@@ -119,7 +132,7 @@ def longest_streak(gifts: list[Donation]) -> int:
     return best
 
 
-def _place(person: User) -> tuple[str, str] | None:
+def place(person: User) -> tuple[str, str] | None:
     if not (person.city and person.state):
         return None
     return person.city.strip().casefold(), person.state.casefold()
@@ -132,8 +145,8 @@ class Badge:
 
 
 def badges(user: User, gifts: list[Donation], people_helped: int) -> list[Badge]:
-    home = _place(user)
-    local = {g.post.user_id for g in gifts if home and _place(g.post.user) == home}
+    home = place(user)
+    local = {g.post.user_id for g in gifts if home and place(g.post.user) == home}
     earned = [
         (len(gifts) >= 1, Badge("First gift", "Had a gift confirmed")),
         (people_helped >= 5, Badge("Helped 5", "Helped 5 different people")),
