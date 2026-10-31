@@ -75,6 +75,7 @@ def signup() -> str | Response:
                 username=form.username.data,
                 email=form.email.data,
                 password_hash=generate_password_hash(form.password.data or ""),
+                adult_attested_at=utcnow(),
             )
             db.session.add(user)
             try:

@@ -126,6 +126,7 @@ def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tupl
             venmo_handle=f"@{username}" if i % 3 != 0 else None,
             paypal_handle=username if i % 3 == 2 else None,
             rules_accepted_at=now,
+            adult_attested_at=now,
             is_admin=i == 0,
             created_at=now - timedelta(days=30 - i),
         )

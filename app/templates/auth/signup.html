@@ -9,6 +9,11 @@
     {{ field(form.email, autocomplete="email") }}
     {{ field(form.password, autocomplete="new-password") }}
     {{ field(form.confirm, autocomplete="new-password") }}
+    <label class="choice">
+      {{ form.adult() }}
+      <span>{{ form.adult.label.text }}</span>
+    </label>
+    {% for error in form.adult.errors %}<small class="error">{{ error }}</small>{% endfor %}
     <button type="submit" class="btn">Sign up</button>
   </form>
 {% endblock %}

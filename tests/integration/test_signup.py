@@ -1,6 +1,7 @@
 import logging
 import re
 import smtplib
+from datetime import timedelta
 
 import pytest
 from flask import Flask
@@ -11,7 +12,7 @@ from werkzeug.security import check_password_hash
 from app import create_app
 from app.auth import verified_required
 from app.extensions import db
-from app.models import User, utcnow
+from app.models import User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
 from tests.conftest import MakeUser, login_as
 
@@ -20,6 +21,7 @@ FORM = {
     "email": "New@Example.com",
     "password": "s3cret-pass",
     "confirm": "s3cret-pass",
+    "adult": "y",
 }
 
 
@@ -236,3 +238,18 @@ def test_proxy_headers_make_https_links(
 ) -> None:
     client.post("/signup", data=FORM, headers={"X-Forwarded-Proto": "https"})
     assert "https://localhost/verify/" in caplog.text
+
+
+def test_signup_requires_18_plus(client: FlaskClient) -> None:
+    resp = client.post("/signup", data={k: v for k, v in FORM.items() if k != "adult"})
+    assert resp.status_code == 200
+    assert "You need to be 18 or older to join." in resp.get_data(as_text=True)
+    assert user_count() == 0
+
+
+def test_signup_stores_adult_attestation(client: FlaskClient) -> None:
+    client.post("/signup", data=FORM)
+    user = db.session.scalar(select(User))
+    assert user is not None
+    assert user.adult_attested_at is not None
+    assert utcnow() - as_utc(user.adult_attested_at) < timedelta(seconds=30)
