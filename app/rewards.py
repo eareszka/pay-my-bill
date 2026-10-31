@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from functools import cached_property
 
 from sqlalchemy import select
@@ -77,13 +77,17 @@ def progress(gifts: list[Donation]) -> Progress:
 
 def week_of(moment: datetime) -> date:
     """The Monday (UTC) of the week a moment falls in."""
-    day = as_utc(moment).date()
+    day = as_utc(moment).astimezone(UTC).date()
     return day - timedelta(days=day.weekday())
 
 
 def streak(gifts: list[Donation], now: datetime | None = None) -> int:
-    """Consecutive weeks with a confirmed gift, ending this week or last week."""
-    weeks = {week_of(gift.created_at) for gift in gifts}
+    """Consecutive weeks with a confirmed gift, ending this week or last week.
+
+    A gift counts in the week it was confirmed, so a batch of old claims confirmed
+    together can't backfill a streak.
+    """
+    weeks = {week_of(gift.resolved_at or gift.created_at) for gift in gifts}
     week = week_of(now or utcnow())
     if week not in weeks:
         week -= timedelta(weeks=1)

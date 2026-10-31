@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 
@@ -24,7 +24,7 @@ def test_progress_toward_next_level() -> None:
 
 
 def gift_on(day: datetime) -> Donation:
-    return Donation(created_at=day)
+    return Donation(created_at=day, resolved_at=day)
 
 
 NOW = datetime(2026, 11, 18, 12, tzinfo=UTC)  # a Wednesday
@@ -49,3 +49,17 @@ def test_streak(days_ago: list[int], expected: int) -> None:
 
 def test_streak_handles_naive_times() -> None:
     assert streak([gift_on(NOW.replace(tzinfo=None))], now=NOW) == 1
+
+
+def test_streak_week_boundaries_are_utc_mondays() -> None:
+    sunday_late = datetime(2026, 11, 15, 23, 59, tzinfo=UTC)
+    monday_early = datetime(2026, 11, 16, 0, 0, tzinfo=UTC)
+    assert streak([gift_on(sunday_late), gift_on(monday_early)], now=NOW) == 2
+    eastern = timezone(timedelta(hours=-5))
+    # Monday 02:00 UTC is still Sunday evening in New York, but counts as Monday.
+    assert streak([gift_on(monday_early.astimezone(eastern) + timedelta(hours=2))], now=NOW) == 1
+
+
+def test_streak_counts_the_week_a_gift_was_confirmed() -> None:
+    old_claim = Donation(created_at=NOW - timedelta(weeks=3), resolved_at=NOW)
+    assert streak([old_claim], now=NOW) == 1
