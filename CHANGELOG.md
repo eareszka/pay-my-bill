@@ -39,6 +39,8 @@ All notable changes to this project are documented here. The format follows [Kee
   - Top-bar links have 44px touch targets at the same height, and flash messages are announced.
   - Owner-approved copy: "donate" wording became gift and chip-in wording, and form errors are written plainly.
 
+- XP and levels (#56): each confirmed gift earns 10 XP, plus 25 the first time you help a new person, and the amount doesn't matter (ADR 0009). Level L starts at 50 × L × (L − 1) XP. The public profile shows the level, an XP bar, and people helped. Everything is computed from confirmed gifts in `app/rewards.py`.
+
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 

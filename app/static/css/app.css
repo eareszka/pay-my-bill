@@ -164,6 +164,20 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 }
 .count { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 
+.rewards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.rewards p { margin: 0; }
+.rewards-level { font-size: 1.125rem; font-weight: 700; }
+.rewards-stats { font-variant-numeric: tabular-nums; }
+
 .danger-zone { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); }
 .danger-zone .section-title { margin-bottom: 8px; }
 .confirm-prompt { margin: 0 0 10px; font-weight: 600; }
