@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 
 from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Index, String, Text
@@ -8,10 +8,21 @@ from app.extensions import Base
 
 MAX_GOAL_CENTS = 100_000
 MAX_OPEN_POSTS = 2
+PENDING_GIFT_DAYS = 14
 
 
 def utcnow() -> datetime:
     return datetime.now(UTC)
+
+
+def as_utc(value: datetime) -> datetime:
+    # SQLite hands back naive datetimes; everything is stored in UTC.
+    return value if value.tzinfo else value.replace(tzinfo=UTC)
+
+
+def gift_expiry_cutoff(now: datetime | None = None) -> datetime:
+    # Pending gifts created at or before this moment have expired (T15).
+    return (now or utcnow()) - timedelta(days=PENDING_GIFT_DAYS)
 
 
 class PostKind(StrEnum):
@@ -165,9 +176,26 @@ class Donation(Base):
     )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    reminded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     post: Mapped[Post] = relationship(back_populates="donations")
     donor: Mapped[User] = relationship()
+
+    @property
+    def is_expired(self) -> bool:
+        return (
+            self.status == DonationStatus.PENDING
+            and self.created_at is not None
+            and as_utc(self.created_at) <= gift_expiry_cutoff()
+        )
+
+    @property
+    def status_label(self) -> str:
+        return "Expired" if self.is_expired else self.status.label
+
+    @property
+    def status_class(self) -> str:
+        return "expired" if self.is_expired else self.status.value
 
 
 class LoginAttempt(Base):

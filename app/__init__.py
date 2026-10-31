@@ -28,6 +28,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAIL_USERNAME=os.environ.get("MAIL_USERNAME", ""),
         MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD", ""),
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
+        # Base URL for links in emails sent outside a request (the reminder command).
+        APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )

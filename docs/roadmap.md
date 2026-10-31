@@ -18,6 +18,7 @@ Reporting, blocking, and in-app account deletion are App Store requirements (Gui
 - Paid hosting, a custom domain, and HTTPS (PB-13, ADR 0010). The staging Postgres expiry (PB-8) is handled first.
 - A transactional email provider so verification emails arrive (PB-14).
 - Error monitoring, an uptime check, and database backups (PB-15).
+- A daily scheduled job runs `flask gifts remind` (#29).
 - An admin account and a moderation runbook.
 
 **Done when:** `/health` returns 200 on the production domain, and a new user can sign up, verify by email, and post.

@@ -1,5 +1,8 @@
 import smtplib
+from collections import defaultdict
+from datetime import timedelta
 
+import click
 from flask import (
     Blueprint,
     abort,
@@ -11,7 +14,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
-from sqlalchemy import Select, func, select
+from sqlalchemy import Select, func, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
@@ -19,7 +22,17 @@ from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm
 from app.mail import send_email
-from app.models import Donation, DonationStatus, PaymentMethod, Post, PostStatus, User, utcnow
+from app.models import (
+    PENDING_GIFT_DAYS,
+    Donation,
+    DonationStatus,
+    PaymentMethod,
+    Post,
+    PostStatus,
+    User,
+    gift_expiry_cutoff,
+    utcnow,
+)
 from app.money import format_cents
 from app.routes.posts import MAX_DB_INT, render_post
 
@@ -47,6 +60,7 @@ def has_pending_gift(donor: User, post: Post) -> bool:
             Donation.post_id == post.id,
             Donation.donor_id == donor.id,
             Donation.status == DonationStatus.PENDING,
+            Donation.created_at > gift_expiry_cutoff(),
         )
     )
     return bool(count)
@@ -93,7 +107,7 @@ MY_GIFTS_LIMIT = 50
 
 
 def waiting_for(user: User) -> Select[Donation]:
-    # Pending gifts to the user's posts; gifts on removed posts never count.
+    # Pending gifts to the user's posts; expired gifts and removed posts never count.
     return (
         select(Donation)
         .join(Donation.post)
@@ -101,6 +115,7 @@ def waiting_for(user: User) -> Select[Donation]:
             Post.user_id == user.id,
             Post.status != PostStatus.REMOVED,
             Donation.status == DonationStatus.PENDING,
+            Donation.created_at > gift_expiry_cutoff(),
         )
     )
 
@@ -165,6 +180,10 @@ def resolve(donation_id: int, action: str) -> Response:
         db.session.rollback()
         flash("That gift was already handled.", "info")
         return redirect(url_for("gifts.index"))
+    if action == "confirm" and donation.is_expired:
+        db.session.rollback()
+        flash(f"That gift expired after {PENDING_GIFT_DAYS} days, so it can't count.", "info")
+        return redirect(url_for("gifts.index"))
     confirmed = action == "confirm"
     donation.status = DonationStatus.CONFIRMED if confirmed else DonationStatus.DISPUTED
     donation.resolved_at = utcnow()
@@ -190,3 +209,65 @@ def resolve(donation_id: int, action: str) -> Response:
     else:
         flash(f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success")
     return redirect(url_for("gifts.index"))
+
+
+REMIND_AFTER_DAYS = 3
+
+
+def send_reminders() -> int:
+    """Email each poster once about gifts pending for 3+ days; returns emails sent."""
+    now = utcnow()
+    due = db.session.scalars(
+        select(Donation)
+        .join(Donation.post)
+        .options(joinedload(Donation.donor), joinedload(Donation.post).joinedload(Post.user))
+        .where(
+            Donation.status == DonationStatus.PENDING,
+            Donation.reminded_at.is_(None),
+            Donation.created_at <= now - timedelta(days=REMIND_AFTER_DAYS),
+            Donation.created_at > gift_expiry_cutoff(now),
+            Post.status != PostStatus.REMOVED,
+        )
+        .order_by(Donation.created_at, Donation.id)
+    ).all()
+    by_poster: defaultdict[User, list[Donation]] = defaultdict(list)
+    for gift in due:
+        by_poster[gift.post.user].append(gift)
+    link = current_app.config["APP_URL"].rstrip("/") + "/gifts"
+    emails = []
+    for poster, gifts in by_poster.items():
+        lines = "\n".join(
+            f"- {format_cents(g.amount_cents)} via {g.method.label} "
+            f'from {g.donor.username} for "{g.post.title}"'
+            for g in gifts
+        )
+        body = (
+            f"Hi {poster.username},\n\n"
+            f"These gifts are still waiting for you to confirm:\n{lines}\n\n"
+            f"Check your payment app, then confirm or dispute them here:\n{link}\n\n"
+            f"Gifts nobody confirms expire after {PENDING_GIFT_DAYS} days, "
+            "and the donor gets no credit."
+        )
+        emails.append((poster.id, poster.email, body, [g.id for g in gifts]))
+    # End the read transaction before slow SMTP sends; mark each poster as soon as
+    # their email goes out so a later failure can't cause a repeat.
+    db.session.rollback()
+    sent = 0
+    for poster_id, address, body, gift_ids in emails:
+        try:
+            send_email(address, "Gifts waiting for you to confirm", body)
+        except (smtplib.SMTPException, OSError):
+            current_app.logger.exception("Could not send the gift reminder to user %s", poster_id)
+            continue
+        db.session.execute(
+            update(Donation).where(Donation.id.in_(gift_ids)).values(reminded_at=now)
+        )
+        db.session.commit()
+        sent += 1
+    return sent
+
+
+@bp.cli.command("remind")
+def remind_command() -> None:
+    """Email posters about gifts waiting 3+ days to be confirmed (run daily)."""
+    click.echo(f"Reminder emails sent: {send_reminders()}")
