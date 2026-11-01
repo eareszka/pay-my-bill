@@ -45,6 +45,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Badges (#57): First gift, Helped 5, Helped 25, Local hero (3 people in your own city and state), and On a roll (a 4-week streak). They're computed from confirmed gifts that count toward rewards, and only earned badges show on the profile.
 
+- Leaderboards (#59): `/leaders` ranks donors by distinct people helped, with Global / state / city tabs and This week / All time. Only verified donors and recipients whose accounts are 3+ days old count, and a donor→recipient pair over $200 in a week is left out. Your row is highlighted (or listed below the top 20), and a full board links to the feed. The top bar gains Leaders, and Log out moves to the profile page.
+
 ### Fixed
 - Staging deploys failing since #12 (#23): SQLAlchemy 2.1 defaults `postgresql://` to psycopg 3, but only psycopg2 was installed. The app now depends on `psycopg[binary]` and pins `postgresql+psycopg://` for any Postgres URL scheme.
 
