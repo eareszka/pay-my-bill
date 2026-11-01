@@ -211,6 +211,7 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 .leader-rank { justify-self: end; color: var(--muted); font-variant-numeric: tabular-nums; }
 .leader-people { justify-self: end; font-variant-numeric: tabular-nums; }
 .leader-you { margin: 12px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.leader-cta { margin: 16px 0 0; }
 
 .danger-zone { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); }
 .danger-zone .section-title { margin-bottom: 8px; }

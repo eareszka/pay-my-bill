@@ -8,9 +8,9 @@ Pulled forward on 2026-10-31, because Sprint 2 finished early. The owner chose t
 | Story | Issue | Points | Status |
 |---|---|---|---|
 | S3-1 XP and levels on profiles | #56 | 3 | Done |
-| S3-2 Badges | #57 | 3 | In review |
+| S3-2 Badges | #57 | 3 | Done |
 | S3-3 Weekly giving streak | #58 | 2 | Done |
-| S3-4 Leaderboards by people helped | #59 | 5 | To do |
+| S3-4 Leaderboards by people helped | #59 | 5 | In review |
 
 **Total:** 13 points (Sprint 2: 16).
 
@@ -18,3 +18,4 @@ Pulled forward on 2026-10-31, because Sprint 2 finished early. The owner chose t
 - 2026-10-31: Sprint 2 finished (#47–#53) along with the polish pass (#55). Planned Sprint 3 with the owner and filed #56–#59. Claimed #56. Blocked: none.
 - 2026-10-31: #56 merged (#60). The review added the recipient checks (verified, 3+ days old, post not removed) and a lighter query, and ADR 0010 records the XP rule. Did #58: the weekly streak. Next: #57 badges, then #59 leaderboards. Blocked: none.
 - 2026-10-31: #58 merged (#61). The review moved weeks to UTC dates and counts gifts in the week they were confirmed, so streaks can't be backfilled. Did #57: badges. Next: #59 leaderboards. Blocked: none.
+- 2026-11-01: #57 merged (#62). Did #59: leaderboards. The code review hardened the pair cap, credit from deleted recipients, and ties at the cut. Impeccable's finish review spaced the tab rows apart and added screen-reader text for your row, and the owner approved a "Find someone to help" link under a full board. Next: merge, then Sprint 3 Review. Blocked: none.

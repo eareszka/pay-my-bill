@@ -26,6 +26,7 @@
       {% endfor %}
     </ol>
     {% if mine %}<p class="leader-you">You: #{{ mine.rank }} · {{ mine.people }} {{ "person" if mine.people == 1 else "people" }}</p>{% endif %}
+    <p class="leader-cta"><a href="{{ url_for('main.index') }}">Find someone to help</a></p>
   {% else %}
     <p class="empty">No one's on this board yet{% if period == Period.WEEK %} this week{% endif %}. Chip in on a post, and once it's confirmed you'll show up here. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
   {% endif %}

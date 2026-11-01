@@ -108,6 +108,7 @@ def test_page_tabs_rows_and_empty_state(client: FlaskClient, make_user: MakeUser
     page = client.get("/leaders?period=all&scope=bogus").get_data(as_text=True)
     assert '<span class="leader-rank">1</span>' in page
     assert '<span class="leader-people">1 person</span>' in page
+    assert '<p class="leader-cta"><a href="/">Find someone to help</a></p>' in page
     assert 'href="/leaders?scope=global&amp;period=week"' in page
 
 
