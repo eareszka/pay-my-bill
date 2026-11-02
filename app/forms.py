@@ -228,6 +228,17 @@ class GiftForm(FlaskForm):
         return form
 
 
+class ResultsUpdateForm(FlaskForm):
+    note = TextAreaField(
+        "Your update",
+        filters=[_strip_to_none],
+        validators=[
+            DataRequired(message="Tell people how it went."),
+            Length(min=20, max=2000, message="Your update needs 20 to 2,000 characters."),
+        ],
+    )
+
+
 class DeleteAccountForm(FlaskForm):
     password = PasswordField(
         "Your password",

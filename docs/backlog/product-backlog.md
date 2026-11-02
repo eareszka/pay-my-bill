@@ -100,14 +100,14 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 - [ ] A demo account and review notes covering link-out gifts (Guideline 3.2.1(vii)), reporting, blocking, and account deletion.
 - [ ] User-facing copy says "gift" or "chip in", never "charitable donation".
 
-### PB-20 Photo on a results update · #TBD · 2 pts · P3 · epic:posts
+### PB-20 Photo on a results update · #69 · 2 pts · P3 · epic:posts
 Moved out of PB-1 by the owner (2026-11-02). Text-only updates ship first.
 - [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename (T7).
 
-### PB-21 Record a gift sent just before a post closed · #TBD · 2 pts · P2 · epic:donations
+### PB-21 Record a gift sent just before a post closed · #67 · 2 pts · P2 · epic:donations
 From the PR #66 review. A donor can pay in their app while the post closes, and then "I sent it" is refused, so the gift can't count.
 - [ ] Decide with the owner how long after closing a gift can still be recorded, and whether a closed post should show the form.
 
-### PB-22 The 30 days start when a flagged post is approved · #TBD · 1 pt · P1 · epic:safety
+### PB-22 The 30 days start when a flagged post is approved · #68 · 1 pt · P1 · epic:safety
 From the PR #66 review. Do this with the admin queue, which adds approval. Today the clock runs from `created_at`, so time in review uses up a post's open window.
 - [ ] Given a flagged post approved on day 25, then it stays open for 30 days from approval.

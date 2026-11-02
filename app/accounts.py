@@ -20,6 +20,7 @@ def delete_post(post: Post) -> None:
         return
     post.title = DELETED_POST_TITLE
     post.body = DELETED_POST_BODY
+    post.update_body = None  # update_posted_at stays: the update was still made
     if post.status == PostStatus.OPEN:
         post.close()
 
