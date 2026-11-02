@@ -10,6 +10,7 @@ from sqlalchemy import (
     Index,
     String,
     Text,
+    UniqueConstraint,
     and_,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -59,6 +60,12 @@ class PostStatus(StrEnum):
 
 
 PUBLIC_STATUSES = (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
+
+
+class ReactionKind(StrEnum):
+    KUDOS = "kudos"
+    UP = "up"
+    HMM = "hmm"
 
 
 class PaymentMethod(StrEnum):
@@ -179,6 +186,7 @@ class Post(Base):
     donations: Mapped[list["Donation"]] = relationship(
         back_populates="post", cascade="all, delete-orphan", lazy="selectin"
     )
+    reactions: Mapped[list["Reaction"]] = relationship(cascade="all, delete-orphan")
 
     @property
     def is_deleted(self) -> bool:
@@ -299,6 +307,17 @@ class Donation(Base):
     @property
     def status_class(self) -> str:
         return "expired" if self.is_expired else self.status.value
+
+
+class Reaction(Base):
+    __tablename__ = "reactions"
+    __table_args__ = (UniqueConstraint("post_id", "user_id", "kind", name="one_reaction_each"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    kind: Mapped[ReactionKind] = mapped_column(_enum_column(ReactionKind, "reaction_kind"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class LoginAttempt(Base):

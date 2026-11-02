@@ -23,6 +23,8 @@ from app.models import (
     Post,
     PostKind,
     PostStatus,
+    Reaction,
+    ReactionKind,
     User,
     open_posts,
     utcnow,
@@ -123,10 +125,34 @@ def show(post_id: int) -> str:
     return render_post(post, GiftForm.for_post(post))
 
 
+def gave_to(post: Post, user: User) -> bool:
+    return user in post.confirmed_donors
+
+
+def reaction_view(post: Post) -> dict[str, object]:
+    viewer: User | None = current_user if current_user.is_authenticated else None
+    counts = {kind: 0 for kind in ReactionKind}
+    mine = set()
+    for reaction in post.reactions:
+        counts[reaction.kind] += 1
+        if viewer and reaction.user_id == viewer.id:
+            mine.add(reaction.kind)
+    can_react = bool(viewer and viewer.is_verified and viewer.id != post.user_id)
+    return {
+        "counts": counts,
+        "mine": mine,
+        "can_kudos": can_react,
+        "can_judge": bool(viewer and can_react and gave_to(post, viewer)),
+        "sees_hmm": viewer is not None and viewer.is_admin,
+    }
+
+
 def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
     return render_template(
         "posts/show.html",
         post=post,
+        reactions=reaction_view(post),
+        ReactionKind=ReactionKind,
         pay_options=pay_options(post.user),
         form=form,
         update_form=update_form or ResultsUpdateForm(formdata=None),
@@ -200,6 +226,36 @@ def update(post_id: int) -> Response | tuple[str, int]:
         send_update_notice(post, donor)
     flash("Thanks for sharing how it went.", "success")
     return redirect(url_for("posts.show", post_id=post_id))
+
+
+@bp.post("/<int:post_id>/react/<any(kudos, up, hmm):kind>")
+@verified_required
+def react(post_id: int, kind: str) -> Response:
+    # Lock the post so a double tap can't add the same reaction twice.
+    post = (
+        db.session.scalar(select(Post).where(Post.id == post_id).with_for_update())
+        if post_id <= MAX_DB_INT
+        else None
+    )
+    if post is None or post.status not in PUBLIC_STATUSES or not post.update_body:
+        db.session.rollback()
+        abort(404)
+    user: User = current_user
+    chosen = ReactionKind(kind)
+    if user.id == post.user_id or (chosen is not ReactionKind.KUDOS and not gave_to(post, user)):
+        db.session.rollback()
+        abort(403)
+    mine = {r.kind: r for r in post.reactions if r.user_id == user.id}
+    if chosen in mine:
+        post.reactions.remove(mine[chosen])
+    else:
+        post.reactions.append(Reaction(user_id=user.id, kind=chosen))
+        # 👍 and 🤨 replace each other; kudos stands apart.
+        other = {ReactionKind.UP: ReactionKind.HMM, ReactionKind.HMM: ReactionKind.UP}.get(chosen)
+        if other in mine:
+            post.reactions.remove(mine[other])
+    db.session.commit()
+    return redirect(url_for("posts.show", post_id=post_id, _anchor="update"))
 
 
 @bp.post("/<int:post_id>/delete")

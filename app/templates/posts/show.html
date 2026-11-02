@@ -21,6 +21,7 @@
         <h2 class="section-title">Results update</h2>
         <p class="hint">Posted {{ post.update_posted_at | date }}</p>
         <p class="post-body update-body">{{ post.update_body }}</p>
+        {% include "posts/_reactions.html" %}
       </section>
     {% elif post.owes_update and is_owner %}
       {% set helped = post.confirmed_donors | length %}
