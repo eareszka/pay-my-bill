@@ -8,6 +8,7 @@ from app.models import (
     LoginAttempt,
     Post,
     PostStatus,
+    Reaction,
     User,
 )
 
@@ -31,6 +32,7 @@ def anonymize(user: User) -> None:
     db.session.execute(
         delete(LoginAttempt).where(LoginAttempt.identifier.in_((user.username, user.email)))
     )
+    db.session.execute(delete(Reaction).where(Reaction.user_id == user.id))
     user.username = f"deleted-{user.id}"
     user.email = f"deleted-{user.id}{DELETED_EMAIL_DOMAIN}"
     user.password_hash = "!"  # noqa: S105 - not a hash, so no password matches

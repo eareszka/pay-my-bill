@@ -10,7 +10,7 @@ The owner chose the scope and the rules. See the amendments in ADR 0008.
 | S4-1 Close a post, and auto-close after 30 days | #65 | 3 | Done |
 | S4-2 Post a results update | #26 | 5 | Done |
 | S4-3 Block new posts while an update is overdue, with reminders | #27 | 3 | Done |
-| S4-4 Kudos and reactions on results updates | #64 | 3 | In review |
+| S4-4 Kudos and reactions on results updates | #64 | 3 | Done |
 | S4-5 Follow-through stat on profiles | #28 | 2 | To do |
 
 **Total:** 16 points (Sprint 3: 13).
@@ -22,3 +22,4 @@ The owner chose the scope and the rules. See the amendments in ADR 0008.
 - 2026-11-02: #26 merged (#70). Did #27: the overdue block and reminders. Next: #64 kudos and reactions. Blocked: none.
 - 2026-11-02: The #27 review stopped a late confirmation from lifting the block, restarted reminders when the deadline moves, and moved reminders to calendar days so they land before the date they name. Blocked: none.
 - 2026-11-02: #27 merged (#71). Did #64: kudos and reactions. Next: #28 follow-through stat. Blocked: none.
+- 2026-11-02: The #64 review made a double tap safe, removed a deleted account's reactions, and hid buttons that couldn't work. PB-23 went to the backlog for showing 🤨 counts in the admin queue. Blocked: none.

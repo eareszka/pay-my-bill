@@ -1,10 +1,12 @@
 {% macro react_button(kind, label, description, count=none) %}
   <form method="post" action="{{ url_for('posts.react', post_id=post.id, kind=kind.value) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="on" value="{{ '0' if kind in reactions.mine else '1' }}">
     <button type="submit" class="btn btn-secondary react" aria-pressed="{{ 'true' if kind in reactions.mine else 'false' }}" aria-label="{{ description }}{% if count %}, {{ count }}{% endif %}">{{ label }}{% if count %} {{ count }}{% endif %}</button>
   </form>
 {% endmacro %}
 {% set kudos, up, hmm = reactions.counts[ReactionKind.KUDOS], reactions.counts[ReactionKind.UP], reactions.counts[ReactionKind.HMM] %}
+{% if reactions.can_kudos or kudos or up or (reactions.sees_hmm and hmm) %}
 <div class="reactions">
   {% if reactions.can_kudos %}
     {{ react_button(ReactionKind.KUDOS, "Kudos", "Give kudos", kudos) }}
@@ -19,8 +21,11 @@
     {% if reactions.sees_hmm and hmm %}<span class="reaction-count"><span aria-hidden="true">🤨</span><span class="sr-only">Something seems off:</span> {{ hmm }}</span>{% endif %}
   {% endif %}
 </div>
+{% endif %}
 {% if reactions.can_judge %}
   <p class="hint reactions-hint">You chipped in, so you can use 👍 or 🤨. Only moderators see 🤨 counts.</p>
 {% elif not current_user.is_authenticated %}
   <p class="hint reactions-hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to give kudos.</p>
+{% elif not current_user.is_verified %}
+  <p class="hint reactions-hint">Verify your email to give kudos.</p>
 {% endif %}

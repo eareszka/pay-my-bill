@@ -2,7 +2,7 @@ import pytest
 from flask.testing import FlaskClient
 from sqlalchemy import select
 
-from app.accounts import delete_post
+from app.accounts import anonymize, delete_post
 from app.extensions import db
 from app.models import (
     Donation,
@@ -19,6 +19,7 @@ from app.models import (
 from tests.conftest import MakeUser, login_as
 
 NOTE = "Made rent on time. Thank you all so much."
+ON, OFF = {"on": "1"}, {"on": "0"}
 
 
 @pytest.fixture
@@ -79,13 +80,14 @@ def test_anyone_verified_can_give_kudos_and_take_it_back(
     client: FlaskClient, post: Post, stranger: User
 ) -> None:
     login_as(client, stranger)
-    response = client.post(f"/posts/{post.id}/react/kudos")
+    response = client.post(f"/posts/{post.id}/react/kudos", data=ON)
     assert response.location.endswith(f"/posts/{post.id}#update")
     assert kinds(post, stranger) == {ReactionKind.KUDOS}
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert 'aria-pressed="true"' in page
     assert "Kudos 1" in page
-    client.post(f"/posts/{post.id}/react/kudos")
+    assert 'name="on" value="0"' in page
+    client.post(f"/posts/{post.id}/react/kudos", data=OFF)
     assert kinds(post, stranger) == set()
 
 
@@ -137,12 +139,12 @@ def test_up_and_hmm_replace_each_other_and_leave_kudos_alone(
     client: FlaskClient, post: Post, donor: User
 ) -> None:
     login_as(client, donor)
-    client.post(f"/posts/{post.id}/react/kudos")
-    client.post(f"/posts/{post.id}/react/up")
+    client.post(f"/posts/{post.id}/react/kudos", data=ON)
+    client.post(f"/posts/{post.id}/react/up", data=ON)
     assert kinds(post, donor) == {ReactionKind.KUDOS, ReactionKind.UP}
-    client.post(f"/posts/{post.id}/react/hmm")
+    client.post(f"/posts/{post.id}/react/hmm", data=ON)
     assert kinds(post, donor) == {ReactionKind.KUDOS, ReactionKind.HMM}
-    client.post(f"/posts/{post.id}/react/hmm")
+    client.post(f"/posts/{post.id}/react/hmm", data=OFF)
     assert kinds(post, donor) == {ReactionKind.KUDOS}
 
 
@@ -236,3 +238,47 @@ def test_deleting_the_note_hides_reactions(client: FlaskClient, post: Post, stra
     delete_post(post)
     db.session.commit()
     assert "Kudos" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+
+
+def test_double_tap_does_not_undo_the_reaction(
+    client: FlaskClient, post: Post, stranger: User
+) -> None:
+    login_as(client, stranger)
+    client.post(f"/posts/{post.id}/react/kudos", data=ON)
+    client.post(f"/posts/{post.id}/react/kudos", data=ON)
+    assert kinds(post, stranger) == {ReactionKind.KUDOS}
+    client.post(f"/posts/{post.id}/react/kudos", data=OFF)
+    client.post(f"/posts/{post.id}/react/kudos", data=OFF)
+    assert kinds(post, stranger) == set()
+
+
+def test_admin_gets_no_buttons_on_a_removed_post(
+    client: FlaskClient, post: Post, make_user: MakeUser
+) -> None:
+    post.status = PostStatus.REMOVED
+    db.session.commit()
+    login_as(client, make_user("admin_one", is_admin=True))
+    assert f"/posts/{post.id}/react" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+
+
+def test_deleting_an_account_removes_its_reactions(post: Post, stranger: User) -> None:
+    add(post, stranger, ReactionKind.KUDOS)
+    anonymize(stranger)
+    db.session.commit()
+    assert kinds(post, stranger) == set()
+
+
+def test_unverified_user_is_told_to_verify(
+    client: FlaskClient, post: Post, make_user: MakeUser
+) -> None:
+    login_as(client, make_user("new_one", verified=False))
+    assert "Verify your email to give kudos." in client.get(f"/posts/{post.id}").get_data(
+        as_text=True
+    )
+
+
+def test_poster_with_no_reactions_gets_no_empty_row(
+    client: FlaskClient, post: Post, poster: User
+) -> None:
+    login_as(client, poster)
+    assert 'class="reactions"' not in client.get(f"/posts/{post.id}").get_data(as_text=True)
