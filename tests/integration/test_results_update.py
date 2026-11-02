@@ -59,9 +59,7 @@ def closed_post(owner: User, *donors: User) -> Post:
 
 
 def emails(caplog: pytest.LogCaptureFixture, address: str) -> int:
-    return sum(
-        f"To: {address}" in r.getMessage() or address in r.getMessage() for r in caplog.records
-    )
+    return sum(address in r.getMessage() for r in caplog.records)
 
 
 def test_open_post_owes_nothing(poster: User, donor: User) -> None:
@@ -187,7 +185,9 @@ def test_bad_note_is_rejected(
     login_as(client, poster)
     response = client.post(f"/posts/{post.id}/update", data={"note": note})
     assert response.status_code == 400
-    assert message in response.get_data(as_text=True)
+    page = response.get_data(as_text=True)
+    assert message in page
+    assert "Don't share account numbers" in page
     assert post.update_posted_at is None
 
 
@@ -264,10 +264,7 @@ def test_delete_prompt_warns_the_update_is_still_owed(
     post = closed_post(poster, donor)
     login_as(client, poster)
     page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
-    assert (
-        "You&#39;ll still owe a results update." in page
-        or "You'll still owe a results update." in page
-    )
+    assert "You'll still owe a results update." in page
 
 
 def test_deleting_scrubs_the_note_but_counts_as_updated(
