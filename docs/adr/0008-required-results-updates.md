@@ -22,6 +22,8 @@ A results update replaces the optional thank-you post.
 - **The deadline is fair to late confirmations.** The 7 days run from the later of the close date and the latest confirmation.
 - **The stat reads "Updated N of M posts",** because partly funded posts owe updates too. Posts count once an update is posted or overdue, so the first 7 days don't look like a miss.
 - **Reactions:** any verified user can give Kudos. Only people with a confirmed gift on the post can use 👍/🤨. Kudos and reactions earn no XP.
+- **The deadline stops moving once it's missed.** After that, confirming another gift doesn't lift the block; only posting the update does.
+- **No overdue job.** Overdue status is computed from dates, and the daily job only sends reminders. This replaces the scheduled marking in Consequences below.
 - **Auto-close:** an open post closes on its own after 30 days. It's computed from dates, so no job is needed.
 
 ## Consequences

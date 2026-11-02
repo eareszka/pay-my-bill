@@ -24,6 +24,7 @@ from app.forms import GiftForm
 from app.mail import send_email
 from app.models import (
     PENDING_GIFT_DAYS,
+    PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
     Donation,
     DonationStatus,
@@ -35,7 +36,7 @@ from app.models import (
     utcnow,
 )
 from app.money import format_cents
-from app.routes.posts import MAX_DB_INT, PUBLIC_STATUSES, render_post, send_update_notice
+from app.routes.posts import MAX_DB_INT, render_post, send_update_notice
 
 bp = Blueprint("gifts", __name__)
 
@@ -209,6 +210,9 @@ def resolve(donation_id: int, action: str) -> Response:
     funded = post.is_open and post.raised_cents >= post.goal_cents
     if funded:
         post.close(PostStatus.FUNDED)
+    if post.owes_update:
+        # The confirmation may have moved the deadline, so remind against the new one.
+        post.update_reminders_sent = 0
     db.session.commit()
     if post.update_body and not already_heard:
         # The update went out before this gift counted, so this donor hasn't heard.
