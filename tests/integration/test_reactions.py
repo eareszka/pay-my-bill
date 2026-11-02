@@ -282,3 +282,23 @@ def test_poster_with_no_reactions_gets_no_empty_row(
 ) -> None:
     login_as(client, poster)
     assert 'class="reactions"' not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+
+
+def test_member_is_told_who_can_use_the_emoji(
+    client: FlaskClient, post: Post, stranger: User
+) -> None:
+    login_as(client, stranger)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "People whose gift was confirmed can also use" in page
+
+
+def test_donor_is_told_what_the_emoji_mean(client: FlaskClient, post: Post, donor: User) -> None:
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "if something seems off" in page
+    assert "People whose gift was confirmed" not in page
+
+
+def test_poster_gets_no_emoji_hint(client: FlaskClient, post: Post, poster: User) -> None:
+    login_as(client, poster)
+    assert "reactions-hint" not in client.get(f"/posts/{post.id}").get_data(as_text=True)

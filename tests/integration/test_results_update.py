@@ -120,7 +120,9 @@ def test_owner_sees_the_prompt_and_privacy_warning(
     login_as(client, poster)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     day = post.update_last_day
-    assert f"Due by {day:%b} {day.day}, {day.year}. Tell the person who helped" in page
+    assert f"Due by {day:%b} {day.day}, {day.year}." in page
+    assert "Tell the person who helped" in page
+    assert "At least 20 characters." in page
     assert "Receipts are never needed." in page
     assert "account numbers or medical details" in page
     assert f'action="/posts/{post.id}/update#update"' in page

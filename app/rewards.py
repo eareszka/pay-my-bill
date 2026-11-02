@@ -8,6 +8,7 @@ from sqlalchemy.orm import aliased, contains_eager, lazyload
 from app.extensions import db
 from app.models import (
     DELETED_EMAIL_DOMAIN,
+    PUBLIC_STATUSES,
     Donation,
     DonationStatus,
     Post,
@@ -92,6 +93,28 @@ def progress(gifts: list[Donation]) -> Progress:
     return Progress(
         xp=GIFT_XP * len(gifts) + NEW_PERSON_XP * len(people), people_helped=len(people)
     )
+
+
+@dataclass(frozen=True)
+class FollowThrough:
+    updated: int
+    due: int
+
+
+def follow_through(user: User) -> FollowThrough:
+    """Results updates posted, out of those posted or overdue (ADR 0008).
+
+    Posts still inside their 7 days don't count, so they can't look like a miss.
+    """
+    posts = db.session.scalars(
+        select(Post).where(
+            Post.user_id == user.id,
+            Post.status.in_(PUBLIC_STATUSES),
+            Post.donations.any(Donation.status == DonationStatus.CONFIRMED),
+        )
+    ).all()
+    updated = sum(post.update_posted_at is not None for post in posts)
+    return FollowThrough(updated, updated + sum(post.update_overdue for post in posts))
 
 
 def week_of(moment: datetime) -> date:

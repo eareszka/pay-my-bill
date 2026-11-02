@@ -76,6 +76,8 @@ flask --app app run
 - **Roadmap:** `docs/roadmap.md` lists the phases from staging to App Store approval. PB-12 to PB-19 in the backlog cover the App Store requirements.
 - **Product backlog:** `docs/backlog/product-backlog.md` lists the stories and spikes from ADRs 0008/0009 and threat-model cases T11–T15, each with a GitHub issue. Pull from it at Sprint Planning.
 
+- **Sprint 4, "Follow-through"** is done: issues #65, #26, #27, #64, and #28 (16 points) merged through PRs #66, #70, #71, #72, and #74. Posts close by hand or on their own at 30 days (`Post.is_open`, `open_posts()`), and results updates, the overdue block, and the follow-through stat all come from dates when read. Reminders run through `flask --app app posts remind`. Migrations 0006–0009. Rules are in the ADR 0008 amendments.
+
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:
 - Before starting work, pull `main` and check the open PRs and branches.

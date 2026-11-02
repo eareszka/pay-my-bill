@@ -21,8 +21,8 @@ As the **community**, we want **recipients to follow through** so that **people 
 - [ ] Overdue status is computed from dates, not a cron-only flag, so a missed job can't block or unblock anyone wrongly.
 
 ### PB-3 Follow-through stat on profiles · #28 · 2 pts · P2 · epic:rewards
-- [ ] Given a user with posts that owed updates, when anyone views their profile, then it shows "Updated N of M funded posts."
-- [ ] Given a user with no posts that owed updates, then the stat isn't shown.
+- [ ] Given a user with results updates posted or overdue, when anyone views their profile, then it shows "Updated N of M posts."
+- [ ] Given a user with none posted or overdue, then the stat isn't shown.
 
 ### PB-4 Auto-expire pending donations · #29 · 2 pts · P1 · epic:donations
 - [ ] Given a donation `pending` for 3 days, then the recipient gets one reminder to confirm or dispute.

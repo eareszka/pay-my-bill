@@ -238,6 +238,7 @@ class ResultsUpdateForm(FlaskForm):
             DataRequired(message="Tell people how it went."),
             Length(min=20, max=2000, message="Your update needs 20 to 2,000 characters."),
         ],
+        description="At least 20 characters.",
     )
 
     def validate_note(self, field: TextAreaField) -> None:

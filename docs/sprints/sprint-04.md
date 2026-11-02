@@ -11,7 +11,7 @@ The owner chose the scope and the rules. See the amendments in ADR 0008.
 | S4-2 Post a results update | #26 | 5 | Done |
 | S4-3 Block new posts while an update is overdue, with reminders | #27 | 3 | Done |
 | S4-4 Kudos and reactions on results updates | #64 | 3 | Done |
-| S4-5 Follow-through stat on profiles | #28 | 2 | To do |
+| S4-5 Follow-through stat on profiles | #28 | 2 | Done |
 
 **Total:** 16 points (Sprint 3: 13).
 
@@ -23,3 +23,5 @@ The owner chose the scope and the rules. See the amendments in ADR 0008.
 - 2026-11-02: The #27 review stopped a late confirmation from lifting the block, restarted reminders when the deadline moves, and moved reminders to calendar days so they land before the date they name. Blocked: none.
 - 2026-11-02: #27 merged (#71). Did #64: kudos and reactions. Next: #28 follow-through stat. Blocked: none.
 - 2026-11-02: The #64 review made a double tap safe, removed a deleted account's reactions, and hid buttons that couldn't work. PB-23 went to the backlog for showing 🤨 counts in the admin queue. Blocked: none.
+- 2026-11-02: #64 merged (#72). Did #28: the follow-through stat. Next: the finish review, then Sprint 4 Review. Blocked: none.
+- 2026-11-02: The #28 review added test cases for auto-closed and deleted posts and late confirmations. Impeccable's finish review of the post page and profile, at 360px and 1440px in both themes, made the due date stand out, explained what 👍 and 🤨 mean and who can use them, showed the 20-character minimum up front, and explained the stat on profiles. The full loop passed on a migrated, seeded database. Next: Sprint 4 Review. Blocked: none.

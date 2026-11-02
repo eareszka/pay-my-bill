@@ -23,7 +23,9 @@
 </div>
 {% endif %}
 {% if reactions.can_judge %}
-  <p class="hint reactions-hint">You chipped in, so you can use 👍 or 🤨. Only moderators see 🤨 counts.</p>
+  <p class="hint reactions-hint">You chipped in, so you can also use 👍 if it helped or 🤨 if something seems off. Only moderators see 🤨 counts.</p>
+{% elif reactions.can_kudos %}
+  <p class="hint reactions-hint">People whose gift was confirmed can also use 👍 or 🤨.</p>
 {% elif not current_user.is_authenticated %}
   <p class="hint reactions-hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to give kudos.</p>
 {% elif not current_user.is_verified %}
