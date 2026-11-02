@@ -135,7 +135,10 @@ def test_auto_closed_post_takes_no_gifts(client: FlaskClient, poster: User, dono
     response = client.post(
         f"/posts/{post.id}/gifts", data={"amount": "20", "method": PaymentMethod.VENMO.value}
     )
-    assert response.status_code == 404
+    assert "closed before your gift was recorded" in client.get(response.location).get_data(
+        as_text=True
+    )
+    assert post.donations == []
 
 
 def test_auto_closed_post_frees_a_slot(client: FlaskClient, poster: User) -> None:
@@ -195,7 +198,14 @@ def test_reaching_the_goal_after_auto_close_does_not_fund(
     assert gift.status is DonationStatus.CONFIRMED
     assert post.status is PostStatus.OPEN
     assert not post.is_open
-    assert post.closed_at is None
+
+
+def test_close_date_shown_is_the_last_full_day(client: FlaskClient, poster: User) -> None:
+    post = add_post(poster)
+    assert post.last_open_day == post.closes_at - timedelta(days=1)
+    day = post.last_open_day
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert f"Open until {day:%b} {day.day}, {day.year}." in page
 
 
 def test_funding_records_when_the_post_closed(

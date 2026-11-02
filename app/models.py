@@ -188,10 +188,15 @@ class Post(Base):
     def is_open(self) -> bool:
         return self.status == PostStatus.OPEN and as_utc(self.created_at) > post_open_cutoff()
 
-    def close(self) -> None:
-        # A post past its 30 days closed back then, not when the poster got around to it.
+    @property
+    def last_open_day(self) -> datetime:
+        # The last full day it's open; the exact closing time falls on the next UTC date.
+        return self.closes_at - timedelta(days=1)
+
+    def close(self, status: PostStatus = PostStatus.CLOSED) -> None:
+        # Keeps the date it first closed: a post past its 30 days closed back then.
         self.closed_at = min(utcnow(), self.closes_at)
-        self.status = PostStatus.CLOSED
+        self.status = status
 
     @property
     def raised_cents(self) -> int:

@@ -18,7 +18,7 @@
     {% if post.is_open %}
       <section class="group">
         <h2 class="section-title">Chip in</h2>
-        <p class="hint">Open until {{ post.closes_at | date }}.</p>
+        <p class="hint">Open until {{ post.last_open_day | date }}.</p>
         {% if is_owner %}
           <p class="hint">This is your post. Share it so people can chip in.</p>
         {% elif pay_options %}

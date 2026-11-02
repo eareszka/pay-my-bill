@@ -89,14 +89,17 @@ def test_poster_cannot_gift_themselves(client: FlaskClient, post: Post) -> None:
     assert gifts() == []
 
 
-@pytest.mark.parametrize("status", [PostStatus.FUNDED, PostStatus.CLOSED, PostStatus.REMOVED])
+@pytest.mark.parametrize(
+    ("status", "code"),
+    [(PostStatus.FUNDED, 302), (PostStatus.CLOSED, 302), (PostStatus.REMOVED, 404)],
+)
 def test_only_open_posts_take_gifts(
-    client: FlaskClient, post: Post, donor: User, status: PostStatus
+    client: FlaskClient, post: Post, donor: User, status: PostStatus, code: int
 ) -> None:
     post.status = status
     db.session.commit()
     login_as(client, donor)
-    assert send(client, post).status_code == 404
+    assert send(client, post).status_code == code
     assert gifts() == []
 
 
