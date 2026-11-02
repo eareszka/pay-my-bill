@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from app.models import Post, PostKind, PostStatus
+from app.models import Post, PostKind, open_posts
 
 bp = Blueprint("main", __name__)
 
@@ -18,7 +18,7 @@ def index() -> str:
     query = (
         select(Post)
         .options(joinedload(Post.user))
-        .where(Post.status == PostStatus.OPEN)
+        .where(open_posts())
         .order_by(Post.created_at.desc(), Post.id.desc())
     )
     if kind:

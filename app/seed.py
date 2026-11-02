@@ -149,6 +149,7 @@ def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tupl
                     goal_cents=rng.randrange(20, 1001) * 100,
                     status=status,
                     created_at=now - timedelta(hours=rng.randrange(1, 24 * 14)),
+                    closed_at=now if status in (PostStatus.FUNDED, PostStatus.CLOSED) else None,
                 )
             )
     db.session.add_all([*users, *posts, *seed_donations(users, posts)])

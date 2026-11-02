@@ -6,8 +6,8 @@
     <p class="notice">{% if is_owner %}Your post is waiting for review. Only you and moderators can see it until then.{% else %}Pending review: hidden from everyone except the poster and moderators.{% endif %}</p>
   {% elif post.status == PostStatus.REMOVED %}
     <p class="notice notice-error">{% if is_owner %}This post was removed for breaking the Community Rules. Only you and moderators can see it.{% else %}Removed: hidden from everyone except the poster and moderators.{% endif %}</p>
-  {% elif post.status in (PostStatus.FUNDED, PostStatus.CLOSED) %}
-    <p class="notice">This post is {{ post.status.value }} and isn't taking gifts.</p>
+  {% elif not post.is_open %}
+    <p class="notice">This post is {{ "funded" if post.status == PostStatus.FUNDED else "closed" }} and isn't taking gifts.</p>
   {% endif %}
   <article class="post">
     {% include "posts/_meta.html" %}
@@ -15,9 +15,10 @@
     {% include "posts/_progress.html" %}
     <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
     <p class="post-body">{{ post.body }}</p>
-    {% if post.status == PostStatus.OPEN %}
+    {% if post.is_open %}
       <section class="group">
         <h2 class="section-title">Chip in</h2>
+        <p class="hint">Open until {{ post.last_open_day | date }}.</p>
         {% if is_owner %}
           <p class="hint">This is your post. Share it so people can chip in.</p>
         {% elif pay_options %}
@@ -58,7 +59,16 @@
   </article>
   {% if is_owner and not post.is_deleted %}
     <section class="danger-zone" id="delete">
-      {% if request.args.get("delete") %}
+      {% if post.is_open and request.args.get("close") %}
+        <p class="confirm-prompt">Close this post? It leaves the feed and stops taking gifts, and you can't reopen it. You can still confirm gifts people already sent.</p>
+        <div class="actions">
+          <form method="post" action="{{ url_for('posts.close', post_id=post.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn">Yes, close it</button>
+          </form>
+          <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id) }}#delete">Cancel</a>
+        </div>
+      {% elif request.args.get("delete") %}
         <p class="confirm-prompt">Delete this post? {% if post.donations %}Its story is removed, but donors keep credit for their gifts.{% else %}It's removed for good.{% endif %}</p>
         <div class="actions">
           <form method="post" action="{{ url_for('posts.delete', post_id=post.id) }}">
@@ -68,7 +78,10 @@
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id) }}#delete">Cancel</a>
         </div>
       {% else %}
-        <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete post</a>
+        <div class="actions">
+          {% if post.is_open %}<a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, close=1) }}#delete">Close post</a>{% endif %}
+          <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete post</a>
+        </div>
       {% endif %}
     </section>
   {% endif %}

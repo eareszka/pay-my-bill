@@ -67,3 +67,12 @@ def test_seed_cli(app: Flask) -> None:
     again = runner.invoke(args=["seed"])
     assert again.exit_code == 1
     assert "refusing to seed twice" in again.output
+
+
+def test_seeded_closed_posts_have_a_close_date(app: Flask) -> None:
+    seed()
+    posts = db.session.scalars(select(Post)).all()
+    assert all(
+        (post.closed_at is not None) == (post.status in (PostStatus.FUNDED, PostStatus.CLOSED))
+        for post in posts
+    )

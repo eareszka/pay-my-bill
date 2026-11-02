@@ -2,6 +2,7 @@
 
 import logging
 import os
+from datetime import datetime
 from typing import Any
 
 from dotenv import load_dotenv
@@ -15,6 +16,10 @@ def database_url(raw: str) -> str:
     if sep and scheme.lower().split("+")[0] in {"postgres", "postgresql"}:
         return f"postgresql+psycopg://{rest}"
     return raw
+
+
+def format_date(value: datetime) -> str:
+    return f"{value:%b} {value.day}, {value.year}"
 
 
 def create_app(config: dict[str, Any] | None = None) -> Flask:
@@ -70,6 +75,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     from app.money import format_cents
 
     app.add_template_filter(format_cents, "cents")
+    app.add_template_filter(format_date, "date")
     app.jinja_env.globals.update(
         MAX_GOAL=format_cents(models.MAX_GOAL_CENTS),
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,

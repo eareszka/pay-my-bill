@@ -19,7 +19,7 @@ Read this file fully before making any change. The project is run as a professio
    - 0006: money is stored as integer cents
    - 0010: XP per person helped (amount-blind)
 4. `docs/threat-model.md`: abuse cases T1–T10 and which sprint mitigates each
-5. `docs/backlog/sprint-03.md`: the current sprint's stories and acceptance criteria
+5. `docs/backlog/sprint-04.md`: the current sprint's stories and acceptance criteria
 
 ## Stack and commands
 - Python 3.12, Flask app factory in `app/__init__.py`, blueprints in `app/routes/`
@@ -57,7 +57,7 @@ flask --app app run
 - Donations go `pending` → `confirmed` | `disputed`. Only the recipient can confirm.
 - Leaderboards only count confirmed donations from verified accounts older than 3 days. Anything over $200/week for one donor→recipient pair is excluded and flagged.
 - Leaderboards rank by **distinct recipients helped**, never by dollars (ADR 0009).
-- A post that closes with any confirmed donation owes a **results update** within 7 days (note ≥ 20 chars, optional photo, never a required receipt). While one is overdue, that user can't create posts (ADR 0008).
+- A post that closes with any confirmed donation owes a **results update** within 7 days of the later of the close and the latest confirmation (note ≥ 20 chars, text only, never a required receipt). Open posts close on their own after 30 days. While one is overdue, that user can't create posts (ADR 0008).
 - `pending` donations auto-expire after 14 days with no credit (T15). Users must attest they're 18+ at signup (T13).
 - Region is self-reported city and state. No GPS.
 - Every form needs a CSRF token. Passwords are hashed. Logins are rate-limited.

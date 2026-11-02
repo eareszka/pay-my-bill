@@ -34,7 +34,7 @@ from app.models import (
     utcnow,
 )
 from app.money import format_cents
-from app.routes.posts import MAX_DB_INT, render_post
+from app.routes.posts import MAX_DB_INT, PUBLIC_STATUSES, render_post
 
 bp = Blueprint("gifts", __name__)
 
@@ -75,8 +75,12 @@ def create(post_id: int) -> Response | tuple[str, int]:
         if post_id <= MAX_DB_INT
         else None
     )
-    if post is None or post.status != PostStatus.OPEN:
+    if post is None or post.status not in PUBLIC_STATUSES:
         abort(404)
+    if not post.is_open:
+        db.session.rollback()
+        flash("This post closed before your gift was recorded, so it can't count.", "info")
+        return redirect(url_for("posts.show", post_id=post_id))
     donor: User = current_user
     if donor.id == post.user_id:
         abort(403)
@@ -200,9 +204,9 @@ def resolve(donation_id: int, action: str) -> Response:
         .with_for_update()
         .execution_options(populate_existing=True)
     ).one()
-    funded = post.status == PostStatus.OPEN and post.raised_cents >= post.goal_cents
+    funded = post.is_open and post.raised_cents >= post.goal_cents
     if funded:
-        post.status = PostStatus.FUNDED
+        post.close(PostStatus.FUNDED)
     db.session.commit()
     if funded:
         flash(f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success")
