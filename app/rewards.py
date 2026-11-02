@@ -98,7 +98,7 @@ def progress(gifts: list[Donation]) -> Progress:
 @dataclass(frozen=True)
 class FollowThrough:
     updated: int
-    owed: int
+    due: int
 
 
 def follow_through(user: User) -> FollowThrough:

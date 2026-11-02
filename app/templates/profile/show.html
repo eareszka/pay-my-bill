@@ -16,8 +16,9 @@
       </ul>
     {% endif %}
   </section>
-  {% if follow_through.owed %}
-    <p class="follow-through">Updated {{ follow_through.updated }} of {{ follow_through.owed }} {{ "post" if follow_through.owed == 1 else "posts" }}</p>
+  {% if follow_through.due %}
+    <p class="follow-through">Updated {{ follow_through.updated }} of {{ follow_through.due }} {{ "post" if follow_through.due == 1 else "posts" }}</p>
+    <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
   {% endif %}
   {% include "profile/_handles.html" %}
 {% endblock %}

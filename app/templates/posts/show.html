@@ -27,7 +27,8 @@
       {% set helped = post.confirmed_donors | length %}
       <section class="group" id="update">
         <h2 class="section-title">Results update</h2>
-        <p class="hint">{% if post.update_overdue %}This was due {{ post.update_last_day | date }}, and you can't create new posts until it's up.{% else %}Due by {{ post.update_last_day | date }}.{% endif %} Tell the {{ "person who" if helped == 1 else helped ~ " people who" }} helped how it went.</p>
+        <p class="update-due">{% if post.update_overdue %}This was due {{ post.update_last_day | date }}, and you can't create new posts until it's up.{% else %}Due by {{ post.update_last_day | date }}.{% endif %}</p>
+        <p class="hint">Tell the {{ "person who" if helped == 1 else helped ~ " people who" }} helped how it went.</p>
         <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}#update" class="form" novalidate>
           {{ update_form.hidden_tag() }}
           <p class="hint">Receipts are never needed. Don't share account numbers or medical details.</p>

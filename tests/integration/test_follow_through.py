@@ -3,6 +3,7 @@ from datetime import timedelta
 import pytest
 from flask.testing import FlaskClient
 
+from app.accounts import delete_post
 from app.extensions import db
 from app.models import (
     Donation,
@@ -93,10 +94,34 @@ def test_other_peoples_posts_do_not_count(poster: User, donor: User) -> None:
     assert follow_through(poster) == FollowThrough(0, 0)
 
 
+def test_auto_closed_post_counts_once_overdue(poster: User, donor: User) -> None:
+    post = add_post(poster, donor, status=PostStatus.OPEN)
+    post.closed_at = None
+    post.created_at = utcnow() - timedelta(days=40)
+    db.session.commit()
+    assert follow_through(poster) == FollowThrough(0, 1)
+
+
+def test_deleted_posts_still_count(poster: User, donor: User) -> None:
+    delete_post(add_post(poster, donor))
+    delete_post(add_post(poster, donor, updated=True))
+    db.session.commit()
+    assert follow_through(poster) == FollowThrough(1, 2)
+
+
+def test_late_confirmation_stays_out_until_its_deadline(poster: User, donor: User) -> None:
+    post = add_post(poster, donor)
+    post.confirmed_gifts[0].resolved_at = utcnow() - timedelta(days=1)
+    db.session.commit()
+    assert follow_through(poster) == FollowThrough(0, 0)
+
+
 def test_profile_shows_the_stat(client: FlaskClient, poster: User, donor: User) -> None:
     add_post(poster, donor, updated=True)
     add_post(poster, donor)
-    assert "Updated 1 of 2 posts" in client.get("/u/maria_g").get_data(as_text=True)
+    page = client.get("/u/maria_g").get_data(as_text=True)
+    assert "Updated 1 of 2 posts" in page
+    assert "Results updates shared, out of those due." in page
 
 
 def test_profile_says_post_for_one(client: FlaskClient, poster: User, donor: User) -> None:
