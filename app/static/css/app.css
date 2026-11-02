@@ -267,6 +267,7 @@ h1 { font-size: 1.5rem; margin: 8px 0 16px; }
 .post h1 { margin-top: 10px; }
 .post-body { margin: 16px 0; white-space: pre-line; }
 .update-body { margin: 8px 0 0; }
+.follow-through { margin: 16px 0 0; }
 .reactions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
 .reactions form { margin: 0; }
 .react { min-height: 44px; padding: 8px 14px; font-variant-numeric: tabular-nums; }

@@ -21,7 +21,7 @@ from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
 from app.mail import send_email
 from app.models import User
-from app.rewards import badges, confirmed_gifts, progress, streak
+from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 
 bp = Blueprint("profile", __name__)
 
@@ -113,4 +113,5 @@ def show(username: str) -> str:
         progress=stats,
         streak=streak(gifts),
         badges=badges(user, gifts, stats.people_helped),
+        follow_through=follow_through(user),
     )
