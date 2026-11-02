@@ -107,7 +107,7 @@ def test_overdue_poster_is_sent_to_the_post(
     assert response.status_code == 302
     assert response.location.endswith(f"/posts/{post.id}#update")
     page = client.get(response.location).get_data(as_text=True)
-    assert "Post this overdue results update" in page
+    assert "You have an overdue results update." in page
     assert "can't create new posts until it's up" in page
     assert db.session.query(Post).filter_by(title="Phone bill").first() is None
 
@@ -143,7 +143,7 @@ def test_others_see_that_it_is_overdue(client: FlaskClient, poster: User, donor:
 @pytest.mark.parametrize(
     ("days", "sent", "count", "after"),
     [
-        (2.9, 0, 0, 0),
+        (2, 0, 0, 0),
         (3, 0, 1, 1),
         (3, 1, 0, 1),
         (6, 1, 1, 2),
@@ -217,3 +217,62 @@ def test_remind_command(app: Flask, poster: User, donor: User) -> None:
     closed_days_ago(poster, donor, 3)
     result = app.test_cli_runner().invoke(args=["posts", "remind"])
     assert "Update reminder emails sent: 1" in result.output
+
+
+def add_pending(post: Post, donor: User, age_days: float = 0) -> Donation:
+    gift = Donation(
+        post=post,
+        donor=donor,
+        amount_cents=500,
+        method=PaymentMethod.VENMO,
+        created_at=utcnow() - timedelta(days=age_days),
+    )
+    db.session.add(gift)
+    db.session.commit()
+    return gift
+
+
+def test_confirming_while_overdue_does_not_lift_the_block(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = closed_days_ago(poster, donor, 9)
+    gift = add_pending(post, donor, age_days=10)
+    login_as(client, poster)
+    client.post(f"/gifts/{gift.id}/confirm")
+    assert overdue_post(poster) is post
+
+
+def test_first_confirmation_after_the_window_starts_a_fresh_deadline(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = closed_days_ago(poster, None, 9)
+    gift = add_pending(post, donor, age_days=10)
+    login_as(client, poster)
+    client.post(f"/gifts/{gift.id}/confirm")
+    assert post.owes_update
+    assert overdue_post(poster) is None
+
+
+def test_confirming_in_time_moves_the_deadline_and_restarts_reminders(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = closed_days_ago(poster, donor, 6)
+    post.update_reminders_sent = 2
+    gift = add_pending(post, donor, age_days=7)
+    db.session.commit()
+    login_as(client, poster)
+    client.post(f"/gifts/{gift.id}/confirm")
+    assert post.update_reminders_sent == 0
+    assert post.update_due_at > utcnow() + timedelta(days=6)
+    assert send_update_reminders() == 0
+
+
+def test_two_overdue_posts_each_need_an_update(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    first = closed_days_ago(poster, donor, 30)
+    second = closed_days_ago(poster, donor, 20)
+    login_as(client, poster)
+    assert client.get("/posts/new").location.endswith(f"/posts/{first.id}#update")
+    client.post(f"/posts/{first.id}/update", data={"note": NOTE})
+    assert client.get("/posts/new").location.endswith(f"/posts/{second.id}#update")

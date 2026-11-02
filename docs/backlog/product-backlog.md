@@ -16,7 +16,7 @@ As a **recipient**, I want to **tell donors how their help was used** so that **
 ### PB-2 Block posting while an update is overdue · #27 · 3 pts · P1 · epic:safety
 As the **community**, we want **recipients to follow through** so that **people can't collect and vanish** (T12).
 - [ ] Given a post that owes an update, when 3 and 6 days have passed since it closed, then the recipient gets a reminder email.
-- [ ] Given an update is more than 7 days overdue, when the recipient tries to create a post, then they're sent to the overdue post with an explanation.
+- [ ] Given the 7-day deadline has passed, when the recipient tries to create a post, then they're sent to the overdue post with an explanation.
 - [ ] Given they post the overdue update, when they try again, then posting works right away.
 - [ ] Overdue status is computed from dates, not a cron-only flag, so a missed job can't block or unblock anyone wrongly.
 

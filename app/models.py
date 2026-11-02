@@ -58,6 +58,9 @@ class PostStatus(StrEnum):
     REMOVED = "removed"
 
 
+PUBLIC_STATUSES = (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
+
+
 class PaymentMethod(StrEnum):
     CASHAPP = "cashapp"
     VENMO = "venmo"
@@ -215,16 +218,25 @@ class Post(Base):
         # A deleted post still owes one, so deleting can't dodge the follow-through (ADR 0008).
         return (
             self.update_posted_at is None
-            and self.status in (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
+            and self.status in PUBLIC_STATUSES
             and not self.is_open
             and bool(self.confirmed_gifts)
         )
 
     @property
     def update_due_at(self) -> datetime:
-        # Runs from the latest confirmation too, so a late confirm can't make it overdue at once.
-        confirmed = [as_utc(g.resolved_at) for g in self.confirmed_gifts if g.resolved_at]
-        return max([self.closes_at, *confirmed]) + timedelta(days=UPDATE_DUE_DAYS)
+        # A late confirm moves the deadline, so it can't make the update overdue at once.
+        # Once a deadline has passed, only posting the update lifts the block (ADR 0008).
+        window = timedelta(days=UPDATE_DUE_DAYS)
+        due = None
+        for confirmed in sorted(
+            as_utc(g.resolved_at or self.closes_at) for g in self.confirmed_gifts
+        ):
+            if due is None:
+                due = max(self.closes_at, confirmed) + window
+            elif confirmed < due:
+                due = confirmed + window
+        return due or self.closes_at + window
 
     @property
     def update_overdue(self) -> bool:

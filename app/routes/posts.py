@@ -16,6 +16,7 @@ from app.forms import GiftForm, PostForm, ResultsUpdateForm
 from app.mail import send_email
 from app.models import (
     MAX_OPEN_POSTS,
+    PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
     Donation,
     DonationStatus,
@@ -31,7 +32,6 @@ from app.payment_links import pay_options
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
-PUBLIC_STATUSES = (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
 MAX_DB_INT = 2**31 - 1
 
 
@@ -55,7 +55,8 @@ def posts_owing_update(user: User | None = None) -> list[Post]:
     )
     if user:
         query = query.where(Post.user_id == user.id)
-    return [post for post in db.session.scalars(query.order_by(Post.id)) if post.owes_update]
+    query = query.options(joinedload(Post.user)).order_by(Post.id)
+    return [post for post in db.session.scalars(query) if post.owes_update]
 
 
 def overdue_post(user: User) -> Post | None:
@@ -69,7 +70,7 @@ def new() -> str | Response | tuple[str, int]:
     user: User = current_user
     overdue = overdue_post(user)
     if overdue:
-        flash("Post this overdue results update, and then you can post again right away.", "info")
+        flash("You have an overdue results update. Post it before creating a new post.", "info")
         return redirect(url_for("posts.show", post_id=overdue.id, _anchor="update"))
     if not user.has_payment_handle:
         flash("Add a Cash App, Venmo, or PayPal handle so people can pay you.", "info")
@@ -215,8 +216,9 @@ REMINDER_DAYS = (3, 6)
 
 def reminders_due(post: Post) -> int:
     """How many of the day 3 and day 6 reminders should have gone out by now."""
+    # By calendar date, so a daily run always lands before the last day the email names.
     started = post.update_due_at - timedelta(days=UPDATE_DUE_DAYS)
-    return sum(utcnow() >= started + timedelta(days=day) for day in REMINDER_DAYS)
+    return sum(utcnow().date() >= (started + timedelta(days=day)).date() for day in REMINDER_DAYS)
 
 
 def send_update_reminders() -> int:
