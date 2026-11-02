@@ -24,6 +24,7 @@ from wtforms.validators import (
 )
 
 from app.models import MAX_GOAL_CENTS, Post, PostKind
+from app.moderation import is_flagged
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
 from app.regions import US_STATES
@@ -34,7 +35,8 @@ def _lower(value: str | None) -> str | None:
 
 
 def _strip_to_none(value: str | None) -> str | None:
-    return (value or "").strip() or None
+    # Browsers send line breaks as CRLF, and Postgres text can't hold NUL.
+    return (value or "").replace("\r\n", "\n").replace("\x00", "").strip() or None
 
 
 class SignupForm(FlaskForm):
@@ -237,6 +239,13 @@ class ResultsUpdateForm(FlaskForm):
             Length(min=20, max=2000, message="Your update needs 20 to 2,000 characters."),
         ],
     )
+
+    def validate_note(self, field: TextAreaField) -> None:
+        if is_flagged(field.data):
+            raise ValidationError(
+                "That reads like fundraising, which isn't allowed here. "
+                "Tell people how the help was used."
+            )
 
 
 class DeleteAccountForm(FlaskForm):

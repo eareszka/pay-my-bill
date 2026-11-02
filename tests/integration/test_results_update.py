@@ -58,6 +58,13 @@ def closed_post(owner: User, *donors: User) -> Post:
     return post
 
 
+def add_pending(post: Post, donor: User) -> Donation:
+    gift = Donation(post=post, donor=donor, amount_cents=500, method=PaymentMethod.VENMO)
+    db.session.add(gift)
+    db.session.commit()
+    return gift
+
+
 def emails(caplog: pytest.LogCaptureFixture, address: str) -> int:
     return sum(address in r.getMessage() for r in caplog.records)
 
@@ -288,10 +295,12 @@ def test_note_on_a_deleted_post_can_still_be_removed(
     db.session.commit()
     login_as(client, poster)
     client.post(f"/posts/{post.id}/update", data={"note": NOTE})
-    assert "Delete post" in client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Delete update" in client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
+    assert "Delete your results update?" in page
     client.post(f"/posts/{post.id}/delete")
     assert post.update_body is None
-    assert "Delete post" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Delete update" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
 
 
 def test_close_prompt_mentions_the_update_only_when_it_will_be_owed(
@@ -313,3 +322,101 @@ def test_deleted_posters_owed_update_is_not_mentioned(
     anonymize(poster)
     db.session.commit()
     assert "has until" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+
+
+def test_delete_prompt_on_an_open_post_warns_the_update_will_be_owed(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = add_post(poster, donor)
+    login_as(client, poster)
+    page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
+    assert "still owe a results update" in page
+
+
+def test_delete_prompt_says_the_update_goes_too(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = closed_post(poster, donor)
+    post.update_body = NOTE
+    post.update_posted_at = utcnow()
+    db.session.commit()
+    login_as(client, poster)
+    page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
+    assert "Its story and results update are removed" in page
+    assert "still owe" not in page
+
+
+def test_donor_confirmed_after_the_update_is_emailed_once(
+    client: FlaskClient,
+    poster: User,
+    donor: User,
+    make_user: MakeUser,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    early = make_user("kayla")
+    post = closed_post(poster, early)
+    gifts = [add_pending(post, donor), add_pending(post, donor), add_pending(post, early)]
+    login_as(client, poster)
+    client.post(f"/posts/{post.id}/update", data={"note": NOTE})
+    caplog.clear()
+    with caplog.at_level(logging.INFO):
+        for gift in gifts:
+            client.post(f"/gifts/{gift.id}/confirm")
+    assert emails(caplog, "dev_tom@example.com") == 1
+    assert emails(caplog, "kayla@example.com") == 0
+
+
+def test_disputing_after_the_update_emails_no_one(
+    client: FlaskClient,
+    poster: User,
+    donor: User,
+    make_user: MakeUser,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    post = closed_post(poster, make_user("kayla"))
+    gift = add_pending(post, donor)
+    login_as(client, poster)
+    client.post(f"/posts/{post.id}/update", data={"note": NOTE})
+    caplog.clear()
+    with caplog.at_level(logging.INFO):
+        client.post(f"/gifts/{gift.id}/dispute")
+    assert emails(caplog, "dev_tom@example.com") == 0
+
+
+def test_confirming_on_a_closed_post_says_an_update_is_owed(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = add_post(poster)
+    gift = add_pending(post, donor)
+    post.close()
+    db.session.commit()
+    login_as(client, poster)
+    response = client.post(f"/gifts/{gift.id}/confirm", follow_redirects=True)
+    assert "You have 7 days to post a results update." in response.get_data(as_text=True)
+
+
+def test_fundraising_note_is_rejected(client: FlaskClient, poster: User, donor: User) -> None:
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    response = client.post(
+        f"/posts/{post.id}/update", data={"note": "Now invest in my startup, shares available."}
+    )
+    assert response.status_code == 400
+    assert "reads like fundraising" in response.get_data(as_text=True)
+    assert post.update_body is None
+
+
+def test_note_with_a_nul_byte_is_cleaned(client: FlaskClient, poster: User, donor: User) -> None:
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    client.post(f"/posts/{post.id}/update", data={"note": NOTE + "\x00"})
+    assert post.update_body == NOTE
+
+
+def test_line_breaks_count_as_one_character(client: FlaskClient, poster: User, donor: User) -> None:
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    note = "\r\n".join(["x" * 99] * 20)
+    assert len(note) > 2000
+    client.post(f"/posts/{post.id}/update", data={"note": note})
+    assert post.update_body == note.replace("\r\n", "\n")

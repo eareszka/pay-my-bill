@@ -130,21 +130,20 @@ def close(post_id: int) -> Response:
     return redirect(url_for("posts.show", post_id=post_id))
 
 
-def send_update_notices(post: Post) -> None:
+def send_update_notice(post: Post, donor: User) -> None:
+    if donor.is_deleted:
+        return
     link = url_for("posts.show", post_id=post.id, _external=True)
-    for donor in post.confirmed_donors:
-        if donor.is_deleted:
-            continue
-        body = (
-            f"Hi {donor.username},\n\n{post.user.username} shared how it went "
-            f'on "{post.title}", a post you chipped in on.\n\nRead it here:\n{link}'
+    body = (
+        f"Hi {donor.username},\n\n{post.user.username} shared how it went "
+        f'on "{post.title}", a post you chipped in on.\n\nRead it here:\n{link}'
+    )
+    try:
+        send_email(donor.email, f"{post.user.username} shared how it went", body)
+    except (smtplib.SMTPException, OSError):
+        current_app.logger.exception(
+            "Could not send the update notice for post %s to user %s", post.id, donor.id
         )
-        try:
-            send_email(donor.email, f"{post.user.username} shared how it went", body)
-        except (smtplib.SMTPException, OSError):
-            current_app.logger.exception(
-                "Could not send the update notice for post %s to user %s", post.id, donor.id
-            )
 
 
 @bp.post("/<int:post_id>/update")
@@ -162,8 +161,9 @@ def update(post_id: int) -> Response | tuple[str, int]:
     post.update_body = form.note.data
     post.update_posted_at = utcnow()
     db.session.commit()
-    send_update_notices(post)
-    flash("Thanks for sharing how it went. Everyone who chipped in was emailed.", "success")
+    for donor in post.confirmed_donors:
+        send_update_notice(post, donor)
+    flash("Thanks for sharing how it went.", "success")
     return redirect(url_for("posts.show", post_id=post_id))
 
 
