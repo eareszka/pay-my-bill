@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Close a post, and auto-close after 30 days (#65). The poster can close an open post with an inline "Are you sure?" step, and there's no reopening. An open post closes on its own at 30 days, worked out from its date with no cron (migration 0006 adds `posts.closed_at`). A closed post leaves the feed, stops taking gifts, and no longer counts toward the 2-post limit. Gifts already sent can still be confirmed. Open posts show when they close.
 - Project foundation: tooling, CI, templates, PRD, ADRs, threat model, and a Flask skeleton with `/health`.
 - Render staging blueprint (`render.yaml`) with gunicorn and free Postgres; ADR 0005.
 - `User` and `Post` models, Alembic migration 0001, and a `flask seed` command that creates 10 users and 20 posts for local dev (#1). Money is stored as integer cents (ADR 0006).

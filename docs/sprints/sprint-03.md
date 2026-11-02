@@ -10,7 +10,7 @@ Pulled forward on 2026-10-31, because Sprint 2 finished early. The owner chose t
 | S3-1 XP and levels on profiles | #56 | 3 | Done |
 | S3-2 Badges | #57 | 3 | Done |
 | S3-3 Weekly giving streak | #58 | 2 | Done |
-| S3-4 Leaderboards by people helped | #59 | 5 | In review |
+| S3-4 Leaderboards by people helped | #59 | 5 | Done |
 
 **Total:** 13 points (Sprint 2: 16).
 

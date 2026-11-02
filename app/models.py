@@ -1,7 +1,17 @@
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 
-from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Index, String, Text
+from sqlalchemy import (
+    CheckConstraint,
+    ColumnElement,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    String,
+    Text,
+    and_,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import Base
@@ -9,6 +19,7 @@ from app.extensions import Base
 MAX_GOAL_CENTS = 100_000
 MAX_OPEN_POSTS = 2
 PENDING_GIFT_DAYS = 14
+POST_OPEN_DAYS = 30
 DELETED_EMAIL_DOMAIN = "@deleted.invalid"
 DELETED_POST_TITLE = "Deleted post"
 DELETED_POST_BODY = "The poster deleted this post."
@@ -26,6 +37,11 @@ def as_utc(value: datetime) -> datetime:
 def gift_expiry_cutoff(now: datetime | None = None) -> datetime:
     # Pending gifts created at or before this moment have expired (T15).
     return (now or utcnow()) - timedelta(days=PENDING_GIFT_DAYS)
+
+
+def post_open_cutoff(now: datetime | None = None) -> datetime:
+    # Open posts created at or before this moment have closed on their own.
+    return (now or utcnow()) - timedelta(days=POST_OPEN_DAYS)
 
 
 class PostKind(StrEnum):
@@ -150,6 +166,7 @@ class Post(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     user: Mapped[User] = relationship(back_populates="posts")
     donations: Mapped[list["Donation"]] = relationship(
@@ -161,6 +178,22 @@ class Post(Base):
         return self.title == DELETED_POST_TITLE and self.body == DELETED_POST_BODY
 
     @property
+    def closes_at(self) -> datetime:
+        # When it closed, or when it will close on its own.
+        if self.closed_at is not None:
+            return as_utc(self.closed_at)
+        return as_utc(self.created_at) + timedelta(days=POST_OPEN_DAYS)
+
+    @property
+    def is_open(self) -> bool:
+        return self.status == PostStatus.OPEN and as_utc(self.created_at) > post_open_cutoff()
+
+    def close(self) -> None:
+        # A post past its 30 days closed back then, not when the poster got around to it.
+        self.closed_at = min(utcnow(), self.closes_at)
+        self.status = PostStatus.CLOSED
+
+    @property
     def raised_cents(self) -> int:
         # Only recipient-confirmed donations count (ADR 0004).
         return sum(d.amount_cents for d in self.donations if d.status == DonationStatus.CONFIRMED)
@@ -168,6 +201,11 @@ class Post(Base):
     @property
     def progress_percent(self) -> int:
         return min(100, self.raised_cents * 100 // self.goal_cents)
+
+
+def open_posts() -> ColumnElement[bool]:
+    # The query form of Post.is_open.
+    return and_(Post.status == PostStatus.OPEN, Post.created_at > post_open_cutoff())
 
 
 class Donation(Base):

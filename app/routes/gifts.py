@@ -75,7 +75,7 @@ def create(post_id: int) -> Response | tuple[str, int]:
         if post_id <= MAX_DB_INT
         else None
     )
-    if post is None or post.status != PostStatus.OPEN:
+    if post is None or not post.is_open:
         abort(404)
     donor: User = current_user
     if donor.id == post.user_id:
@@ -200,9 +200,10 @@ def resolve(donation_id: int, action: str) -> Response:
         .with_for_update()
         .execution_options(populate_existing=True)
     ).one()
-    funded = post.status == PostStatus.OPEN and post.raised_cents >= post.goal_cents
+    funded = post.is_open and post.raised_cents >= post.goal_cents
     if funded:
         post.status = PostStatus.FUNDED
+        post.closed_at = utcnow()
     db.session.commit()
     if funded:
         flash(f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success")

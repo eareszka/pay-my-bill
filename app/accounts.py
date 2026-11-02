@@ -21,7 +21,7 @@ def delete_post(post: Post) -> None:
     post.title = DELETED_POST_TITLE
     post.body = DELETED_POST_BODY
     if post.status == PostStatus.OPEN:
-        post.status = PostStatus.CLOSED
+        post.close()
 
 
 def anonymize(user: User) -> None:

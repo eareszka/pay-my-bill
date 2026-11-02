@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import current_user
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
@@ -8,13 +8,12 @@ from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm, PostForm
-from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, utcnow
+from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, open_posts, utcnow
 from app.moderation import is_flagged
 from app.payment_links import pay_options
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
-ACTIVE_STATUSES = (PostStatus.OPEN, PostStatus.PENDING_REVIEW)
 PUBLIC_STATUSES = (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
 MAX_DB_INT = 2**31 - 1
 
@@ -23,7 +22,10 @@ def active_post_count(user: User) -> int:
     count = db.session.scalar(
         select(func.count())
         .select_from(Post)
-        .where(Post.user_id == user.id, Post.status.in_(ACTIVE_STATUSES))
+        .where(
+            Post.user_id == user.id,
+            or_(open_posts(), Post.status == PostStatus.PENDING_REVIEW),
+        )
     )
     return count or 0
 
@@ -89,9 +91,7 @@ def render_post(post: Post, form: GiftForm) -> str:
     )
 
 
-@bp.post("/<int:post_id>/delete")
-@login_required
-def delete(post_id: int) -> Response:
+def own_post_for_update(post_id: int) -> Post:
     # Lock the post so a gift confirmed or recorded at the same moment can't be lost.
     post = (
         db.session.scalars(
@@ -106,7 +106,27 @@ def delete(post_id: int) -> Response:
     if post is None or post.user_id != current_user.id:
         db.session.rollback()
         abort(404)
-    delete_post(post)
+    return post
+
+
+@bp.post("/<int:post_id>/close")
+@login_required
+def close(post_id: int) -> Response:
+    post = own_post_for_update(post_id)
+    if post.is_open:
+        post.close()
+        db.session.commit()
+        flash("Your post is closed.", "success")
+    else:
+        db.session.rollback()
+        flash("That post isn't open anymore.", "info")
+    return redirect(url_for("posts.show", post_id=post_id))
+
+
+@bp.post("/<int:post_id>/delete")
+@login_required
+def delete(post_id: int) -> Response:
+    delete_post(own_post_for_update(post_id))
     db.session.commit()
     flash("Your post was deleted.", "success")
     return redirect(url_for("main.index"))
