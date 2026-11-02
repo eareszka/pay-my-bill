@@ -24,6 +24,7 @@ from app.forms import GiftForm
 from app.mail import send_email
 from app.models import (
     PENDING_GIFT_DAYS,
+    UPDATE_DUE_DAYS,
     Donation,
     DonationStatus,
     PaymentMethod,
@@ -34,7 +35,7 @@ from app.models import (
     utcnow,
 )
 from app.money import format_cents
-from app.routes.posts import MAX_DB_INT, PUBLIC_STATUSES, render_post
+from app.routes.posts import MAX_DB_INT, PUBLIC_STATUSES, render_post, send_update_notice
 
 bp = Blueprint("gifts", __name__)
 
@@ -189,6 +190,7 @@ def resolve(donation_id: int, action: str) -> Response:
         flash(f"That gift expired after {PENDING_GIFT_DAYS} days, so it can't count.", "info")
         return redirect(url_for("gifts.index"))
     confirmed = action == "confirm"
+    already_heard = donation.donor in donation.post.confirmed_donors
     donation.status = DonationStatus.CONFIRMED if confirmed else DonationStatus.DISPUTED
     donation.resolved_at = utcnow()
     db.session.commit()
@@ -208,8 +210,17 @@ def resolve(donation_id: int, action: str) -> Response:
     if funded:
         post.close(PostStatus.FUNDED)
     db.session.commit()
+    if post.update_body and not already_heard:
+        # The update went out before this gift counted, so this donor hasn't heard.
+        send_update_notice(post, donation.donor)
     if funded:
         flash(f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success")
+    elif post.owes_update:
+        flash(
+            f"Confirmed {amount} from {donor}. You have {UPDATE_DUE_DAYS} days "
+            "to post a results update.",
+            "success",
+        )
     else:
         flash(f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success")
     return redirect(url_for("gifts.index"))

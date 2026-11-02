@@ -1,4 +1,6 @@
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+import smtplib
+
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, url_for
 from flask_login import current_user
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
@@ -7,7 +9,8 @@ from werkzeug.wrappers import Response
 from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.extensions import db
-from app.forms import GiftForm, PostForm
+from app.forms import GiftForm, PostForm, ResultsUpdateForm
+from app.mail import send_email
 from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, open_posts, utcnow
 from app.moderation import is_flagged
 from app.payment_links import pay_options
@@ -85,9 +88,13 @@ def show(post_id: int) -> str:
     return render_post(post, GiftForm.for_post(post))
 
 
-def render_post(post: Post, form: GiftForm) -> str:
+def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
     return render_template(
-        "posts/show.html", post=post, pay_options=pay_options(post.user), form=form
+        "posts/show.html",
+        post=post,
+        pay_options=pay_options(post.user),
+        form=form,
+        update_form=update_form or ResultsUpdateForm(formdata=None),
     )
 
 
@@ -120,6 +127,43 @@ def close(post_id: int) -> Response:
     else:
         db.session.rollback()
         flash("That post isn't open anymore.", "info")
+    return redirect(url_for("posts.show", post_id=post_id))
+
+
+def send_update_notice(post: Post, donor: User) -> None:
+    if donor.is_deleted:
+        return
+    link = url_for("posts.show", post_id=post.id, _external=True)
+    body = (
+        f"Hi {donor.username},\n\n{post.user.username} shared how it went "
+        f'on "{post.title}", a post you chipped in on.\n\nRead it here:\n{link}'
+    )
+    try:
+        send_email(donor.email, f"{post.user.username} shared how it went", body)
+    except (smtplib.SMTPException, OSError):
+        current_app.logger.exception(
+            "Could not send the update notice for post %s to user %s", post.id, donor.id
+        )
+
+
+@bp.post("/<int:post_id>/update")
+@login_required
+def update(post_id: int) -> Response | tuple[str, int]:
+    post = own_post_for_update(post_id)
+    if not post.owes_update:
+        db.session.rollback()
+        flash("This post doesn't need an update.", "info")
+        return redirect(url_for("posts.show", post_id=post_id))
+    form = ResultsUpdateForm()
+    if not form.validate_on_submit():
+        db.session.rollback()
+        return render_post(post, GiftForm.for_post(post), form), 400
+    post.update_body = form.note.data
+    post.update_posted_at = utcnow()
+    db.session.commit()
+    for donor in post.confirmed_donors:
+        send_update_notice(post, donor)
+    flash("Thanks for sharing how it went.", "success")
     return redirect(url_for("posts.show", post_id=post_id))
 
 

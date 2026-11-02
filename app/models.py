@@ -20,6 +20,7 @@ MAX_GOAL_CENTS = 100_000
 MAX_OPEN_POSTS = 2
 PENDING_GIFT_DAYS = 14
 POST_OPEN_DAYS = 30
+UPDATE_DUE_DAYS = 7
 DELETED_EMAIL_DOMAIN = "@deleted.invalid"
 DELETED_POST_TITLE = "Deleted post"
 DELETED_POST_BODY = "The poster deleted this post."
@@ -167,6 +168,8 @@ class Post(Base):
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    update_body: Mapped[str | None] = mapped_column(Text)
+    update_posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     user: Mapped[User] = relationship(back_populates="posts")
     donations: Mapped[list["Donation"]] = relationship(
@@ -199,9 +202,37 @@ class Post(Base):
         self.status = status
 
     @property
+    def confirmed_gifts(self) -> list["Donation"]:
+        return [d for d in self.donations if d.status == DonationStatus.CONFIRMED]
+
+    @property
+    def confirmed_donors(self) -> list[User]:
+        return list({gift.donor_id: gift.donor for gift in self.confirmed_gifts}.values())
+
+    @property
+    def owes_update(self) -> bool:
+        # A deleted post still owes one, so deleting can't dodge the follow-through (ADR 0008).
+        return (
+            self.update_posted_at is None
+            and self.status in (PostStatus.OPEN, PostStatus.FUNDED, PostStatus.CLOSED)
+            and not self.is_open
+            and bool(self.confirmed_gifts)
+        )
+
+    @property
+    def update_due_at(self) -> datetime:
+        # Runs from the latest confirmation too, so a late confirm can't make it overdue at once.
+        confirmed = [as_utc(g.resolved_at) for g in self.confirmed_gifts if g.resolved_at]
+        return max([self.closes_at, *confirmed]) + timedelta(days=UPDATE_DUE_DAYS)
+
+    @property
+    def update_last_day(self) -> datetime:
+        return self.update_due_at - timedelta(days=1)
+
+    @property
     def raised_cents(self) -> int:
         # Only recipient-confirmed donations count (ADR 0004).
-        return sum(d.amount_cents for d in self.donations if d.status == DonationStatus.CONFIRMED)
+        return sum(d.amount_cents for d in self.confirmed_gifts)
 
     @property
     def progress_percent(self) -> int:
