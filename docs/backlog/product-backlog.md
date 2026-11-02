@@ -111,3 +111,7 @@ From the PR #66 review. A donor can pay in their app while the post closes, and 
 ### PB-22 The 30 days start when a flagged post is approved · #68 · 1 pt · P1 · epic:safety
 From the PR #66 review. Do this with the admin queue, which adds approval. Today the clock runs from `created_at`, so time in review uses up a post's open window.
 - [ ] Given a flagged post approved on day 25, then it stays open for 30 days from approval.
+
+### PB-23 Show reaction counts in the admin queue · #73 · 1 pt · P2 · epic:safety
+From the PR #72 review. Deleting a post hides its update and reactions, so admins lose the 🤨 signal (ADR 0008). The rows stay in the database.
+- [ ] Given a post with 🤨 reactions, deleted or not, when an admin opens the queue, then they see the count.

@@ -2,7 +2,16 @@ import smtplib
 from datetime import timedelta
 
 import click
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
@@ -23,6 +32,8 @@ from app.models import (
     Post,
     PostKind,
     PostStatus,
+    Reaction,
+    ReactionKind,
     User,
     open_posts,
     utcnow,
@@ -123,28 +134,58 @@ def show(post_id: int) -> str:
     return render_post(post, GiftForm.for_post(post))
 
 
+def gave_to(post: Post, user: User) -> bool:
+    return any(gift.donor_id == user.id for gift in post.confirmed_gifts)
+
+
+def reaction_view(post: Post) -> dict[str, object]:
+    viewer: User | None = current_user if current_user.is_authenticated else None
+    counts = {kind: 0 for kind in ReactionKind}
+    mine = set()
+    for reaction in post.reactions:
+        counts[reaction.kind] += 1
+        if viewer and reaction.user_id == viewer.id:
+            mine.add(reaction.kind)
+    can_react = bool(
+        viewer
+        and viewer.is_verified
+        and viewer.id != post.user_id
+        and post.status in PUBLIC_STATUSES
+    )
+    return {
+        "counts": counts,
+        "mine": mine,
+        "can_kudos": can_react,
+        "can_judge": bool(viewer and can_react and gave_to(post, viewer)),
+        "sees_hmm": viewer is not None and viewer.is_admin,
+    }
+
+
 def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
     return render_template(
         "posts/show.html",
         post=post,
+        reactions=reaction_view(post) if post.update_body else None,
         pay_options=pay_options(post.user),
         form=form,
         update_form=update_form or ResultsUpdateForm(formdata=None),
     )
 
 
-def own_post_for_update(post_id: int) -> Post:
+def locked_post(post_id: int) -> Post | None:
     # Lock the post so a gift confirmed or recorded at the same moment can't be lost.
-    post = (
-        db.session.scalars(
-            select(Post)
-            .where(Post.id == post_id)
-            .with_for_update()
-            .execution_options(populate_existing=True)
-        ).one_or_none()
-        if post_id <= MAX_DB_INT
-        else None
-    )
+    if post_id > MAX_DB_INT:
+        return None
+    return db.session.scalars(
+        select(Post)
+        .where(Post.id == post_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).one_or_none()
+
+
+def own_post_for_update(post_id: int) -> Post:
+    post = locked_post(post_id)
     if post is None or post.user_id != current_user.id:
         db.session.rollback()
         abort(404)
@@ -200,6 +241,33 @@ def update(post_id: int) -> Response | tuple[str, int]:
         send_update_notice(post, donor)
     flash("Thanks for sharing how it went.", "success")
     return redirect(url_for("posts.show", post_id=post_id))
+
+
+@bp.post("/<int:post_id>/react/<any(kudos, up, hmm):kind>")
+@verified_required
+def react(post_id: int, kind: str) -> Response:
+    post = locked_post(post_id)
+    if post is None or post.status not in PUBLIC_STATUSES or not post.update_body:
+        db.session.rollback()
+        abort(404)
+    user: User = current_user
+    chosen = ReactionKind(kind)
+    if user.id == post.user_id or (chosen is not ReactionKind.KUDOS and not gave_to(post, user)):
+        db.session.rollback()
+        abort(403)
+    mine = {r.kind: r for r in post.reactions if r.user_id == user.id}
+    # The form says what the tap wants, so a double tap can't undo itself.
+    wanted = request.form.get("on") == "1"
+    if chosen in mine and not wanted:
+        post.reactions.remove(mine[chosen])
+    elif chosen not in mine and wanted:
+        post.reactions.append(Reaction(user_id=user.id, kind=chosen))
+        # 👍 and 🤨 replace each other; kudos stands apart.
+        other = {ReactionKind.UP: ReactionKind.HMM, ReactionKind.HMM: ReactionKind.UP}.get(chosen)
+        if other in mine:
+            post.reactions.remove(mine[other])
+    db.session.commit()
+    return redirect(url_for("posts.show", post_id=post_id, _anchor="update"))
 
 
 @bp.post("/<int:post_id>/delete")
