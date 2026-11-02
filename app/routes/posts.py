@@ -1,17 +1,31 @@
 import smtplib
+from datetime import timedelta
 
+import click
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, url_for
 from flask_login import current_user
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
+from app import format_date
 from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm, PostForm, ResultsUpdateForm
 from app.mail import send_email
-from app.models import MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, open_posts, utcnow
+from app.models import (
+    MAX_OPEN_POSTS,
+    UPDATE_DUE_DAYS,
+    Donation,
+    DonationStatus,
+    Post,
+    PostKind,
+    PostStatus,
+    User,
+    open_posts,
+    utcnow,
+)
 from app.moderation import is_flagged
 from app.payment_links import pay_options
 
@@ -33,10 +47,30 @@ def active_post_count(user: User) -> int:
     return count or 0
 
 
+def posts_owing_update(user: User | None = None) -> list[Post]:
+    query = select(Post).where(
+        Post.update_posted_at.is_(None),
+        Post.status.in_(PUBLIC_STATUSES),
+        Post.donations.any(Donation.status == DonationStatus.CONFIRMED),
+    )
+    if user:
+        query = query.where(Post.user_id == user.id)
+    return [post for post in db.session.scalars(query.order_by(Post.id)) if post.owes_update]
+
+
+def overdue_post(user: User) -> Post | None:
+    # Worked out from dates when asked, so a missed job can't block or unblock anyone.
+    return next((post for post in posts_owing_update(user) if post.update_overdue), None)
+
+
 @bp.route("/new", methods=["GET", "POST"])
 @verified_required
 def new() -> str | Response | tuple[str, int]:
     user: User = current_user
+    overdue = overdue_post(user)
+    if overdue:
+        flash("Post this overdue results update, and then you can post again right away.", "info")
+        return redirect(url_for("posts.show", post_id=overdue.id, _anchor="update"))
     if not user.has_payment_handle:
         flash("Add a Cash App, Venmo, or PayPal handle so people can pay you.", "info")
         return redirect(url_for("profile.edit"))
@@ -174,3 +208,51 @@ def delete(post_id: int) -> Response:
     db.session.commit()
     flash("Your post was deleted.", "success")
     return redirect(url_for("main.index"))
+
+
+REMINDER_DAYS = (3, 6)
+
+
+def reminders_due(post: Post) -> int:
+    """How many of the day 3 and day 6 reminders should have gone out by now."""
+    started = post.update_due_at - timedelta(days=UPDATE_DUE_DAYS)
+    return sum(utcnow() >= started + timedelta(days=day) for day in REMINDER_DAYS)
+
+
+def send_update_reminders() -> int:
+    """Email posters whose results update is due soon; returns emails sent."""
+    site = current_app.config["APP_URL"].rstrip("/")
+    emails = []
+    for post in posts_owing_update():
+        due = reminders_due(post)
+        if post.update_overdue or post.user.is_deleted or due <= post.update_reminders_sent:
+            continue
+        body = (
+            f"Hi {post.user.username},\n\n"
+            f'People chipped in on "{post.title}", and they\'d love to hear how it went. '
+            f"Your results update is due by {format_date(post.update_last_day)}.\n\n"
+            f"Post it here:\n{site}/posts/{post.id}#update\n\n"
+            "Until it's up after that date, you won't be able to create new posts."
+        )
+        emails.append((post.id, post.user.email, body, due))
+    # End the read transaction before slow SMTP sends; mark each post as soon as
+    # its email goes out so a later failure can't cause a repeat.
+    db.session.rollback()
+    sent = 0
+    for post_id, address, body, due in emails:
+        try:
+            send_email(address, "Your results update is due soon", body)
+        except (smtplib.SMTPException, OSError):
+            current_app.logger.exception("Could not send the update reminder for post %s", post_id)
+            continue
+        reminded = db.session.get_one(Post, post_id)
+        reminded.update_reminders_sent = due
+        db.session.commit()
+        sent += 1
+    return sent
+
+
+@bp.cli.command("remind")
+def remind_command() -> None:
+    """Email posters on day 3 and day 6 of their results update deadline (run daily)."""
+    click.echo(f"Update reminder emails sent: {send_update_reminders()}")

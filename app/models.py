@@ -170,6 +170,7 @@ class Post(Base):
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     update_body: Mapped[str | None] = mapped_column(Text)
     update_posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    update_reminders_sent: Mapped[int] = mapped_column(default=0, server_default="0")
 
     user: Mapped[User] = relationship(back_populates="posts")
     donations: Mapped[list["Donation"]] = relationship(
@@ -224,6 +225,10 @@ class Post(Base):
         # Runs from the latest confirmation too, so a late confirm can't make it overdue at once.
         confirmed = [as_utc(g.resolved_at) for g in self.confirmed_gifts if g.resolved_at]
         return max([self.closes_at, *confirmed]) + timedelta(days=UPDATE_DUE_DAYS)
+
+    @property
+    def update_overdue(self) -> bool:
+        return self.owes_update and self.update_due_at <= utcnow()
 
     @property
     def update_last_day(self) -> datetime:
