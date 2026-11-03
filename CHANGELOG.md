@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Changed
+- Bulletin board redesign (#85). The owner replaced the rack: every page now uses a cork ground, a wood top bar, and plain square tickets, with leaf green for primary actions. One large ticket with a tear-off Chip in tab tops the feed, with small tickets beneath it. The top spot rewards follow-through (ADR 0013): overdue posters are out, a good record comes first, then first-time posters, then closest to goal.
+
+### Changed
 - Safer chip-in (#78). Logged-out visitors are told to log in before the pay buttons, and logging in or signing up returns them to the post. The amount is remembered while a donor is in their payment app, and after tapping a pay button the panel asks one question: "Sent $20 to $mariag on Cash App?" Without JavaScript the full form stays. A donor with a waiting gift sees that instead of the form. A gift can be recorded for 24 hours after a post closes. "Paid with" replaces "via", a single payment app is preselected, and a plain hint replaces the "$20.00" placeholder.
 
 ### Fixed

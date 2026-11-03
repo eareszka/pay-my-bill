@@ -11,8 +11,8 @@
   {% elif not post.is_open %}
     <p class="notice">This post is {{ "funded" if post.status == PostStatus.FUNDED else "closed" }}{% if not post.takes_gifts %} and isn't taking gifts{% endif %}.</p>
   {% endif %}
-  <article class="post">
-    <div class="band band-{{ post.kind.value }}"><h1>{{ post.title }}</h1></div>
+  <article class="post post-{{ post.kind.value }}">
+    <h1>{{ post.title }}</h1>
     {% include "posts/_meta.html" %}
     {{ grow(post.progress_percent, "Progress toward goal") }}
     <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
@@ -32,6 +32,7 @@
         <p class="hint">Tell the {{ "person who" if helped == 1 else helped ~ " people who" }} helped how it went.</p>
         <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}" class="form" novalidate>
           {{ update_form.hidden_tag() }}
+          <p class="hint">Posters who follow through get first shot at the top of the board.</p>
           <p class="hint">Receipts are never needed. Don't share account numbers or medical details.</p>
           {{ field(update_form.note, rows=4, maxlength=2000) }}
           <button type="submit" class="btn">Post update</button>

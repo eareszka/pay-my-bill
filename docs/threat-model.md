@@ -15,5 +15,6 @@
 | T11 | Round-tripping money between accounts to climb leaderboards | Colluding accounts | Rank by distinct recipients helped, not dollars (ADR 0009); per-pair weekly cap flag | 3 |
 | T12 | Post, collect, and vanish | Poster | Required results update within 7 days; overdue blocks new posts; follow-through stat on profile (ADR 0008) | 4 |
 | T13 | Minors on the platform | Under-18 user | 18+ attestation at signup; ToS states the age rule; accounts removed when reported | 2 |
+| T16 | Fake feedback to reach the top of the board | Poster, friends | Kudos need a verified account, 👍 and 🤨 need a confirmed gift, and overdue posters are out (ADR 0013). Limits come with the admin queue | Later |
 | T14 | Sensitive health or financial details exposed in posts or updates | Poster (self) | Privacy note on the post form; receipts never required (ADR 0008); edit and delete for posts and accounts | 2 |
 | T15 | Donations left `pending` forever, so donors never get credit | Recipient (neglect) | Confirm reminders; auto-expire `pending` after 14 days with no credit | 2 |

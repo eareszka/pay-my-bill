@@ -3,7 +3,7 @@
 {% block title %}Sign up · Pay My Bill{% endblock %}
 {% block content %}
   <h1>Create your account</h1>
-  <form method="post" class="form" novalidate>
+  <form method="post" class="form page-form" novalidate>
     {{ form.hidden_tag() }}
     {{ field(form.username, autocomplete="username") }}
     {{ field(form.email, autocomplete="email") }}

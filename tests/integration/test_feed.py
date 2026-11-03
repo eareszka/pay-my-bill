@@ -41,16 +41,16 @@ def add_post(
 
 def test_feed_shows_open_posts_newest_first(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user(city="Tampa", state="FL")
+    add_post(user, "The top ticket", hours_ago=9)
     add_post(user, "Older need", hours_ago=5)
     add_post(user, "Newest want", kind=PostKind.WANT, hours_ago=1)
     page = client.get("/").get_data(as_text=True)
     assert page.index("Newest want") < page.index("Older need")
     assert "$0</strong> of $120.50" in page
-    assert "band-want" in page
-    assert "band-need" in page
+    assert "ticket-want" in page
+    assert "ticket-need" in page
     assert "alice</a>" in page
-    assert "Need · Tampa, FL" in page
-    assert 'aria-valuenow="0"' in page
+    assert "Tampa, FL" in page
 
 
 @pytest.mark.parametrize(
@@ -92,15 +92,18 @@ def test_unknown_kind_shows_all(client: FlaskClient, make_user: MakeUser) -> Non
 
 def test_feed_paginates(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user()
-    for i in range(PAGE_SIZE + 1):
+    # The first post is the top ticket, and the rest are paged beneath it.
+    for i in range(PAGE_SIZE + 2):
         add_post(user, f"Post number {i:02d}", hours_ago=i)
     first = client.get("/").get_data(as_text=True)
     assert "Post number 00" in first
-    assert f"Post number {PAGE_SIZE:02d}" not in first
+    assert f"Post number {PAGE_SIZE:02d}" in first
+    assert f"Post number {PAGE_SIZE + 1:02d}" not in first
     assert "Older</a>" in first
     assert "Newer</a>" not in first
     second = client.get("/?page=2").get_data(as_text=True)
-    assert f"Post number {PAGE_SIZE:02d}" in second
+    assert f"Post number {PAGE_SIZE + 1:02d}" in second
+    assert "Post number 00" not in second
     assert "Newer</a>" in second
     assert "Older</a>" not in second
     for bad in ("0", "-3", "abc", "99999999999999999999"):
@@ -115,10 +118,12 @@ def test_page_past_end_links_back(client: FlaskClient, make_user: MakeUser) -> N
 
 
 def test_region_hidden_without_city(client: FlaskClient, make_user: MakeUser) -> None:
-    add_post(make_user(state="FL"), "Post")
+    user = make_user(state="FL")
+    add_post(user, "The top ticket")
+    add_post(user, "Post")
     page = client.get("/").get_data(as_text=True)
     assert "None" not in page
-    assert '<span class="card-where">Need</span>' in page
+    assert 'class="card-where"' not in page
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
@@ -134,7 +139,9 @@ def test_layout_has_mobile_viewport(client: FlaskClient) -> None:
 def test_feed_cards_open_the_post_and_name_the_kind(
     client: FlaskClient, make_user: MakeUser
 ) -> None:
-    post = add_post(make_user(), "Rack post")
+    user = make_user()
+    add_post(user, "The top ticket")
+    post = add_post(user, "Rack post")
     page = client.get("/").get_data(as_text=True)
     assert 'class="cards rack"' in page
     assert f'href="/posts/{post.id}">Rack post</a>' in page

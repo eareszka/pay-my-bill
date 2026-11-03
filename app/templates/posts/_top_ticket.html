@@ -1,0 +1,9 @@
+<article class="ticket top-ticket ticket-{{ top.kind.value }}">
+  <div class="card-body">
+    <h2 class="card-title"><a href="{{ url_for('posts.show', post_id=top.id) }}">{{ top.title }}</a></h2>
+    <p class="card-head">{{ top.kind.value | capitalize }} · <a href="{{ url_for('profile.show', username=top.user.username) }}">{{ top.user.username }}</a>{% if top.user.region %} · {{ top.user.region }}{% endif %}</p>
+    <p class="top-story">{{ top.body | truncate(140) }}</p>
+    <p class="amounts"><strong>{{ top.raised_cents | cents }}</strong> of {{ top.goal_cents | cents }}</p>
+  </div>
+  {% if not (current_user.is_authenticated and current_user.id == top.user_id) %}<a class="tear-tab" href="{{ url_for('posts.show', post_id=top.id, _anchor='chip-in') }}">Chip in<span class="sr-only"> on {{ top.title }}</span></a>{% endif %}
+</article>

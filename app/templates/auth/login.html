@@ -3,7 +3,7 @@
 {% block title %}Log in · Pay My Bill{% endblock %}
 {% block content %}
   <h1>Log in</h1>
-  <form method="post" class="form" novalidate>
+  <form method="post" class="form page-form" novalidate>
     {{ form.hidden_tag() }}
     {{ field(form.identifier, autocomplete="username") }}
     {{ field(form.password, autocomplete="current-password") }}

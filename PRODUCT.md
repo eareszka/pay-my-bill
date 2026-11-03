@@ -21,7 +21,7 @@ Crowdfunding sites are built for big campaigns and businesses. Pay My Bill is fo
 - Used mostly on phones, as a mobile-first web app installable to the home screen (PWA). Later the same site is wrapped with Capacitor for the iOS App Store, keeping its own design rather than adopting native iOS conventions.
 - A gift leaves the app: the donor types an amount, opens the poster's Cash App, Venmo, or PayPal prefilled, pays there, then returns to tap "I sent it".
 - The poster gets an email, checks their payment app, and confirms or disputes the gift on the Gifts page. Pending gifts don't count until confirmed.
-- After a post closes with confirmed gifts, the poster owes a results update within 7 days.
+- After a post closes with confirmed gifts, the poster owes a results update within 7 days. Following through earns first shot at the large ticket at the top of the board.
 
 ## Capabilities and Constraints
 - Built so far: sign-up with email verification, log in and out, a profile with city/state and payment handles, posting a Want or Need, the feed, post pages, pay-app buttons, recording a gift, and confirming or disputing gifts.

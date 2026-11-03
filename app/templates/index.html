@@ -6,14 +6,16 @@
       <a href="{{ url_for('main.index', kind=value) }}" {% if kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
     {% endfor %}
   </nav>
+  {% if top %}{% include "posts/_top_ticket.html" %}{% endif %}
   {% if posts %}
     <ul class="cards rack">
       {% for post in posts %}
-        <li class="card">
+        <li class="ticket ticket-{{ post.kind.value }}">
           {% include "posts/_card.html" %}
         </li>
       {% endfor %}
     </ul>
+  {% elif top %}
   {% elif page > 1 %}
     <p class="empty">No more posts.</p>
   {% else %}
