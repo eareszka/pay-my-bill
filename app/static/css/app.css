@@ -64,7 +64,7 @@ body {
 
 a { color: var(--link); text-underline-offset: 0.15em; }
 p, li { text-wrap: pretty; }
-::selection { background: var(--action); color: var(--on-action); }
+::selection { background: var(--tint-good); color: var(--ink); }
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 input, textarea { caret-color: var(--mark); }
 ::placeholder { color: var(--muted); opacity: 1; }
@@ -200,7 +200,7 @@ h3.section-title { font-size: 1.0625rem; }
 .plain-group legend { padding: 0; margin-bottom: 4px; font-weight: 700; }
 .form { display: flex; flex-direction: column; gap: 14px; }
 .field { display: flex; flex-direction: column; gap: 4px; font-weight: 700; }
-.field small { font-weight: 400; }
+.field small { font-size: 0.875rem; font-weight: 400; }
 .field input, .field select, .field textarea {
   width: 100%;
   padding: 10px 12px;
