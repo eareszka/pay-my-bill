@@ -58,7 +58,7 @@ def test_owner_sees_inline_delete_confirm(client: FlaskClient, poster: User) -> 
     assert f'href="/posts/{post.id}?delete=1#delete">Delete post</a>' in page
     assert "Yes, delete" not in page
     page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
-    assert "Delete this post? It's removed for good." in page
+    assert "Delete this post?</strong> It's removed for good." in page
     assert f'action="/posts/{post.id}/delete"' in page
 
 

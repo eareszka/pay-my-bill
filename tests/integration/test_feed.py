@@ -4,9 +4,18 @@ import pytest
 from flask.testing import FlaskClient
 
 from app.extensions import db
-from app.models import Post, PostKind, PostStatus, User, utcnow
+from app.models import (
+    Donation,
+    DonationStatus,
+    PaymentMethod,
+    Post,
+    PostKind,
+    PostStatus,
+    User,
+    utcnow,
+)
 from app.routes.main import PAGE_SIZE
-from tests.conftest import MakeUser
+from tests.conftest import MakeUser, login_as
 
 
 def add_post(
@@ -37,9 +46,10 @@ def test_feed_shows_open_posts_newest_first(client: FlaskClient, make_user: Make
     page = client.get("/").get_data(as_text=True)
     assert page.index("Newest want") < page.index("Older need")
     assert "$0</strong> of $120.50" in page
-    assert 'class="chip chip-want">Want<' in page
-    assert 'class="chip chip-need">Need<' in page
-    assert "alice</a> · Tampa, FL" in page
+    assert "band-want" in page
+    assert "band-need" in page
+    assert "alice</a>" in page
+    assert "Need · Tampa, FL" in page
     assert 'aria-valuenow="0"' in page
 
 
@@ -108,7 +118,7 @@ def test_region_hidden_without_city(client: FlaskClient, make_user: MakeUser) ->
     add_post(make_user(state="FL"), "Post")
     page = client.get("/").get_data(as_text=True)
     assert "None" not in page
-    assert 'href="/u/alice">alice</a></span>' in page
+    assert '<span class="card-where">Need</span>' in page
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
@@ -119,3 +129,43 @@ def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
 
 def test_layout_has_mobile_viewport(client: FlaskClient) -> None:
     assert b'name="viewport" content="width=device-width, initial-scale=1"' in client.get("/").data
+
+
+def test_feed_cards_open_the_post_and_name_the_kind(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    post = add_post(make_user(), "Rack post")
+    page = client.get("/").get_data(as_text=True)
+    assert 'class="cards rack"' in page
+    assert f'href="/posts/{post.id}">Rack post</a>' in page
+
+
+@pytest.mark.parametrize(
+    ("raised", "marks"), [(0, 0), (100, 1), (5_000, 5), (9_100, 9), (9_999, 9), (10_000, 10)]
+)
+def test_progress_marks_only_look_full_when_funded(
+    client: FlaskClient, make_user: MakeUser, raised: int, marks: int
+) -> None:
+    poster, donor = make_user(), make_user("dev_tom")
+    post = Post(user=poster, kind=PostKind.NEED, title="Rent", body="Short.", goal_cents=10_000)
+    if raised:
+        post.donations.append(
+            Donation(
+                donor=donor,
+                amount_cents=raised,
+                method=PaymentMethod.VENMO,
+                status=DonationStatus.CONFIRMED,
+            )
+        )
+    db.session.add(post)
+    db.session.commit()
+    assert client.get(f"/posts/{post.id}").get_data(as_text=True).count('class="on"') == marks
+
+
+def test_heading_is_visible_to_visitors(client: FlaskClient) -> None:
+    assert "<h1>Help someone out</h1>" in client.get("/").get_data(as_text=True)
+
+
+def test_heading_steps_back_for_members(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user())
+    assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/").get_data(as_text=True)

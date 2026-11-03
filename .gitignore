@@ -27,3 +27,4 @@ Thumbs.db
 
 # Impeccable design-review captures (local only)
 .impeccable/review/
+.impeccable/mocks/
