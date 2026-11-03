@@ -2,8 +2,6 @@
 {% from "posts/_progress.html" import grow %}
 {% block title %}{{ user.username }} · Pay My Bill{% endblock %}
 {% block content %}
-  <div class="profile-grid">
-  <div>
   <h1>{{ user.username }}</h1>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
   <section class="rewards" aria-label="Giving">
@@ -17,13 +15,9 @@
       </ul>
     {% endif %}
   </section>
-  </div>
-  <div class="profile-side">
   {% if follow_through.due %}
     <p class="follow-through">Updated {{ follow_through.updated }} of {{ follow_through.due }} {{ "post" if follow_through.due == 1 else "posts" }}</p>
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
   {% endif %}
   {% include "profile/_handles.html" %}
-  </div>
-  </div>
 {% endblock %}

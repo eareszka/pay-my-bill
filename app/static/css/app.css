@@ -4,6 +4,7 @@
 
 :root {
   --display: "Bitter", Georgia, serif;
+  --shell: 608px;
   --ground: #c49a6c;
   --surface: #ffffff;
   --want: #cfe3f5;
@@ -121,7 +122,7 @@ h3.section-title { font-size: 1.0625rem; }
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0 12px;
-  padding: 2px 16px;
+  padding: 2px max(16px, calc((100% - var(--shell)) / 2));
   color: var(--on-bar);
   background: var(--bar);
 }
@@ -401,64 +402,26 @@ html { scrollbar-color: var(--muted) var(--ground); }
   .chip::before { forced-color-adjust: none; }
 }
 
-/* Website layout: every page fills the browser, with an arrangement that suits it. */
+/* Website layout: the ticket on the left, with Chip in right beside it. */
 @media (min-width: 960px) {
-  body { display: flex; flex-direction: column; min-height: 100dvh; }
-  .topbar { padding-inline: 24px; }
-  .container { display: flex; flex: 1; flex-direction: column; width: 100%; max-width: none; padding: 16px 24px 20px; }
-  p { max-width: 75ch; }
-  h1 { font-size: clamp(2rem, 2.6vw, 3rem); }
-
-  /* Feed: the ticket beside Chip in, down to the count and Next ticket. */
-  .board { display: flex; flex: 1; flex-direction: column; width: 100%; max-width: none; margin-inline: 0; }
+  :root { --shell: 1120px; }
+  .container-wide { max-width: 1152px; }
+  .board { max-width: none; }
   .wide-only { display: block; }
   .narrow-only, .deck .tear-tab { display: none; }
-  .deck-layout { display: grid; flex: 1; grid-template-columns: minmax(0, 2fr) minmax(360px, 1fr); gap: 24px; margin-top: 12px; }
-  .deck-stacked { margin-top: 0; }
-  .deck-side { display: flex; }
+  .deck-layout { display: grid; grid-template-columns: minmax(0, 1fr) 416px; gap: 24px; align-items: stretch; }
+  .deck-stacked { margin-top: 18px; }
+  .deck-side { display: flex; margin-top: 18px; }
   .deck-side .group { flex: 1; }
-  .deck-ticket { height: 100%; min-height: 0; }
-  .deck-ticket .card-body { padding: clamp(24px, 2.4vw, 48px); }
-  .card-title { font-size: clamp(2.625rem, 3.6vw, 4.5rem); }
-  .ticket-story { font-size: clamp(1.125rem, 1.25vw, 1.5rem); }
+  .deck-ticket { height: 100%; min-height: 520px; }
+  .deck-ticket .card-body { padding: 28px; }
+  .card-title { font-size: 2.625rem; }
+  .ticket-story { font-size: 1.125rem; }
   .side-amount { font-size: 1.0625rem; }
   .side-amount strong { font-size: 1.875rem; }
-  .deck-nav { position: sticky; bottom: 0; z-index: 1; flex: none; margin: 14px -24px -20px; padding: 12px 24px; background: var(--ground); }
-
-  /* Post page: the same split whenever there's something to do. */
-  .post { flex: 1; padding: clamp(24px, 2.4vw, 48px); }
-  .post:has(> .group) { display: grid; grid-template-columns: minmax(0, 2fr) minmax(360px, 1fr); grid-template-rows: repeat(11, min-content) 1fr; column-gap: 32px; }
+  /* The post page follows the same split whenever there's something to do. */
+  .post:has(> .group) { display: grid; grid-template-columns: minmax(0, 1fr) 416px; column-gap: 28px; align-items: start; padding: 24px 28px; }
   .post:has(> .group) > * { grid-column: 1; }
-  .post > .group { grid-column: 2; grid-row: 1 / span 12; align-self: stretch; margin: 0; padding: 0 0 0 32px; border-top: 0; border-left: 2px solid var(--line); }
-  .post h1 { font-size: clamp(2.625rem, 3.6vw, 4.5rem); }
-
-  /* Gifts: both lists side by side when both have something. */
-  .gifts-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
-  .gift-section { margin-bottom: 0; }
-
-  /* Leaders: heading and filters beside the ranked list. */
-  .leaders-grid { display: grid; flex: 1; grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr); gap: 32px; align-items: start; }
-
-  /* Profiles */
-  .profile-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); gap: 32px; align-items: start; }
-  .profile-side { padding-top: 16px; }
-  .edit-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
-  .edit-grid + .btn { align-self: flex-start; min-width: 240px; }
-
-  /* New post: the story beside the short fields. */
-  .post-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 24px; }
-  .post-form > * { grid-column: 1; }
-  .post-form > .new-story { grid-column: 2; grid-row: 1 / span 5; display: flex; }
-  .new-story .field { flex: 1; }
-  .new-story textarea { flex: 1; }
-
-  /* Log in, sign up, verify: a short summary beside the form. */
-  .auth-grid { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
-  .auth-lead { margin: 0 0 16px; font-family: var(--display); font-size: clamp(3rem, 5vw, 6rem); font-weight: 800; line-height: 1.05; }
-  .auth-facts { margin: 0; padding-left: 20px; font-size: clamp(1.125rem, 1.3vw, 1.5rem); }
-  .auth-facts li { margin-bottom: 10px; }
-
-  .rules { columns: 2; column-gap: 48px; padding-left: 28px; }
-  .rules li { break-inside: avoid; }
-  .error-page { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .post > .group { grid-column: 2; grid-row: 1 / span 12; margin: 0; padding: 0 0 0 28px; border-top: 0; border-left: 2px solid var(--line); }
+  .post h1 { font-size: 2.625rem; }
 }

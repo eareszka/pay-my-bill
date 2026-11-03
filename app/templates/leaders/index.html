@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Leaders · Pay My Bill{% endblock %}
 {% block content %}
-  <div class="leaders-grid">
-  <div class="leaders-lead">
   <h1>Leaders</h1>
   <p class="hint leaders-hint">Ranked by how many different people each donor has helped. Only confirmed gifts count.</p>
   {% if tabs | length > 1 %}
@@ -17,8 +15,6 @@
       <a href="{{ url_for('leaders.index', scope=scope, period=value) }}" {% if period == value %}aria-current="page"{% endif %}>{{ label }}</a>
     {% endfor %}
   </nav>
-  </div>
-  <div class="leaders-main">
   {% if rows %}
     <ol class="leader-list">
       {% for row in rows %}
@@ -34,6 +30,4 @@
   {% else %}
     <p class="empty">No one's on this board yet{% if period == Period.WEEK %} this week{% endif %}. Chip in on a post, and once it's confirmed you'll show up here. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
   {% endif %}
-  </div>
-  </div>
 {% endblock %}

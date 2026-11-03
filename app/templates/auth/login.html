@@ -2,9 +2,6 @@
 {% from "_field.html" import field %}
 {% block title %}Log in · Pay My Bill{% endblock %}
 {% block content %}
-  <div class="auth-grid">
-  {% include "auth/_side.html" %}
-  <div class="auth-main">
   <h1>Log in</h1>
   <form method="post" class="form page-form" novalidate>
     {{ form.hidden_tag() }}
@@ -13,6 +10,4 @@
     <button type="submit" class="btn">Log in</button>
   </form>
   <p>New here? <a href="{{ url_for('auth.signup', next=request.args.get('next')) }}">Create an account</a></p>
-  </div>
-  </div>
 {% endblock %}
