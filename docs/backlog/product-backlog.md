@@ -123,3 +123,11 @@ From the PR #86 review. Next ticket uses a position, so a new or closed post can
 ### PB-25 Rotate older posts forward · #88 · 2 pts · P2 · epic:posts
 From the owner's choice of One Ticket at a Time. Posts deep in the stack may rarely be seen.
 - [ ] Given a post far back in the stack, it gets a fair turn near the front.
+
+### PB-26 Owner's open design decisions from the board review · #89 · 2 pts · P2 · epic:posts
+From the PR #86 finish review. Each one is the owner's call, since it changes the approved look or flow.
+- [ ] Reaction emoji: keep 👍 and 🤨, or replace them.
+- [ ] Green links and progress marks: keep them, or reserve green for main buttons.
+- [ ] Rules and profile text on cork: move it onto white tickets, or leave it.
+- [ ] "I sent it" on the feed: stay at the same ticket, or go to the post page.
+- [ ] Need or Want on phones: add a small label, since only color shows it today.

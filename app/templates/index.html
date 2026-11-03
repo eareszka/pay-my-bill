@@ -19,10 +19,19 @@
         </aside>
       </div>
       <nav class="deck-nav" aria-label="Tickets">
-        {% if position > 1 %}<a class="btn btn-secondary" href="{{ url_for('main.index', kind=kind, n=position - 1) }}">Back</a>{% endif %}
+        {% if position > 1 %}<a class="btn btn-secondary deck-back" href="{{ url_for('main.index', kind=kind, n=position - 1) }}">Back</a>{% endif %}
         <span class="deck-count">{{ position }} of {{ total }}</span>
         {% if total > 1 %}<a class="btn btn-secondary deck-next" href="{{ url_for('main.index', kind=kind, n=position + 1 if position < total else none) }}">Next ticket</a>{% endif %}
       </nav>
+      {# The tickets either side stay inert in a template until a swipe reveals one. #}
+      {% for side, neighbor in [("next", next_post), ("back", back_post)] if neighbor %}
+        <template id="deck-under-{{ side }}">
+          {% with post = neighbor, is_owner = current_user.is_authenticated and current_user.id == neighbor.user_id %}
+            {% include "posts/_ticket.html" %}
+          {% endwith %}
+        </template>
+      {% endfor %}
+      <script src="{{ url_for('static', filename='js/swipe.js') }}" defer></script>
     {% else %}
       <p class="empty">No open posts here yet.
         {% if current_user.is_authenticated %}<a href="{{ url_for('posts.new') }}">Post a want or need</a>{% else %}<a href="{{ url_for('auth.signup') }}">Sign up</a> to post one{% endif %}.</p>
