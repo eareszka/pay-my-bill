@@ -23,6 +23,7 @@ from app.extensions import db
 from app.forms import GiftForm
 from app.mail import send_email
 from app.models import (
+    LATE_GIFT_HOURS,
     PENDING_GIFT_DAYS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
@@ -79,9 +80,13 @@ def create(post_id: int) -> Response | tuple[str, int]:
     )
     if post is None or post.status not in PUBLIC_STATUSES:
         abort(404)
-    if not post.is_open:
+    if not post.takes_gifts:
         db.session.rollback()
-        flash("This post closed before your gift was recorded, so it can't count.", "info")
+        flash(
+            f"This post closed more than {LATE_GIFT_HOURS} hours ago, "
+            "so a new gift can't be recorded.",
+            "info",
+        )
         return redirect(url_for("posts.show", post_id=post_id))
     donor: User = current_user
     if donor.id == post.user_id:

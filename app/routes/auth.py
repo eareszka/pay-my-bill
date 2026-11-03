@@ -2,7 +2,16 @@ import smtplib
 from functools import cache
 from urllib.parse import urlsplit
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
@@ -85,6 +94,9 @@ def signup() -> str | Response:
                 form.username.errors.append("That username or email is already in use.")
             else:
                 login_user(user)
+                # Verifying takes a trip to their email; afterwards, back to what they were doing.
+                if request.args.get("next"):
+                    session["after_verify"] = safe_next(request.args.get("next"))
                 if try_send_verification(user):
                     flash("Account created. Check your email to verify it.", "success")
                 return redirect(url_for("auth.verify_pending"))
@@ -122,7 +134,7 @@ def verify(token: str) -> Response:
         user.email_verified_at = utcnow()
         db.session.commit()
     flash("Your email is verified. Welcome!", "success")
-    return redirect(url_for("main.index"))
+    return redirect(session.pop("after_verify", url_for("main.index")))
 
 
 @bp.route("/login", methods=["GET", "POST"])

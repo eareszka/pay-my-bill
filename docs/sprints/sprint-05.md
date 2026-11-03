@@ -8,7 +8,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | Story | Issue | Points | Status |
 |---|---|---|---|
 | S5-1 Harden errors, accessibility, and small screens | #77 | 5 | Done |
-| S5-2 Safer chip-in flow | #78 | 5 | To do |
+| S5-2 Safer chip-in flow | #78 | 5 | In review |
 | S5-3 Trust information | #79 | 3 | To do |
 | S5-4 Visible rewards | #80 | 5 | To do |
 | S5-5 Clear disputes | #81 | 3 | To do |
@@ -19,3 +19,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 ## Daily log
 - 2026-11-03: Planned with the owner, who approved the order and chose an email plus a Gifts banner for confirmed gifts, and dates plus an optional payment-app name for matching. Did #77: hardening. Next: #78 safer chip-in. Blocked: none.
 - 2026-11-03: The #77 review kept the 500 page working when the database is down, fixed comma amounts that could inflate a pay link, stopped redirects from scrolling past confirmation messages, and made stale forms return only to pages that can open. Static caching waits for production hosting. Blocked: none.
+- 2026-11-03: #77 merged (#83). Did #78: the safer chip-in flow. Next: #79 trust information. Blocked: none.

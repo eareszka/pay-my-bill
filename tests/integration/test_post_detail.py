@@ -1,8 +1,10 @@
+from datetime import timedelta
+
 import pytest
 from flask.testing import FlaskClient
 
 from app.extensions import db
-from app.models import Post, PostKind, PostStatus, User
+from app.models import Post, PostKind, PostStatus, User, utcnow
 from tests.conftest import MakeUser, login_as
 
 
@@ -59,6 +61,8 @@ def test_finished_posts_are_public_without_handles(
     client: FlaskClient, owner: User, status: PostStatus
 ) -> None:
     post = add_post(owner, status)
+    post.closed_at = utcnow() - timedelta(days=2)
+    db.session.commit()
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert f"This post is {status.value}" in page
     assert "Chip in" not in page

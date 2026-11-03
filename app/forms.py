@@ -201,7 +201,9 @@ class GiftForm(FlaskForm):
         "Amount", filters=[_strip_to_none], validators=[DataRequired(message="Enter an amount.")]
     )
     method = SelectField(
-        "via", validators=[DataRequired(message="Pick the app you used.")], validate_choice=True
+        "Paid with",
+        validators=[DataRequired(message="Pick the app you used.")],
+        validate_choice=True,
     )
 
     amount_cents = 0
@@ -223,9 +225,9 @@ class GiftForm(FlaskForm):
     @classmethod
     def for_post(cls, post: Post) -> "GiftForm":
         form = cls()
-        form.method.choices = [SelectChoice("", "Choose app")] + [
-            SelectChoice(o.method.value, o.label) for o in pay_options(post.user)
-        ]
+        apps = [SelectChoice(o.method.value, o.label) for o in pay_options(post.user)]
+        # With only one app there's nothing to choose.
+        form.method.choices = apps if len(apps) == 1 else [SelectChoice("", "Choose app"), *apps]
         form.max_cents = post.goal_cents
         return form
 

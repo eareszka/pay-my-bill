@@ -21,6 +21,7 @@ MAX_GOAL_CENTS = 100_000
 MAX_OPEN_POSTS = 2
 PENDING_GIFT_DAYS = 14
 POST_OPEN_DAYS = 30
+LATE_GIFT_HOURS = 24
 UPDATE_DUE_DAYS = 7
 DELETED_EMAIL_DOMAIN = "@deleted.invalid"
 DELETED_POST_TITLE = "Deleted post"
@@ -207,6 +208,21 @@ class Post(Base):
     def last_open_day(self) -> datetime:
         # The last full day it's open; the exact closing time falls on the next UTC date.
         return self.closes_at - timedelta(days=1)
+
+    @property
+    def late_gift_until(self) -> datetime:
+        # A donor can pay in their app just as a post closes, so they get a day to record it.
+        return self.closes_at + timedelta(hours=LATE_GIFT_HOURS)
+
+    @property
+    def takes_gifts(self) -> bool:
+        if self.is_open:
+            return True
+        return (
+            self.status in PUBLIC_STATUSES
+            and not self.is_deleted
+            and utcnow() < self.late_gift_until
+        )
 
     def close(self, status: PostStatus = PostStatus.CLOSED) -> None:
         # Keeps the date it first closed: a post past its 30 days closed back then.

@@ -178,10 +178,27 @@ def reaction_view(post: Post) -> dict[str, object]:
     }
 
 
+def waiting_gift(post: Post) -> Donation | None:
+    # The viewer's own gift still waiting for the poster, which blocks another one.
+    if not current_user.is_authenticated:
+        return None
+    return next(
+        (
+            gift
+            for gift in post.donations
+            if gift.donor_id == current_user.id
+            and gift.status == DonationStatus.PENDING
+            and not gift.is_expired
+        ),
+        None,
+    )
+
+
 def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
     return render_template(
         "posts/show.html",
         post=post,
+        waiting_gift=waiting_gift(post),
         reactions=reaction_view(post) if post.update_body else None,
         pay_options=pay_options(post.user),
         form=form,

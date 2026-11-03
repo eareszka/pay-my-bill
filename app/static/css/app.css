@@ -274,6 +274,14 @@ h3.section-title { font-size: 1.0625rem; }
 
 /* Chipping in */
 .chip-in { display: flex; flex-direction: column; gap: 12px; }
+.chip-in .notice { margin: 0; }
+.step-pay { display: flex; flex-direction: column; gap: 12px; }
+.chip-in h3.step-pay { display: block; }
+.chip-in[data-step="sent"] .step-pay { display: none; }
+.sent-question { margin: 0; font-family: var(--display); font-size: 1.25rem; font-weight: 800; line-height: 1.2; }
+.sent-question:focus { outline: none; }
+.chip-in[data-step="sent"] .sent-row .btn { flex: 1; }
+.chip-in[data-step="sent"] button[type="submit"] { color: var(--on-action); background: var(--action); border-color: transparent; }
 .pay-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 .pay-buttons .btn { flex: 1 1 96px; }
 .pay-buttons small { display: block; font-size: 0.875rem; font-weight: 400; }

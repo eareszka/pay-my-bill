@@ -9,7 +9,7 @@
   {% elif post.status == PostStatus.REMOVED %}
     <p class="notice notice-error">{% if is_owner %}This post was removed for breaking the Community Rules. Only you and moderators can see it.{% else %}Removed: hidden from everyone except the poster and moderators.{% endif %}</p>
   {% elif not post.is_open %}
-    <p class="notice">This post is {{ "funded" if post.status == PostStatus.FUNDED else "closed" }} and isn't taking gifts.</p>
+    <p class="notice">This post is {{ "funded" if post.status == PostStatus.FUNDED else "closed" }}{% if not post.takes_gifts %} and isn't taking gifts{% endif %}.</p>
   {% endif %}
   <article class="post">
     <div class="band band-{{ post.kind.value }}"><h1>{{ post.title }}</h1></div>
@@ -40,48 +40,7 @@
     {% elif post.owes_update and not post.user.is_deleted %}
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
     {% endif %}
-    {% if post.is_open %}
-      <section class="group" id="chip-in">
-        <h2 class="section-title">Chip in</h2>
-        <p class="hint">Open until {{ post.last_open_day | date }}.</p>
-        {% if is_owner %}
-          <p class="hint">This is your post. Share it so people can chip in.</p>
-        {% elif pay_options %}
-          <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in" novalidate>
-            {{ form.csrf_token }}
-            {# The first submit button is the default one; disabled, so Enter in the amount box never records a gift. #}
-            <button type="submit" disabled hidden aria-hidden="true"></button>
-            <div class="field">
-              <label for="chip-amount">Amount</label>
-              {% set amount_attrs = dict(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100, aria_describedby="chip-amount-error") %}
-              {% if form.amount.errors %}{{ form.amount(aria_invalid="true", autofocus=True, **amount_attrs) }}{% else %}{{ form.amount(**amount_attrs) }}{% endif %}
-              {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
-              <small id="chip-amount-error" class="error" role="alert" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
-            </div>
-            <div class="pay-buttons">
-              {% for option in pay_options %}
-                <a class="btn" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
-              {% endfor %}
-            </div>
-            <p class="hint">Opens {{ post.user.username }}'s page in the app. Pay My Bill never holds money.</p>
-            <h3 class="section-title">Sent it?</h3>
-            {% if current_user.is_authenticated %}
-              <div class="sent-row">
-                <div class="field"><label for="method">via</label>{% if form.method.errors %}{{ form.method(aria_invalid="true", aria_describedby="method-error", autofocus=True) }}{% else %}{{ form.method() }}{% endif %}</div>
-                <button type="submit" class="btn btn-secondary">I sent it</button>
-              </div>
-              {% if form.method.errors %}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% endif %}
-              <p class="hint">It counts once {{ post.user.username }} confirms it came through.</p>
-            {% else %}
-              <p class="hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
-            {% endif %}
-          </form>
-          <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
-        {% else %}
-          <p class="hint">{{ post.user.username }} hasn't added a way to get paid yet. Check back soon.</p>
-        {% endif %}
-      </section>
-    {% endif %}
+    {% if post.is_open or (post.takes_gifts and not is_owner) %}{% include "posts/_chip_in.html" %}{% endif %}
   </article>
   {% if is_owner and (not post.is_deleted or post.update_body) %}
     <section class="danger-zone" id="delete">
