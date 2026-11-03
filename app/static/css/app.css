@@ -9,14 +9,14 @@
   --want: #cfe3f5;
   --ink: #231a12;
   --on-ground: #231a12;
-  --muted: #54463a;
+  --muted-surface: #54463a;
   --muted-on-ground: #2f2114;
   --line: #d8ccbd;
   --bar: #4a2f1b;
   --rule: #4a2f1b;
   --on-bar: #ffffff;
   --ink-on-light: #231a12;
-  --link: #1f5a3d;
+  --link-surface: #1f5a3d;
   --link-on-ground: #231a12;
   --action: #1f5a3d;
   --action-hover: #17452f;
@@ -41,12 +41,12 @@
     --want: #1b2f3f;
     --ink: #f3ebdf;
     --on-ground: #f3ebdf;
-    --muted: #c4b5a2;
+    --muted-surface: #c4b5a2;
     --muted-on-ground: #dccdb9;
     --line: #453628;
     --bar: #1a110a;
     --rule: #dccdb9;
-    --link: #86d8ac;
+    --link-surface: #86d8ac;
     --link-on-ground: #f3ebdf;
     --action: #2c7a53;
     --action-hover: #348c60;
@@ -63,6 +63,10 @@
     accent-color: var(--mark);
   }
 }
+
+/* Text on cork by default; everything on a ticket re-binds to its surface colors. */
+body { --muted: var(--muted-on-ground); --link: var(--link-on-ground); }
+.ticket, .post, .group, .page-form, .gift, .gift-list, .leader-list, .rewards, .flash, .notice { --muted: var(--muted-surface); --link: var(--link-surface); }
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -248,8 +252,7 @@ h3.section-title { font-size: 1.0625rem; }
 .field [aria-invalid="true"], .field [aria-invalid="true"]:focus-visible { border-color: var(--tomato); border-width: 2px; }
 .field textarea { min-height: 120px; }
 .error, .field small.error { color: var(--tomato); font-weight: 700; }
-.muted, .hint, .field small:not(.error) { color: var(--muted-on-ground); }
-.ticket .hint, .post .hint, .group .hint, .group small:not(.error), .page-form .hint, .page-form small:not(.error), .gift .hint, .gift-list .hint, .rewards .hint { color: var(--muted); }
+.muted, .hint, .field small:not(.error) { color: var(--muted); }
 .hint { margin: 0; font-size: 0.9375rem; }
 .choices { display: flex; gap: 20px; }
 .choice { display: flex; align-items: center; gap: 8px; min-height: 32px; }
@@ -331,7 +334,7 @@ h3.section-title { font-size: 1.0625rem; }
 .chip-expired::before { background: var(--mark-empty); border-color: var(--mark-empty); }
 
 /* Gifts */
-.count { font-family: "Public Sans", system-ui, sans-serif; font-weight: 400; color: var(--muted-on-ground); font-variant-numeric: tabular-nums; }
+.count { font-family: "Public Sans", system-ui, sans-serif; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 .gift-section { margin-bottom: 32px; }
 .gift-section > .section-title { margin-bottom: 4px; }
 .gift-section > .hint { margin-bottom: 12px; }
@@ -352,7 +355,6 @@ h3.section-title { font-size: 1.0625rem; }
 .gift-list-title:hover { text-decoration: underline; }
 .gift-list-amount { justify-self: end; font-weight: 700; font-variant-numeric: tabular-nums; }
 .gift-list-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 0.9375rem; color: var(--muted); }
-.gift-list a, .leader-list a { color: var(--link); }
 .gift-list-meta > a { margin-left: -4px; }
 .gift-list-note { margin-top: 8px; }
 
@@ -376,12 +378,10 @@ h3.section-title { font-size: 1.0625rem; }
 .follow-through { margin: 16px 0 0; font-weight: 700; }
 .follow-through-hint { margin-top: 2px; }
 .handles { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0; }
-.handles dt { color: var(--muted-on-ground); }
+.handles dt { color: var(--muted); }
 .handles dd { margin: 0; font-weight: 700; }
 
 .empty { color: var(--on-ground); }
-main > p a, .empty a, .leader-cta a, .hint > a { color: var(--link-on-ground); }
-.group .hint > a, .page-form .hint > a, .post .hint > a, .gift .hint > a { color: var(--link); }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }
 

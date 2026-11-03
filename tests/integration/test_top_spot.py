@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 from flask.testing import FlaskClient
 
-from app.accounts import delete_post
+from app.accounts import anonymize, delete_post
 from app.extensions import db
 from app.models import (
     Donation,
@@ -159,14 +159,78 @@ def test_deleting_a_post_does_not_erase_its_hmm(make_user: MakeUser, donor: User
     assert top_post() is newcomer
 
 
-def test_removed_post_stops_counting_its_feedback(make_user: MakeUser, donor: User) -> None:
-    poster = make_user("poster")
-    past = past_post(poster, donor)
+def test_removing_a_post_does_not_erase_its_hmm(make_user: MakeUser, donor: User) -> None:
+    doubted = make_user("doubted")
+    past = past_post(doubted, donor)
     react(past, donor, ReactionKind.HMM)
     past.status = PostStatus.REMOVED
     db.session.commit()
-    post = open_post(poster)
-    assert top_post() is post
+    open_post(doubted)
+    newcomer = open_post(make_user("new_one"))
+    assert top_post() is newcomer
+
+
+def test_removed_post_earns_no_credit(make_user: MakeUser, donor: User) -> None:
+    poster = make_user("poster")
+    past = past_post(poster, donor)
+    react(past, make_user("fan", created_at=OLD), ReactionKind.KUDOS)
+    past.status = PostStatus.REMOVED
+    db.session.commit()
+    open_post(poster)
+    closer = open_post(make_user("new_one"), donor, raised=500)
+    assert top_post() is closer
+
+
+def test_deleted_update_earns_no_credit(make_user: MakeUser, donor: User) -> None:
+    poster = make_user("poster")
+    delete_post(past_post(poster, donor))
+    db.session.commit()
+    open_post(poster)
+    closer = open_post(make_user("new_one"), donor, raised=500)
+    assert top_post() is closer
+
+
+def test_fake_progress_does_not_win_the_tie(make_user: MakeUser, donor: User) -> None:
+    open_post(make_user("faker"), make_user("sock_puppet"), raised=9_900)
+    real = open_post(make_user("real_one"), donor, raised=500)
+    assert top_post() is real
+
+
+def test_real_update_keeps_credit_after_the_donor_leaves(make_user: MakeUser, donor: User) -> None:
+    keeper = make_user("keeper")
+    past_post(keeper, donor)
+    anonymize(donor)
+    db.session.commit()
+    earned = open_post(keeper)
+    open_post(make_user("new_one"))
+    assert top_post() is earned
+
+
+def test_sock_account_does_not_start_counting_once_it_ages(
+    make_user: MakeUser, donor: User
+) -> None:
+    faker = make_user("faker")
+    sock = make_user("sock_puppet")
+    past_post(faker, sock)
+    sock.created_at = utcnow() - timedelta(days=30)  # now old, but new when it gave
+    gift_made = db.session.query(Donation).filter_by(donor_id=sock.id).one()
+    gift_made.created_at = sock.created_at + timedelta(hours=1)
+    db.session.commit()
+    open_post(faker)
+    closer = open_post(make_user("new_one"), donor, raised=500)
+    assert top_post() is closer
+
+
+def test_kudos_on_a_sock_funded_update_cannot_cancel_real_hmm(
+    make_user: MakeUser, donor: User
+) -> None:
+    doubted = make_user("doubted")
+    react(past_post(doubted, donor), donor, ReactionKind.HMM)
+    sock_funded = past_post(doubted, make_user("sock_puppet"))
+    react(sock_funded, make_user("friend", created_at=OLD), ReactionKind.KUDOS)
+    open_post(doubted)
+    newcomer = open_post(make_user("new_one"))
+    assert top_post() is newcomer
 
 
 def test_poster_with_no_way_to_be_paid_is_out(make_user: MakeUser) -> None:

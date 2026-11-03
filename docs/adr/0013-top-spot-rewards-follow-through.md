@@ -14,7 +14,7 @@ One open post comes first in the stack, worked out from current data whenever th
 - **Last:** posters whose updates drew more 🤨 than kudos and 👍.
 - **Within a group:** more updates plus net feedback first, then closest to its goal, then the oldest post.
 
-The results update is the feedback. Kudos and 👍 add one point each, and 🤨 takes one away. An update only counts if a verified donor at least 3 days old gave to that post, only reactions from such accounts count, and net feedback is capped at 3 points per counted update. Deleting a post doesn't erase its feedback. Moderated posts stop counting. All other posts keep their newest-first order behind it.
+The results update is the feedback. Kudos and 👍 add one point each, and 🤨 takes one away. An update only counts while it can still be read, and only if a donor who was verified and at least 3 days old when they gave chipped in. The same age rule applies to reactions, and to the gifts used for closest to its goal. Net feedback is capped at 3 points per counted update. Kudos and 👍 only count on counted updates. 🤨 always counts, so deleting a post or having it removed can't erase it. All other posts keep their newest-first order behind it.
 
 ## Consequences
 - Following through has a visible reward, and it costs nothing to build beyond a ranking.

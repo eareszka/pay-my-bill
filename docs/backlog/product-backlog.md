@@ -115,3 +115,11 @@ From the PR #66 review. Do this with the admin queue, which adds approval. Today
 ### PB-23 Show reaction counts in the admin queue · #73 · 1 pt · P2 · epic:safety
 From the PR #72 review. Deleting a post hides its update and reactions, so admins lose the 🤨 signal (ADR 0008). The rows stay in the database.
 - [ ] Given a post with 🤨 reactions, deleted or not, when an admin opens the queue, then they see the count.
+
+### PB-24 Keep the stack steady while browsing · #87 · 2 pts · P2 · epic:posts
+From the PR #86 review. Next ticket uses a position, so a new or closed post can repeat or skip a ticket mid-browse. A stable cursor would fix it.
+- [ ] Given a post is added or closes while I'm browsing, when I tap Next ticket, then I don't see a repeat or miss a post.
+
+### PB-25 Rotate older posts forward · #88 · 2 pts · P2 · epic:posts
+From the owner's choice of One Ticket at a Time. Posts deep in the stack may rarely be seen.
+- [ ] Given a post far back in the stack, it gets a fair turn near the front.
