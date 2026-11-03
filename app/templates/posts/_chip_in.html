@@ -1,6 +1,7 @@
 {% set poster = post.user.username %}
 <section class="group" id="chip-in">
   <h2 class="section-title">Chip in</h2>
+  {% if show_amount %}<p class="amounts side-amount"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>{% endif %}
   {% if post.is_open %}<p class="hint">Open until {{ post.last_open_day | date }}.</p>{% endif %}
   {% if is_owner %}
     <p class="hint">This is your post. Share it so people can chip in.</p>

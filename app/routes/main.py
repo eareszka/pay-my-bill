@@ -4,6 +4,7 @@ from sqlalchemy.orm import joinedload
 
 from app.extensions import db
 from app.models import Post, PostKind, open_posts
+from app.routes.posts import chip_in_context
 from app.top_spot import top_post
 
 bp = Blueprint("main", __name__)
@@ -38,12 +39,14 @@ def index() -> str:
     # An old link can point past the end of a stack that has shrunk.
     if not 1 <= position <= total:
         position = 1
+    post = ticket_at(position, kind) if total else None
     return render_template(
         "index.html",
-        post=ticket_at(position, kind) if total else None,
+        post=post,
         kind=kind.value if kind else None,
         position=position,
         total=total,
+        **(chip_in_context(post) if post else {}),
     )
 
 

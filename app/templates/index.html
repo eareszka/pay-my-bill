@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block main_class %} container-wide{% endblock %}
 {% block content %}
   <div class="board">
     <h1{% if current_user.is_authenticated %} class="sr-only"{% endif %}>Help someone out</h1>
@@ -8,7 +9,15 @@
       {% endfor %}
     </nav>
     {% if post %}
-      <div class="deck{% if total > 1 %} deck-stacked{% endif %}">{% include "posts/_ticket.html" %}</div>
+      {% set is_owner = current_user.is_authenticated and current_user.id == post.user_id %}
+      <div class="deck-layout">
+        <div class="deck{% if total > 1 %} deck-stacked{% endif %}">{% include "posts/_ticket.html" %}</div>
+        {# On a wide screen, give right here. On a phone, the tear-off tab opens the post instead. #}
+        <aside class="deck-side">
+          {% set show_amount = true %}
+          {% include "posts/_chip_in.html" %}
+        </aside>
+      </div>
       <nav class="deck-nav" aria-label="Tickets">
         {% if position > 1 %}<a class="btn btn-secondary" href="{{ url_for('main.index', kind=kind, n=position - 1) }}">Back</a>{% endif %}
         <span class="deck-count">{{ position }} of {{ total }}</span>

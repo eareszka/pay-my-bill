@@ -124,11 +124,33 @@ def test_only_ticket_has_no_next_or_stack(client: FlaskClient, make_user: MakeUs
     assert "1 of 1" in page
 
 
-def test_ticket_stays_uncluttered(client: FlaskClient, make_user: MakeUser) -> None:
+def test_who_and_where_are_for_wide_screens_only(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(city="Tampa", state="FL"), "Only post")
     page = client.get("/").get_data(as_text=True)
-    assert "Tampa, FL" not in page
+    assert page.index('class="wide-only"') < page.index("Tampa, FL")
     assert 'class="grow"' not in page
+
+
+def test_chip_in_panel_sits_beside_the_ticket(client: FlaskClient, make_user: MakeUser) -> None:
+    post = add_post(make_user(venmo_handle="@maria-g"), "Only post")
+    login_as(client, make_user("dev_tom"))
+    page = client.get("/").get_data(as_text=True)
+    assert 'class="deck-side"' in page
+    assert f'action="/posts/{post.id}/gifts"' in page
+    assert "side-amount" in page
+
+
+def test_own_post_has_no_form_beside_the_ticket(client: FlaskClient, make_user: MakeUser) -> None:
+    owner = make_user(venmo_handle="@maria-g")
+    add_post(owner, "Only post")
+    login_as(client, owner)
+    page = client.get("/").get_data(as_text=True)
+    assert "This is your post." in page
+    assert 'class="chip-in"' not in page
+
+
+def test_empty_board_has_no_panel(client: FlaskClient) -> None:
+    assert "deck-side" not in client.get("/").get_data(as_text=True)
 
 
 def test_ticket_body_is_shortened(client: FlaskClient, make_user: MakeUser) -> None:
