@@ -59,7 +59,7 @@ def test_record_gift_emails_poster(
 def test_form_shown_to_logged_in_donor(client: FlaskClient, post: Post, donor: User) -> None:
     login_as(client, donor)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
-    assert f'action="/posts/{post.id}/gifts"' in page
+    assert f'action="/posts/{post.id}/gifts#chip-in"' in page
     assert '<select id="method" name="method" required><option value="">Choose app</option>' in page
     assert '<option value="cashapp">Cash App</option>' in page
     assert '<button type="submit" disabled hidden aria-hidden="true"></button>' in page

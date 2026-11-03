@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Hardening from Impeccable's audit (#77). Errors show styled pages with a way forward, and a stale form returns you to the page with a message. Form errors are focused and announced, and error text no longer pollutes field names. The top bar wraps at 320px and with large text. The packet username is a larger target, and there's a skip link. Any gift shows at least one progress mark, and the row stays visible in high-contrast mode. Long post titles scale down, and a double tap can't create two posts.
+
 ### Changed
 - Complete redesign with Impeccable (#75). Every page moves to the owner-chosen Seed Packet look: a leaf-green shell, flat colour bands for posts (leaf for needs, teal for wants), marigold for primary actions, Bitter and Public Sans (self-hosted), and progress as a growing row of ten marks. The feed becomes a rack of packets, in two columns on phones, and tapping a whole card opens the post. Filters read All, Needs, Wants, the pay-app buttons now lead over "I sent it", and My gifts leads with the post title. Earlier surface briefs are replaced by one app-wide brief. Font licenses sit beside the fonts.
 

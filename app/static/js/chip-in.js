@@ -5,7 +5,7 @@ const method = document.getElementById("method");
 const links = document.querySelectorAll("[data-amount-sep]");
 
 function parsed() {
-  const text = amount.value.replace(/[$\s]/g, "");
+  const text = amount.value.replace(/[$,\s]/g, "");
   const value = /^\d+(\.\d{1,2})?$/.test(text) ? Number(text) : NaN;
   return { text, valid: value >= 0.01 && value <= Number(amount.dataset.max), value };
 }
@@ -29,6 +29,8 @@ if (amount) {
     const { text, valid } = parsed();
     error.textContent = error.dataset.message;
     error.hidden = valid || text === "";
+    if (error.hidden) amount.removeAttribute("aria-invalid");
+    else amount.setAttribute("aria-invalid", "true");
   });
   window.addEventListener("pageshow", syncLinks);
 }

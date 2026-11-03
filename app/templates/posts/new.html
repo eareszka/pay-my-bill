@@ -6,7 +6,7 @@
   {% if at_limit %}
     <p class="flash flash-error">You already have {{ MAX_OPEN_POSTS }} open posts. Close or finish one before posting again.</p>
   {% else %}
-    <form method="post" class="form" novalidate>
+    <form method="post" class="form" novalidate data-once>
       {{ form.hidden_tag() }}
       <fieldset class="plain-group">
         <legend>{{ form.kind.label.text }}</legend>
@@ -25,5 +25,6 @@
       {% endif %}
       <button type="submit" class="btn">Post</button>
     </form>
+    <script src="{{ url_for('static', filename='js/once.js') }}" defer></script>
   {% endif %}
 {% endblock %}

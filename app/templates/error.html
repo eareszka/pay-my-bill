@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Pay My Bill{% endblock %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  <p>{{ message }}</p>
+  <p><a class="btn" href="{{ url_for('main.index') }}">See who needs a hand</a></p>
+{% endblock %}

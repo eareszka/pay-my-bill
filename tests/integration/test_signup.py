@@ -189,7 +189,8 @@ def test_csrf_token_required() -> None:
     with app.app_context():
         db.create_all()
         client = app.test_client()
-        assert client.post("/signup", data=FORM).status_code == 400
+        assert client.post("/signup", data=FORM).status_code == 302
+        assert "gone stale" in client.get("/signup").get_data(as_text=True)
         page = client.get("/signup").get_data(as_text=True)
         token = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', page)
         assert token is not None

@@ -52,9 +52,10 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     csrf.init_app(app)
     login_manager.init_app(app)
 
-    from app import auth, seed  # noqa: F401
+    from app import auth, errors, seed  # noqa: F401
 
     seed.register(app)
+    errors.register(app)
 
     from app.routes.auth import bp as auth_bp
     from app.routes.gifts import bp as gifts_bp

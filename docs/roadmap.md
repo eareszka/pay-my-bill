@@ -8,7 +8,8 @@ This expands the PRD's "Scope by release" into the steps between today's staging
 The site isn't usable until donations work.
 - Sprint 2: payment deep links, donation pledge → recipient confirm or dispute, auto-expiry (PB-4)
 - Sprints 3–4: XP, levels, badges, streaks, kudos, leaderboards by people helped (ADR 0009), results updates (PB-1, PB-2)
-- Sprint 5: reports and admin queue, user blocking (PB-12), post and account deletion (PB-6), ToS and Privacy (PB-7), PWA manifest and service worker, e2e tests
+- Sprint 5: ready for real people: hardening, safer chip-in, trust information, visible rewards, clear disputes, password reset
+- Next: optional photos on posts, then reports and admin queue, user blocking (PB-12), post and account deletion (PB-6), ToS and Privacy (PB-7), PWA manifest and service worker, e2e tests
 
 Reporting, blocking, and in-app account deletion are App Store requirements (Guidelines 1.2 and 5.1.1(v)). They ship in v0.1 so the wrapper doesn't need new features later.
 
