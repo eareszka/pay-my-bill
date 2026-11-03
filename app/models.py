@@ -224,6 +224,19 @@ class Post(Base):
             and utcnow() < self.late_gift_until
         )
 
+    def pending_gift_from(self, donor_id: int) -> "Donation | None":
+        # One pending claim per donor per post keeps a poster's inbox from being flooded.
+        return next(
+            (
+                gift
+                for gift in self.donations
+                if gift.donor_id == donor_id
+                and gift.status == DonationStatus.PENDING
+                and not gift.is_expired
+            ),
+            None,
+        )
+
     def close(self, status: PostStatus = PostStatus.CLOSED) -> None:
         # Keeps the date it first closed: a post past its 30 days closed back then.
         self.closed_at = min(utcnow(), self.closes_at)

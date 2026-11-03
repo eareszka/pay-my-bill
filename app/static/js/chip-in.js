@@ -42,18 +42,18 @@ function save(state) {
   }
 }
 
-function clear() {
+function clear(recordedKey) {
   try {
-    sessionStorage.removeItem(key);
+    sessionStorage.removeItem(recordedKey);
   } catch {
     // Nothing to do: see load().
   }
 }
 
-function showSentStep(link) {
+function showSentStep(label, handle) {
   const { value } = parsed();
   const shown = Number.isInteger(value) ? String(value) : value.toFixed(2);
-  question.textContent = `Sent $${shown} to ${link.dataset.handle} on ${link.dataset.label}?`;
+  question.textContent = `Sent $${shown} to ${handle} on ${label}?`;
   question.hidden = false;
   notYet.hidden = false;
   form.dataset.step = "sent";
@@ -69,12 +69,11 @@ function restore() {
   const state = load();
   if (state.amount && !amount.value) amount.value = state.amount;
   syncLinks();
-  const paid = [...links].find((link) => link.dataset.method === state.paid);
-  // Logged-out visitors have nothing to record yet, so they keep the full form.
-  if (paid && method && parsed().valid) {
-    method.value = state.paid;
-    showSentStep(paid);
-  }
+  // A server error needs the whole form, and logged-out visitors have nothing to record yet.
+  if (!state.paid || !method || form.querySelector("[aria-invalid=true]")) return;
+  method.value = state.paid;
+  // The app may be gone if the poster removed it since; then the donor picks another.
+  if (method.value === state.paid && parsed().valid) showSentStep(state.label, state.handle);
 }
 
 if (amount) {
@@ -84,9 +83,10 @@ if (amount) {
       // Paying with an app picks that app for "I sent it".
       if (method) method.value = link.dataset.method;
       if (!parsed().valid) return;
-      save({ amount: amount.value, paid: link.dataset.method });
+      const { method: paid, label, handle } = link.dataset;
+      save({ amount: amount.value, paid, label, handle });
       if (method) {
-        showSentStep(link);
+        showSentStep(label, handle);
         question.focus();
       }
     });
@@ -109,6 +109,11 @@ if (amount) {
       amount.focus();
     });
   }
-  form.addEventListener("submit", clear);
   window.addEventListener("pageshow", restore);
+}
+
+// The server has this gift now, so there's nothing left to remember.
+const recorded = document.querySelector("[data-gift-recorded]");
+if (recorded) {
+  clear(`chip-in:${recorded.dataset.giftRecorded}`);
 }

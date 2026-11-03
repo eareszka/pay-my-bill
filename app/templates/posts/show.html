@@ -40,7 +40,7 @@
     {% elif post.owes_update and not post.user.is_deleted %}
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
     {% endif %}
-    {% if post.is_open or (post.takes_gifts and not is_owner) %}{% include "posts/_chip_in.html" %}{% endif %}
+    {% if post.is_open or (not is_owner and (post.takes_gifts or waiting_gift)) %}{% include "posts/_chip_in.html" %}{% endif %}
   </article>
   {% if is_owner and (not post.is_deleted or post.update_body) %}
     <section class="danger-zone" id="delete">

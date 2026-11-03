@@ -16,7 +16,7 @@ from app.models import (
     utcnow,
 )
 from app.tokens import VERIFY_EMAIL, make_token
-from tests.conftest import MakeUser, login_as
+from tests.conftest import PASSWORD, MakeUser, login_as
 
 GIFT = {"amount": "20", "method": "venmo"}
 
@@ -195,3 +195,61 @@ def test_late_visitor_is_told_to_log_in(client: FlaskClient, poster: User) -> No
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Log in first" not in page
     assert "to record your gift so it counts." in page
+
+
+def test_unverified_donor_is_told_before_paying(
+    client: FlaskClient, poster: User, make_user: MakeUser
+) -> None:
+    post = add_post(poster)
+    login_as(client, make_user("new_one", verified=False))
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert page.index("Verify your email first") < page.index('class="pay-buttons"')
+
+
+def test_unverified_login_keeps_the_way_back(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user("new_one", verified=False)
+    client.post("/login?next=/posts/7", data={"identifier": "new_one", "password": PASSWORD})
+    token = make_token(user.id, user.email, VERIFY_EMAIL)
+    assert client.get(f"/verify/{token}").location.endswith("/posts/7")
+
+
+def test_waiting_gift_stays_visible_after_the_window(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = add_post(poster, closed_hours_ago=48)
+    db.session.add(Donation(post=post, donor=donor, amount_cents=2_000, method=PaymentMethod.VENMO))
+    db.session.commit()
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "gift is waiting for maria_g" in page
+    assert "You can chip in again" not in page
+
+
+def test_deleted_post_says_why_a_gift_is_refused(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = add_post(poster)
+    db.session.add(
+        Donation(
+            post=post,
+            donor=donor,
+            amount_cents=500,
+            method=PaymentMethod.VENMO,
+            status=DonationStatus.CONFIRMED,
+        )
+    )
+    delete_post(post)
+    db.session.commit()
+    login_as(client, donor)
+    response = client.post(f"/posts/{post.id}/gifts", data=GIFT, follow_redirects=True)
+    assert "This post was deleted, so a new gift" in response.get_data(as_text=True)
+
+
+def test_closed_post_without_handles_does_not_promise_a_return(
+    client: FlaskClient, make_user: MakeUser, donor: User
+) -> None:
+    post = add_post(make_user("no_handles"), closed_hours_ago=1)
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "no longer lists a payment app" in page
+    assert "Check back soon" not in page

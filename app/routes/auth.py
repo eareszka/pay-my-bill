@@ -159,7 +159,10 @@ def login() -> str | Response | tuple[str, int, dict[str, str]]:
         if user is not None and ok:
             mark_login_succeeded(attempt)
             login_user(user)
-            return redirect(safe_next(request.args.get("next")))
+            next_page = safe_next(request.args.get("next"))
+            if not user.is_verified and request.args.get("next"):
+                session["after_verify"] = next_page
+            return redirect(next_page)
         form.password.errors.append("Wrong username, email, or password.")
     return render_template("auth/login.html", form=form)
 
