@@ -261,7 +261,9 @@ class Post(Base):
 
     @property
     def progress_percent(self) -> int:
-        return min(100, self.raised_cents * 100 // self.goal_cents)
+        # Any confirmed gift shows some progress, even under 1% of the goal.
+        raised = self.raised_cents
+        return min(100, max(1, raised * 100 // self.goal_cents)) if raised else 0
 
 
 def open_posts() -> ColumnElement[bool]:

@@ -6,16 +6,16 @@
   {% if at_limit %}
     <p class="flash flash-error">You already have {{ MAX_OPEN_POSTS }} open posts. Close or finish one before posting again.</p>
   {% else %}
-    <form method="post" class="form" novalidate>
+    <form method="post" class="form" novalidate data-once>
       {{ form.hidden_tag() }}
       <fieldset class="plain-group">
         <legend>{{ form.kind.label.text }}</legend>
         <div class="choices">
           {% for option in form.kind %}
-            <label class="choice">{{ option() }} {{ option.label.text }}</label>
+            <label class="choice">{% if form.kind.errors %}{{ option(aria_describedby="kind-error", autofocus=loop.first) }}{% else %}{{ option() }}{% endif %} {{ option.label.text }}</label>
           {% endfor %}
         </div>
-        {% for error in form.kind.errors %}<small class="error">{{ error }}</small>{% endfor %}
+        {% if form.kind.errors %}<small class="error" id="kind-error">{{ form.kind.errors | join(" ") }}</small>{% endif %}
       </fieldset>
       {{ field(form.title, maxlength=80) }}
       {{ field(form.body, rows=6, maxlength=2000) }}
@@ -25,5 +25,6 @@
       {% endif %}
       <button type="submit" class="btn">Post</button>
     </form>
+    <script src="{{ url_for('static', filename='js/once.js') }}" defer></script>
   {% endif %}
 {% endblock %}

@@ -125,7 +125,7 @@ def test_owner_sees_the_prompt_and_privacy_warning(
     assert "At least 20 characters." in page
     assert "Receipts are never needed." in page
     assert "account numbers or medical details" in page
-    assert f'action="/posts/{post.id}/update#update"' in page
+    assert f'action="/posts/{post.id}/update"' in page
 
 
 def test_prompt_counts_people_not_gifts(

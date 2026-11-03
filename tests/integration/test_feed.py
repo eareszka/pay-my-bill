@@ -141,7 +141,8 @@ def test_feed_cards_open_the_post_and_name_the_kind(
 
 
 @pytest.mark.parametrize(
-    ("raised", "marks"), [(0, 0), (100, 1), (5_000, 5), (9_100, 9), (9_999, 9), (10_000, 10)]
+    ("raised", "marks"),
+    [(0, 0), (1, 1), (100, 1), (5_000, 5), (9_100, 9), (9_999, 9), (10_000, 10)],
 )
 def test_progress_marks_only_look_full_when_funded(
     client: FlaskClient, make_user: MakeUser, raised: int, marks: int

@@ -119,12 +119,12 @@ def test_third_open_post_rejected(client: FlaskClient, poster: User) -> None:
 
 
 def test_closed_posts_do_not_count(client: FlaskClient, poster: User) -> None:
-    client.post("/posts/new", data=FORM)
-    client.post("/posts/new", data=FORM)
+    for title in ("First post", "Second post"):
+        client.post("/posts/new", data={**FORM, "title": title})
     for post in posts():
         post.status = PostStatus.FUNDED
     db.session.commit()
-    client.post("/posts/new", data=FORM)
+    client.post("/posts/new", data={**FORM, "title": "Third post"})
     assert len(posts()) == 3
 
 
@@ -150,6 +150,6 @@ def test_rules_and_field_errors_reported_together(client: FlaskClient, poster: U
 
 
 def test_limit_text_uses_constant(client: FlaskClient, poster: User) -> None:
-    for _ in range(MAX_OPEN_POSTS):
-        client.post("/posts/new", data=FORM)
+    for n in range(MAX_OPEN_POSTS):
+        client.post("/posts/new", data={**FORM, "title": f"Post number {n}"})
     assert f"You already have {MAX_OPEN_POSTS} open posts".encode() in client.get("/posts/new").data

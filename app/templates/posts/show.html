@@ -30,7 +30,7 @@
         <h2 class="section-title">Results update</h2>
         <p class="update-due">{% if post.update_overdue %}This was due {{ post.update_last_day | date }}, and you can't create new posts until it's up.{% else %}Due by {{ post.update_last_day | date }}.{% endif %}</p>
         <p class="hint">Tell the {{ "person who" if helped == 1 else helped ~ " people who" }} helped how it went.</p>
-        <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}#update" class="form" novalidate>
+        <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}" class="form" novalidate>
           {{ update_form.hidden_tag() }}
           <p class="hint">Receipts are never needed. Don't share account numbers or medical details.</p>
           {{ field(update_form.note, rows=4, maxlength=2000) }}
@@ -47,17 +47,17 @@
         {% if is_owner %}
           <p class="hint">This is your post. Share it so people can chip in.</p>
         {% elif pay_options %}
-          <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in">
+          <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in" novalidate>
             {{ form.csrf_token }}
             {# The first submit button is the default one; disabled, so Enter in the amount box never records a gift. #}
             <button type="submit" disabled hidden aria-hidden="true"></button>
-            <label class="field">
-              <span>Amount</span>
+            <div class="field">
+              <label for="chip-amount">Amount</label>
               {% set amount_attrs = dict(id="chip-amount", inputmode="decimal", autocomplete="off", placeholder="$20.00", data_max=post.goal_cents / 100, aria_describedby="chip-amount-error") %}
-              {% if form.amount.errors %}{{ form.amount(aria_invalid="true", **amount_attrs) }}{% else %}{{ form.amount(**amount_attrs) }}{% endif %}
+              {% if form.amount.errors %}{{ form.amount(aria_invalid="true", autofocus=True, **amount_attrs) }}{% else %}{{ form.amount(**amount_attrs) }}{% endif %}
               {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
-              <small id="chip-amount-error" class="error" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
-            </label>
+              <small id="chip-amount-error" class="error" role="alert" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
+            </div>
             <div class="pay-buttons">
               {% for option in pay_options %}
                 <a class="btn" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
@@ -67,9 +67,10 @@
             <h3 class="section-title">Sent it?</h3>
             {% if current_user.is_authenticated %}
               <div class="sent-row">
-                <label class="field"><span>via</span>{% if form.method.errors %}{{ form.method(aria_invalid="true", aria_describedby="method-error") }}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% else %}{{ form.method() }}{% endif %}</label>
+                <div class="field"><label for="method">via</label>{% if form.method.errors %}{{ form.method(aria_invalid="true", aria_describedby="method-error", autofocus=True) }}{% else %}{{ form.method() }}{% endif %}</div>
                 <button type="submit" class="btn btn-secondary">I sent it</button>
               </div>
+              {% if form.method.errors %}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% endif %}
               <p class="hint">It counts once {{ post.user.username }} confirms it came through.</p>
             {% else %}
               <p class="hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
