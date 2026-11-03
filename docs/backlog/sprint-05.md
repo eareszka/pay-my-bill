@@ -60,7 +60,7 @@ The owner found the rack too cluttered and chose a bulletin board with no thumbt
 
 ### S5-8 Swipe through the pile · #90 · 3 pts · P1
 The owner sees the feed as swiping through mail and bills, like Tinder except you can go back. Added mid-sprint by the owner, with motion only and no change to the approved look.
-- [ ] Swiping left shows the next ticket, and swiping right shows the previous one. On the first ticket, a right swipe springs back.
+- [ ] Swiping left shows the next ticket, and swiping right shows the previous one, with the real post already underneath and no blank stage. On the first ticket, a right swipe springs back.
 - [ ] Letting go early settles the ticket back. Scrolling still works over the ticket, and a drag never opens the post or Chip in.
 - [ ] Back, Next ticket, and the arrow keys play the same motion, and the arrow keys do nothing while typing.
 - [ ] Swiping never gives, passes on, or hides a post.

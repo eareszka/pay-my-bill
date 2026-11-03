@@ -181,9 +181,11 @@ h3.section-title { font-size: 1.0625rem; }
 .deck-stacked { margin-top: 18px; }
 .deck-stacked::before, .deck-stacked::after { content: ""; position: absolute; left: 12px; right: 12px; height: 12px; top: -7px; background: var(--stack-1); box-shadow: var(--shadow); }
 .deck-stacked::after { left: 6px; right: 6px; top: -3px; background: var(--stack-2); }
-/* While a ticket is moving, a blank sheet shows underneath it. */
-.deck-stacked.is-moving::after { inset: 0; height: auto; }
-.is-moving .deck-ticket { user-select: none; }
+/* While a ticket is moving, the real next post waits underneath it. */
+.is-moving > .deck-ticket { z-index: 2; user-select: none; }
+.deck .deck-under { position: absolute; inset: 0; z-index: 1; height: auto; overflow: hidden; pointer-events: none; }
+/* Until the next post's page loads, nobody can pay from the last post's panel. */
+.deck-side.is-waiting { opacity: 0.4; }
 .deck-ticket { z-index: 1; min-height: min(calc(100dvh - 215px), 520px); }
 /* Logged-out visitors also see the heading above the tabs. */
 .board h1:not(.sr-only) ~ .deck-layout .deck-ticket { min-height: min(calc(100dvh - 275px), 520px); }

@@ -4,9 +4,11 @@ const ticket = document.querySelector(".deck-ticket");
 const deck = document.querySelector(".deck");
 const nextLink = document.querySelector(".deck-next");
 const backLink = document.querySelector(".deck-back");
+const panel = document.querySelector(".deck-side");
+const nextUnder = document.getElementById("deck-under-next");
+const backUnder = document.getElementById("deck-under-back");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-const ARRIVING = "deck-arriving";
 const START_DRAG_PX = 8;
 const COMMIT_SHARE = 0.3; // of the ticket's width
 const FLICK_PX_PER_MS = 0.5;
@@ -14,12 +16,14 @@ const FLICK_MIN_PX = 30;
 const FLICK_WINDOW_MS = 100;
 const MAX_TILT_DEG = 6;
 const RESIST = 0.25; // how far the ticket gives when there's nowhere to go
-const ARRIVE = "cubic-bezier(0.16, 1, 0.3, 1)";
+const SETTLE = "cubic-bezier(0.16, 1, 0.3, 1)";
 const THROW = "cubic-bezier(0.4, 0, 1, 1)";
 
 let leaving = false;
 let press = null;
 let dragged = false;
+let under = null;
+let underFor = null;
 
 const tilt = (dx) => {
   const share = Math.max(-1, Math.min(1, dx / ticket.offsetWidth));
@@ -30,31 +34,46 @@ const pose = (dx) => (calm.matches
   ? { opacity: 1 - Math.min(Math.abs(dx) / ticket.offsetWidth, 1) / 2 }
   : { transform: `translateX(${dx}px) rotate(${tilt(dx)}deg)` });
 
-const moving = (on) => deck.classList.toggle("is-moving", on);
-
-const remember = (direction) => {
-  try {
-    sessionStorage.setItem(ARRIVING, direction);
-  } catch {
-    // Without storage the next ticket simply appears.
-  }
+// Put the real neighboring ticket under this one, to be seen but not used.
+const reveal = (link) => {
+  if (link === underFor) return;
+  under?.remove();
+  under = null;
+  underFor = link;
+  const source = link === nextLink ? nextUnder : backUnder;
+  const copy = link && source?.content.querySelector(".deck-ticket")?.cloneNode(true);
+  if (!copy) return;
+  copy.classList.add("deck-under");
+  copy.inert = true;
+  copy.setAttribute("aria-hidden", "true");
+  deck.append(copy);
+  under = copy;
 };
 
-// Play the ticket off the pile, then follow the link.
+const moving = (on) => {
+  deck.classList.toggle("is-moving", on);
+  if (!on) reveal(null);
+};
+
+// Play the ticket off the pile, leaving its neighbor in place, then follow the link.
 const leave = (link, dx = 0) => {
   if (leaving) return;
   leaving = true;
-  const direction = link === nextLink ? "next" : "back";
-  remember(direction);
+  prefetch(link);
   moving(true);
+  reveal(link);
+  if (panel) {
+    panel.inert = true;
+    panel.classList.add("is-waiting");
+  }
   const goTo = () => window.location.assign(link.href);
   if (!ticket.animate) {
     goTo();
     return;
   }
-  const end = (direction === "next" ? -1 : 1) * (window.innerWidth + ticket.offsetWidth);
+  const end = (link === nextLink ? -1 : 1) * (window.innerWidth + ticket.offsetWidth);
   const keyframes = calm.matches
-    ? [{ opacity: pose(dx).opacity }, { opacity: 0.4 }]
+    ? [{ opacity: pose(dx).opacity }, { opacity: 0 }]
     : [pose(dx), { transform: `translateX(${end}px) rotate(${tilt(end)}deg)` }];
   const flight = ticket.animate(keyframes, {
     duration: calm.matches ? 120 : 200,
@@ -70,36 +89,11 @@ const settle = (dx) => {
   const back = ticket.animate
     ? ticket.animate([pose(dx), calm.matches ? { opacity: 1 } : { transform: "none" }], {
       duration: calm.matches ? 120 : 250,
-      easing: ARRIVE,
+      easing: SETTLE,
     })
     : null;
   if (back) back.onfinish = () => { if (!press) moving(false); };
   else moving(false);
-};
-
-const arrive = () => {
-  let direction = null;
-  try {
-    direction = sessionStorage.getItem(ARRIVING);
-    sessionStorage.removeItem(ARRIVING);
-  } catch {
-    return;
-  }
-  if (!direction || !ticket.animate) return;
-  if (calm.matches) {
-    ticket.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 120 });
-  } else if (direction === "next") {
-    ticket.animate(
-      [{ transform: "translateY(10px) scale(0.97)" }, { transform: "none" }],
-      { duration: 250, easing: ARRIVE },
-    );
-  } else {
-    // A ticket dealt off to the left comes back from the left, on top of the pile.
-    ticket.animate(
-      [{ transform: `translateX(${-window.innerWidth}px) rotate(${-MAX_TILT_DEG}deg)` }, { transform: "none" }],
-      { duration: 300, easing: ARRIVE },
-    );
-  }
 };
 
 const prefetched = new Set();
@@ -154,6 +148,7 @@ const onMove = (event) => {
   }
   const target = raw < 0 ? nextLink : backLink;
   prefetch(target);
+  reveal(target);
   press.dx = target ? raw : raw * RESIST;
   press.trail.push({ x: event.clientX, at: event.timeStamp });
   Object.assign(ticket.style, pose(press.dx));
@@ -214,8 +209,6 @@ if (ticket && deck && (nextLink || backLink)) {
     if (link) leave(link);
   });
 
-  arrive();
-
   // Coming back with the browser's Back button can restore the ticket mid-flight.
   window.addEventListener("pageshow", (event) => {
     if (!event.persisted) return;
@@ -223,5 +216,9 @@ if (ticket && deck && (nextLink || backLink)) {
     press = null;
     ticket.getAnimations().forEach((animation) => animation.cancel());
     moving(false);
+    if (panel) {
+      panel.inert = false;
+      panel.classList.remove("is-waiting");
+    }
   });
 }

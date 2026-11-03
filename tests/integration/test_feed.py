@@ -47,7 +47,7 @@ def test_one_ticket_shows_at_a_time_newest_after_the_top(
     add_post(user, "Newest want", kind=PostKind.WANT, hours_ago=1)
     first = client.get("/").get_data(as_text=True)
     assert "The top ticket" in first
-    assert "Newest want" not in first
+    assert "Newest want" not in first.split("<template")[0]
     assert "1 of 3" in first
     second = client.get("/?n=2").get_data(as_text=True)
     assert "Newest want" in second
@@ -237,3 +237,60 @@ def test_back_link_is_there_to_swipe_to(client: FlaskClient, make_user: MakeUser
     add_post(user, "Second post")
     assert "deck-back" not in client.get("/").get_data(as_text=True)
     assert "deck-back" in client.get("/?n=2").get_data(as_text=True)
+
+
+def under_card(page: str, side: str) -> str:
+    start = page.find(f'<template id="deck-under-{side}">')
+    return "" if start < 0 else page[start : page.index("</template>", start)]
+
+
+def three_posts(user: User) -> None:
+    for title in ("Oldest post", "Middle post", "Newest post"):
+        add_post(user, title)
+
+
+def test_neighbors_wait_under_a_middle_ticket(client: FlaskClient, make_user: MakeUser) -> None:
+    three_posts(make_user(venmo_handle="@maria-g"))
+    page = client.get("/?n=2").get_data(as_text=True)
+    shown = page[: page.index("<template")]
+    titles = ("Oldest post", "Middle post", "Newest post")
+    current = next(title for title in titles if title in shown)
+    next_title = next(title for title in titles if title in under_card(page, "next"))
+    back_title = next(title for title in titles if title in under_card(page, "back"))
+    assert {current, next_title, back_title} == set(titles)
+
+
+def test_first_ticket_has_nothing_to_go_back_to(client: FlaskClient, make_user: MakeUser) -> None:
+    three_posts(make_user())
+    page = client.get("/").get_data(as_text=True)
+    assert under_card(page, "next")
+    assert not under_card(page, "back")
+
+
+def test_last_ticket_wraps_to_the_first_underneath(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    three_posts(make_user())
+    first = client.get("/").get_data(as_text=True)
+    first_title = first[: first.index("<template")]
+    last = client.get("/?n=3").get_data(as_text=True)
+    wrapped = under_card(last, "next")
+    title = next(t for t in ("Oldest post", "Middle post", "Newest post") if t in first_title)
+    assert title in wrapped
+
+
+def test_lone_ticket_has_nothing_underneath(client: FlaskClient, make_user: MakeUser) -> None:
+    add_post(make_user(), "Only post")
+    assert "<template" not in client.get("/").get_data(as_text=True)
+
+
+def test_neighbor_checks_its_own_owner(client: FlaskClient, make_user: MakeUser) -> None:
+    mine = make_user("mine", venmo_handle="@mine-pays")
+    theirs = make_user("theirs", venmo_handle="@they-pay")
+    add_post(mine, "My post")
+    add_post(theirs, "Their post")
+    login_as(client, mine)
+    for position in (1, 2):
+        page = client.get(f"/?n={position}").get_data(as_text=True)
+        under = under_card(page, "next") or under_card(page, "back")
+        assert ("tear-tab" in under) == ("Their post" in under)
