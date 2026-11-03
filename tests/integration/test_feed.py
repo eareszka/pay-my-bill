@@ -223,3 +223,17 @@ def test_logging_in_from_the_panel_returns_to_that_post(
 def test_lone_ticket_does_not_use_the_stack(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
     assert "deck-stacked" not in client.get("/").get_data(as_text=True)
+
+
+def test_swipe_script_loads_only_with_a_ticket(client: FlaskClient, make_user: MakeUser) -> None:
+    assert "js/swipe.js" not in client.get("/").get_data(as_text=True)
+    add_post(make_user(), "Only post")
+    assert "js/swipe.js" in client.get("/").get_data(as_text=True)
+
+
+def test_back_link_is_there_to_swipe_to(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user()
+    add_post(user, "First post")
+    add_post(user, "Second post")
+    assert "deck-back" not in client.get("/").get_data(as_text=True)
+    assert "deck-back" in client.get("/?n=2").get_data(as_text=True)

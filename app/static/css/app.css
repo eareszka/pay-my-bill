@@ -79,6 +79,7 @@ body { --muted: var(--muted-on-ground); --link: var(--link-on-ground); }
 [hidden] { display: none !important; }
 
 body {
+  overflow-x: clip; /* A ticket dealt off the pile never adds a sideways scroll. */
   margin: 0;
   background: var(--ground);
   color: var(--on-ground);
@@ -175,9 +176,14 @@ h3.section-title { font-size: 1.0625rem; }
 .board { max-width: 480px; margin-inline: auto; }
 .wide-only, .deck-side { display: none; }
 .deck { position: relative; }
+/* A ticket can be dragged sideways, while the page still scrolls under the finger. */
+.deck-ticket { touch-action: pan-y; }
 .deck-stacked { margin-top: 18px; }
 .deck-stacked::before, .deck-stacked::after { content: ""; position: absolute; left: 12px; right: 12px; height: 12px; top: -7px; background: var(--stack-1); box-shadow: var(--shadow); }
 .deck-stacked::after { left: 6px; right: 6px; top: -3px; background: var(--stack-2); }
+/* While a ticket is moving, a blank sheet shows underneath it. */
+.deck-stacked.is-moving::after { inset: 0; height: auto; }
+.is-moving .deck-ticket { user-select: none; }
 .deck-ticket { z-index: 1; min-height: min(calc(100dvh - 215px), 520px); }
 /* Logged-out visitors also see the heading above the tabs. */
 .board h1:not(.sr-only) ~ .deck-layout .deck-ticket { min-height: min(calc(100dvh - 275px), 520px); }

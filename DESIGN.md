@@ -460,6 +460,18 @@ One device for every gift state: a small mark before a 0.875rem, 700 label. It c
 ### Flashes and Notices
 Full-width tinted sheets above the content with ink text, 10px 12px padding, and square corners: info, success, or error by tint and words. Error flashes are announced as alerts.
 
+### Motion
+
+The feed moves like a pile of mail being dealt, and nothing else on the site gets a similar effect.
+
+- **Drag:** the ticket follows the pointer and tilts up to 6°, with a blank sheet underneath.
+- **Swipe left or Next ticket:** the ticket flies off left in 200ms, and the next one rises from the pile in 250ms.
+- **Swipe right or Back:** the ticket flies off right in 200ms, and the previous one returns from the left in 300ms.
+- **Let go early:** the ticket settles back in 250ms. With nowhere to go, it gives a quarter of the drag and springs back.
+- **Reduced motion:** no flight or tilt, only a 120ms fade.
+
+Swiping only moves through the pile. It never gives, passes on, or hides a post.
+
 ## Do's and Don'ts
 
 ### Do:

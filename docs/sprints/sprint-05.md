@@ -14,8 +14,9 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-5 Clear disputes | #81 | 3 | To do |
 | S5-7 Bulletin board and the top spot | #85 | 5 | Done |
 | S5-6 Password reset | #82 | 3 | To do |
+| S5-8 Swipe through the pile | #90 | 3 | In progress |
 
-**Total:** 29 points (Sprint 4: 16).
+**Total:** 32 points (Sprint 4: 16).
 
 ## Daily log
 - 2026-11-03: Planned with the owner, who approved the order and chose an email plus a Gifts banner for confirmed gifts, and dates plus an optional payment-app name for matching. Did #77: hardening. Next: #78 safer chip-in. Blocked: none.
@@ -30,3 +31,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-03: The finish review's contrast, line length, and dark stack fixes went in. Its suggestions to replace the reaction emoji, recolor links and marks, and put Rules and profile text on tickets would change the approved look, so they wait for the owner. Blocked: none.
 - 2026-11-04: #85 is complete and approved by the owner, with PR #86 open and not merged. Complete: the bulletin board with One Ticket at a Time on phones and Give Right Here on computers, the top spot that rewards follow-through, the code review and finish review fixes, and a rewritten `DESIGN.md`. 550 tests pass at 100% coverage. Waiting on five owner decisions: reaction emoji, green links and marks, Rules and profile text on cork, where "I sent it" lands, and a Need or Want label on phones. Loading the first ticket on every feed view still costs more as history grows; revisit with real traffic. Next: #79 trust information. Blocked: none.
 - 2026-11-04: The owner chose to merge #85 (#86) now and build swiping on its own PR. The five open decisions move to a follow-up issue. Blocked: none.
+- 2026-11-04: #85 merged (#86). The owner described the feed as swiping through mail and bills and added #90: swipe left for next and right for back, with motion only and no new look. The five open decisions moved to #89. Waiting on the owner's review of the feel. Blocked: none.
