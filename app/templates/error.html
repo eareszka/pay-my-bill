@@ -3,5 +3,9 @@
 {% block content %}
   <h1>{{ title }}</h1>
   <p>{{ message }}</p>
-  <p><a class="btn" href="{{ url_for('main.index') }}">See who needs a hand</a></p>
+  {% if back %}
+    <p><a class="btn" href="{{ back }}">Go back</a></p>
+  {% else %}
+    <p><a class="btn" href="{{ url_for('main.index') }}">See who needs a hand</a></p>
+  {% endif %}
 {% endblock %}

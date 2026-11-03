@@ -5,8 +5,10 @@ const method = document.getElementById("method");
 const links = document.querySelectorAll("[data-amount-sep]");
 
 function parsed() {
-  const text = amount.value.replace(/[$,\s]/g, "");
-  const value = /^\d+(\.\d{1,2})?$/.test(text) ? Number(text) : NaN;
+  // Same rule as the server: commas only as thousands separators, so 5,50 is an error.
+  const text = amount.value.replace(/[$\s]/g, "");
+  const ok = /^(\d+|\d{1,3}(,\d{3})+)(\.\d{1,2})?$/.test(text);
+  const value = ok ? Number(text.replaceAll(",", "")) : NaN;
   return { text, valid: value >= 0.01 && value <= Number(amount.dataset.max), value };
 }
 
@@ -27,8 +29,10 @@ if (amount) {
   amount.addEventListener("input", () => {
     syncLinks();
     const { text, valid } = parsed();
-    error.textContent = error.dataset.message;
-    error.hidden = valid || text === "";
+    // Only change the alert when it flips, so screen readers don't repeat it on each key.
+    if (error.textContent !== error.dataset.message) error.textContent = error.dataset.message;
+    const hidden = valid || text === "";
+    if (error.hidden !== hidden) error.hidden = hidden;
     if (error.hidden) amount.removeAttribute("aria-invalid");
     else amount.setAttribute("aria-invalid", "true");
   });

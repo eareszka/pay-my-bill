@@ -12,10 +12,10 @@
         <legend>{{ form.kind.label.text }}</legend>
         <div class="choices">
           {% for option in form.kind %}
-            <label class="choice">{{ option() }} {{ option.label.text }}</label>
+            <label class="choice">{% if form.kind.errors %}{{ option(aria_describedby="kind-error", autofocus=loop.first) }}{% else %}{{ option() }}{% endif %} {{ option.label.text }}</label>
           {% endfor %}
         </div>
-        {% for error in form.kind.errors %}<small class="error">{{ error }}</small>{% endfor %}
+        {% if form.kind.errors %}<small class="error" id="kind-error">{{ form.kind.errors | join(" ") }}</small>{% endif %}
       </fieldset>
       {{ field(form.title, maxlength=80) }}
       {{ field(form.body, rows=6, maxlength=2000) }}

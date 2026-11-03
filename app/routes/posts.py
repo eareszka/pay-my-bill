@@ -44,6 +44,7 @@ from app.payment_links import pay_options
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
 MAX_DB_INT = 2**31 - 1
+DUPLICATE_POST_SECONDS = 60
 
 
 def active_post_count(user: User) -> int:
@@ -56,6 +57,18 @@ def active_post_count(user: User) -> int:
         )
     )
     return count or 0
+
+
+def just_posted(user: User, title: str | None, body: str | None) -> Post | None:
+    # The same post again within moments is a double tap or a resubmit, not a new ask.
+    return db.session.scalars(
+        select(Post).where(
+            Post.user_id == user.id,
+            Post.title == title,
+            Post.body == body,
+            Post.created_at > utcnow() - timedelta(seconds=DUPLICATE_POST_SECONDS),
+        )
+    ).first()
 
 
 def posts_owing_update(user: User | None = None) -> list[Post]:
@@ -92,6 +105,10 @@ def new() -> str | Response | tuple[str, int]:
         db.session.execute(select(User.id).where(User.id == user.id).with_for_update())
     at_limit = active_post_count(user) >= MAX_OPEN_POSTS
     if not at_limit and form.validate_on_submit():
+        repeat = just_posted(user, form.title.data, form.body.data)
+        if repeat:
+            db.session.rollback()
+            return redirect(url_for("posts.show", post_id=repeat.id))
         if form.require_rules:
             user.rules_accepted_at = utcnow()
         flagged = is_flagged(form.title.data, form.body.data)
