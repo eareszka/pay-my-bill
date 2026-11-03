@@ -1,6 +1,7 @@
 {% set poster = post.user.username %}
 <section class="group" id="chip-in">
   <h2 class="section-title">Chip in</h2>
+  {% if show_amount %}<p class="amounts side-amount"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>{% endif %}
   {% if post.is_open %}<p class="hint">Open until {{ post.last_open_day | date }}.</p>{% endif %}
   {% if is_owner %}
     <p class="hint">This is your post. Share it so people can chip in.</p>
@@ -16,7 +17,7 @@
       {% if not post.is_open %}
         <p class="hint">This post just closed. If you already sent a gift, record it now so it counts. You have {{ late_gift_hours }} hours from when it closed.</p>
       {% elif not current_user.is_authenticated %}
-        <p class="notice"><a href="{{ url_for('auth.login', next=request.path) }}">Log in first</a> so your gift counts. Gifts are only credited to an account.</p>
+        <p class="notice"><a href="{{ url_for('auth.login', next=url_for('posts.show', post_id=post.id)) }}">Log in first</a> so your gift counts. Gifts are only credited to an account.</p>
       {% elif not current_user.is_verified %}
         <p class="notice"><a href="{{ url_for('auth.verify_pending') }}">Verify your email first</a> so your gift counts.</p>
       {% endif %}
@@ -49,9 +50,9 @@
         {% if form.method.errors %}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% endif %}
         <p class="hint">It counts once {{ poster }} confirms it came through.</p>
       {% elif post.is_open %}
-        <p class="hint">Already paid? <a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
+        <p class="hint">Already paid? <a href="{{ url_for('auth.login', next=url_for('posts.show', post_id=post.id)) }}">Log in</a> to record your gift so it counts.</p>
       {% else %}
-        <p class="hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
+        <p class="hint"><a href="{{ url_for('auth.login', next=url_for('posts.show', post_id=post.id)) }}">Log in</a> to record your gift so it counts.</p>
       {% endif %}
     </form>
     <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>

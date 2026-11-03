@@ -1,87 +1,42 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-03T06:36:11Z",
+  "generatedAt": "2026-11-03T14:55:00Z",
   "title": "Design System: Pay My Bill",
   "extensions": {
     "colorMeta": {
-      "leaf": {
+      "action": {
         "role": "primary",
         "displayName": "Leaf Green",
         "canonical": "#1f5a3d",
         "tonalRamp": [
           "#000f06",
-          "#062d1b",
-          "#1e4d35",
-          "#366f51",
-          "#5e8f73",
-          "#88b098",
-          "#b2d2bf",
-          "#ddf6e7"
+          "#002e1a",
+          "#104e32",
+          "#356f51",
+          "#579171",
+          "#7ab493",
+          "#a8d6bb",
+          "#daf7e5"
         ]
       },
-      "mark": {
+      "action-hover": {
         "role": "primary",
-        "displayName": "Progress Green",
-        "canonical": "#1f5a3d",
+        "displayName": "Leaf Green Hover",
+        "canonical": "#17452f",
         "tonalRamp": [
           "#000f06",
-          "#062d1b",
-          "#1e4d35",
-          "#366f51",
-          "#5e8f73",
-          "#88b098",
-          "#b2d2bf",
-          "#ddf6e7"
+          "#002e1a",
+          "#1f4c36",
+          "#3f6c54",
+          "#608e75",
+          "#83b297",
+          "#aed4be",
+          "#def5e7"
         ]
       },
-      "mark-empty": {
+      "on-action": {
         "role": "neutral",
-        "displayName": "Empty Mark",
-        "canonical": "#d2e0d7",
-        "tonalRamp": [
-          "#080d09",
-          "#202723",
-          "#3b453f",
-          "#59655d",
-          "#7b857e",
-          "#9ea8a2",
-          "#c4cbc6",
-          "#eaf0ec"
-        ]
-      },
-      "link": {
-        "role": "primary",
-        "displayName": "Link Green",
-        "canonical": "#1f5a3d",
-        "tonalRamp": [
-          "#000f06",
-          "#062d1b",
-          "#1e4d35",
-          "#366f51",
-          "#5e8f73",
-          "#88b098",
-          "#b2d2bf",
-          "#ddf6e7"
-        ]
-      },
-      "teal": {
-        "role": "secondary",
-        "displayName": "Deep Teal",
-        "canonical": "#0f5e6e",
-        "tonalRamp": [
-          "#000e12",
-          "#002b33",
-          "#0b4a57",
-          "#246c7c",
-          "#538c9b",
-          "#7faeba",
-          "#abd1db",
-          "#d8f4fc"
-        ]
-      },
-      "on-band": {
-        "role": "neutral",
-        "displayName": "On Band White",
+        "displayName": "On Green",
         "canonical": "#ffffff",
         "tonalRamp": [
           "#0b0b0b",
@@ -94,49 +49,79 @@
           "#eeeeee"
         ]
       },
-      "action": {
-        "role": "tertiary",
-        "displayName": "Marigold",
-        "canonical": "#f4b223",
+      "mark": {
+        "role": "primary",
+        "displayName": "Progress Green",
+        "canonical": "#1f5a3d",
         "tonalRamp": [
-          "#120900",
-          "#332100",
-          "#573d02",
-          "#7e5a06",
-          "#a97803",
-          "#ca9d4b",
-          "#e8c385",
-          "#ffeccd"
+          "#000f06",
+          "#002e1a",
+          "#104e32",
+          "#356f51",
+          "#579171",
+          "#7ab493",
+          "#a8d6bb",
+          "#daf7e5"
         ]
       },
-      "action-hover": {
-        "role": "tertiary",
-        "displayName": "Marigold Hover",
-        "canonical": "#e5a412",
-        "tonalRamp": [
-          "#120900",
-          "#332100",
-          "#583c01",
-          "#7f5906",
-          "#aa7802",
-          "#ca9d4e",
-          "#e8c387",
-          "#ffecce"
-        ]
-      },
-      "on-action": {
+      "mark-empty": {
         "role": "neutral",
-        "displayName": "On Marigold Ink",
-        "canonical": "#17231c",
+        "displayName": "Empty Mark",
+        "canonical": "#e4ddd2",
         "tonalRamp": [
-          "#070d09",
-          "#1f2722",
-          "#3a453e",
-          "#57655d",
-          "#79867e",
-          "#9da8a1",
-          "#c3ccc6",
-          "#eaf0ec"
+          "#0e0b06",
+          "#29241c",
+          "#474138",
+          "#666057",
+          "#888177",
+          "#aba49a",
+          "#cec8c0",
+          "#f1eee9"
+        ]
+      },
+      "link-surface": {
+        "role": "primary",
+        "displayName": "Paper Link Green",
+        "canonical": "#1f5a3d",
+        "tonalRamp": [
+          "#000f06",
+          "#002e1a",
+          "#104e32",
+          "#356f51",
+          "#579171",
+          "#7ab493",
+          "#a8d6bb",
+          "#daf7e5"
+        ]
+      },
+      "link-on-ground": {
+        "role": "neutral",
+        "displayName": "Cork Link Ink",
+        "canonical": "#231a12",
+        "tonalRamp": [
+          "#100a05",
+          "#2c231b",
+          "#4a4037",
+          "#6a5f55",
+          "#8c8076",
+          "#afa398",
+          "#d1c7bf",
+          "#f3ede8"
+        ]
+      },
+      "want": {
+        "role": "secondary",
+        "displayName": "Want Blue",
+        "canonical": "#cfe3f5",
+        "tonalRamp": [
+          "#040c15",
+          "#172734",
+          "#344453",
+          "#526473",
+          "#738595",
+          "#95a8b9",
+          "#bccbd9",
+          "#e6f0f9"
         ]
       },
       "tomato": {
@@ -145,12 +130,12 @@
         "canonical": "#b8452c",
         "tonalRamp": [
           "#1d0100",
-          "#490a00",
-          "#781c06",
-          "#a6351c",
-          "#c5614a",
-          "#e18b77",
-          "#fcb5a4",
+          "#490900",
+          "#7a1700",
+          "#a7351b",
+          "#ce593f",
+          "#f67d62",
+          "#ffb4a2",
           "#ffe9e4"
         ]
       },
@@ -159,14 +144,29 @@
         "displayName": "Tomato Hover",
         "canonical": "#9d3a24",
         "tonalRamp": [
-          "#1d0200",
+          "#1d0100",
           "#490a00",
-          "#732312",
-          "#9f3d27",
-          "#be6651",
-          "#db8e7c",
-          "#f7b8a8",
-          "#ffe9e4"
+          "#7a1800",
+          "#a03d27",
+          "#c65f48",
+          "#ee836a",
+          "#ffb4a2",
+          "#ffe9e3"
+        ]
+      },
+      "tomato-text": {
+        "role": "tertiary",
+        "displayName": "Tomato Text",
+        "canonical": "#9d3a24",
+        "tonalRamp": [
+          "#1d0100",
+          "#490a00",
+          "#7a1800",
+          "#a03d27",
+          "#c65f48",
+          "#ee836a",
+          "#ffb4a2",
+          "#ffe9e3"
         ]
       },
       "on-tomato": {
@@ -186,22 +186,52 @@
       },
       "ground": {
         "role": "neutral",
-        "displayName": "Pale Leaf Ground",
-        "canonical": "#e6f0ea",
+        "displayName": "Cork",
+        "canonical": "#c49a6c",
         "tonalRamp": [
-          "#090c0a",
-          "#212623",
-          "#3d4440",
-          "#5b645f",
-          "#7d8480",
-          "#a0a7a3",
-          "#c5cbc7",
-          "#ebf0ed"
+          "#140800",
+          "#371f00",
+          "#5d3905",
+          "#7f582b",
+          "#a2794c",
+          "#c69c6e",
+          "#e4c29e",
+          "#ffebd6"
+        ]
+      },
+      "bar": {
+        "role": "neutral",
+        "displayName": "Wood",
+        "canonical": "#4a2f1b",
+        "tonalRamp": [
+          "#170600",
+          "#371e0a",
+          "#573b27",
+          "#785a45",
+          "#9a7b65",
+          "#bf9d87",
+          "#dec3b1",
+          "#fcebdf"
+        ]
+      },
+      "on-bar": {
+        "role": "neutral",
+        "displayName": "On Wood",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
         ]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Surface",
+        "displayName": "Paper",
         "canonical": "#ffffff",
         "tonalRamp": [
           "#0b0b0b",
@@ -217,76 +247,166 @@
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "#17231c",
+        "canonical": "#231a12",
         "tonalRamp": [
-          "#070d09",
-          "#1f2722",
-          "#3a453e",
-          "#57655d",
-          "#79867e",
-          "#9da8a1",
-          "#c3ccc6",
-          "#eaf0ec"
+          "#100a05",
+          "#2c231b",
+          "#4a4037",
+          "#6a5f55",
+          "#8c8076",
+          "#afa398",
+          "#d1c7bf",
+          "#f3ede8"
         ]
       },
-      "muted": {
+      "ink-on-light": {
         "role": "neutral",
-        "displayName": "Muted",
-        "canonical": "#46574e",
+        "displayName": "Ink on Light",
+        "canonical": "#231a12",
         "tonalRamp": [
-          "#060d09",
-          "#1d2822",
-          "#38463e",
-          "#55665d",
-          "#77877e",
-          "#9ba9a1",
-          "#c1ccc6",
-          "#e9f1ec"
+          "#100a05",
+          "#2c231b",
+          "#4a4037",
+          "#6a5f55",
+          "#8c8076",
+          "#afa398",
+          "#d1c7bf",
+          "#f3ede8"
+        ]
+      },
+      "on-ground": {
+        "role": "neutral",
+        "displayName": "Ink on Cork",
+        "canonical": "#231a12",
+        "tonalRamp": [
+          "#100a05",
+          "#2c231b",
+          "#4a4037",
+          "#6a5f55",
+          "#8c8076",
+          "#afa398",
+          "#d1c7bf",
+          "#f3ede8"
+        ]
+      },
+      "muted-surface": {
+        "role": "neutral",
+        "displayName": "Muted on Paper",
+        "canonical": "#54463a",
+        "tonalRamp": [
+          "#110904",
+          "#2f2217",
+          "#4d3f33",
+          "#6d5e52",
+          "#8f7f72",
+          "#b2a294",
+          "#d4c6bb",
+          "#f5ede6"
+        ]
+      },
+      "muted-on-ground": {
+        "role": "neutral",
+        "displayName": "Muted on Cork",
+        "canonical": "#2f2114",
+        "tonalRamp": [
+          "#120903",
+          "#302215",
+          "#4e3f31",
+          "#6e5e4f",
+          "#907f6f",
+          "#b4a191",
+          "#d5c6b9",
+          "#f6ede4"
         ]
       },
       "line": {
         "role": "neutral",
-        "displayName": "Line",
-        "canonical": "#c3d4ca",
+        "displayName": "Paper Line",
+        "canonical": "#d8ccbd",
         "tonalRamp": [
-          "#070d09",
-          "#1f2822",
-          "#39453e",
-          "#57655d",
-          "#79867e",
-          "#9da8a1",
-          "#c2ccc6",
-          "#e9f0ec"
+          "#100a04",
+          "#2c2318",
+          "#4a4034",
+          "#6a5f52",
+          "#8b8073",
+          "#afa395",
+          "#d1c8bc",
+          "#f3ede6"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Board Rule",
+        "canonical": "#4a2f1b",
+        "tonalRamp": [
+          "#170600",
+          "#371e0a",
+          "#573b27",
+          "#785a45",
+          "#9a7b65",
+          "#bf9d87",
+          "#dec3b1",
+          "#fcebdf"
+        ]
+      },
+      "stack-1": {
+        "role": "neutral",
+        "displayName": "Back Stack Edge",
+        "canonical": "#cfe3f5",
+        "tonalRamp": [
+          "#040c15",
+          "#172734",
+          "#344453",
+          "#526473",
+          "#738595",
+          "#95a8b9",
+          "#bccbd9",
+          "#e6f0f9"
+        ]
+      },
+      "stack-2": {
+        "role": "neutral",
+        "displayName": "Front Stack Edge",
+        "canonical": "#efe6d8",
+        "tonalRamp": [
+          "#0f0a05",
+          "#2b2419",
+          "#484136",
+          "#686054",
+          "#898174",
+          "#aca497",
+          "#cfc8be",
+          "#f2eee7"
         ]
       },
       "tint-info": {
         "role": "neutral",
         "displayName": "Info Tint",
-        "canonical": "#d6e7dd",
+        "canonical": "#efe6d8",
         "tonalRamp": [
-          "#070d09",
-          "#1f2722",
-          "#3a453f",
-          "#57655d",
-          "#79867e",
-          "#9da8a2",
-          "#c2ccc6",
-          "#e9f0ec"
+          "#0f0a05",
+          "#2b2419",
+          "#484136",
+          "#686054",
+          "#898174",
+          "#aca497",
+          "#cfc8be",
+          "#f2eee7"
         ]
       },
       "tint-good": {
         "role": "neutral",
         "displayName": "Good Tint",
-        "canonical": "#cfe6d8",
+        "canonical": "#d9eadf",
         "tonalRamp": [
-          "#060d09",
-          "#1c2821",
-          "#36463d",
-          "#53675b",
-          "#75877d",
-          "#9aa9a0",
+          "#060d08",
+          "#1c2921",
+          "#38463d",
+          "#57655c",
+          "#77877d",
+          "#9aaa9f",
           "#c0cdc5",
-          "#e8f1eb"
+          "#e9f1eb"
         ]
       },
       "tint-bad": {
@@ -294,164 +414,44 @@
         "displayName": "Bad Tint",
         "canonical": "#f7dfd8",
         "tonalRamp": [
-          "#110907",
-          "#2e221e",
-          "#4e3e39",
+          "#130806",
+          "#31201b",
+          "#503d37",
           "#705c56",
-          "#907e78",
-          "#b1a19c",
-          "#d3c6c2",
-          "#f6ece9"
+          "#927d77",
+          "#b69f99",
+          "#d7c5bf",
+          "#f7ece8"
         ]
       },
-      "ground-dark": {
-        "role": "neutral",
-        "displayName": "Pale Leaf Ground (dark theme)",
-        "canonical": "#0f1a14",
-        "tonalRamp": [
-          "#070d0a",
-          "#1f2723",
-          "#3b453f",
-          "#58655d",
-          "#7a867f",
-          "#9ea8a2",
-          "#c3cbc7",
-          "#eaf0ec"
-        ]
-      },
-      "surface-dark": {
-        "role": "neutral",
-        "displayName": "Surface (dark theme)",
-        "canonical": "#18251e",
-        "tonalRamp": [
-          "#070d09",
-          "#1f2723",
-          "#3a453f",
-          "#57655d",
-          "#79867e",
-          "#9da8a2",
-          "#c2ccc6",
-          "#e9f0ec"
-        ]
-      },
-      "ink-dark": {
-        "role": "neutral",
-        "displayName": "Ink (dark theme)",
-        "canonical": "#edf4ef",
-        "tonalRamp": [
-          "#090c0a",
-          "#232624",
-          "#3f4340",
-          "#5d635f",
-          "#7e8480",
-          "#a2a6a3",
-          "#c6cac7",
-          "#ecefed"
-        ]
-      },
-      "muted-dark": {
-        "role": "neutral",
-        "displayName": "Muted (dark theme)",
-        "canonical": "#a9bcb0",
-        "tonalRamp": [
-          "#060d09",
-          "#1e2822",
-          "#38463d",
-          "#55665b",
-          "#77877d",
-          "#9ca9a0",
-          "#c1ccc5",
-          "#e9f1ec"
-        ]
-      },
-      "line-dark": {
-        "role": "neutral",
-        "displayName": "Line (dark theme)",
-        "canonical": "#304238",
-        "tonalRamp": [
-          "#060d09",
-          "#1d2822",
-          "#37463e",
-          "#54665c",
-          "#76877d",
-          "#9ba9a1",
-          "#c1cdc5",
-          "#e8f1ec"
-        ]
-      },
-      "link-dark": {
+      "action-dark": {
         "role": "primary",
-        "displayName": "Link Green (dark theme)",
-        "canonical": "#86d8ac",
+        "displayName": "Leaf Green (dark theme)",
+        "canonical": "#2c7a53",
         "tonalRamp": [
-          "#000f06",
-          "#012d1b",
-          "#004f31",
-          "#1b724c",
-          "#4f9370",
-          "#7db495",
-          "#aad5bc",
-          "#d7f8e5"
+          "#001006",
+          "#002e19",
+          "#00502f",
+          "#22724b",
+          "#48946c",
+          "#6cb88e",
+          "#9fd9b6",
+          "#d5f9e3"
         ]
       },
       "action-hover-dark": {
-        "role": "tertiary",
-        "displayName": "Marigold Hover (dark theme)",
-        "canonical": "#ffc53d",
+        "role": "primary",
+        "displayName": "Leaf Green Hover (dark theme)",
+        "canonical": "#256a48",
         "tonalRamp": [
-          "#110a00",
-          "#312200",
-          "#553e02",
-          "#7b5b07",
-          "#a57b05",
-          "#c69f4b",
-          "#e4c586",
-          "#ffecc8"
-        ]
-      },
-      "tomato-dark": {
-        "role": "tertiary",
-        "displayName": "Tomato (dark theme)",
-        "canonical": "#f08a72",
-        "tonalRamp": [
-          "#1d0200",
-          "#470d02",
-          "#712615",
-          "#9d402b",
-          "#bb6854",
-          "#d8907e",
-          "#f5b9aa",
-          "#ffe9e4"
-        ]
-      },
-      "tomato-hover-dark": {
-        "role": "tertiary",
-        "displayName": "Tomato Hover (dark theme)",
-        "canonical": "#f5a28e",
-        "tonalRamp": [
-          "#1d0200",
-          "#41150b",
-          "#682e21",
-          "#924938",
-          "#b16e5e",
-          "#cf9587",
-          "#ecbcb0",
-          "#ffe9e4"
-        ]
-      },
-      "on-tomato-dark": {
-        "role": "neutral",
-        "displayName": "On Tomato (dark theme)",
-        "canonical": "#17231c",
-        "tonalRamp": [
-          "#070d09",
-          "#1f2722",
-          "#3a453e",
-          "#57655d",
-          "#79867e",
-          "#9da8a1",
-          "#c3ccc6",
-          "#eaf0ec"
+          "#001006",
+          "#002e19",
+          "#005030",
+          "#2c704e",
+          "#50936e",
+          "#73b690",
+          "#a3d7b9",
+          "#d8f8e4"
         ]
       },
       "mark-dark": {
@@ -459,44 +459,314 @@
         "displayName": "Progress Green (dark theme)",
         "canonical": "#62c390",
         "tonalRamp": [
-          "#000f06",
-          "#002e1a",
-          "#034f30",
-          "#0a7449",
-          "#44956b",
-          "#75b691",
-          "#a4d7b9",
-          "#d4f9e2"
+          "#001006",
+          "#002e19",
+          "#005030",
+          "#007448",
+          "#329867",
+          "#5abc89",
+          "#94dcb3",
+          "#cffbe1"
         ]
       },
       "mark-empty-dark": {
         "role": "neutral",
         "displayName": "Empty Mark (dark theme)",
-        "canonical": "#304238",
+        "canonical": "#453628",
         "tonalRamp": [
-          "#060d09",
-          "#1d2822",
-          "#37463e",
-          "#54665c",
-          "#76877d",
-          "#9ba9a1",
-          "#c1cdc5",
-          "#e8f1ec"
+          "#120903",
+          "#302214",
+          "#4e3f30",
+          "#6e5e4f",
+          "#907f6f",
+          "#b4a191",
+          "#d5c6b9",
+          "#f6ede4"
+        ]
+      },
+      "link-surface-dark": {
+        "role": "primary",
+        "displayName": "Paper Link Green (dark theme)",
+        "canonical": "#86d8ac",
+        "tonalRamp": [
+          "#000f06",
+          "#002e1a",
+          "#004f31",
+          "#19734c",
+          "#43956c",
+          "#67b98e",
+          "#9cdab7",
+          "#d3f9e3"
+        ]
+      },
+      "link-on-ground-dark": {
+        "role": "neutral",
+        "displayName": "Cork Link Ink (dark theme)",
+        "canonical": "#f3ebdf",
+        "tonalRamp": [
+          "#0e0a05",
+          "#2a241b",
+          "#474137",
+          "#676056",
+          "#888176",
+          "#aba499",
+          "#cec8bf",
+          "#f2eee8"
+        ]
+      },
+      "want-dark": {
+        "role": "secondary",
+        "displayName": "Want Blue (dark theme)",
+        "canonical": "#1b2f3f",
+        "tonalRamp": [
+          "#020c16",
+          "#132737",
+          "#304555",
+          "#4e6476",
+          "#6f8598",
+          "#91a8bc",
+          "#b9ccdc",
+          "#e4f0fa"
+        ]
+      },
+      "tomato-dark": {
+        "role": "tertiary",
+        "displayName": "Tomato (dark theme)",
+        "canonical": "#f08a72",
+        "tonalRamp": [
+          "#1d0100",
+          "#490a00",
+          "#781c05",
+          "#9d402a",
+          "#c3624b",
+          "#ea856d",
+          "#ffb4a1",
+          "#ffe9e3"
+        ]
+      },
+      "tomato-hover-dark": {
+        "role": "tertiary",
+        "displayName": "Tomato Hover (dark theme)",
+        "canonical": "#f5a28e",
+        "tonalRamp": [
+          "#1d0100",
+          "#490a00",
+          "#6e2819",
+          "#924938",
+          "#b86a58",
+          "#de8d79",
+          "#f9b7a7",
+          "#ffe9e3"
+        ]
+      },
+      "tomato-text-dark": {
+        "role": "tertiary",
+        "displayName": "Tomato Text (dark theme)",
+        "canonical": "#f08a72",
+        "tonalRamp": [
+          "#1d0100",
+          "#490a00",
+          "#781c05",
+          "#9d402a",
+          "#c3624b",
+          "#ea856d",
+          "#ffb4a1",
+          "#ffe9e3"
+        ]
+      },
+      "on-tomato-dark": {
+        "role": "neutral",
+        "displayName": "On Tomato (dark theme)",
+        "canonical": "#231a12",
+        "tonalRamp": [
+          "#100a05",
+          "#2c231b",
+          "#4a4037",
+          "#6a5f55",
+          "#8c8076",
+          "#afa398",
+          "#d1c7bf",
+          "#f3ede8"
+        ]
+      },
+      "ground-dark": {
+        "role": "neutral",
+        "displayName": "Cork (dark theme)",
+        "canonical": "#33261a",
+        "tonalRamp": [
+          "#110903",
+          "#2f2216",
+          "#4d3f32",
+          "#6d5e51",
+          "#8f7f71",
+          "#b2a293",
+          "#d4c6bb",
+          "#f5ede5"
+        ]
+      },
+      "bar-dark": {
+        "role": "neutral",
+        "displayName": "Wood (dark theme)",
+        "canonical": "#1a110a",
+        "tonalRamp": [
+          "#100a06",
+          "#2d231b",
+          "#4a4037",
+          "#6a5f56",
+          "#8c8077",
+          "#afa299",
+          "#d1c7bf",
+          "#f4ede8"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Paper (dark theme)",
+        "canonical": "#1e1711",
+        "tonalRamp": [
+          "#0f0a06",
+          "#2b231d",
+          "#484039",
+          "#685f58",
+          "#8a8079",
+          "#ada39b",
+          "#cfc8c1",
+          "#f2ede9"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink (dark theme)",
+        "canonical": "#f3ebdf",
+        "tonalRamp": [
+          "#0e0a05",
+          "#2a241b",
+          "#474137",
+          "#676056",
+          "#888176",
+          "#aba499",
+          "#cec8bf",
+          "#f2eee8"
+        ]
+      },
+      "on-ground-dark": {
+        "role": "neutral",
+        "displayName": "Ink on Cork (dark theme)",
+        "canonical": "#f3ebdf",
+        "tonalRamp": [
+          "#0e0a05",
+          "#2a241b",
+          "#474137",
+          "#676056",
+          "#888176",
+          "#aba499",
+          "#cec8bf",
+          "#f2eee8"
+        ]
+      },
+      "muted-surface-dark": {
+        "role": "neutral",
+        "displayName": "Muted on Paper (dark theme)",
+        "canonical": "#c4b5a2",
+        "tonalRamp": [
+          "#110a02",
+          "#2e2313",
+          "#4c402f",
+          "#6c5f4e",
+          "#8e806e",
+          "#b1a390",
+          "#d3c7b8",
+          "#f5ede4"
+        ]
+      },
+      "muted-on-ground-dark": {
+        "role": "neutral",
+        "displayName": "Muted on Cork (dark theme)",
+        "canonical": "#dccdb9",
+        "tonalRamp": [
+          "#110a02",
+          "#2e2313",
+          "#4c402f",
+          "#6c5f4d",
+          "#8e806e",
+          "#b1a38f",
+          "#d3c7b8",
+          "#f5ede3"
+        ]
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Paper Line (dark theme)",
+        "canonical": "#453628",
+        "tonalRamp": [
+          "#120903",
+          "#302214",
+          "#4e3f30",
+          "#6e5e4f",
+          "#907f6f",
+          "#b4a191",
+          "#d5c6b9",
+          "#f6ede4"
+        ]
+      },
+      "rule-dark": {
+        "role": "neutral",
+        "displayName": "Board Rule (dark theme)",
+        "canonical": "#dccdb9",
+        "tonalRamp": [
+          "#110a02",
+          "#2e2313",
+          "#4c402f",
+          "#6c5f4d",
+          "#8e806e",
+          "#b1a38f",
+          "#d3c7b8",
+          "#f5ede3"
+        ]
+      },
+      "stack-1-dark": {
+        "role": "neutral",
+        "displayName": "Back Stack Edge (dark theme)",
+        "canonical": "#4a6a85",
+        "tonalRamp": [
+          "#000c1a",
+          "#07273f",
+          "#26455e",
+          "#456580",
+          "#6586a3",
+          "#87a9c7",
+          "#b2cde5",
+          "#e1f1ff"
+        ]
+      },
+      "stack-2-dark": {
+        "role": "neutral",
+        "displayName": "Front Stack Edge (dark theme)",
+        "canonical": "#6b5540",
+        "tonalRamp": [
+          "#140800",
+          "#33200c",
+          "#523d29",
+          "#735c47",
+          "#957d67",
+          "#b9a089",
+          "#d9c5b3",
+          "#f9ece0"
         ]
       },
       "tint-info-dark": {
         "role": "neutral",
         "displayName": "Info Tint (dark theme)",
-        "canonical": "#20352a",
+        "canonical": "#33291e",
         "tonalRamp": [
-          "#050e09",
-          "#1b2921",
-          "#35473d",
-          "#51675b",
-          "#74887d",
-          "#99aaa0",
-          "#bfcdc5",
-          "#e7f2eb"
+          "#100a04",
+          "#2d2318",
+          "#4b4034",
+          "#6a5f53",
+          "#8c8073",
+          "#afa395",
+          "#d1c7bc",
+          "#f4ede6"
         ]
       },
       "tint-good-dark": {
@@ -504,14 +774,14 @@
         "displayName": "Good Tint (dark theme)",
         "canonical": "#1d3d2c",
         "tonalRamp": [
-          "#020f07",
-          "#162a1f",
-          "#2e493a",
+          "#000f06",
+          "#0b2c1c",
+          "#2a4a38",
           "#496a57",
-          "#6d8a79",
-          "#93ac9d",
-          "#bbcfc3",
-          "#e4f3ea"
+          "#698c78",
+          "#8caf9a",
+          "#b5d1c0",
+          "#e2f4e9"
         ]
       },
       "tint-bad-dark": {
@@ -519,21 +789,29 @@
         "displayName": "Bad Tint (dark theme)",
         "canonical": "#43241c",
         "tonalRamp": [
-          "#150704",
-          "#341f19",
-          "#563a33",
+          "#180502",
+          "#391b14",
+          "#593830",
           "#7b574e",
-          "#9a7a71",
-          "#ba9e96",
-          "#dbc3bd",
-          "#fceae5"
+          "#9e786e",
+          "#c29b90",
+          "#e1c1b8",
+          "#fee9e4"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "The post title inside its band on the post page."
+        "purpose": "The ticket title and the post title at 960px and wider."
+      },
+      "post-title": {
+        "displayName": "Post Title",
+        "purpose": "The post title below 960px, fluid from 1.75rem at 8vw."
+      },
+      "ticket-title": {
+        "displayName": "Ticket Title",
+        "purpose": "The ticket title below 960px, fluid from 1.75rem at 8vw."
       },
       "headline": {
         "displayName": "Headline",
@@ -543,21 +821,41 @@
         "displayName": "Title",
         "purpose": "Panel and section titles."
       },
-      "packet-title": {
-        "displayName": "Packet Title",
-        "purpose": "Titles on the feed rack, the brand in the top bar, and form-group legends."
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "The name in the top bar and form-group legends."
       },
       "list-title": {
         "displayName": "List Title",
         "purpose": "Post titles in the gift list."
       },
+      "amount-panel": {
+        "displayName": "Panel Amount",
+        "purpose": "The raised figure at the top of the Chip in panel on the board."
+      },
       "gift-amount": {
         "displayName": "Gift Amount",
         "purpose": "The amount on a gift waiting to be confirmed."
       },
+      "amount-ticket": {
+        "displayName": "Ticket Amount",
+        "purpose": "The raised figure on a phone ticket."
+      },
+      "story": {
+        "displayName": "Story",
+        "purpose": "The short story on a ticket at 960px and wider."
+      },
+      "tear-tab": {
+        "displayName": "Tear Tab",
+        "purpose": "The Chip in label on the tear-off tab."
+      },
       "amount": {
         "displayName": "Amount",
-        "purpose": "The raised figure beside the goal."
+        "purpose": "The raised figure on the post page."
+      },
+      "story-phone": {
+        "displayName": "Phone Story",
+        "purpose": "The short story on a ticket below 960px."
       },
       "body": {
         "displayName": "Body",
@@ -565,27 +863,36 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Field labels, buttons, tabs, and state emphasis."
+        "purpose": "Field labels, buttons, tabs, and the ticket count."
       },
       "hint": {
         "displayName": "Hint",
-        "purpose": "Guidance under headings and inside panels, in muted."
+        "purpose": "Guidance on cork and inside panels."
       },
       "fine": {
         "displayName": "Fine",
-        "purpose": "Packet metadata and state marks."
+        "purpose": "Who and where on a ticket, field help and errors, state marks, and badge tags."
+      },
+      "count": {
+        "displayName": "Count",
+        "purpose": "The number in the top-bar capsule."
       }
     },
     "shadows": [
+      {
+        "name": "paper",
+        "value": "0 2px 5px rgba(50, 30, 10, 0.35)",
+        "purpose": "Every sheet of paper on the cork, at rest. Dark theme: 0 2px 5px rgba(0, 0, 0, 0.5). A sheet inside a sheet gets none."
+      },
       {
         "name": "pressed-reaction",
         "value": "inset 0 0 0 1px var(--mark)",
         "purpose": "Doubles the border weight on a reaction that is on. State only."
       },
       {
-        "name": "packet-focus-buffer",
-        "value": "inset 0 0 0 6px var(--surface)",
-        "purpose": "Keeps the focus ring legible over the dark band. State only."
+        "name": "empty-mark-ring",
+        "value": "inset 0 0 0 1px color-mix(in srgb, var(--muted) 35%, transparent)",
+        "purpose": "Outlines an unfilled progress mark."
       }
     ],
     "motion": [
@@ -616,12 +923,20 @@
         "value": "max-width: 400px"
       },
       {
-        "name": "rack-three",
-        "value": "min-width: 600px"
+        "name": "give-right-here",
+        "value": "min-width: 960px"
+      },
+      {
+        "name": "board-ticket",
+        "value": "480px maximum ticket width below 960px"
       },
       {
         "name": "column",
         "value": "640px container, 608px content"
+      },
+      {
+        "name": "container-wide",
+        "value": "1152px container, 1120px content, from 960px; a full-width layout is not wanted"
       }
     ]
   },
@@ -630,17 +945,17 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Marigold. The one primary decision in a panel: pay apps, Confirm, Save, Post.",
+      "description": "Leaf green. The one primary decision in a panel: pay apps, Confirm, Save, Post.",
       "html": "<button class=\"ds-btn-primary\">Cash App</button>",
-      "css": ".ds-btn-primary { display: inline-block; min-height: 44px; padding: 10px 18px; font: 700 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; border: 1.5px solid transparent; border-radius: 6px; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out; color: var(--on-action, #17231c); background: var(--action, #f4b223); } .ds-btn-primary:hover { background: var(--action-hover, #e5a412); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 3px solid var(--ink, #17231c); outline-offset: 2px; }"
+      "css": ".ds-btn-primary { display: inline-block; min-height: 44px; padding: 10px 18px; font: 700 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; text-align: center; text-decoration: none; border: 1.5px solid transparent; border-radius: 3px; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out; color: var(--on-action, #ffffff); background: var(--action, #1f5a3d); } .ds-btn-primary:hover { background: var(--action-hover, #17452f); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 2px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Cancel, I sent it, Didn't get it, and the entry points to close or delete.",
-      "html": "<button class=\"ds-btn-secondary\">I sent it</button>",
-      "css": ".ds-btn-secondary { display: inline-block; min-height: 44px; padding: 10px 18px; font: 700 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; border: 1.5px solid transparent; border-radius: 6px; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out; color: var(--ink, #17231c); background: var(--surface, #ffffff); border-color: var(--muted, #46574e); } .ds-btn-secondary:hover { border-color: var(--ink, #17231c); } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--ink, #17231c); outline-offset: 2px; }"
+      "description": "Next ticket, Back, Cancel, I sent it, Didn't get it, and the entry points to close or delete.",
+      "html": "<button class=\"ds-btn-secondary\">Next ticket</button>",
+      "css": ".ds-btn-secondary { display: inline-block; min-height: 44px; padding: 10px 18px; font: 700 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; text-align: center; text-decoration: none; border: 1.5px solid transparent; border-radius: 3px; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out; color: var(--ink, #231a12); background: var(--surface, #ffffff); border-color: var(--muted-surface, #54463a); } .ds-btn-secondary:hover { border-color: var(--ink, #231a12); } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 2px; }"
     },
     {
       "name": "Danger Button",
@@ -648,79 +963,92 @@
       "refersTo": "button-danger",
       "description": "Tomato. Only on the confirming step of a delete or dispute.",
       "html": "<button class=\"ds-btn-danger\">Yes, delete</button>",
-      "css": ".ds-btn-danger { display: inline-block; min-height: 44px; padding: 10px 18px; font: 700 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; border: 1.5px solid transparent; border-radius: 6px; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out; color: var(--on-tomato, #ffffff); background: var(--tomato, #b8452c); } .ds-btn-danger:hover { background: var(--tomato-hover, #9d3a24); } .ds-btn-danger:active { transform: translateY(1px); } .ds-btn-danger:focus-visible { outline: 3px solid var(--ink, #17231c); outline-offset: 2px; }"
+      "css": ".ds-btn-danger { display: inline-block; min-height: 44px; padding: 10px 18px; font: 700 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; text-align: center; text-decoration: none; border: 1.5px solid transparent; border-radius: 3px; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out; color: var(--on-tomato, #ffffff); background: var(--tomato, #b8452c); } .ds-btn-danger:hover { background: var(--tomato-hover, #9d3a24); } .ds-btn-danger:active { transform: translateY(1px); } .ds-btn-danger:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 2px; }"
     },
     {
       "name": "Text Field",
       "kind": "input",
       "refersTo": "input",
       "description": "Label above in 700, hint below in muted, full width.",
-      "html": "<label class=\"ds-field\"><span>Amount</span><input class=\"ds-input\" placeholder=\"$20.00\"><small>Up to $1,000.</small></label>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; font: 700 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; color: var(--ink, #17231c); } .ds-field small { font-size: smaller; font-weight: 400; color: var(--muted, #46574e); } .ds-input { min-height: 46px; padding: 10px 12px; font: 400 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; color: var(--ink, #17231c); background: var(--surface, #ffffff); border: 1.5px solid var(--muted, #46574e); border-radius: 6px; } .ds-input::placeholder { color: var(--muted, #46574e); opacity: 1; } .ds-input:focus-visible { outline: 3px solid var(--ink, #17231c); outline-offset: 0; border-color: var(--ink, #17231c); }"
+      "html": "<label class=\"ds-field\"><span>Amount</span><input class=\"ds-input\" placeholder=\"$20\"><small>Any amount up to $300.</small></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; font: 700 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; color: var(--ink, #231a12); } .ds-field small { font-size: 0.875rem; font-weight: 400; color: var(--muted-surface, #54463a); } .ds-input { width: 100%; min-height: 46px; padding: 10px 12px; font: 400 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; color: var(--ink, #231a12); background: var(--surface, #ffffff); border: 1.5px solid var(--muted-surface, #54463a); border-radius: 3px; } .ds-input::placeholder { color: var(--muted-surface, #54463a); opacity: 1; } .ds-input:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 0; border-color: var(--ink, #231a12); }"
     },
     {
       "name": "Top Bar",
       "kind": "nav",
       "refersTo": "topbar",
-      "description": "Leaf band in both themes. Bitter brand left, 700 links right, white count capsule for waiting gifts.",
+      "description": "Flat wood band in both themes. Bitter brand left, 700 links right, white count capsule for waiting gifts.",
       "html": "<header class=\"ds-topbar\"><a class=\"ds-brand\" href=\"#\">Pay My Bill</a><nav class=\"ds-topnav\"><a href=\"#\">Post</a><a href=\"#\">Gifts <span class=\"ds-count\">2</span></a><a href=\"#\">Leaders</a></nav></header>",
-      "css": ".ds-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 16px; color: var(--on-band, #ffffff); background: var(--leaf, #1f5a3d); } .ds-topbar a { color: inherit; text-decoration: none; } .ds-topbar a:focus-visible { outline: 3px solid var(--on-band, #ffffff); outline-offset: 2px; } .ds-brand { font: 800 1.125rem/1.15 var(--display, \"Bitter\", Georgia, serif); } .ds-topnav { display: flex; align-items: center; gap: 12px; font: 700 0.9375rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-topnav a { padding-block: 12px; } .ds-topnav a:hover { text-decoration: underline; text-decoration-thickness: 2px; } .ds-count { display: inline-block; min-width: 20px; padding: 0 6px; font-size: 0.75rem; line-height: 20px; text-align: center; color: var(--on-action, #17231c); background: var(--on-band, #ffffff); border-radius: 10px; }"
+      "css": ".ds-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0 12px; padding: 2px 16px; color: var(--on-bar, #ffffff); background: var(--bar, #4a2f1b); } .ds-topbar a { color: inherit; text-decoration: none; } .ds-topbar a:focus-visible { outline: 3px solid var(--on-bar, #ffffff); outline-offset: 2px; } .ds-brand { font: 800 1.125rem/1.15 \"Bitter\", Georgia, serif; } .ds-topnav { display: flex; align-items: center; gap: 0 12px; font: 700 0.9375rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-topnav a { padding-block: 12px; } .ds-topnav a:hover { text-decoration: underline; text-decoration-thickness: 2px; } .ds-count { display: inline-block; min-width: 20px; padding: 0 6px; font-size: 0.75rem; line-height: 20px; text-align: center; color: var(--ink-on-light, #231a12); background: var(--on-bar, #ffffff); border-radius: 10px; }"
     },
     {
       "name": "Filter Tabs",
       "kind": "nav",
-      "description": "700 muted text over a 2px rule; the current tab goes ink with a 4px underline on the rule.",
-      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">All</a><a href=\"#\">Needs</a><a href=\"#\">Wants</a></nav>",
-      "css": ".ds-tabs { display: flex; flex-wrap: wrap; gap: 4px 20px; border-bottom: 2px solid var(--mark, #1f5a3d); font: 700 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-tabs a { padding: 8px 2px; margin-bottom: -2px; color: var(--muted, #46574e); text-decoration: none; border-bottom: 4px solid transparent; } .ds-tabs a:hover { color: var(--ink, #17231c); } .ds-tabs a[aria-current='page'] { color: var(--ink, #17231c); border-bottom-color: var(--mark, #1f5a3d); } .ds-tabs a:focus-visible { outline: 3px solid var(--ink, #17231c); outline-offset: 2px; }"
+      "description": "700 muted text on cork over a 2px board rule; the current tab goes full ink with a 4px underline on the rule.",
+      "html": "<div class=\"ds-cork\"><nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">All</a><a href=\"#\">Needs</a><a href=\"#\">Wants</a></nav></div>",
+      "css": ".ds-cork { padding: 16px; background: var(--ground, #c49a6c); } .ds-tabs { display: flex; flex-wrap: wrap; gap: 4px 20px; border-bottom: 2px solid var(--rule, #4a2f1b); font: 700 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-tabs a { padding: 8px 2px; margin-bottom: -2px; color: var(--muted-on-ground, #2f2114); text-decoration: none; border-bottom: 4px solid transparent; } .ds-tabs a:hover { color: var(--on-ground, #231a12); } .ds-tabs a[aria-current=\"page\"] { color: var(--on-ground, #231a12); border-bottom-color: var(--rule, #4a2f1b); } .ds-tabs a:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 2px; }"
     },
     {
-      "name": "Seed Packet (no-photo state)",
+      "name": "Ticket with Tear-Off Chip In Tab",
       "kind": "card",
-      "refersTo": "packet",
-      "description": "The shipped feed item: colour band, who and where, growing row, amount. The whole packet opens the post. The photo state is planned, not built, so it has no snippet.",
-      "html": "<article class=\"ds-packet\"><div class=\"ds-band\"><h2><a href=\"#\">Short on rent this month</a></h2></div><div class=\"ds-packet-body\"><p class=\"ds-who\"><b>maria_g</b><br>Need · Tampa, FL</p><div class=\"ds-row\"><i class=\"on\"></i><i class=\"on\"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p class=\"ds-amount\"><strong>$45</strong> of $300</p></div></article>",
-      "css": ".ds-packet { position: relative; display: flex; flex-direction: column; width: 200px; overflow: hidden; color: var(--ink, #17231c); background: var(--surface, #ffffff); border-radius: 6px; font: 400 16px/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-band { display: flex; align-items: flex-end; min-height: 112px; padding: 12px; color: var(--on-band, #ffffff); background: var(--leaf, #1f5a3d); } .ds-band h2 { margin: 0; font: 800 1.125rem/1.15 var(--display, \"Bitter\", Georgia, serif); text-wrap: balance; } .ds-band a { color: inherit; text-decoration: none; } .ds-band a::after { content: ''; position: absolute; inset: 0; border-radius: 6px; } .ds-packet:hover .ds-band a { text-decoration: underline; text-decoration-thickness: 2px; } .ds-band a:focus-visible { outline: none; } .ds-band a:focus-visible::after { outline: 3px solid var(--ink, #17231c); outline-offset: -3px; box-shadow: inset 0 0 0 6px var(--surface, #ffffff); } .ds-packet-body { padding: 10px 12px 12px; } .ds-who { margin: 0 0 10px; font-size: 0.875rem; color: var(--muted, #46574e); } .ds-row { display: flex; gap: 4px; } .ds-row i { flex: 1; height: 9px; background: var(--mark-empty, #d2e0d7); border-radius: 5px; } .ds-row i.on { background: color-mix(in srgb, var(--mark, #1f5a3d) 78%, var(--surface, #ffffff)); } .ds-amount { margin: 8px 0 0; } .ds-amount strong { font-size: 1.1875rem; }"
+      "refersTo": "ticket",
+      "description": "The phone form of the signature container: one square paper ticket with the stack peeking out behind it and the green tear-off tab. At 960px and wider the tab gives way to the Chip in panel beside the ticket.",
+      "html": "<div class=\"ds-ticket-deck\"><article class=\"ds-ticket\"><div class=\"ds-ticket-body\"><h2><a href=\"#\">Short on rent this month</a></h2><p class=\"ds-story\">Hours got cut at work and I'm about $300 short.</p><p class=\"ds-amounts\"><strong>$45</strong> of $300</p></div><a class=\"ds-tear\" href=\"#\">Chip in</a></article></div>",
+      "css": ".ds-ticket-deck { position: relative; width: 320px; margin-top: 18px; } .ds-ticket-deck::before, .ds-ticket-deck::after { content: \"\"; position: absolute; left: 12px; right: 12px; top: -7px; height: 12px; background: var(--stack-1, #cfe3f5); box-shadow: var(--shadow, 0 2px 5px rgba(50, 30, 10, 0.35)); } .ds-ticket-deck::after { left: 6px; right: 6px; top: -3px; background: var(--stack-2, #efe6d8); } .ds-ticket { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 400px; color: var(--ink, #231a12); background: var(--surface, #ffffff); box-shadow: var(--shadow, 0 2px 5px rgba(50, 30, 10, 0.35)); font: 400 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-ticket-body { display: flex; flex: 1; flex-direction: column; padding: 16px; } .ds-ticket h2 { margin: 0 0 10px; font: 800 2.125rem/1.15 \"Bitter\", Georgia, serif; text-wrap: balance; } .ds-ticket h2 a { color: inherit; text-decoration: none; } .ds-ticket h2 a::after { content: \"\"; position: absolute; inset: 0; } .ds-ticket:hover h2 a { text-decoration: underline; text-decoration-thickness: 2px; } .ds-ticket h2 a:focus-visible { outline: none; } .ds-ticket h2 a:focus-visible::after { outline: 3px solid var(--ink, #231a12); outline-offset: -3px; } .ds-story { margin: 0 0 16px; font-size: 1.0625rem; } .ds-amounts { margin: auto 0 0; font-size: 1.0625rem; } .ds-amounts strong { font-size: 1.5rem; } .ds-tear { position: relative; z-index: 1; display: block; padding: 15px; font-size: 1.125rem; font-weight: 700; text-align: center; text-decoration: none; color: var(--on-action, #ffffff); background: var(--action, #1f5a3d); border-top: 2px dashed var(--on-action, #ffffff); } .ds-tear:hover { background: var(--action-hover, #17452f); } .ds-tear:focus-visible { outline: 3px solid var(--on-action, #ffffff); outline-offset: -5px; }"
     },
     {
-      "name": "Growing Row",
+      "name": "Give Right Here Panel",
+      "kind": "card",
+      "refersTo": "chip-in-panel",
+      "description": "The board's Chip in panel at 960px and wider, 416px wide beside the ticket: the raised amount, the amount field, and the pay-app buttons as one primary decision.",
+      "html": "<section class=\"ds-panel\"><h2>Chip in</h2><p class=\"ds-panel-amount\"><strong>$45</strong> of $300</p><label class=\"ds-panel-field\"><span>Amount</span><input placeholder=\"$20\"></label><div class=\"ds-pay\"><a href=\"#\">Cash App</a><a href=\"#\">Venmo</a></div><p class=\"ds-hint\">Opens the poster's page in the app. Pay My Bill never holds money.</p></section>",
+      "css": ".ds-panel { display: flex; flex-direction: column; gap: 12px; width: 416px; max-width: 100%; padding: 14px; color: var(--ink, #231a12); background: var(--surface, #ffffff); box-shadow: var(--shadow, 0 2px 5px rgba(50, 30, 10, 0.35)); font: 400 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; } .ds-panel h2 { margin: 0; font: 800 1.25rem/1.15 \"Bitter\", Georgia, serif; } .ds-panel-amount { margin: 0; font-size: 1.0625rem; } .ds-panel-amount strong { font-size: 1.875rem; } .ds-panel-field { display: flex; flex-direction: column; gap: 4px; font-weight: 700; } .ds-panel-field input { min-height: 46px; padding: 10px 12px; font: 400 1rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; color: var(--ink, #231a12); background: var(--surface, #ffffff); border: 1.5px solid var(--muted-surface, #54463a); border-radius: 3px; } .ds-panel-field input:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 0; border-color: var(--ink, #231a12); } .ds-pay { display: flex; flex-wrap: wrap; gap: 8px; } .ds-pay a { flex: 1 1 96px; min-height: 44px; padding: 10px 18px; font-weight: 700; text-align: center; text-decoration: none; color: var(--on-action, #ffffff); background: var(--action, #1f5a3d); border-radius: 3px; transition: background-color 120ms ease-out; } .ds-pay a:hover { background: var(--action-hover, #17452f); } .ds-pay a:focus-visible { outline: 3px solid var(--ink, #231a12); outline-offset: 2px; } .ds-hint { margin: 0; font-size: 0.9375rem; color: var(--muted-surface, #54463a); }"
+    },
+    {
+      "name": "Ten-Mark Row",
       "kind": "custom",
       "refersTo": "mark-on",
-      "description": "Ten marks filling left to right. This is the post-page form: 13px, full colour, growing in once unless reduced motion is set.",
+      "description": "Ten marks filling left to right. This is the post-page form: 13px, growing in once unless reduced motion is set.",
       "html": "<div class=\"ds-grow\" role=\"progressbar\" aria-valuenow=\"45\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-label=\"Progress toward goal\"><i class=\"on\" style=\"--n:0\"></i><i class=\"on\" style=\"--n:1\"></i><i class=\"on\" style=\"--n:2\"></i><i class=\"on\" style=\"--n:3\"></i><i class=\"on\" style=\"--n:4\"></i><i></i><i></i><i></i><i></i><i></i></div>",
-      "css": ".ds-grow { display: flex; gap: 4px; width: 320px; } .ds-grow i { flex: 1; height: 13px; background: var(--mark-empty, #d2e0d7); border-radius: 5px; } .ds-grow i.on { background: var(--mark, #1f5a3d); } @media (prefers-reduced-motion: no-preference) { .ds-grow i.on { transform-origin: left; animation: ds-grow 280ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--n) * 45ms); } @keyframes ds-grow { from { transform: scaleX(0); } } }"
+      "css": ".ds-grow { display: flex; gap: 4px; width: 320px; } .ds-grow i { flex: 1; height: 13px; background: var(--mark-empty, #e4ddd2); border-radius: 5px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted-surface, #54463a) 35%, transparent); } .ds-grow i.on { background: var(--mark, #1f5a3d); box-shadow: none; } @media (prefers-reduced-motion: no-preference) { .ds-grow i.on { transform-origin: left; animation: ds-grow 280ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--n) * 45ms); } @keyframes ds-grow { from { transform: scaleX(0); } } }"
     },
     {
       "name": "State Mark",
       "kind": "chip",
       "description": "One device for every gift state: a small mark before a 700 label, with no pill or background. Failure differs in shape as well as colour.",
       "html": "<div class=\"ds-states\"><span class=\"ds-state\">Waiting</span><span class=\"ds-state ds-confirmed\">Confirmed</span><span class=\"ds-state ds-disputed\">Not received</span><span class=\"ds-state ds-expired\">Expired</span></div>",
-      "css": ".ds-states { display: flex; flex-wrap: wrap; gap: 12px; color: var(--ink, #17231c); } .ds-state { display: inline-flex; align-items: center; gap: 6px; font: 700 0.875rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; white-space: nowrap; } .ds-state::before { content: ''; width: 10px; height: 10px; border: 2px solid var(--muted, #46574e); border-radius: 50%; } .ds-confirmed::before { background: var(--mark, #1f5a3d); border-color: var(--mark, #1f5a3d); } .ds-disputed { color: var(--tomato, #b8452c); } .ds-disputed::before { background: var(--tomato, #b8452c); border-color: var(--tomato, #b8452c); border-radius: 2px; } .ds-expired { color: var(--muted, #46574e); } .ds-expired::before { background: var(--mark-empty, #d2e0d7); border-color: var(--mark-empty, #d2e0d7); }"
+      "css": ".ds-states { display: flex; flex-wrap: wrap; gap: 12px; color: var(--ink, #231a12); } .ds-state { display: inline-flex; align-items: center; gap: 6px; font: 700 0.875rem/1.5 \"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif; white-space: nowrap; } .ds-state::before { content: \"\"; width: 10px; height: 10px; border: 2px solid var(--muted-surface, #54463a); border-radius: 50%; } .ds-confirmed::before { background: var(--mark, #1f5a3d); border-color: var(--mark, #1f5a3d); } .ds-disputed { color: var(--tomato-text, #9d3a24); } .ds-disputed::before { background: var(--tomato, #b8452c); border-color: var(--tomato, #b8452c); border-radius: 2px; } .ds-expired { color: var(--muted-surface, #54463a); } .ds-expired::before { background: var(--mark-empty, #e4ddd2); border-color: var(--mark-empty, #e4ddd2); }"
     }
   ],
   "narrative": {
-    "northStar": "The Seed Packet",
-    "overview": "Every post is a seed packet on a garden-aisle rack: a flat colour band with a plain title, who and where, how far along it is, and what it takes. The packet states what you are helping grow and asks nothing more of the reader. It reads simple and trustworthy, with personality carried by a chunky slab title and the green of the shell, not by decoration.\n\nThe system is an operating surface for phones. One narrow column of 608px at most, a leaf-green bar, a pale green ground, white panels with gently cut corners, and no drop shadows. Hierarchy comes from size. Colour is assigned by job: green and teal say what kind of ask it is, marigold says \"press this\", tomato says \"this went wrong or cannot be undone\". There is no plant art anywhere; the seed packet is a structure, never an illustration.\n\nThe owner's brief rules out four looks: a sad charity page, a bank or finance app, a game or casino, and a generic startup. The light and dark themes follow the system setting and share one shell, so the leaf bar, the colour bands, and marigold stay the same in both.",
+    "northStar": "The Community Board at the Door",
+    "overview": "Pay My Bill is a community bulletin board, and the owner chose that world. Each post is a plain square ticket on cork: a big slab title, a short story, and how much has come in so far. A visitor sees one person up close, then chips in or moves on to the next ticket. The ticket reads simple and trustworthy, with its personality coming from the heavy title, the warm cork, and the green tab you tear off to help.\n\nThe materials are stated, not imitated. Cork is one flat tan and the wood bar is one flat brown, with no grain, texture, or image behind either. Paper is the only thing that lifts, on one soft shadow. There are no thumbtacks. Phones get One Ticket at a Time, with a green tear-off Chip in tab. Screens 960px and wider get Give Right Here, with the ticket and the Chip in panel side by side in a centered layout. The owner tried a full-browser layout and rejected it, so a full-width layout is not wanted.\n\nThe owner's brief rules out five looks: a sad charity page, a bank or finance app, a game or casino, a generic startup, and a typical scroll app. Light and dark themes follow the system setting and keep the same roles: dark is the same board with the lights down, not a different world.",
     "keyCharacteristics": [
-      "Flat colour bands in place of pictures; a post with no photo is complete, not missing something.",
-      "Two typefaces: Bitter extra-bold for titles, Public Sans for everything else, including all money.",
-      "A row of ten marks is the one progress device, wherever progress appears.",
-      "One colour for pressing, one for trouble, and neither is used for anything else.",
-      "Depth comes from a white panel on a tinted ground, never from a shadow."
+      "One ticket at a time, with the rest of the stack peeking out behind it, instead of a grid or an endless list.",
+      "Flat cork and a flat wood bar, with no faked material and no thumbtacks.",
+      "Square paper tickets on one soft shadow: white for needs, light blue for wants.",
+      "Green for primary actions, links, and progress marks. Tomato for errors and destructive actions.",
+      "Two typefaces: Bitter extra-bold for titles, Public Sans for everything else, including all money."
     ],
     "rules": [
       {
-        "name": "The Marigold Rule",
-        "body": "Marigold appears only on what can be pressed as a primary action, and a panel offers one such decision at a time. A set of equal pay-app choices counts as one decision. The feed has no marigold at all, because the whole packet is the action there.",
+        "name": "The Working Green Rule",
+        "body": "Green is used for primary actions, links, and progress marks, as the owner decided. Green never colours the bar, the ground, the paper, or a decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Decision Rule",
+        "body": "A panel offers one primary green decision at a time. A set of equal pay-app choices counts as one decision. Everything else on that panel is secondary.",
         "section": "colors"
       },
       {
         "name": "The Tomato Rule",
-        "body": "Tomato means an error or a destructive action: field errors, the disputed mark, and the buttons that delete or dispute. It never decorates and never signals urgency on its own.",
+        "body": "Tomato means an error or a destructive action. It never decorates and never signals urgency on its own.",
         "section": "colors"
       },
       {
-        "name": "The Band Colour Rule",
-        "body": "Leaf means need and teal means want, as flat fills with no gradient or texture. The kind is also stated in words on the packet, so colour is never the only signal.",
+        "name": "The Flat Materials Rule",
+        "body": "Cork and wood are flat fills. No grain, texture, gradient, or image may fake either material, in either theme.",
         "section": "colors"
       },
       {
@@ -739,34 +1067,60 @@
         "section": "typography"
       },
       {
-        "name": "The Flat Packet Rule",
-        "body": "Packets and panels lie flat on the rack. If something needs to stand apart, put it on a surface or give it a band; do not lift it.",
+        "name": "The One Ticket Rule",
+        "body": "The board shows one ticket at a time, on every screen size. It never becomes a grid, a rack, or an endless list.",
+        "section": "layout"
+      },
+      {
+        "name": "The Give Right Here Rule",
+        "body": "At 960px and wider, the ticket and the Chip in panel stand side by side. On phones, the same step is one tap away through the tear-off tab.",
+        "section": "layout"
+      },
+      {
+        "name": "The Centered Board Rule",
+        "body": "A full-width layout is not wanted: the owner tried a full-browser layout and rejected it. Page content stays inside the centered 1152px container at any screen size, and the extra width is plain cork.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Sheet of Paper Rule",
+        "body": "All paper uses the one soft shadow, at rest. A sheet on a sheet gets no second shadow, and no shadow gets harder, offset, or larger to win attention.",
         "section": "elevation"
       },
       {
-        "name": "The Six Pixel Rule",
-        "body": "New containers and controls use the 6px corner. Pill buttons and large rounded cards do not belong to this world.",
+        "name": "The Square Paper Rule",
+        "body": "Anything that reads as a sheet of paper has square corners. Pill buttons and large rounded cards do not belong on this board.",
+        "section": "shapes"
+      },
+      {
+        "name": "The No Thumbtacks Rule",
+        "body": "Tickets are not pinned, taped, tilted, or otherwise dressed up, and the owner has ruled out thumbtacks. Paper, a shadow, and the tear-off tab are all the board needs.",
         "section": "shapes"
       }
     ],
     "dos": [
-      "Do treat a band with no picture as the finished packet: flat leaf or teal, with the title anchored at the bottom.",
-      "Do make the whole packet open the post, and keep the marigold decision on the post page.",
-      "Do keep the Seed Rack at two columns on phones and three at 600px and up.",
+      "Do show one ticket at a time on the board, with the stack peeking out when more wait.",
+      "Do keep the tear-off Chip in tab on phones and put the ticket and Chip in panel side by side from 960px.",
+      "Do keep the board and post page inside the centered 1152px container, and leave the other pages in the 640px column.",
+      "Do use green for primary actions, links on paper, and progress marks, and switch to Cork Link Ink for links on cork.",
+      "Do give cork text the on-cork muted and link tokens, and paper text the on-paper ones.",
+      "Do treat a ticket with no photo as finished.",
       "Do show progress with the ten-mark row and state the same fact in words beside it.",
-      "Do use the one state mark for every gift state, differing in shape as well as colour for failures.",
-      "Do put one marigold decision in a panel, and make any delete or dispute a two-step move ending in tomato.",
+      "Do put one primary green decision in a panel, and make any delete or dispute a two-step move ending in tomato.",
       "Do keep money in Public Sans, with tabular numerals wherever figures are listed in a column.",
       "Do check every new surface in both themes and at 360px wide."
     ],
     "donts": [
-      "Don't use marigold on anything that is not a primary pressable action, including decoration, highlights, and status. The stylesheet's text-selection colour currently breaks this; it is recorded drift, not a precedent.",
-      "Don't use tomato for emphasis, urgency, or decoration, and don't set tomato text on the bad tint, where it drops to 4.2:1.",
-      "Don't add plant art, leaf motifs, or other seed-packet illustration. The packet is a structure.",
-      "Don't render a placeholder or empty image frame for a post with no photo, and don't treat the planned photo state as shipped.",
-      "Don't drift toward a sad charity page, a bank or finance app, a game or casino, or a generic startup.",
-      "Don't add drop shadows, gradients, pill buttons, or small uppercase labels above headings.",
+      "Don't build a full-width layout. The owner tried a full-browser layout and rejected it.",
+      "Don't put posts back in a grid, a rack, or a scrolling list on the board.",
+      "Don't add thumbtacks, pins, tape, tilted tickets, or plant art.",
+      "Don't fake cork or wood with grain, texture, gradients, or images.",
+      "Don't use green as decoration, or on the bar, the ground, or a sheet of paper.",
+      "Don't use tomato for emphasis, urgency, or decoration.",
+      "Don't drift toward a sad charity page, a bank or finance app, a game or casino, a generic startup, or a typical scroll app.",
+      "Don't add hard offset shadows, hover lifts, or a second shadow on a sheet inside a sheet.",
+      "Don't add pill buttons, large rounded cards, or small uppercase labels above headings.",
       "Don't load another weight or typeface, or set money in Bitter.",
+      "Don't render an empty image frame for a post with no photo, or treat the planned photo state as shipped.",
       "Don't extend the reaction emoji into a general icon set. They are the content of those two reactions and nothing more."
     ]
   }

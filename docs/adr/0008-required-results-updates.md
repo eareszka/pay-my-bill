@@ -11,7 +11,7 @@ A results update replaces the optional thank-you post.
 - **When it's owed:** a post that closes (funded, expired, or closed by the poster) with at least one confirmed donation owes one update. Partially funded posts owe one too.
 - **Content:** a note of at least 20 characters, with an optional photo. Receipts or documents are never required, because needs like rent or medical bills would push people to expose sensitive information (T14).
 - **Deadline:** 7 days after the post closes. Reminders go out on day 3 and day 6.
-- **Penalty:** while any update is overdue, the recipient can't create new posts. Posting the late update lifts the block right away. Feed ranking isn't changed.
+- **Penalty:** while any update is overdue, the recipient can't create new posts. Posting the late update lifts the block right away. Feed ranking isn't changed, apart from the top spot (ADR 0013).
 - **Visibility:** the update shows on the post. Every donor with a confirmed donation is notified. Kudos and 👍/🤨 reactions attach to the update.
 - **Follow-through stat:** profiles show "Updated N of M funded posts." It counts only posts that owed an update.
 

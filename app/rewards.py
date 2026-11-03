@@ -8,19 +8,19 @@ from sqlalchemy.orm import aliased, contains_eager, lazyload
 from app.extensions import db
 from app.models import (
     DELETED_EMAIL_DOMAIN,
-    PUBLIC_STATUSES,
+    MIN_ACCOUNT_AGE_DAYS,
     Donation,
     DonationStatus,
     Post,
     PostStatus,
     User,
     as_utc,
+    posts_with_confirmed_gifts,
     utcnow,
 )
 
 GIFT_XP = 10
 NEW_PERSON_XP = 25
-MIN_ACCOUNT_AGE_DAYS = 3  # T2: verified accounts this old count toward rewards
 
 
 def level_start(level: int) -> int:
@@ -109,8 +109,7 @@ def follow_through(user: User) -> FollowThrough:
     posts = db.session.scalars(
         select(Post).where(
             Post.user_id == user.id,
-            Post.status.in_(PUBLIC_STATUSES),
-            Post.donations.any(Donation.status == DonationStatus.CONFIRMED),
+            posts_with_confirmed_gifts(),
         )
     ).all()
     updated = sum(post.update_posted_at is not None for post in posts)

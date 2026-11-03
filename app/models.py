@@ -21,6 +21,7 @@ MAX_GOAL_CENTS = 100_000
 MAX_OPEN_POSTS = 2
 PENDING_GIFT_DAYS = 14
 POST_OPEN_DAYS = 30
+MIN_ACCOUNT_AGE_DAYS = 3  # T2: verified accounts this old count toward rewards and rank
 LATE_GIFT_HOURS = 24
 UPDATE_DUE_DAYS = 7
 DELETED_EMAIL_DOMAIN = "@deleted.invalid"
@@ -298,6 +299,14 @@ class Post(Base):
 def open_posts() -> ColumnElement[bool]:
     # The query form of Post.is_open.
     return and_(Post.status == PostStatus.OPEN, Post.created_at > post_open_cutoff())
+
+
+def posts_with_confirmed_gifts() -> ColumnElement[bool]:
+    # Posts that owe a results update once closed (ADR 0008).
+    return and_(
+        Post.status.in_(PUBLIC_STATUSES),
+        Post.donations.any(Donation.status == DonationStatus.CONFIRMED),
+    )
 
 
 class Donation(Base):

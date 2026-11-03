@@ -28,8 +28,6 @@ from app.models import (
     MAX_OPEN_POSTS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
-    Donation,
-    DonationStatus,
     Post,
     PostKind,
     PostStatus,
@@ -37,6 +35,7 @@ from app.models import (
     ReactionKind,
     User,
     open_posts,
+    posts_with_confirmed_gifts,
     utcnow,
 )
 from app.moderation import is_flagged
@@ -75,8 +74,7 @@ def just_posted(user: User, title: str | None, body: str | None) -> Post | None:
 def posts_owing_update(user: User | None = None) -> list[Post]:
     query = select(Post).where(
         Post.update_posted_at.is_(None),
-        Post.status.in_(PUBLIC_STATUSES),
-        Post.donations.any(Donation.status == DonationStatus.CONFIRMED),
+        posts_with_confirmed_gifts(),
     )
     if user:
         query = query.where(Post.user_id == user.id)
@@ -179,18 +177,25 @@ def reaction_view(post: Post) -> dict[str, object]:
     }
 
 
+def chip_in_context(post: Post, form: GiftForm | None = None) -> dict[str, object]:
+    # What the Chip in panel needs, on the post page and beside the ticket on the feed.
+    return {
+        "form": form or GiftForm.for_post(post),
+        "pay_options": pay_options(post.user),
+        "waiting_gift": (
+            post.pending_gift_from(current_user.id) if current_user.is_authenticated else None
+        ),
+        "late_gift_hours": LATE_GIFT_HOURS,
+    }
+
+
 def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
     return render_template(
         "posts/show.html",
         post=post,
-        waiting_gift=(
-            post.pending_gift_from(current_user.id) if current_user.is_authenticated else None
-        ),
-        late_gift_hours=LATE_GIFT_HOURS,
         reactions=reaction_view(post) if post.update_body else None,
-        pay_options=pay_options(post.user),
-        form=form,
         update_form=update_form or ResultsUpdateForm(formdata=None),
+        **chip_in_context(post, form),
     )
 
 

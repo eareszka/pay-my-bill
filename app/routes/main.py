@@ -1,20 +1,20 @@
 from flask import Blueprint, render_template, request
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
 from app.models import Post, PostKind, open_posts
+from app.routes.posts import chip_in_context
+from app.top_spot import top_post
 
 bp = Blueprint("main", __name__)
 
-PAGE_SIZE = 20
-MAX_PAGE = 1000
 
-
-@bp.get("/")
-def index() -> str:
-    kind = request.args.get("kind", type=PostKind)
-    page = min(max(request.args.get("page", 1, type=int), 1), MAX_PAGE)
+def ticket_at(position: int, kind: PostKind | None) -> Post | None:
+    # The earned ticket comes first (ADR 0013), then the rest of the stack, newest first.
+    top = top_post(kind)
+    if top and position == 1:
+        return top
     query = (
         select(Post)
         .options(joinedload(Post.user))
@@ -23,13 +23,30 @@ def index() -> str:
     )
     if kind:
         query = query.where(Post.kind == kind)
-    rows = list(db.session.scalars(query.offset((page - 1) * PAGE_SIZE).limit(PAGE_SIZE + 1)))
+    if top:
+        query = query.where(Post.id != top.id)
+    return db.session.scalars(query.offset(position - (2 if top else 1)).limit(1)).first()
+
+
+@bp.get("/")
+def index() -> str:
+    kind = request.args.get("kind", type=PostKind)
+    count = select(func.count()).select_from(Post).where(open_posts())
+    if kind:
+        count = count.where(Post.kind == kind)
+    total = db.session.scalar(count) or 0
+    position = request.args.get("n", 1, type=int)
+    # An old link can point past the end of a stack that has shrunk.
+    if not 1 <= position <= total:
+        position = 1
+    post = ticket_at(position, kind) if total else None
     return render_template(
         "index.html",
-        posts=rows[:PAGE_SIZE],
+        post=post,
         kind=kind.value if kind else None,
-        page=page,
-        has_next=len(rows) > PAGE_SIZE,
+        position=position,
+        total=total,
+        **(chip_in_context(post) if post else {}),
     )
 
 

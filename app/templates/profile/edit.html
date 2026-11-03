@@ -29,7 +29,7 @@
     <h2 class="section-title">Delete account</h2>
     {% if request.args.get("delete") or delete_form.errors %}
       <p class="confirm-prompt">This removes your profile and posts. Donors keep credit for gifts you confirmed.</p>
-      <form method="post" action="{{ url_for('profile.delete_account') }}" class="form" novalidate>
+      <form method="post" action="{{ url_for('profile.delete_account') }}" class="form page-form" novalidate>
         {{ delete_form.hidden_tag() }}
         {{ field(delete_form.password, autocomplete="current-password") }}
         <div class="actions">

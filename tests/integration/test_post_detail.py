@@ -112,7 +112,10 @@ def test_open_post_without_handles(client: FlaskClient, make_user: MakeUser) -> 
 
 def test_feed_card_links_to_detail(client: FlaskClient, owner: User) -> None:
     post = add_post(owner)
-    assert f'href="/posts/{post.id}">Electric bill help</a>'.encode() in client.get("/").data
+    assert (
+        f'href="/posts/{post.id}"><span class="sr-only">Need: </span>Electric bill help'.encode()
+        in client.get("/").data
+    )
 
 
 def test_new_post_redirects_to_detail(client: FlaskClient, owner: User) -> None:

@@ -7,8 +7,8 @@ from sqlalchemy import Select, select
 from sqlalchemy.orm import aliased, contains_eager
 
 from app.extensions import db
-from app.models import Donation, DonationStatus, User, utcnow
-from app.rewards import MIN_ACCOUNT_AGE_DAYS, place, rewardable_gifts, week_of
+from app.models import MIN_ACCOUNT_AGE_DAYS, Donation, DonationStatus, User, utcnow
+from app.rewards import place, rewardable_gifts, week_of
 
 PAIR_WEEKLY_CAP_CENTS = 20_000
 TOP = 20

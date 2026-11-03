@@ -1,9 +1,0 @@
-{% from "posts/_progress.html" import grow %}
-<div class="band band-{{ post.kind.value }}">
-  <h2 class="card-title"><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h2>
-</div>
-<div class="card-body">
-  <p class="card-head"><a class="card-user" href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a><span class="card-where">{{ post.kind.value | capitalize }}{% if post.user.region %} · {{ post.user.region }}{% endif %}</span></p>
-  {{ grow(post.progress_percent, "Progress toward goal") }}
-  <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
-</div>

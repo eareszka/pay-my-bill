@@ -48,6 +48,14 @@ As a **user**, I want to **reset a forgotten password** so that **I don't lose m
 - [ ] A signed link that expires and works once sets a new password.
 - [ ] Requests are rate-limited, and the account gets a notice when the password changes.
 
+### S5-7 Bulletin board and the top spot · #85 · 5 pts · P1
+The owner found the rack too cluttered and chose a bulletin board with no thumbtacks that shows one ticket at a time, with the first ticket as a reward for follow-through.
+- [ ] Cork ground, wood top bar, and plain square tickets. Every page moves to this look.
+- [ ] The feed shows one large ticket with the stack behind it, a Chip in tab, and Next ticket, with no scrolling list.
+- [ ] Tickets show a title, short story, and amount, with who and where on the post page.
+- [ ] On wide screens, the ticket sits beside a Chip in panel, and the post page uses the same split (owner's choice).
+- [ ] The first ticket follows ADR 0013: overdue posters are out, a good record comes first, then first-time posters, then closest to goal.
+
 ---
 
 ## Wireframes (phone width, 360px)
