@@ -3,10 +3,7 @@
   <h2 class="card-title"><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h2>
 </div>
 <div class="card-body">
-  {% include "posts/_meta.html" %}
+  <p class="card-head"><span class="sr-only">{{ post.kind.value | capitalize }} · </span><a href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a>{% if post.user.region %} · {{ post.user.region }}{% endif %}</p>
   {{ grow(post.progress_percent, "Progress toward goal") }}
-  <div class="card-foot">
-    <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
-    {% if not (current_user.is_authenticated and current_user.id == post.user_id) %}<a class="btn" href="{{ url_for('posts.show', post_id=post.id, _anchor='chip-in') }}">Chip in</a>{% endif %}
-  </div>
+  <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
 </div>

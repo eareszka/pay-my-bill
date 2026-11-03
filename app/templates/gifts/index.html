@@ -42,10 +42,9 @@
       <ul class="gift-list">
         {% for gift in sent %}
           <li>
+            <a class="gift-list-title" href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a>
             <span class="gift-list-amount">{{ gift.amount_cents | cents }}</span>
-            <span>to <a href="{{ url_for('profile.show', username=gift.post.user.username) }}">{{ gift.post.user.username }}</a></span>
-            <span class="chip chip-{{ gift.status_class }}">{{ gift.status_label }}</span>
-            <span class="gift-list-for hint">for <a href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a></span>
+            <span class="gift-list-meta">to <a href="{{ url_for('profile.show', username=gift.post.user.username) }}">{{ gift.post.user.username }}</a> <span class="chip chip-{{ gift.status_class }}">{{ gift.status_label }}</span></span>
           </li>
         {% endfor %}
       </ul>

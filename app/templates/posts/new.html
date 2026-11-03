@@ -8,7 +8,7 @@
   {% else %}
     <form method="post" class="form" novalidate>
       {{ form.hidden_tag() }}
-      <fieldset class="group">
+      <fieldset class="plain-group">
         <legend>{{ form.kind.label.text }}</legend>
         <div class="choices">
           {% for option in form.kind %}

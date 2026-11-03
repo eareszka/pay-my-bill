@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1 class="sr-only">Help someone out</h1>
+  <h1{% if current_user.is_authenticated %} class="sr-only"{% endif %}>Help someone out</h1>
   <nav class="tabs" aria-label="Filter posts">
-    {% for value, label in [(None, "All"), ("want", "Wants"), ("need", "Needs")] %}
+    {% for value, label in [(None, "All"), ("need", "Needs"), ("want", "Wants")] %}
       <a href="{{ url_for('main.index', kind=value) }}" {% if kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
     {% endfor %}
   </nav>
   {% if posts %}
-    <ul class="cards">
+    <ul class="cards rack">
       {% for post in posts %}
         <li class="card">
           {% include "posts/_card.html" %}
