@@ -1,0 +1,61 @@
+{% set poster = post.user.username %}
+<section class="group" id="chip-in">
+  <h2 class="section-title">Chip in</h2>
+  {% if post.is_open %}<p class="hint">Open until {{ post.last_open_day | date }}.</p>{% endif %}
+  {% if is_owner %}
+    <p class="hint">This is your post. Share it so people can chip in.</p>
+  {% elif waiting_gift %}
+    <p class="update-due" data-gift-recorded="{{ post.id }}">Your {{ waiting_gift.amount_cents | cents }} gift is waiting for {{ poster }} to confirm.</p>
+    <p class="hint">{% if post.is_open %}You can chip in again once it's confirmed or marked not received. {% endif %}<a href="{{ url_for('gifts.index') }}">See your gifts</a></p>
+    <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
+  {% elif pay_options %}
+    <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in" data-post="{{ post.id }}" novalidate>
+      {{ form.csrf_token }}
+      {# The first submit button is the default one; disabled, so Enter in the amount box never records a gift. #}
+      <button type="submit" disabled hidden aria-hidden="true"></button>
+      {% if not post.is_open %}
+        <p class="hint">This post just closed. If you already sent a gift, record it now so it counts. You have {{ late_gift_hours }} hours from when it closed.</p>
+      {% elif not current_user.is_authenticated %}
+        <p class="notice"><a href="{{ url_for('auth.login', next=request.path) }}">Log in first</a> so your gift counts. Gifts are only credited to an account.</p>
+      {% elif not current_user.is_verified %}
+        <p class="notice"><a href="{{ url_for('auth.verify_pending') }}">Verify your email first</a> so your gift counts.</p>
+      {% endif %}
+      <p class="sent-question" id="sent-question" tabindex="-1" hidden></p>
+      <div class="step-pay">
+        <div class="field">
+          <label for="chip-amount">Amount</label>
+          {% set amount_hint = "Enter an amount like 20 or 12.50, up to " ~ (post.goal_cents | cents) ~ "." %}
+          {% set amount_attrs = dict(id="chip-amount", inputmode="decimal", autocomplete="off", data_max=post.goal_cents / 100, aria_describedby="chip-amount-hint chip-amount-error") %}
+          {% if form.amount.errors %}{{ form.amount(aria_invalid="true", autofocus=True, **amount_attrs) }}{% else %}{{ form.amount(**amount_attrs) }}{% endif %}
+          <small id="chip-amount-hint">Any amount up to {{ post.goal_cents | cents }}.</small>
+          <small id="chip-amount-error" class="error" role="alert" data-message="{{ amount_hint }}"{% if not form.amount.errors %} hidden{% endif %}>{{ form.amount.errors[0] if form.amount.errors else amount_hint }}</small>
+        </div>
+        {% if post.is_open %}
+          <div class="pay-buttons">
+            {% for option in pay_options %}
+              <a class="btn" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" data-label="{{ option.label }}" data-handle="{{ option.handle }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
+            {% endfor %}
+          </div>
+          <p class="hint">Opens {{ poster }}'s page in the app. Pay My Bill never holds money.</p>
+        {% endif %}
+      </div>
+      {% if current_user.is_authenticated %}
+        <h3 class="section-title step-pay">Sent it?</h3>
+        <div class="sent-row">
+          <div class="field step-pay"><label for="method">{{ form.method.label.text }}</label>{% if form.method.errors %}{{ form.method(aria_invalid="true", aria_describedby="method-error", autofocus=True) }}{% else %}{{ form.method() }}{% endif %}</div>
+          <button type="submit" class="btn btn-secondary">I sent it</button>
+          <button type="button" class="btn btn-secondary step-sent" id="not-yet" hidden>Not yet</button>
+        </div>
+        {% if form.method.errors %}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% endif %}
+        <p class="hint">It counts once {{ poster }} confirms it came through.</p>
+      {% elif post.is_open %}
+        <p class="hint">Already paid? <a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
+      {% else %}
+        <p class="hint"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to record your gift so it counts.</p>
+      {% endif %}
+    </form>
+    <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
+  {% else %}
+    <p class="hint">{% if post.is_open %}{{ poster }} hasn't added a way to get paid yet. Check back soon.{% else %}This post has closed, and {{ poster }} no longer lists a payment app.{% endif %}</p>
+  {% endif %}
+</section>

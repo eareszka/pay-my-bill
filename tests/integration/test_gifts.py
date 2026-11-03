@@ -1,13 +1,23 @@
 import logging
 import re
 import smtplib
+from datetime import timedelta
 
 import pytest
 from flask.testing import FlaskClient
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import Donation, DonationStatus, PaymentMethod, Post, PostKind, PostStatus, User
+from app.models import (
+    Donation,
+    DonationStatus,
+    PaymentMethod,
+    Post,
+    PostKind,
+    PostStatus,
+    User,
+    utcnow,
+)
 from tests.conftest import MakeUser, login_as
 
 
@@ -97,6 +107,7 @@ def test_only_open_posts_take_gifts(
     client: FlaskClient, post: Post, donor: User, status: PostStatus, code: int
 ) -> None:
     post.status = status
+    post.closed_at = utcnow() - timedelta(days=2)
     db.session.commit()
     login_as(client, donor)
     assert send(client, post).status_code == code
@@ -177,6 +188,6 @@ def test_gift_field_errors_are_linked(client: FlaskClient, post: Post, donor: Us
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "aria-invalid" not in page
     page = send(client, post, "0", "").get_data(as_text=True)
-    assert 'aria-describedby="chip-amount-error" aria-invalid="true"' in page
+    assert 'aria-describedby="chip-amount-hint chip-amount-error" aria-invalid="true"' in page
     assert 'aria-describedby="method-error" aria-invalid="true"' in page
     assert '<small class="error" id="method-error">Pick the app you used.</small>' in page

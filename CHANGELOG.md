@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Safer chip-in (#78). Logged-out visitors are told to log in before the pay buttons, and logging in or signing up returns them to the post. The amount is remembered while a donor is in their payment app, and after tapping a pay button the panel asks one question: "Sent $20 to $mariag on Cash App?" Without JavaScript the full form stays. A donor with a waiting gift sees that instead of the form. A gift can be recorded for 24 hours after a post closes. "Paid with" replaces "via", a single payment app is preselected, and a plain hint replaces the "$20.00" placeholder.
+
 ### Fixed
 - Hardening from Impeccable's audit (#77). Errors show styled pages with a way forward, and a stale form returns you to the page with a message. Form errors are focused and announced, and error text no longer pollutes field names. The top bar wraps at 320px and with large text. The packet username is a larger target, and there's a skip link. Any gift shows at least one progress mark, and the row stays visible in high-contrast mode. Long post titles scale down, and the same post sent twice within a minute makes one post.
 

@@ -69,7 +69,7 @@ def test_closing_takes_the_post_off_the_feed(client: FlaskClient, poster: User) 
     response = client.post(f"/posts/{post.id}/close", follow_redirects=True)
     page = response.get_data(as_text=True)
     assert "Your post is closed." in page
-    assert "This post is closed and isn't taking gifts." in page
+    assert "This post is closed." in page
     assert "Close post" not in page
     assert post.status is PostStatus.CLOSED
     assert post.closed_at is not None
@@ -130,14 +130,12 @@ def test_post_closes_on_its_own_at_30_days(
 
 
 def test_auto_closed_post_takes_no_gifts(client: FlaskClient, poster: User, donor: User) -> None:
-    post = add_post(poster, age_days=POST_OPEN_DAYS)
+    post = add_post(poster, age_days=POST_OPEN_DAYS + 2)
     login_as(client, donor)
     response = client.post(
         f"/posts/{post.id}/gifts", data={"amount": "20", "method": PaymentMethod.VENMO.value}
     )
-    assert "closed before your gift was recorded" in client.get(response.location).get_data(
-        as_text=True
-    )
+    assert "new gift can&#39;t be recorded" in client.get(response.location).get_data(as_text=True)
     assert post.donations == []
 
 

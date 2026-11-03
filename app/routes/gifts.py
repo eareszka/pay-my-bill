@@ -23,6 +23,7 @@ from app.extensions import db
 from app.forms import GiftForm
 from app.mail import send_email
 from app.models import (
+    LATE_GIFT_HOURS,
     PENDING_GIFT_DAYS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
@@ -55,19 +56,6 @@ def send_gift_notice(donation: Donation) -> None:
         current_app.logger.exception("Could not send the gift notice for donation %s", donation.id)
 
 
-def has_pending_gift(donor: User, post: Post) -> bool:
-    # One pending claim per donor per post keeps a poster's inbox from being flooded.
-    count = db.session.scalar(
-        select(func.count(Donation.id)).where(
-            Donation.post_id == post.id,
-            Donation.donor_id == donor.id,
-            Donation.status == DonationStatus.PENDING,
-            Donation.created_at > gift_expiry_cutoff(),
-        )
-    )
-    return bool(count)
-
-
 @bp.post("/posts/<int:post_id>/gifts")
 @verified_required
 def create(post_id: int) -> Response | tuple[str, int]:
@@ -79,14 +67,19 @@ def create(post_id: int) -> Response | tuple[str, int]:
     )
     if post is None or post.status not in PUBLIC_STATUSES:
         abort(404)
-    if not post.is_open:
+    if not post.takes_gifts:
         db.session.rollback()
-        flash("This post closed before your gift was recorded, so it can't count.", "info")
+        reason = (
+            "This post was deleted"
+            if post.is_deleted
+            else f"This post closed more than {LATE_GIFT_HOURS} hours ago"
+        )
+        flash(f"{reason}, so a new gift can't be recorded.", "info")
         return redirect(url_for("posts.show", post_id=post_id))
     donor: User = current_user
     if donor.id == post.user_id:
         abort(403)
-    if has_pending_gift(donor, post):
+    if post.pending_gift_from(donor.id):
         db.session.rollback()
         flash(f"You already have a gift waiting for {post.user.username} to confirm.", "info")
         return redirect(url_for("posts.show", post_id=post.id))

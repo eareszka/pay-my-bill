@@ -24,6 +24,7 @@ from app.extensions import db
 from app.forms import GiftForm, PostForm, ResultsUpdateForm
 from app.mail import send_email
 from app.models import (
+    LATE_GIFT_HOURS,
     MAX_OPEN_POSTS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
@@ -182,6 +183,10 @@ def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | Non
     return render_template(
         "posts/show.html",
         post=post,
+        waiting_gift=(
+            post.pending_gift_from(current_user.id) if current_user.is_authenticated else None
+        ),
+        late_gift_hours=LATE_GIFT_HOURS,
         reactions=reaction_view(post) if post.update_body else None,
         pay_options=pay_options(post.user),
         form=form,
