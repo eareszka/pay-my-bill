@@ -48,7 +48,8 @@ def test_feed_shows_open_posts_newest_first(client: FlaskClient, make_user: Make
     assert "$0</strong> of $120.50" in page
     assert "band-want" in page
     assert "band-need" in page
-    assert "alice</a> · Tampa, FL" in page
+    assert "alice</a>" in page
+    assert "Need · Tampa, FL" in page
     assert 'aria-valuenow="0"' in page
 
 
@@ -117,7 +118,7 @@ def test_region_hidden_without_city(client: FlaskClient, make_user: MakeUser) ->
     add_post(make_user(state="FL"), "Post")
     page = client.get("/").get_data(as_text=True)
     assert "None" not in page
-    assert 'href="/u/alice">alice</a></p>' in page
+    assert '<span class="card-where">Need</span>' in page
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
@@ -137,7 +138,6 @@ def test_feed_cards_open_the_post_and_name_the_kind(
     page = client.get("/").get_data(as_text=True)
     assert 'class="cards rack"' in page
     assert f'href="/posts/{post.id}">Rack post</a>' in page
-    assert '<span class="sr-only">Need · </span>' in page
 
 
 @pytest.mark.parametrize(

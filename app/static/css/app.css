@@ -146,7 +146,8 @@ h3.section-title { font-size: 1.0625rem; }
 .card-head a { position: relative; z-index: 1; }
 
 /* The feed is a rack of packets: tap anywhere on one to open it. */
-.rack { display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 10px; }
+.rack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 600px) { .rack { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .rack .card { position: relative; display: flex; flex-direction: column; }
 .rack .band { display: flex; align-items: flex-end; min-height: 112px; padding: 12px; }
 .rack .card-title { font-size: 1.125rem; }
@@ -154,9 +155,11 @@ h3.section-title { font-size: 1.0625rem; }
 .rack .card-title a:hover { text-decoration: none; }
 .rack .card:hover .card-title a { text-decoration: underline; text-decoration-thickness: 2px; }
 .rack .card-title a:focus-visible { outline: none; }
-.rack .card-title a:focus-visible::after { outline: 3px solid var(--ink); outline-offset: 2px; }
+.rack .card-title a:focus-visible::after { outline: 3px solid var(--ink); outline-offset: -3px; box-shadow: inset 0 0 0 6px var(--surface); }
 .rack .card-body { display: flex; flex: 1; flex-direction: column; padding: 10px 12px 12px; }
 .rack .card-head { flex: 1; font-size: 0.875rem; }
+.card-user { display: block; width: fit-content; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-where { display: block; }
 
 .grow { display: flex; gap: 4px; }
 .grow { flex: none; }
