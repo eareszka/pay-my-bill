@@ -37,8 +37,8 @@ def test_feed_shows_open_posts_newest_first(client: FlaskClient, make_user: Make
     page = client.get("/").get_data(as_text=True)
     assert page.index("Newest want") < page.index("Older need")
     assert "$0</strong> of $120.50" in page
-    assert 'class="chip chip-want">Want<' in page
-    assert 'class="chip chip-need">Need<' in page
+    assert 'band-want' in page
+    assert 'band-need' in page
     assert "alice</a> · Tampa, FL" in page
     assert 'aria-valuenow="0"' in page
 
@@ -108,7 +108,7 @@ def test_region_hidden_without_city(client: FlaskClient, make_user: MakeUser) ->
     add_post(make_user(state="FL"), "Post")
     page = client.get("/").get_data(as_text=True)
     assert "None" not in page
-    assert 'href="/u/alice">alice</a></span>' in page
+    assert 'href="/u/alice">alice</a></p>' in page
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:

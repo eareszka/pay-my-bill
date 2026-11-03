@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Complete redesign with Impeccable (#75). Every page moves to the owner-chosen Seed Packet look: a leaf-green shell, flat colour bands for posts (leaf for needs, teal for wants), marigold for primary actions, Bitter and Public Sans (self-hosted), and progress as a growing row of ten marks. Feed cards gain a Chip in button that jumps to the form on the post page. Behaviour and wording are otherwise unchanged. Earlier surface briefs are replaced by one app-wide brief.
+
 ### Added
 - Follow-through stat on profiles (#28, ADR 0008): "Updated N of M posts", counting posts whose results update is posted or overdue. It's hidden when nothing has come due. Impeccable's finish review also made the update's due date stand out, explained 👍 and 🤨, and showed the 20-character minimum up front.
 - Kudos and reactions on results updates (#64, ADR 0008). Any verified user can give Kudos, and people with a confirmed gift on the post can use 👍 or 🤨, which replace each other. Tapping again removes it, and posters can't react to their own update. Kudos and 👍 counts are public, only admins see 🤨 counts, and reactions earn no XP (migration 0009).
