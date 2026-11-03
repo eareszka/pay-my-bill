@@ -192,3 +192,15 @@ def test_same_post_twice_makes_one_post(client: FlaskClient, make_user: MakeUser
     assert db.session.scalar(select(func.count()).select_from(Post)) == 1
     other = client.post("/posts/new", data={**form, "title": "Water bill"})
     assert other.location != first.location
+
+
+def test_sign_in_pages_have_the_summary_beside_the_form(client: FlaskClient) -> None:
+    for path in ("/login", "/signup"):
+        page = client.get(path).get_data(as_text=True)
+        assert 'class="auth-side wide-only"' in page
+        assert "Pay My Bill never holds money." in page
+
+
+def test_sign_in_page_title_stays_clean(client: FlaskClient) -> None:
+    page = client.get("/login").get_data(as_text=True)
+    assert "<title>Log in · Pay My Bill</title>" in page

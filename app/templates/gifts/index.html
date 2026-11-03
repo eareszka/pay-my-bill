@@ -2,6 +2,7 @@
 {% block title %}Gifts · Pay My Bill{% endblock %}
 {% block content %}
   <h1>Gifts</h1>
+  <div class="gifts-grid{% if to_confirm and sent %} gifts-two{% endif %}">
   {% if to_confirm %}
     <section class="gift-section" aria-labelledby="to-confirm">
       <h2 class="section-title" id="to-confirm">To confirm <span class="count">{{ to_confirm | length }}</span></h2>
@@ -53,4 +54,5 @@
       <p class="empty">No gifts yet. After you chip in on a post, tap “I sent it” and your gift shows up here as Waiting until the poster confirms it. <a href="{{ url_for('main.index') }}">Find someone to help</a>.</p>
     {% endif %}
   </section>
+  </div>
 {% endblock %}

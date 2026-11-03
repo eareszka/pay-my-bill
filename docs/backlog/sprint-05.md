@@ -53,7 +53,7 @@ The owner found the rack too cluttered and chose a bulletin board with no thumbt
 - [ ] Cork ground, wood top bar, and plain square tickets. Every page moves to this look.
 - [ ] The feed shows one large ticket with the stack behind it, a Chip in tab, and Next ticket, with no scrolling list.
 - [ ] Tickets show a title, short story, and amount, with who and where on the post page.
-- [ ] On wide screens, the ticket sits beside a Chip in panel, and the post page uses the same split (owner's choice).
+- [ ] On wide screens, every page fills the browser, with the ticket beside a Chip in panel on the feed and post page (owner's choice).
 - [ ] The first ticket follows ADR 0013: overdue posters are out, a good record comes first, then first-time posters, then closest to goal.
 
 ---

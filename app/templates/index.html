@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% block main_class %} container-wide{% endblock %}
 {% block content %}
   <div class="board">
     <h1{% if current_user.is_authenticated %} class="sr-only"{% endif %}>Help someone out</h1>

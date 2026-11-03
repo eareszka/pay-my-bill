@@ -2,7 +2,6 @@
 {% from "_field.html" import field %}
 {% from "posts/_progress.html" import grow %}
 {% block title %}{{ post.title }} · Pay My Bill{% endblock %}
-{% block main_class %} container-wide{% endblock %}
 {% block content %}
   {% set is_owner = current_user.is_authenticated and current_user.id == post.user_id %}
   {% if post.status == PostStatus.PENDING_REVIEW %}

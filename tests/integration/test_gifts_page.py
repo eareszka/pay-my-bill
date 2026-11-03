@@ -212,3 +212,10 @@ def test_my_gifts_says_when_it_is_cut_off(
     page = client.get("/gifts").get_data(as_text=True)
     assert page.count('class="gift-list-amount"') == 2
     assert "Showing your latest 2 gifts." in page
+
+
+def test_gift_lists_only_split_when_both_have_something(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    login_as(client, make_user("loner"))
+    assert "gifts-two" not in client.get("/gifts").get_data(as_text=True)
