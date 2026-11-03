@@ -8,6 +8,7 @@
   </nav>
   {% if top %}{% include "posts/_top_ticket.html" %}{% endif %}
   {% if posts %}
+    <h2 class="sr-only">More posts</h2>
     <ul class="cards rack">
       {% for post in posts %}
         <li class="ticket ticket-{{ post.kind.value }}">

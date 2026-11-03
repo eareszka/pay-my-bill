@@ -3,6 +3,7 @@ from datetime import timedelta
 import pytest
 from flask.testing import FlaskClient
 
+from app.accounts import delete_post
 from app.extensions import db
 from app.models import (
     Donation,
@@ -19,15 +20,18 @@ from app.models import (
 from app.top_spot import top_post
 from tests.conftest import MakeUser, login_as
 
+OLD = utcnow() - timedelta(days=30)
+
 
 @pytest.fixture
 def donor(make_user: MakeUser) -> User:
-    return make_user("dev_tom")
+    return make_user("dev_tom", created_at=OLD)
 
 
 def open_post(
     owner: User, donor: User | None = None, raised: int = 0, kind: PostKind = PostKind.NEED
 ) -> Post:
+    owner.venmo_handle = "@has-a-handle"
     post = Post(
         user=owner, kind=kind, title=f"Ask from {owner.username}", body="Short.", goal_cents=10_000
     )
@@ -144,15 +148,64 @@ def test_hmm_outweighing_good_feedback_drops_below_newcomers(
     assert top_post() is newcomer
 
 
-def test_scrubbed_update_no_longer_counts_its_feedback(make_user: MakeUser, donor: User) -> None:
+def test_deleting_a_post_does_not_erase_its_hmm(make_user: MakeUser, donor: User) -> None:
+    doubted = make_user("doubted")
+    past = past_post(doubted, donor)
+    react(past, donor, ReactionKind.HMM)
+    delete_post(past)
+    db.session.commit()
+    open_post(doubted)
+    newcomer = open_post(make_user("new_one"))
+    assert top_post() is newcomer
+
+
+def test_removed_post_stops_counting_its_feedback(make_user: MakeUser, donor: User) -> None:
     poster = make_user("poster")
     past = past_post(poster, donor)
     react(past, donor, ReactionKind.HMM)
-    past.update_body = None
+    past.status = PostStatus.REMOVED
     db.session.commit()
     post = open_post(poster)
-    open_post(make_user("new_one"))
     assert top_post() is post
+
+
+def test_poster_with_no_way_to_be_paid_is_out(make_user: MakeUser) -> None:
+    keeper = make_user("no_handle")
+    open_post(keeper)
+    keeper.venmo_handle = None
+    db.session.commit()
+    assert top_post() is None
+
+
+def test_gift_from_a_new_account_earns_no_record(make_user: MakeUser) -> None:
+    faker = make_user("faker")
+    past_post(faker, make_user("sock_puppet"))
+    open_post(faker)
+    genuine = make_user("genuine")
+    past_post(genuine, make_user("real_donor", created_at=OLD))
+    earned = open_post(genuine)
+    assert top_post() is earned
+
+
+def test_reactions_from_new_accounts_do_not_count(make_user: MakeUser, donor: User) -> None:
+    liked, plain = make_user("liked"), make_user("plain")
+    react(past_post(liked, donor), make_user("sock_puppet"), ReactionKind.KUDOS)
+    past_post(plain, donor)
+    open_post(liked)
+    closest = open_post(plain, donor, raised=500)
+    assert top_post() is closest
+
+
+def test_feedback_is_capped_per_update(make_user: MakeUser, donor: User) -> None:
+    popular, steady = make_user("popular"), make_user("steady")
+    past = past_post(popular, donor)
+    for n in range(10):
+        react(past, make_user(f"fan_{n}", created_at=OLD), ReactionKind.KUDOS)
+    for _ in range(5):
+        past_post(steady, donor)
+    open_post(popular)
+    earned = open_post(steady)
+    assert top_post() is earned
 
 
 def test_filter_picks_a_top_of_that_kind(make_user: MakeUser) -> None:
@@ -166,6 +219,7 @@ def test_feed_shows_top_once(client: FlaskClient, make_user: MakeUser) -> None:
     other = open_post(make_user("second"))
     page = client.get("/").get_data(as_text=True)
     assert 'class="ticket top-ticket ticket-need"' in page
+    assert "More posts" in page
     assert page.count(top.title) == 2  # title and the tab's screen-reader text
     assert f'href="/posts/{top.id}#chip-in">Chip in' in page
     assert other.title in page

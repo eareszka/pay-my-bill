@@ -28,8 +28,6 @@ from app.models import (
     MAX_OPEN_POSTS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
-    Donation,
-    DonationStatus,
     Post,
     PostKind,
     PostStatus,
@@ -37,6 +35,7 @@ from app.models import (
     ReactionKind,
     User,
     open_posts,
+    posts_with_confirmed_gifts,
     utcnow,
 )
 from app.moderation import is_flagged
@@ -75,8 +74,7 @@ def just_posted(user: User, title: str | None, body: str | None) -> Post | None:
 def posts_owing_update(user: User | None = None) -> list[Post]:
     query = select(Post).where(
         Post.update_posted_at.is_(None),
-        Post.status.in_(PUBLIC_STATUSES),
-        Post.donations.any(Donation.status == DonationStatus.CONFIRMED),
+        posts_with_confirmed_gifts(),
     )
     if user:
         query = query.where(Post.user_id == user.id)

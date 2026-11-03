@@ -91,7 +91,7 @@ def test_unknown_kind_shows_all(client: FlaskClient, make_user: MakeUser) -> Non
 
 
 def test_feed_paginates(client: FlaskClient, make_user: MakeUser) -> None:
-    user = make_user()
+    user = make_user(venmo_handle="@maria-g")
     # The first post is the top ticket, and the rest are paged beneath it.
     for i in range(PAGE_SIZE + 2):
         add_post(user, f"Post number {i:02d}", hours_ago=i)
