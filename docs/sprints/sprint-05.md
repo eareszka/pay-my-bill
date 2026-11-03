@@ -23,3 +23,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-03: #77 merged (#83). Did #78: the safer chip-in flow. Next: #79 trust information. Blocked: none.
 - 2026-11-03: The #78 review hid the Not yet button until it's needed, kept the remembered gift until the server has it, and made the late window honest. The remembered amount lasts only in its tab, so verifying email in a new tab loses it. Blocked: none.
 - 2026-11-03: #78 merged (#84). The owner found the rack too cluttered and chose a bulletin board with a large top ticket and no thumbtacks, then decided the top spot should reward follow-through (ADR 0013). Did #85. Next: review it with the owner, then #79. Blocked: none.
+- 2026-11-03: The owner found the grid of small tickets still cluttered and too much like a scroll site, and chose One Ticket at a Time on #85. Waiting on the owner's review of the look. Blocked: none.

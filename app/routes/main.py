@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
@@ -8,16 +8,12 @@ from app.top_spot import top_post
 
 bp = Blueprint("main", __name__)
 
-PAGE_SIZE = 20
-MAX_PAGE = 1000
 
-
-@bp.get("/")
-def index() -> str:
-    kind = request.args.get("kind", type=PostKind)
-    page = min(max(request.args.get("page", 1, type=int), 1), MAX_PAGE)
-    # The big ticket sits above the first page and isn't repeated below it.
+def ticket_at(position: int, kind: PostKind | None) -> Post | None:
+    # The earned ticket comes first (ADR 0013), then the rest of the stack, newest first.
     top = top_post(kind)
+    if top and position == 1:
+        return top
     query = (
         select(Post)
         .options(joinedload(Post.user))
@@ -28,14 +24,26 @@ def index() -> str:
         query = query.where(Post.kind == kind)
     if top:
         query = query.where(Post.id != top.id)
-    rows = list(db.session.scalars(query.offset((page - 1) * PAGE_SIZE).limit(PAGE_SIZE + 1)))
+    return db.session.scalars(query.offset(position - (2 if top else 1)).limit(1)).first()
+
+
+@bp.get("/")
+def index() -> str:
+    kind = request.args.get("kind", type=PostKind)
+    count = select(func.count()).select_from(Post).where(open_posts())
+    if kind:
+        count = count.where(Post.kind == kind)
+    total = db.session.scalar(count) or 0
+    position = request.args.get("n", 1, type=int)
+    # An old link can point past the end of a stack that has shrunk.
+    if not 1 <= position <= total:
+        position = 1
     return render_template(
         "index.html",
-        top=top if page == 1 else None,
-        posts=rows[:PAGE_SIZE],
+        post=ticket_at(position, kind) if total else None,
         kind=kind.value if kind else None,
-        page=page,
-        has_next=len(rows) > PAGE_SIZE,
+        position=position,
+        total=total,
     )
 
 

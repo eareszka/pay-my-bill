@@ -14,7 +14,6 @@ from app.models import (
     User,
     utcnow,
 )
-from app.routes.main import PAGE_SIZE
 from tests.conftest import MakeUser, login_as
 
 
@@ -39,18 +38,25 @@ def add_post(
     return post
 
 
-def test_feed_shows_open_posts_newest_first(client: FlaskClient, make_user: MakeUser) -> None:
-    user = make_user(city="Tampa", state="FL")
+def test_one_ticket_shows_at_a_time_newest_after_the_top(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    user = make_user(venmo_handle="@maria-g")
     add_post(user, "The top ticket", hours_ago=9)
     add_post(user, "Older need", hours_ago=5)
     add_post(user, "Newest want", kind=PostKind.WANT, hours_ago=1)
-    page = client.get("/").get_data(as_text=True)
-    assert page.index("Newest want") < page.index("Older need")
-    assert "$0</strong> of $120.50" in page
-    assert "ticket-want" in page
-    assert "ticket-need" in page
-    assert "alice</a>" in page
-    assert "Tampa, FL" in page
+    first = client.get("/").get_data(as_text=True)
+    assert "The top ticket" in first
+    assert "Newest want" not in first
+    assert "1 of 3" in first
+    second = client.get("/?n=2").get_data(as_text=True)
+    assert "Newest want" in second
+    assert "ticket-want" in second
+    assert '<span class="sr-only">Want: </span>' in second
+    third = client.get("/?n=3").get_data(as_text=True)
+    assert "Older need" in third
+    assert "ticket-need" in third
+    assert "$0</strong> of $120.50" in third
 
 
 @pytest.mark.parametrize(
@@ -85,45 +91,61 @@ def test_unknown_kind_shows_all(client: FlaskClient, make_user: MakeUser) -> Non
     user = make_user()
     add_post(user, "A want", kind=PostKind.WANT)
     add_post(user, "A need")
-    page = client.get("/?kind=loan").get_data(as_text=True)
-    assert "A want" in page
-    assert "A need" in page
+    assert "1 of 2" in client.get("/?kind=loan").get_data(as_text=True)
 
 
-def test_feed_paginates(client: FlaskClient, make_user: MakeUser) -> None:
-    user = make_user(venmo_handle="@maria-g")
-    # The first post is the top ticket, and the rest are paged beneath it.
-    for i in range(PAGE_SIZE + 2):
-        add_post(user, f"Post number {i:02d}", hours_ago=i)
-    first = client.get("/").get_data(as_text=True)
-    assert "Post number 00" in first
-    assert f"Post number {PAGE_SIZE:02d}" in first
-    assert f"Post number {PAGE_SIZE + 1:02d}" not in first
-    assert "Older</a>" in first
-    assert "Newer</a>" not in first
-    second = client.get("/?page=2").get_data(as_text=True)
-    assert f"Post number {PAGE_SIZE + 1:02d}" in second
-    assert "Post number 00" not in second
-    assert "Newer</a>" in second
-    assert "Older</a>" not in second
-    for bad in ("0", "-3", "abc", "99999999999999999999"):
-        assert client.get(f"/?page={bad}").status_code == 200
+def test_next_and_back_walk_the_stack_and_wrap(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user()
+    for i in range(3):
+        add_post(user, f"Post number {i}", kind=PostKind.WANT)
+    first = client.get("/?kind=want").get_data(as_text=True)
+    assert 'href="/?kind=want&amp;n=2">Next ticket' in first
+    assert ">Back</a>" not in first
+    last = client.get("/?kind=want&n=3").get_data(as_text=True)
+    assert 'href="/?kind=want&amp;n=2">Back' in last
+    assert 'href="/?kind=want">Next ticket' in last
 
 
-def test_page_past_end_links_back(client: FlaskClient, make_user: MakeUser) -> None:
+@pytest.mark.parametrize("bad", ["0", "-3", "abc", "99999999999999999999", "4"])
+def test_position_off_the_stack_shows_the_first_ticket(
+    client: FlaskClient, make_user: MakeUser, bad: str
+) -> None:
+    user = make_user()
+    for i in range(3):
+        add_post(user, f"Post number {i}")
+    assert "1 of 3" in client.get(f"/?n={bad}").get_data(as_text=True)
+
+
+def test_only_ticket_has_no_next_or_stack(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
-    page = client.get("/?page=5&kind=need").get_data(as_text=True)
-    assert "No more posts." in page
-    assert 'href="/?kind=need&amp;page=4">Newer</a>' in page
-
-
-def test_region_hidden_without_city(client: FlaskClient, make_user: MakeUser) -> None:
-    user = make_user(state="FL")
-    add_post(user, "The top ticket")
-    add_post(user, "Post")
     page = client.get("/").get_data(as_text=True)
-    assert "None" not in page
-    assert 'class="card-where"' not in page
+    assert "Next ticket" not in page
+    assert "deck-stacked" not in page
+    assert "1 of 1" in page
+
+
+def test_ticket_stays_uncluttered(client: FlaskClient, make_user: MakeUser) -> None:
+    add_post(make_user(city="Tampa", state="FL"), "Only post")
+    page = client.get("/").get_data(as_text=True)
+    assert "Tampa, FL" not in page
+    assert 'class="grow"' not in page
+
+
+def test_ticket_body_is_shortened(client: FlaskClient, make_user: MakeUser) -> None:
+    post = add_post(make_user(), "Only post")
+    post.body = "word " * 100
+    db.session.commit()
+    assert "word " * 40 not in client.get("/").get_data(as_text=True)
+
+
+def test_ticket_opens_the_post(client: FlaskClient, make_user: MakeUser) -> None:
+    post = add_post(make_user(), "Only post")
+    assert f'href="/posts/{post.id}"' in client.get("/").get_data(as_text=True)
+
+
+def test_no_chip_in_tab_without_a_way_to_pay(client: FlaskClient, make_user: MakeUser) -> None:
+    add_post(make_user(), "Only post")
+    assert "tear-tab" not in client.get("/").get_data(as_text=True)
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
@@ -134,17 +156,6 @@ def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
 
 def test_layout_has_mobile_viewport(client: FlaskClient) -> None:
     assert b'name="viewport" content="width=device-width, initial-scale=1"' in client.get("/").data
-
-
-def test_feed_cards_open_the_post_and_name_the_kind(
-    client: FlaskClient, make_user: MakeUser
-) -> None:
-    user = make_user()
-    add_post(user, "The top ticket")
-    post = add_post(user, "Rack post")
-    page = client.get("/").get_data(as_text=True)
-    assert 'class="cards rack"' in page
-    assert f'href="/posts/{post.id}">Rack post</a>' in page
 
 
 @pytest.mark.parametrize(

@@ -60,7 +60,7 @@ flask --app app run
 - Leaderboards rank by **distinct recipients helped**, never by dollars (ADR 0009).
 - A post that closes with any confirmed donation owes a **results update** within 7 days of the later of the close and the latest confirmation (note ≥ 20 chars, text only, never a required receipt). Open posts close on their own after 30 days. While one is overdue, that user can't create posts (ADR 0008).
 - `pending` donations auto-expire after 14 days with no credit (T15). Users must attest they're 18+ at signup (T13).
-- The large ticket at the top of the feed rewards follow-through: overdue posters are out, a good record comes first, then first-time posters, then closest to goal (ADR 0013).
+- The feed shows one ticket at a time, and the first ticket rewards follow-through: overdue posters are out, a good record comes first, then first-time posters, then closest to goal (ADR 0013).
 - Region is self-reported city and state. No GPS.
 - Every form needs a CSRF token. Passwords are hashed. Logins are rate-limited.
 

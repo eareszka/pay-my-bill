@@ -214,26 +214,32 @@ def test_filter_picks_a_top_of_that_kind(make_user: MakeUser) -> None:
     assert top_post(PostKind.WANT) is want
 
 
-def test_feed_shows_top_once(client: FlaskClient, make_user: MakeUser) -> None:
-    top = open_post(make_user("first"))
+def test_earned_ticket_comes_first_and_is_not_repeated(
+    client: FlaskClient, make_user: MakeUser, donor: User
+) -> None:
+    keeper = make_user("keeper")
+    past_post(keeper, donor)
+    top = open_post(keeper)
     other = open_post(make_user("second"))
-    page = client.get("/").get_data(as_text=True)
-    assert 'class="ticket top-ticket ticket-need"' in page
-    assert "More posts" in page
-    assert page.count(top.title) == 2  # title and the tab's screen-reader text
-    assert f'href="/posts/{top.id}#chip-in">Chip in' in page
-    assert other.title in page
+    first = client.get("/").get_data(as_text=True)
+    assert top.title in first
+    assert f'href="/posts/{top.id}#chip-in">Chip in' in first
+    assert "1 of 2" in first
+    second = client.get("/?n=2").get_data(as_text=True)
+    assert other.title in second
+    assert top.title not in second
 
 
-def test_only_post_shows_no_empty_message(client: FlaskClient, make_user: MakeUser) -> None:
-    open_post(make_user("first"))
-    assert "No open posts here yet" not in client.get("/").get_data(as_text=True)
-
-
-def test_top_is_only_on_the_first_page(client: FlaskClient, make_user: MakeUser) -> None:
-    open_post(make_user("first"))
-    page = client.get("/?page=2").get_data(as_text=True)
-    assert "top-ticket" not in page
+def test_stack_without_a_top_is_newest_first(client: FlaskClient, make_user: MakeUser) -> None:
+    # A poster with no way to be paid can't earn the spot, but stays in the stack.
+    owner = make_user("first")
+    older = open_post(owner)
+    newer = open_post(owner)
+    older.created_at = utcnow() - timedelta(hours=2)
+    owner.venmo_handle = None
+    db.session.commit()
+    assert newer.title in client.get("/").get_data(as_text=True)
+    assert top_post() is None
 
 
 def test_own_top_post_has_no_chip_in_tab(client: FlaskClient, make_user: MakeUser) -> None:

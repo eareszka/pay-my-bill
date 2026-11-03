@@ -160,36 +160,33 @@ h3.section-title { font-size: 1.0625rem; }
 .cards { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
 .ticket { position: relative; display: flex; flex-direction: column; color: var(--ink); background: var(--surface); box-shadow: var(--shadow); }
 .ticket-want { background: var(--want); }
-.ticket a { color: var(--link); }
-.card-title { margin: 0 0 4px; font-size: 1.0625rem; }
+/* One ticket at a time, with the rest of the stack peeking out behind it. */
+.board { max-width: 480px; margin-inline: auto; }
+.deck { position: relative; }
+.deck-stacked { margin-top: 18px; }
+.deck-stacked::before, .deck-stacked::after { content: ""; position: absolute; left: 12px; right: 12px; height: 12px; top: -7px; background: var(--want); box-shadow: var(--shadow); }
+.deck-stacked::after { left: 6px; right: 6px; top: -3px; background: var(--tint-info); }
+.deck-ticket { z-index: 1; min-height: min(calc(100dvh - 215px), 520px); }
+/* Logged-out visitors also see the heading above the tabs. */
+.board h1:not(.sr-only) ~ .deck .deck-ticket { min-height: min(calc(100dvh - 275px), 520px); }
+.card-title { margin: 0 0 10px; font-size: clamp(1.75rem, 8vw, 2.125rem); }
 .card-title a, .ticket .card-title a { color: inherit; text-decoration: none; }
 .card-title a::after { content: ""; position: absolute; inset: 0; }
 .ticket:hover .card-title a { text-decoration: underline; text-decoration-thickness: 2px; }
 .card-title a:focus-visible { outline: none; }
 .card-title a:focus-visible::after { outline: 3px solid var(--ink); outline-offset: -3px; box-shadow: inset 0 0 0 6px var(--surface); }
-.card-body { display: flex; flex: 1; flex-direction: column; padding: 11px 12px 12px; }
-.card-head { margin: 0 0 8px; font-size: 0.875rem; color: var(--muted); }
-.ticket .card-head a { position: relative; z-index: 1; display: block; width: fit-content; max-width: 100%; padding-block: 4px; margin-block: -4px; overflow: hidden; font-weight: 700; color: inherit; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
-.ticket .card-head a:hover { text-decoration: underline; }
-.card-who { display: flex; gap: 0.25em; }
-.card-who a { min-width: 0; }
-.card-kind { flex: none; }
-.card-where { display: block; }
-
-.rack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-@media (min-width: 600px) { .rack { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.rack .card-head { flex: 1; }
-
-.top-ticket { margin-bottom: 16px; }
-.top-ticket .card-body { padding: 14px 14px 12px; }
-.top-ticket .card-title { font-size: 1.75rem; }
-.top-ticket .card-head { margin-bottom: 8px; font-size: 0.9375rem; }
-.top-ticket .card-head a { display: inline; padding: 0; margin: 0; }
-.top-story { margin: 0 0 8px; }
-.tear-tab { position: relative; z-index: 1; display: block; padding: 12px; font-weight: 700; text-align: center; text-decoration: none; }
+.card-body { display: flex; flex: 1; flex-direction: column; padding: 16px; }
+.ticket-story { margin: 0 0 16px; font-size: 1.0625rem; }
+.deck-ticket .amounts { margin-top: auto; font-size: 1.0625rem; }
+.deck-ticket .amounts strong { font-size: 1.5rem; }
+.tear-tab { position: relative; z-index: 1; display: block; padding: 15px; font-size: 1.125rem; font-weight: 700; text-align: center; text-decoration: none; }
 .ticket .tear-tab { color: var(--on-action); background: var(--action); border-top: 2px dashed var(--on-action); }
 .ticket .tear-tab:hover { background: var(--action-hover); }
 .tear-tab:focus-visible { outline-offset: -5px; outline-color: var(--on-action); }
+.deck-nav { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.deck-count { font-weight: 700; color: var(--on-ground); }
+.deck-next { margin-left: auto; }
+.card-head { margin: 0 0 8px; font-size: 0.875rem; color: var(--muted); }
 
 .grow { display: flex; flex: none; gap: 4px; }
 .grow i { flex: 1; height: 9px; background: var(--mark-empty); border-radius: 5px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 35%, transparent); }
@@ -382,10 +379,8 @@ h3.section-title { font-size: 1.0625rem; }
 .handles dt { color: var(--muted-on-ground); }
 .handles dd { margin: 0; font-weight: 700; }
 
-.pager { display: flex; justify-content: space-between; margin-top: 16px; font-weight: 700; }
-.pager-next { margin-left: auto; }
 .empty { color: var(--on-ground); }
-main > p a, .empty a, .leader-cta a, .pager a, .hint > a { color: var(--link-on-ground); }
+main > p a, .empty a, .leader-cta a, .hint > a { color: var(--link-on-ground); }
 .group .hint > a, .page-form .hint > a, .post .hint > a, .gift .hint > a { color: var(--link); }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }

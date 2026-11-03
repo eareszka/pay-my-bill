@@ -1,5 +1,0 @@
-<div class="card-body">
-  <h3 class="card-title"><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h3>
-  <p class="card-head"><span class="card-who"><span class="card-kind">{{ post.kind.value | capitalize }} ·</span> <a href="{{ url_for('profile.show', username=post.user.username) }}">{{ post.user.username }}</a></span>{% if post.user.region %}<span class="card-where">{{ post.user.region }}</span>{% endif %}</p>
-  <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
-</div>

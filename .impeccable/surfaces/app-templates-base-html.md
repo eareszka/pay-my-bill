@@ -25,9 +25,9 @@ The whole app shell and every page: feed, post page, gifts, leaders, profile, si
 
 ## Direction contract
 
-THESIS: The community board at the door. One ticket gets the top of the board because its poster follows through, and the rest sit plainly beneath it. It refuses the endless feed and the crowdfunding plea.
+THESIS: The community board at the door. One ticket fills your view at a time, and the first is earned by following through. It refuses the endless feed and the crowdfunding plea.
 OWN-WORLD: Flat cork ground and a dark wood top bar. Square white paper tickets with a soft shadow, light blue for wants. Leaf green only for primary actions, including the tear-off tab with its dashed edge. Tomato only for errors and destructive actions. Bitter extra-bold for titles, Public Sans for everything else. No pins, no plant art, no faked cork texture.
-STORY: The visitor sees one person up close, then others nearby, and chips in. Everything sits on a ticket, so text never rests on a busy surface. After a post closes, the poster's own words take over.
-FIRST VIEWPORT: Wood top bar with brand left and Post, Gifts, Leaders, and user right. Underlined All, Needs, Wants tabs on cork. One full-width ticket: a large photo when there is one, a large Bitter title, who and where, a short story line, the amount, and a full-width green Chip in tab. Beneath it, two columns of small tickets with title, who and where, and amount. Signature move: the tear-off Chip in tab, plus the ten-mark row, which fills once on the post page.
-FORM: Top of the Board, position 3 of 6 on the grounded list. seed:1ead20c5faed4470
+STORY: The visitor sees one person up close, then chips in or moves to the next. Everything sits on a ticket, so text never rests on a busy surface. After a post closes, the poster's own words take over.
+FIRST VIEWPORT: Wood top bar with brand left and Post, Gifts, Leaders, and user right. Underlined All, Needs, Wants tabs on cork. One large ticket filling the screen, with the stack peeking out behind it: a large photo when there is one, a large Bitter title, a short story, the amount, and a full-width green Chip in tab. Who and where live on the post page. Beneath it, the count and Next ticket. There is no scrolling list. Signature move: the tear-off Chip in tab and the stack, plus the ten-mark row, which fills once on the post page.
+FORM: One Ticket at a Time, position 3 of 6 on the grounded list; the owner chose it after rejecting a grid as too cluttered and too much like a scroll site. seed:1ead20c5faed4470
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
