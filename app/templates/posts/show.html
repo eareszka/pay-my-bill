@@ -18,6 +18,7 @@
     {{ grow(post.progress_percent, "Progress toward goal") }}
     <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
     <p class="post-body">{{ post.body }}</p>
+    <div class="post-side">
     {% if post.update_body %}
       <section class="group" id="update">
         <h2 class="section-title">Results update</h2>
@@ -43,6 +44,7 @@
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
     {% endif %}
     {% if post.is_open or (not is_owner and (post.takes_gifts or waiting_gift)) %}{% include "posts/_chip_in.html" %}{% endif %}
+    </div>
   </article>
   {% if is_owner and (not post.is_deleted or post.update_body) %}
     <section class="danger-zone" id="delete">

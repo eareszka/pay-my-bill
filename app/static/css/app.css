@@ -174,7 +174,7 @@ h3.section-title { font-size: 1.0625rem; }
 .deck-stacked::after { left: 6px; right: 6px; top: -3px; background: var(--tint-info); }
 .deck-ticket { z-index: 1; min-height: min(calc(100dvh - 215px), 520px); }
 /* Logged-out visitors also see the heading above the tabs. */
-.board h1:not(.sr-only) ~ .deck .deck-ticket { min-height: min(calc(100dvh - 275px), 520px); }
+.board h1:not(.sr-only) ~ .deck-layout .deck-ticket { min-height: min(calc(100dvh - 275px), 520px); }
 .card-title { margin: 0 0 10px; font-size: clamp(1.75rem, 8vw, 2.125rem); }
 .card-title a, .ticket .card-title a { color: inherit; text-decoration: none; }
 .card-title a::after { content: ""; position: absolute; inset: 0; }
@@ -410,8 +410,8 @@ html { scrollbar-color: var(--muted) var(--ground); }
   .wide-only { display: block; }
   .narrow-only, .deck .tear-tab { display: none; }
   .deck-layout { display: grid; grid-template-columns: minmax(0, 1fr) 416px; gap: 24px; align-items: stretch; }
-  .deck-stacked { margin-top: 18px; }
-  .deck-side { display: flex; margin-top: 18px; }
+  .deck-side { display: flex; }
+  .deck-stacked + .deck-side { margin-top: 18px; }
   .deck-side .group { flex: 1; }
   .deck-ticket { height: 100%; min-height: 520px; }
   .deck-ticket .card-body { padding: 28px; }
@@ -420,8 +420,10 @@ html { scrollbar-color: var(--muted) var(--ground); }
   .side-amount { font-size: 1.0625rem; }
   .side-amount strong { font-size: 1.875rem; }
   /* The post page follows the same split whenever there's something to do. */
-  .post:has(> .group) { display: grid; grid-template-columns: minmax(0, 1fr) 416px; column-gap: 28px; align-items: start; padding: 24px 28px; }
-  .post:has(> .group) > * { grid-column: 1; }
-  .post > .group { grid-column: 2; grid-row: 1 / span 12; margin: 0; padding: 0 0 0 28px; border-top: 0; border-left: 2px solid var(--line); }
+  .post:has(> .post-side > .group) { display: grid; grid-template-columns: minmax(0, 1fr) 416px; grid-template-rows: repeat(11, min-content) 1fr; column-gap: 28px; align-items: start; padding: 24px 28px; }
+  .post:has(> .post-side > .group) > * { grid-column: 1; }
+  .post > .post-side:has(> .group) { grid-column: 2; grid-row: 1 / span 12; padding-left: 28px; border-left: 2px solid var(--line); }
+  .post .post-side .group { margin: 0; padding: 0; border-top: 0; }
+  .post .post-side .group + .group { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--line); }
   .post h1 { font-size: 2.625rem; }
 }

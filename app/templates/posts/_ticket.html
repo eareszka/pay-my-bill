@@ -5,5 +5,5 @@
     <p class="ticket-story">{{ post.body | truncate(140) }}</p>
     <p class="amounts narrow-only"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
   </div>
-  {% if post.user.has_payment_handle and not (current_user.is_authenticated and current_user.id == post.user_id) %}<a class="tear-tab" href="{{ url_for('posts.show', post_id=post.id, _anchor='chip-in') }}">Chip in<span class="sr-only"> on {{ post.title }}</span></a>{% endif %}
+  {% if post.user.has_payment_handle and not is_owner %}<a class="tear-tab" href="{{ url_for('posts.show', post_id=post.id, _anchor='chip-in') }}">Chip in<span class="sr-only"> on {{ post.title }}</span></a>{% endif %}
 </article>

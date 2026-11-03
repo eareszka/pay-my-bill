@@ -311,3 +311,15 @@ def test_own_top_post_has_no_chip_in_tab(client: FlaskClient, make_user: MakeUse
     open_post(owner)
     login_as(client, owner)
     assert "tear-tab" not in client.get("/").get_data(as_text=True)
+
+
+def test_pile_of_kudos_cannot_cancel_real_doubts(make_user: MakeUser, donor: User) -> None:
+    doubted = make_user("doubted")
+    past = past_post(doubted, donor)
+    for number in range(4):
+        react(past, make_user(f"doubter_{number}", created_at=OLD), ReactionKind.HMM)
+    for number in range(6):
+        react(past, make_user(f"friend_{number}", created_at=OLD), ReactionKind.KUDOS)
+    open_post(doubted)
+    newcomer = open_post(make_user("new_one"))
+    assert top_post() is newcomer

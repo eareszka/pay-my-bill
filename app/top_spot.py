@@ -69,12 +69,7 @@ def top_post(kind: PostKind | None = None) -> Post | None:
     def rank(post: Post) -> tuple[int, int, int, int]:
         count, net = updates[post.user_id], feedback[post.user_id]
         tier = POOR_RECORD if net < 0 else GOOD_RECORD if count else NEW_POSTER
-        return (
-            tier,
-            count + min(net, count * MAX_FEEDBACK_PER_UPDATE),
-            real_progress(post),
-            -post.id,
-        )
+        return (tier, count + net, real_progress(post), -post.id)
 
     eligible = [post for post in candidates if post.user_id not in overdue]
     return max(eligible, key=rank, default=None)
@@ -82,7 +77,8 @@ def top_post(kind: PostKind | None = None) -> Post | None:
 
 def reaction_totals(poster_ids: set[int], counted_posts: set[int]) -> Counter[int]:
     # 🤨 always lowers a record, so deleting a post or having it removed can't erase it.
-    # Kudos and 👍 only raise it on an update that earned credit, on a post still public.
+    # Kudos and 👍 only raise it on an update that earned credit, on a post still public,
+    # and each update can only raise it so far, so a pile of kudos can't cancel real doubts.
     rows = db.session.execute(
         select(Post.user_id, Post.id, Post.status, Reaction, User)
         .join(Reaction, Reaction.post_id == Post.id)
@@ -90,11 +86,14 @@ def reaction_totals(poster_ids: set[int], counted_posts: set[int]) -> Counter[in
         .where(Post.user_id.in_(poster_ids))
     ).all()
     totals: Counter[int] = Counter()
+    raised: Counter[tuple[int, int]] = Counter()
     for poster_id, post_id, status, reaction, user in rows:
         if not established(user, reaction.created_at):
             continue
         if reaction.kind is ReactionKind.HMM:
             totals[poster_id] -= 1
         elif post_id in counted_posts and status in PUBLIC_STATUSES:
-            totals[poster_id] += 1
+            raised[poster_id, post_id] += 1
+    for (poster_id, _), points in raised.items():
+        totals[poster_id] += min(points, MAX_FEEDBACK_PER_UPDATE)
     return totals

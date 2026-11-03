@@ -253,3 +253,16 @@ def test_closed_post_without_handles_does_not_promise_a_return(
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "no longer lists a payment app" in page
     assert "Check back soon" not in page
+
+
+def test_update_and_waiting_gift_share_the_side_column(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = add_post(poster, closed_hours_ago=2)
+    post.update_body = "Made rent."
+    post.update_posted_at = utcnow()
+    db.session.add(Donation(post=post, donor=donor, amount_cents=2_000, method=PaymentMethod.VENMO))
+    db.session.commit()
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert page.index('class="post-side"') < page.index('id="update"') < page.index('id="chip-in"')

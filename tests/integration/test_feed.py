@@ -210,3 +210,16 @@ def test_heading_is_visible_to_visitors(client: FlaskClient) -> None:
 def test_heading_steps_back_for_members(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user())
     assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/").get_data(as_text=True)
+
+
+def test_logging_in_from_the_panel_returns_to_that_post(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    post = add_post(make_user(venmo_handle="@maria-g"), "Only post")
+    page = client.get("/").get_data(as_text=True)
+    assert f'href="/login?next=/posts/{post.id}">Log in first' in page
+
+
+def test_lone_ticket_does_not_use_the_stack(client: FlaskClient, make_user: MakeUser) -> None:
+    add_post(make_user(), "Only post")
+    assert "deck-stacked" not in client.get("/").get_data(as_text=True)
