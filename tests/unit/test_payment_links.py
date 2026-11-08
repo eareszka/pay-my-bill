@@ -58,7 +58,7 @@ def test_pay_options_only_for_set_handles() -> None:
             PaymentMethod.VENMO,
             "Venmo",
             "@maria-g",
-            "https://venmo.com/?txn=pay&recipients=maria-g",
+            "https://account.venmo.com/pay?txn=pay&recipients=maria-g",
             "&amount=",
         ),
     ]
