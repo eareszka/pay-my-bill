@@ -40,6 +40,7 @@ from app.models import (
 )
 from app.moderation import is_flagged
 from app.payment_links import pay_options
+from app.routes.admin import notify_admins
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
@@ -122,6 +123,10 @@ def new() -> str | Response | tuple[str, int]:
         db.session.add(post)
         db.session.commit()
         if flagged:
+            notify_admins(
+                "A post is waiting for review",
+                f"{user.username}'s post “{post.title}” matched the fundraising word list.",
+            )
             flash("Thanks! Your post will show in the feed after a quick review.", "info")
         else:
             flash("Your post is live.", "success")

@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Any, cast
 
 import flask_login
-from flask import flash, redirect, request, url_for
+from flask import abort, flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy import ColumnElement, func, select
 from werkzeug.wrappers import Response
@@ -22,8 +22,8 @@ def load_user(user_id: str) -> User | None:
         user = db.session.get(User, int(user_id))
     except ValueError:
         return None
-    # A deleted account's other sessions end on their next request.
-    return None if user is None or user.is_deleted else user
+    # A deleted or banned account's sessions end on their next request.
+    return None if user is None or user.is_deleted or user.is_banned else user
 
 
 def unauthorized() -> Response:
@@ -76,6 +76,16 @@ def mark_login_succeeded(attempt: LoginAttempt) -> None:
 
 def login_required[F: Callable[..., Any]](view: F) -> F:
     return cast(F, flask_login.login_required(view))
+
+
+def admin_required[F: Callable[..., Any]](view: F) -> F:
+    @wraps(view)
+    def wrapped(*args: Any, **kwargs: Any) -> Any:
+        if not current_user.is_admin:
+            abort(404)
+        return view(*args, **kwargs)
+
+    return login_required(cast(F, wrapped))
 
 
 def verified_required[F: Callable[..., Any]](view: F) -> F:
