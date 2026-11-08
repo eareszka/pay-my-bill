@@ -50,7 +50,7 @@ def top_post(kind: PostKind | None = None) -> Post | None:
     query = select(Post).options(joinedload(Post.user), with_donors).where(open_posts())
     if kind:
         query = query.where(Post.kind == kind)
-    candidates = [post for post in db.session.scalars(query) if post.user.has_payment_handle]
+    candidates = [post for post in db.session.scalars(query) if post.user.can_be_paid]
     if not candidates:
         return None
     poster_ids = {post.user_id for post in candidates}
