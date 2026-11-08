@@ -73,8 +73,12 @@ class SignupForm(FlaskForm):
         ],
     )
     adult = BooleanField(
-        "I'm 18 or older",
-        validators=[DataRequired(message="You need to be 18 or older to join.")],
+        "I'm 18 or older and agree to the Terms and Privacy Policy",
+        validators=[
+            DataRequired(
+                message="You need to be 18 or older and agree to the Terms and Privacy Policy."
+            )
+        ],
     )
 
 
