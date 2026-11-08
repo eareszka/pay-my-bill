@@ -32,6 +32,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAIL_PORT=int(os.environ.get("MAIL_PORT") or 587),
         MAIL_USERNAME=os.environ.get("MAIL_USERNAME", ""),
         MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD", ""),
+        BREVO_API_KEY=os.environ.get("BREVO_API_KEY", ""),
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
         # Base URL for links in emails sent outside a request (the reminder command).
         APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),

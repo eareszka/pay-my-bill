@@ -7,12 +7,12 @@ The owner chose to open the site to the public tonight, before anyone else ships
 ## Committed
 | Story | Issue | Points | Status |
 |---|---|---|---|
-| L-1 Terms of Service and Privacy pages | #32 | 2 | To do |
-| L-2 Password reset | #82 | 3 | To do |
-| L-3 Report a post or user, with an admin queue (includes #68) | PB-33 | 5 | To do |
-| L-4 Real email on staging (Gmail SMTP, config only) | — | 1 | To do |
+| L-1 Terms of Service and Privacy pages | #32 | 2 | Done (#93) |
+| L-2 Password reset | #82 | 3 | Done (#94) |
+| L-3 Report a post or user, with an admin queue (includes #68) | PB-33 | 5 | Done (#95) |
+| L-4 Real email on staging (Brevo HTTPS API) | — | 2 | Done (#96) |
 
-**Total:** 11 points.
+**Total:** 12 points.
 
 ## Skipped for speed (owner-approved)
 - Each PR gets a `/code-review` at low effort instead of medium.
@@ -22,3 +22,5 @@ The owner chose to open the site to the public tonight, before anyone else ships
 
 ## Daily log
 - 2026-11-08: Planned the launch sprint with the owner: Gmail SMTP, the free Render URL, PRs and CI kept, and Terms, password reset, and reports in scope. Next: L-1. Blocked: none.
+- 2026-11-08: #32 merged (#93) and #82 merged (#94). The low reviews found nothing real: one flagged a lockout gap, but login already maps an email to the username. Did PB-33 with #68 (#95). Its review flagged `PostStatus` as missing from the template, but it's a Jinja global. Blocked: none.
+- 2026-11-08: Render's free tier blocks outbound SMTP (ports 25/465/587), so Gmail SMTP can't work. The owner chose to stay free with Brevo's HTTPS API (#96). Follow-ups: other sessions aren't ended on a password reset, and admins have no audit log. Next: the owner sets `BREVO_API_KEY`, `MAIL_FROM`, and `CONTACT_EMAIL` in Render, then runs `flask --app app admin grant` and does the phone run. Blocked: owner config.

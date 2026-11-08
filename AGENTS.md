@@ -80,6 +80,8 @@ flask --app app run
 
 - **Sprint 4, "Follow-through"** is done: issues #65, #26, #27, #64, and #28 (16 points) merged through PRs #66, #70, #71, #72, and #74. Posts close by hand or on their own at 30 days (`Post.is_open`, `open_posts()`), and results updates, the overdue block, and the follow-through stat all come from dates when read. Reminders run through `flask --app app posts remind`. Migrations 0006–0009. Rules are in the ADR 0008 amendments.
 
+- **Sprint 5b, "Launch"** (2026-11-08): Terms and Privacy (#93), password reset (#94), reports and the admin queue at `/admin` (#95, migration 0010, `app/routes/admin.py` and `app/routes/reports.py`), and Brevo email (#96). Mail goes through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks SMTP. Make an admin with `flask --app app admin grant <email>`. Sprint 5's #79, #80, and #81 are paused.
+
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:
 - Before starting work, pull `main` and check the open PRs and branches.

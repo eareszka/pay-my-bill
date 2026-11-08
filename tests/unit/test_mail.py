@@ -1,5 +1,7 @@
+import json
 import logging
 import ssl
+import urllib.error
 from unittest.mock import MagicMock
 
 import pytest
@@ -43,3 +45,31 @@ def test_smtps_port_uses_implicit_tls(app: Flask, monkeypatch: pytest.MonkeyPatc
 
 def test_app_logger_emits_info(app: Flask) -> None:
     assert app.logger.isEnabledFor(logging.INFO)
+
+
+def test_brevo_backend_posts_json(app: Flask, monkeypatch: pytest.MonkeyPatch) -> None:
+    urlopen = MagicMock()
+    monkeypatch.setattr("app.mail.urllib.request.urlopen", urlopen)
+    app.config.update(
+        BREVO_API_KEY="key-123", MAIL_FROM="Pay My Bill <hi@example.com>", MAIL_SERVER="smtp.x"
+    )
+    send_email("a@example.com", "Hello", "Body")
+    request = urlopen.call_args.args[0]
+    assert request.full_url == "https://api.brevo.com/v3/smtp/email"
+    assert request.get_header("Api-key") == "key-123"
+    payload = json.loads(request.data)
+    assert payload["sender"] == {"name": "Pay My Bill", "email": "hi@example.com"}
+    assert payload["to"] == [{"email": "a@example.com"}]
+    assert (payload["subject"], payload["textContent"]) == ("Hello", "Body")
+
+
+def test_brevo_bare_sender_and_errors_are_oserror(
+    app: Flask, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fail(*_: object, **__: object) -> None:
+        raise urllib.error.URLError("down")
+
+    monkeypatch.setattr("app.mail.urllib.request.urlopen", fail)
+    app.config.update(BREVO_API_KEY="key", MAIL_FROM="hi@example.com")
+    with pytest.raises(OSError):
+        send_email("a@example.com", "Hello", "Body")
