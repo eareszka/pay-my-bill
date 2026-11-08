@@ -70,6 +70,29 @@ class ReactionKind(StrEnum):
     HMM = "hmm"
 
 
+class ReportReason(StrEnum):
+    SCAM = "scam"
+    BUSINESS = "business"
+    HARASSMENT = "harassment"
+    PRIVATE_INFO = "private_info"
+    SPAM = "spam"
+    OTHER = "other"
+
+    @property
+    def label(self) -> str:
+        return REPORT_REASON_LABELS[self]
+
+
+REPORT_REASON_LABELS = {
+    ReportReason.SCAM: "Scam or false story",
+    ReportReason.BUSINESS: "Business or investment fundraising",
+    ReportReason.HARASSMENT: "Harassment, hate, or threats",
+    ReportReason.PRIVATE_INFO: "Shares private information",
+    ReportReason.SPAM: "Spam",
+    ReportReason.OTHER: "Something else",
+}
+
+
 class PaymentMethod(StrEnum):
     CASHAPP = "cashapp"
     VENMO = "venmo"
@@ -131,6 +154,7 @@ class User(Base):
     rules_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     adult_attested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_admin: Mapped[bool] = mapped_column(default=False)
+    banned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")
@@ -153,6 +177,10 @@ class User(Base):
     @property
     def is_deleted(self) -> bool:
         return self.email.endswith(DELETED_EMAIL_DOMAIN)
+
+    @property
+    def is_banned(self) -> bool:
+        return self.banned_at is not None
 
     @property
     def has_payment_handle(self) -> bool:
@@ -189,6 +217,9 @@ class Post(Base):
         back_populates="post", cascade="all, delete-orphan", lazy="selectin"
     )
     reactions: Mapped[list["Reaction"]] = relationship(cascade="all, delete-orphan")
+    reports: Mapped[list["Report"]] = relationship(
+        back_populates="post", cascade="all, delete-orphan"
+    )
 
     @property
     def is_deleted(self) -> bool:
@@ -358,6 +389,28 @@ class Reaction(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     kind: Mapped[ReactionKind] = mapped_column(_enum_column(ReactionKind, "reaction_kind"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Report(Base):
+    __tablename__ = "reports"
+    __table_args__ = (
+        CheckConstraint("(post_id IS NULL) <> (user_id IS NULL)", name="one_target"),
+        Index("ix_reports_resolved_at", "resolved_at"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reporter_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), index=True)
+    reason: Mapped[ReportReason] = mapped_column(_enum_column(ReportReason, "report_reason"))
+    details: Mapped[str | None] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolution: Mapped[str | None] = mapped_column(String(20))
+
+    reporter: Mapped[User] = relationship(foreign_keys=[reporter_id])
+    post: Mapped["Post | None"] = relationship(foreign_keys=[post_id], back_populates="reports")
+    user: Mapped[User | None] = relationship(foreign_keys=[user_id])
 
 
 class LoginAttempt(Base):

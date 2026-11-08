@@ -20,4 +20,7 @@
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
   {% endif %}
   {% include "profile/_handles.html" %}
+  {% if not current_user.is_authenticated or current_user.id != user.id %}
+    <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>
+  {% endif %}
 {% endblock %}

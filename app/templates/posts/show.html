@@ -74,4 +74,7 @@
       {% endif %}
     </section>
   {% endif %}
+  {% if not current_user.is_authenticated or current_user.id != post.user_id %}
+    <p class="report-link"><a href="{{ url_for('reports.post', post_id=post.id) }}">Report this post</a></p>
+  {% endif %}
 {% endblock %}

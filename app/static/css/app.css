@@ -393,6 +393,12 @@ h3.section-title { font-size: 1.0625rem; }
 .empty { color: var(--on-ground); }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }
+.report-link { margin-top: 24px; font-size: 0.875rem; text-align: center; }
+.report-link a { color: var(--link-on-ground); }
+.admin-item { margin-bottom: 12px; }
+.admin-item h3 { margin: 0 0 4px; font-size: 1rem; }
+.admin-item .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.admin-item .actions form { margin: 0; }
 
 @media (max-width: 400px) {
   .topbar { padding-inline: 12px; gap: 8px; }
