@@ -176,3 +176,23 @@ Follows PB-11's recruitment plan.
 ### PB-40 Photos on posts · #TBD · 5 pts · P3 · epic:posts
 Comes after PB-33, since photos need moderation. Compare cloud storage options and bring the cost to the owner first, with an ADR (T7).
 - [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename.
+
+---
+
+## Instant gifts (owner, 2026-11-08)
+
+### PB-41 Spike: Stripe Connect approval · #TBD · 2 pts · P0 · spike · owner
+ADR 0014. The owner applies. Nothing about real payments ships until this is done.
+- [ ] Stripe account with Connect (Express) enabled, and the platform profile describes personal gifting with no business or charity fundraising.
+- [ ] Stripe's answer on the crowdfunding review is recorded in `docs/research/`, along with fees and dispute liability.
+- [ ] PB-9 is updated for Apple Guideline 3.2.1(vii) with Stripe fees.
+
+### PB-42 Recipients connect Stripe · #TBD · 3 pts · P0 · epic:donations
+- [ ] From their profile, a recipient starts Stripe-hosted Express onboarding and comes back to a clear status: not started, pending, or ready.
+- [ ] Only ready recipients can take card gifts. Account status is updated from the `account.updated` webhook.
+
+### PB-43 Instant card gifts · #TBD · 5 pts · P0 · epic:donations
+- [ ] A donor picks an amount and pays with card, Apple Pay, or Google Pay through Stripe Checkout, as a destination charge to the recipient with no platform fee.
+- [ ] A signed, idempotent webhook records the gift as confirmed at once (amending ADR 0004), and the donor sees their rewards.
+- [ ] Refunds and disputes from Stripe un-count the gift and flag it in the admin queue.
+- [ ] Terms and Privacy are updated for card gifts.
