@@ -9,7 +9,7 @@
     {{ field(form.email, autocomplete="email") }}
     {{ field(form.password, autocomplete="new-password") }}
     {{ field(form.confirm, autocomplete="new-password") }}
-    {{ choice(form.adult) }}
+    {% call choice(form.adult) %}I'm 18 or older and agree to the <a href="{{ url_for('main.terms') }}" target="_blank">Terms</a> and <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a>{% endcall %}
     <button type="submit" class="btn">Sign up</button>
   </form>
   <p>Already have an account? <a href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a></p>

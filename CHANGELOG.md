@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Terms of Service and Privacy Policy pages (#32), as drafts pending legal review. They're linked in a new footer beside the Rules, and signup now asks people to confirm they're 18 or older and agree to both. `CONTACT_EMAIL` sets the address shown on the pages, and `render.yaml` lists the mail settings for Gmail SMTP.
+
 ### Documentation
 - The roadmap and backlog now set out the owner's path to launch: match the concept, make it safe to open, go to production, run a closed beta, then the App Store.
 

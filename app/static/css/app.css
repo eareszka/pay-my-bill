@@ -393,6 +393,12 @@ h3.section-title { font-size: 1.0625rem; }
 .empty { color: var(--on-ground); }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }
+.legal h2 { margin: 20px 0 6px; font-size: 1.125rem; }
+.legal h2:first-of-type { margin-top: 8px; }
+.legal p { margin: 0 0 10px; }
+.legal-note { color: var(--muted); font-size: 0.875rem; }
+.site-footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; max-width: var(--shell); margin: 0 auto; padding: 24px 16px 32px; font-size: 0.875rem; }
+.site-footer a { color: var(--link-on-ground); }
 
 @media (max-width: 400px) {
   .topbar { padding-inline: 12px; gap: 8px; }
