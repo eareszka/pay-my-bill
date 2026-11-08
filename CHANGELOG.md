@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- One-tap confirm. The "sent you a gift" email now links to a page that asks "Did $20 arrive?" with Yes and No buttons, and it works without logging in. The link is signed, tied to that recipient, and expires with the gift after 14 days. Opening it only shows the question, so email scanners can't answer it. Confirming from email does everything confirming on the Gifts page does.
+
 ### Fixed
 - Venmo pay buttons now open `account.venmo.com/pay`, Venmo's current web pay page. The old `venmo.com/?txn=pay` link was blocked with a 406.
 

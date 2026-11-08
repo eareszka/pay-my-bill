@@ -87,6 +87,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAX_GOAL=format_cents(models.MAX_GOAL_CENTS),
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,
         PostStatus=models.PostStatus,
+        DonationStatus=models.DonationStatus,
         ReactionKind=models.ReactionKind,
         LEGAL_UPDATED="November 8, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],

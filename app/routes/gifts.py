@@ -38,6 +38,7 @@ from app.models import (
 )
 from app.money import format_cents
 from app.routes.posts import MAX_DB_INT, render_post, send_update_notice
+from app.tokens import GIFT_ANSWER, make_token, read_token
 
 bp = Blueprint("gifts", __name__)
 
@@ -47,8 +48,9 @@ def send_gift_notice(donation: Donation) -> None:
     body = (
         f"Hi {post.user.username},\n\n{donation.donor.username} says they sent you "
         f"{format_cents(donation.amount_cents)} via {donation.method.label} "
-        f'for "{post.title}".\n\nCheck the app, then confirm or dispute the gift here:\n'
-        + url_for("gifts.index", _external=True)
+        f'for "{post.title}".\n\nCheck {donation.method.label}, then answer in one tap:\n'
+        f"{answer_link(donation)}\n\n"
+        f"Or see all your gifts: {url_for('gifts.index', _external=True)}"
     )
     try:
         send_email(post.user.email, f"{donation.donor.username} sent you a gift", body)
@@ -159,9 +161,7 @@ def index() -> str:
     )
 
 
-@bp.post("/gifts/<int:donation_id>/<any(confirm, dispute):action>")
-@login_required
-def resolve(donation_id: int, action: str) -> Response:
+def locked_gift(donation_id: int, owner_id: int) -> Donation:
     # Lock the gift so a double tap can't confirm and dispute it at the same time.
     donation = (
         db.session.scalar(select(Donation).where(Donation.id == donation_id).with_for_update())
@@ -170,19 +170,22 @@ def resolve(donation_id: int, action: str) -> Response:
     )
     if (
         donation is None
-        or donation.post.user_id != current_user.id
+        or donation.post.user_id != owner_id
         or donation.post.status == PostStatus.REMOVED
     ):
         db.session.rollback()
         abort(404)
+    return donation
+
+
+def settle(donation: Donation, action: str) -> tuple[str, str]:
+    """Confirm or dispute a locked gift; returns the message and its flash category."""
     if donation.status != DonationStatus.PENDING:
         db.session.rollback()
-        flash("That gift was already handled.", "info")
-        return redirect(url_for("gifts.index"))
+        return "That gift was already handled.", "info"
     if action == "confirm" and donation.is_expired:
         db.session.rollback()
-        flash(f"That gift expired after {PENDING_GIFT_DAYS} days, so it can't count.", "info")
-        return redirect(url_for("gifts.index"))
+        return f"That gift expired after {PENDING_GIFT_DAYS} days, so it can't count.", "info"
     confirmed = action == "confirm"
     already_heard = donation.donor in donation.post.confirmed_donors
     donation.status = DonationStatus.CONFIRMED if confirmed else DonationStatus.DISPUTED
@@ -190,8 +193,7 @@ def resolve(donation_id: int, action: str) -> Response:
     db.session.commit()
     amount, donor = format_cents(donation.amount_cents), donation.donor.username
     if not confirmed:
-        flash(f"Marked {amount} from {donor} as not received.", "info")
-        return redirect(url_for("gifts.index"))
+        return f"Marked {amount} from {donor} as not received.", "info"
     # Lock the post as create() does, and re-read it after the commit so gifts
     # confirmed in parallel count and a post closed meanwhile stays closed.
     post = db.session.scalars(
@@ -211,16 +213,50 @@ def resolve(donation_id: int, action: str) -> Response:
         # The update went out before this gift counted, so this donor hasn't heard.
         send_update_notice(post, donation.donor)
     if funded:
-        flash(f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success")
-    elif post.owes_update:
-        flash(
+        return f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success"
+    if post.owes_update:
+        return (
             f"Confirmed {amount} from {donor}. You have {UPDATE_DUE_DAYS} days "
             "to post a results update.",
             "success",
         )
-    else:
-        flash(f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success")
+    return f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success"
+
+
+@bp.post("/gifts/<int:donation_id>/<any(confirm, dispute):action>")
+@login_required
+def resolve(donation_id: int, action: str) -> Response:
+    flash(*settle(locked_gift(donation_id, current_user.id), action))
     return redirect(url_for("gifts.index"))
+
+
+def answer_link(donation: Donation) -> str:
+    token = make_token(donation.id, str(donation.post.user_id), GIFT_ANSWER)
+    return url_for("gifts.answer", token=token, _external=True)
+
+
+def answer_target(token: str) -> tuple[int, int]:
+    payload = read_token(token, GIFT_ANSWER, PENDING_GIFT_DAYS * 24 * 3600)
+    if payload is None or not payload[1].isdigit():
+        abort(404)
+    return payload[0], int(payload[1])
+
+
+@bp.get("/gifts/answer/<token>")
+def answer(token: str) -> str:
+    # The link came to the poster's inbox, so it works without logging in. Showing the
+    # question first keeps email scanners that open links from answering it.
+    donation_id, owner_id = answer_target(token)
+    donation = locked_gift(donation_id, owner_id)
+    db.session.rollback()
+    return render_template("gifts/answer.html", donation=donation, token=token)
+
+
+@bp.post("/gifts/answer/<token>/<any(confirm, dispute):action>")
+def answer_post(token: str, action: str) -> str:
+    donation_id, owner_id = answer_target(token)
+    message, category = settle(locked_gift(donation_id, owner_id), action)
+    return render_template("gifts/answered.html", message=message, category=category)
 
 
 REMIND_AFTER_DAYS = 3
