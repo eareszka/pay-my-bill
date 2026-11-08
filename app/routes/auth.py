@@ -163,6 +163,9 @@ def login() -> str | Response | tuple[str, int, dict[str, str]]:
             return render_template("auth/login.html", form=form), 429, {"Retry-After": retry_after}
         password = form.password.data or ""
         ok = check_password_hash(user.password_hash if user else _dummy_hash(), password)
+        if user is not None and ok and user.is_banned:
+            form.password.errors.append("This account has been suspended.")
+            return render_template("auth/login.html", form=form)
         if user is not None and ok:
             mark_login_succeeded(attempt)
             login_user(user)

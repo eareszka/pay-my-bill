@@ -23,7 +23,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app.models import MAX_GOAL_CENTS, Post, PostKind
+from app.models import MAX_GOAL_CENTS, Post, PostKind, ReportReason
 from app.moderation import is_flagged
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
@@ -291,6 +291,19 @@ class DeleteAccountForm(FlaskForm):
             DataRequired(message="Enter your password."),
             Length(max=128, message="Passwords are up to 128 characters."),
         ],
+    )
+
+
+class ReportForm(FlaskForm):
+    reason = RadioField(
+        "What's wrong?",
+        choices=[SelectChoice(r.value, r.label) for r in ReportReason],
+        validators=[DataRequired(message="Choose a reason.")],
+    )
+    details = TextAreaField(
+        "Anything else we should know? (optional)",
+        filters=[_strip_to_none],
+        validators=[Length(max=500, message="Keep it under 500 characters.")],
     )
 
 

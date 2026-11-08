@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Reports and an admin queue (PB-33, #68). Verified users can report a post or a person, with a reason and an optional note. Each person can have one open report per target, and admins get an email for every report and every flagged post. `/admin` shows flagged posts and open reports in one queue. Admins can approve a flagged post, whose 30 days then start at approval, remove a post, ban a user, or dismiss a report. A banned user's open posts are removed, their sessions end, and they can't log in. `flask --app app admin grant <email>` makes an admin (migration 0010).
 - Password reset (#82). Log in links to "Forgot your password?", which always gives the same reply, so it can't reveal who has an account. The emailed link expires in an hour and stops working once the password changes. Requests share the login rate limit. A reset clears a lockout, verifies the email, and emails a notice that the password changed.
 - Terms of Service and Privacy Policy pages (#32), as drafts pending legal review. They're linked in a new footer beside the Rules, and signup now asks people to confirm they're 18 or older and agree to both. `CONTACT_EMAIL` sets the address shown on the pages, and `render.yaml` lists the mail settings for Gmail SMTP.
 

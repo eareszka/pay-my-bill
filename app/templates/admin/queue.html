@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Admin queue · Pay My Bill{% endblock %}
+{% macro action(endpoint, label, cls="btn btn-secondary") %}
+  <form method="post" action="{{ url_for(endpoint, **kwargs) }}">
+    {{ form.hidden_tag() }}
+    <button type="submit" class="{{ cls }}">{{ label }}</button>
+  </form>
+{% endmacro %}
+{% block content %}
+  <h1>Admin queue</h1>
+
+  <h2>Waiting for review ({{ flagged | length }})</h2>
+  {% for post in flagged %}
+    <article class="page-form admin-item">
+      <h3><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h3>
+      <p class="hint">by {{ post.user.username }} · {{ post.goal_cents | cents }} · {{ post.created_at | date }}</p>
+      <p>{{ post.body }}</p>
+      <div class="actions">
+        {{ action("admin.approve", "Approve", "btn", post_id=post.id) }}
+        {{ action("admin.remove", "Remove", "btn btn-danger", post_id=post.id) }}
+      </div>
+    </article>
+  {% else %}
+    <p class="empty">Nothing waiting.</p>
+  {% endfor %}
+
+  <h2>Open reports ({{ reports | length }})</h2>
+  {% for report in reports %}
+    <article class="page-form admin-item">
+      {% if report.post %}
+        <h3>Post: <a href="{{ url_for('posts.show', post_id=report.post.id) }}">{{ report.post.title }}</a> ({{ report.post.status.value }})</h3>
+      {% else %}
+        <h3>User: <a href="{{ url_for('profile.show', username=report.user.username) }}">{{ report.user.username }}</a>{% if report.user.is_banned %} (banned){% endif %}</h3>
+      {% endif %}
+      <p><strong>{{ report.reason.label }}</strong> · from {{ report.reporter.username }} · {{ report.created_at | date }}</p>
+      {% if report.details %}<p>{{ report.details }}</p>{% endif %}
+      <div class="actions">
+        {% if report.post and report.post.status != PostStatus.REMOVED %}{{ action("admin.remove", "Remove post", "btn btn-danger", post_id=report.post.id) }}{% endif %}
+        {% set offender = report.post.user if report.post else report.user %}
+        {% if not offender.is_banned and not offender.is_admin %}{{ action("admin.ban", "Ban " ~ offender.username, "btn btn-danger", user_id=offender.id) }}{% endif %}
+        {{ action("admin.dismiss", "Dismiss", report_id=report.id) }}
+      </div>
+    </article>
+  {% else %}
+    <p class="empty">No open reports.</p>
+  {% endfor %}
+{% endblock %}

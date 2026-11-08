@@ -19,6 +19,7 @@
         <a href="{{ url_for('posts.new') }}">Post</a>
         <a href="{{ url_for('gifts.index') }}">Gifts{% if pending_gift_count %} <span class="badge" aria-hidden="true">{{ pending_gift_count }}</span><span class="sr-only">, {{ pending_gift_count }} to confirm</span>{% endif %}</a>
         <a href="{{ url_for('leaders.index') }}">Leaders</a>
+        {% if current_user.is_admin %}<a href="{{ url_for('admin.queue') }}">Admin</a>{% endif %}
         <a class="nav-user" href="{{ url_for('profile.edit') }}">{{ current_user.username }}</a>
       {% else %}
         <a href="{{ url_for('leaders.index') }}">Leaders</a>
