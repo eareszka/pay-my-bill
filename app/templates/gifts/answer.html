@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Did it arrive? · Pay My Bill{% endblock %}
+{% block content %}
+  {% set amount = donation.amount_cents | cents %}
+  <h1>Did {{ amount }} arrive?</h1>
+  <div class="gift">
+    <p class="gift-amount">{{ amount }}</p>
+    <p class="gift-meta">via {{ donation.method.label }} from {{ donation.donor.username }}</p>
+    <p class="hint">for {{ donation.post.title }}</p>
+    {% if donation.status != DonationStatus.PENDING %}
+      <p>This gift was already handled.</p>
+    {% else %}
+      <p class="hint">Check {{ donation.method.label }} first. Only say yes to money that actually arrived.</p>
+      <div class="gift-actions">
+        <form method="post" action="{{ url_for('gifts.answer_post', token=token, action='confirm') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn">Yes, it arrived</button>
+        </form>
+        <form method="post" action="{{ url_for('gifts.answer_post', token=token, action='dispute') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-secondary">No, it didn't</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
