@@ -245,7 +245,9 @@ def test_proxy_headers_make_https_links(
 def test_signup_requires_18_plus(client: FlaskClient) -> None:
     resp = client.post("/signup", data={k: v for k, v in FORM.items() if k != "adult"})
     assert resp.status_code == 200
-    assert "You need to be 18 or older to join." in resp.get_data(as_text=True)
+    assert "You need to be 18 or older and agree to the Terms and Privacy Policy." in resp.get_data(
+        as_text=True
+    )
     assert user_count() == 0
 
 

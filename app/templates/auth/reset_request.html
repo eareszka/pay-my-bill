@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_field.html" import field %}
+{% block title %}Reset password · Pay My Bill{% endblock %}
+{% block content %}
+  <h1>Reset your password</h1>
+  <form method="post" class="form page-form" novalidate>
+    {{ form.hidden_tag() }}
+    <p>Enter your account's email, and we'll send a link to set a new password.</p>
+    {{ field(form.email, autocomplete="email") }}
+    <button type="submit" class="btn">Send reset link</button>
+  </form>
+  <p><a href="{{ url_for('auth.login') }}">Back to log in</a></p>
+{% endblock %}
