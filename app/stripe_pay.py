@@ -125,8 +125,21 @@ def checkout_url(
     return session.url or ""
 
 
+def webhook_secrets() -> list[str]:
+    # Stripe signs connected-account events (account.updated) on a separate Connect
+    # endpoint with its own secret, so both point here.
+    keys = ("STRIPE_WEBHOOK_SECRET", "STRIPE_CONNECT_WEBHOOK_SECRET")
+    return [current_app.config[key] for key in keys if current_app.config[key]]
+
+
 def parse_event(payload: bytes, signature: str) -> stripe.Event:
-    event: stripe.Event = stripe.Webhook.construct_event(
-        payload, signature, current_app.config["STRIPE_WEBHOOK_SECRET"]
-    )
-    return event
+    error: stripe.SignatureVerificationError | None = None
+    for secret in webhook_secrets():
+        try:
+            event: stripe.Event = stripe.Webhook.construct_event(payload, signature, secret)
+        except stripe.SignatureVerificationError as exc:
+            error = exc
+        else:
+            return event
+    assert error is not None  # noqa: S101 - callers check webhook_secrets() first
+    raise error

@@ -39,6 +39,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         CONTACT_EMAIL=os.environ.get("CONTACT_EMAIL", "support@example.com"),
         STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
         STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
+        STRIPE_CONNECT_WEBHOOK_SECRET=os.environ.get("STRIPE_CONNECT_WEBHOOK_SECRET", ""),
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )

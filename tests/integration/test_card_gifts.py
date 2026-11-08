@@ -3,6 +3,7 @@ import hmac
 import json
 import smtplib
 import time
+from datetime import timedelta
 from types import SimpleNamespace
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -250,7 +251,7 @@ def test_unpaid_or_orphan_sessions_are_ignored(
     event["data"]["object"]["metadata"]["post_id"] = "99999"
     signed(client, event)
     assert gifts() == []
-    assert "no matching post or donor" in caplog.text
+    assert "unusable metadata" in caplog.text
 
 
 def test_duplicate_delivery_race_is_harmless(client: FlaskClient, post: Post, donor: User) -> None:
@@ -297,7 +298,7 @@ def test_refund_or_dispute_uncounts_the_gift(
 ) -> None:
     make_user("boss", is_admin=True)
     signed(client, paid_event(post, donor))
-    charge = {"id": "ch_1", "object": "charge", "payment_intent": "pi_1"}
+    charge = {"id": "ch_1", "object": "charge", "payment_intent": "pi_1", "refunded": True}
     event = {"id": "evt_2", "object": "event", "type": event_type, "data": {"object": charge}}
     assert signed(client, event).status_code == 200
     [gift] = gifts()
@@ -305,9 +306,10 @@ def test_refund_or_dispute_uncounts_the_gift(
     assert post.raised_cents == 0
     assert f"A card gift was {why}" in caplog.text
     assert signed(client, event).status_code == 200
-    other = {"id": "ch_2", "object": "charge", "payment_intent": "pi_other"}
+    other = {"id": "ch_2", "object": "charge", "payment_intent": "pi_other", "refunded": True}
     signed(client, {**event, "data": {"object": other}})
-    signed(client, {**event, "data": {"object": {"id": "ch_3", "object": "charge"}}})
+    bare = {"id": "ch_3", "object": "charge", "refunded": True}
+    signed(client, {**event, "data": {"object": bare}})
 
 
 def test_account_updated_webhook_tracks_readiness(
@@ -348,3 +350,126 @@ def test_terms_cover_card_gifts(client: FlaskClient) -> None:
     terms = client.get("/terms").get_data(as_text=True)
     assert "Stripe Connected Account Agreement" in terms
     assert "Stripe processes card gifts" in client.get("/privacy").get_data(as_text=True)
+
+
+def charge_event(event_type: str, **charge: Any) -> dict[str, Any]:
+    obj = {"id": "ch_1", "object": "charge", "payment_intent": "pi_1", **charge}
+    return {"id": "evt_9", "object": "event", "type": event_type, "data": {"object": obj}}
+
+
+def test_refund_reopens_a_post_it_had_funded(client: FlaskClient, post: Post, donor: User) -> None:
+    signed(client, paid_event(post, donor, gift=5_000))
+    db.session.refresh(post)
+    assert post.status == PostStatus.FUNDED
+    signed(client, charge_event("charge.refunded", refunded=True))
+    db.session.refresh(post)
+    assert post.status == PostStatus.OPEN
+    assert post.closed_at is None
+    assert post.is_open
+
+
+def test_refund_after_30_days_leaves_the_post_closed(
+    client: FlaskClient, post: Post, donor: User
+) -> None:
+    signed(client, paid_event(post, donor, gift=5_000))
+    post.created_at = post.created_at - timedelta(days=31)
+    db.session.commit()
+    signed(client, charge_event("charge.refunded", refunded=True))
+    db.session.refresh(post)
+    assert post.status == PostStatus.CLOSED
+
+
+def test_partial_refund_keeps_the_gift_and_tells_admins(
+    client: FlaskClient,
+    post: Post,
+    donor: User,
+    make_user: MakeUser,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    make_user("boss", is_admin=True)
+    signed(client, paid_event(post, donor))
+    signed(client, charge_event("charge.refunded", refunded=False, amount_refunded=100))
+    [gift] = gifts()
+    assert gift.status == DonationStatus.CONFIRMED
+    assert "A card gift was partly refunded" in caplog.text
+    assert "$1 of dev_tom" in caplog.text
+    signed(client, charge_event("charge.refunded", refunded=False, payment_intent="pi_none"))
+
+
+def test_won_dispute_counts_the_gift_again(
+    client: FlaskClient,
+    post: Post,
+    donor: User,
+    make_user: MakeUser,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    make_user("boss", is_admin=True)
+    signed(client, paid_event(post, donor))
+    signed(client, charge_event("charge.dispute.created"))
+    lost = charge_event("charge.dispute.closed", status="lost")
+    signed(client, lost)
+    assert gifts()[0].status == DonationStatus.DISPUTED
+    signed(client, charge_event("charge.dispute.closed", status="won"))
+    [gift] = gifts()
+    assert gift.status == DonationStatus.CONFIRMED
+    assert post.raised_cents == 2_000
+    assert "A card dispute was won" in caplog.text
+    signed(client, charge_event("charge.dispute.closed", status="won"))
+    assert "A card dispute was won" in caplog.text
+
+
+def test_connect_endpoint_secret_is_accepted(
+    app: Flask, client: FlaskClient, recipient: User
+) -> None:
+    app.config.update(STRIPE_WEBHOOK_SECRET="", STRIPE_CONNECT_WEBHOOK_SECRET="whsec_connect")  # noqa: S106
+    account = {
+        "id": "acct_maria",
+        "object": "account",
+        "details_submitted": True,
+        "payouts_enabled": True,
+        "capabilities": {"transfers": "inactive"},
+    }
+    event = {
+        "id": "evt_5",
+        "object": "event",
+        "type": "account.updated",
+        "data": {"object": account},
+    }
+    assert signed(client, event, secret="whsec_connect").status_code == 200  # noqa: S106
+    db.session.refresh(recipient)
+    assert recipient.stripe_ready is False
+
+
+def test_missing_gift_amount_is_acknowledged(
+    client: FlaskClient, post: Post, donor: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    event = paid_event(post, donor)
+    del event["data"]["object"]["metadata"]["gift_cents"]
+    assert signed(client, event).status_code == 200
+    assert gifts() == []
+    assert "unusable metadata" in caplog.text
+
+
+def test_failed_post_update_saves_nothing_so_retry_works(
+    client: FlaskClient, post: Post, donor: User
+) -> None:
+    client.application.config["PROPAGATE_EXCEPTIONS"] = False
+    with patch("app.routes.card_gifts.count_confirmed", side_effect=RuntimeError("lock timeout")):
+        assert signed(client, paid_event(post, donor)).status_code == 500
+    db.session.rollback()
+    assert gifts() == []
+    assert signed(client, paid_event(post, donor)).status_code == 200
+    assert len(gifts()) == 1
+
+
+def test_card_option_shows_beside_a_waiting_app_gift(
+    client: FlaskClient, post: Post, donor: User, recipient: User
+) -> None:
+    recipient.cashapp_handle = "$mariag"
+    db.session.add(Donation(post=post, donor=donor, amount_cents=500, method=PaymentMethod.CASHAPP))
+    db.session.commit()
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "waiting for maria_g to confirm" in page
+    assert "You can still chip in instantly by card" in page
+    assert "Chip in instantly" in page
