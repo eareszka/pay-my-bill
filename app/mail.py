@@ -1,10 +1,38 @@
+import json
 import smtplib
 import ssl
+import urllib.request
 from email.message import EmailMessage
+from email.utils import parseaddr
 
 from flask import current_app
 
 SMTPS_PORT = 465
+BREVO_URL = "https://api.brevo.com/v3/smtp/email"
+
+
+def _send_brevo(api_key: str, sender: str, to: str, subject: str, body: str) -> None:
+    # Render's free tier blocks SMTP ports, so this sends over HTTPS instead.
+    name, address = parseaddr(sender)
+    payload = {
+        "sender": {"name": name or address, "email": address},
+        "to": [{"email": to}],
+        "subject": subject,
+        "textContent": body,
+    }
+    request = urllib.request.Request(  # noqa: S310 - fixed https URL
+        BREVO_URL,
+        data=json.dumps(payload).encode(),
+        headers={
+            "api-key": api_key,
+            "content-type": "application/json",
+            "accept": "application/json",
+        },
+        method="POST",
+    )
+    # urllib raises URLError/HTTPError (both OSError) on failure, which callers already handle.
+    with urllib.request.urlopen(request, timeout=10):  # noqa: S310
+        pass
 
 
 def send_email(to: str, subject: str, body: str) -> None:
@@ -14,6 +42,9 @@ def send_email(to: str, subject: str, body: str) -> None:
     msg["To"] = to
     msg["Subject"] = subject
     msg.set_content(body)
+    if cfg["BREVO_API_KEY"]:
+        _send_brevo(cfg["BREVO_API_KEY"], cfg["MAIL_FROM"], to, subject, body)
+        return
     if not cfg["MAIL_SERVER"]:
         current_app.logger.info(
             "Email (console backend)\nTo: %s\nSubject: %s\n\n%s", to, subject, body

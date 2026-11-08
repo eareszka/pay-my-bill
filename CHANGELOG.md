@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Email through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks outbound SMTP. SMTP and the console backend still work as before.
 - Password reset (#82). Log in links to "Forgot your password?", which always gives the same reply, so it can't reveal who has an account. The emailed link expires in an hour and stops working once the password changes. Requests share the login rate limit. A reset clears a lockout, verifies the email, and emails a notice that the password changed.
 - Terms of Service and Privacy Policy pages (#32), as drafts pending legal review. They're linked in a new footer beside the Rules, and signup now asks people to confirm they're 18 or older and agree to both. `CONTACT_EMAIL` sets the address shown on the pages, and `render.yaml` lists the mail settings for Gmail SMTP.
 
