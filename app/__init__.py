@@ -83,6 +83,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(admin_bp)
     app.register_blueprint(stripe_bp)
 
+    from app import stripe_pay
     from app.money import format_cents
 
     app.add_template_filter(format_cents, "cents")
@@ -95,6 +96,6 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         ReactionKind=models.ReactionKind,
         LEGAL_UPDATED="November 8, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
-        stripe_enabled=lambda: bool(app.config["STRIPE_SECRET_KEY"]),
+        stripe_enabled=stripe_pay.enabled,
     )
     return app

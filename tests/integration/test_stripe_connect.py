@@ -29,9 +29,18 @@ def fake_client(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
     return fake
 
 
-def account(details: bool = True, payouts: bool = True, transfers: str | None = "active") -> object:
-    caps = SimpleNamespace(transfers=transfers) if transfers is not None else None
-    return SimpleNamespace(details_submitted=details, payouts_enabled=payouts, capabilities=caps)
+def account(
+    details: bool = True, payouts: bool = True, transfers: str | None = "active", caps: bool = True
+) -> stripe.Account:
+    # A real StripeObject, so a missing key behaves as it does in production.
+    data: dict[str, object] = {
+        "id": "acct_123",
+        "details_submitted": details,
+        "payouts_enabled": payouts,
+    }
+    if caps:
+        data["capabilities"] = {"transfers": transfers} if transfers else {}
+    return stripe.Account.construct_from(data, "sk_test_fake")
 
 
 def test_profile_hides_stripe_when_not_configured(client: FlaskClient, make_user: MakeUser) -> None:
@@ -77,6 +86,7 @@ def test_connect_needs_verified_email(client: FlaskClient, make_user: MakeUser) 
         (account(details=False), False, b"still needs a few details"),
         (account(transfers="pending"), False, b"still needs a few details"),
         (account(transfers=None), False, b"still needs a few details"),
+        (account(caps=False), False, b"still needs a few details"),
     ],
 )
 def test_return_from_stripe_records_readiness(

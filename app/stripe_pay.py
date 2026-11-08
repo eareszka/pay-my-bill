@@ -16,8 +16,9 @@ def client() -> stripe.StripeClient:
 
 def account_ready(account: stripe.Account) -> bool:
     # Destination charges need the connected account able to take transfers and pay out.
-    capabilities = account.capabilities
-    transfers = capabilities.transfers if capabilities else None
+    # A new account may lack these keys, and StripeObject raises on a missing attribute.
+    capabilities = getattr(account, "capabilities", None)
+    transfers = getattr(capabilities, "transfers", None)
     return bool(account.details_submitted and account.payouts_enabled and transfers == "active")
 
 
