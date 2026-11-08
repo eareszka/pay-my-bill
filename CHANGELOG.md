@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Instant card gifts (PB-43, ADR 0014). When the recipient has connected Stripe, the Chip in panel leads with Chip in instantly: card, Apple Pay, or Google Pay through Stripe Checkout, from $5 up to the goal. The donor covers the card fee, so the recipient gets the whole gift as a destination charge. A signed webhook records the gift as confirmed at once, with no recipient step (amending ADR 0004), and emails both sides. Retried deliveries are ignored. Refunds and card disputes un-count the gift and email admins. `account.updated` keeps each recipient's readiness current. App links stay as the fallback. The Terms add the Stripe Connected Account Agreement, and the Privacy Policy names Stripe (migration 0012).
 - Recipients can connect Stripe (PB-42, ADR 0014). With `STRIPE_SECRET_KEY` set, the profile has a Card and Apple Pay gifts section that starts Stripe-hosted Express onboarding. Coming back records whether the account can take transfers and pay out, and connected recipients get a link to their Stripe payouts page. A recipient with only Stripe connected can now post (migration 0011).
 
 ### Added
