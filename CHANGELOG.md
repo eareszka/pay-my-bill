@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Recipients can connect Stripe (PB-42, ADR 0014). With `STRIPE_SECRET_KEY` set, the profile has a Card and Apple Pay gifts section that starts Stripe-hosted Express onboarding. Coming back records whether the account can take transfers and pay out, and connected recipients get a link to their Stripe payouts page. A recipient with only Stripe connected can now post (migration 0011).
+
+### Added
 - One-tap confirm. The "sent you a gift" email now links to a page that asks "Did $20 arrive?" with Yes and No buttons, and it works without logging in. The link is signed, tied to that recipient, and expires with the gift after 14 days. Opening it only shows the question, so email scanners can't answer it. Confirming from email does everything confirming on the Gifts page does.
 
 ### Fixed

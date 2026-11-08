@@ -96,8 +96,11 @@ def new() -> str | Response | tuple[str, int]:
     if overdue:
         flash("You have an overdue results update. Post it before creating a new post.", "info")
         return redirect(url_for("posts.show", post_id=overdue.id, _anchor="update"))
-    if not user.has_payment_handle:
-        flash("Add a Cash App, Venmo, or PayPal handle so people can pay you.", "info")
+    if not user.can_be_paid:
+        flash(
+            "Connect Stripe or add a Cash App, Venmo, or PayPal handle so people can pay you.",
+            "info",
+        )
         return redirect(url_for("profile.edit"))
     form = PostForm(require_rules=user.rules_accepted_at is None)
     if form.is_submitted():

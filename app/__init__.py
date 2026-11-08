@@ -37,6 +37,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         # Base URL for links in emails sent outside a request (the reminder command).
         APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),
         CONTACT_EMAIL=os.environ.get("CONTACT_EMAIL", "support@example.com"),
+        STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
+        STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )
@@ -68,6 +70,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     from app.routes.posts import bp as posts_bp
     from app.routes.profile import bp as profile_bp
     from app.routes.reports import bp as reports_bp
+    from app.routes.stripe_connect import bp as stripe_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(main_bp)
@@ -78,7 +81,9 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(leaders_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(stripe_bp)
 
+    from app import stripe_pay
     from app.money import format_cents
 
     app.add_template_filter(format_cents, "cents")
@@ -91,5 +96,6 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         ReactionKind=models.ReactionKind,
         LEGAL_UPDATED="November 8, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
+        stripe_enabled=stripe_pay.enabled,
     )
     return app

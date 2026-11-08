@@ -155,6 +155,8 @@ class User(Base):
     adult_attested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_admin: Mapped[bool] = mapped_column(default=False)
     banned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    stripe_account_id: Mapped[str | None] = mapped_column(String(64), unique=True)
+    stripe_ready: Mapped[bool] = mapped_column(default=False, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")
@@ -185,6 +187,10 @@ class User(Base):
     @property
     def has_payment_handle(self) -> bool:
         return any((self.cashapp_handle, self.venmo_handle, self.paypal_handle))
+
+    @property
+    def can_be_paid(self) -> bool:
+        return self.has_payment_handle or self.stripe_ready
 
 
 class Post(Base):
