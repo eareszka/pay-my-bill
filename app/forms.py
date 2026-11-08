@@ -96,6 +96,35 @@ class LoginForm(FlaskForm):
     )
 
 
+class ResetRequestForm(FlaskForm):
+    email = EmailField(
+        "Email",
+        filters=[_lower],
+        validators=[
+            DataRequired(message="Enter your email."),
+            Email(check_deliverability=False, message="Enter a valid email address."),
+            Length(max=240, message="Emails here are up to 240 characters."),
+        ],
+    )
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(
+        "New password",
+        validators=[
+            DataRequired(message="Choose a password."),
+            Length(min=8, max=128, message="Passwords are 8 to 128 characters."),
+        ],
+    )
+    confirm = PasswordField(
+        "Confirm new password",
+        validators=[
+            DataRequired(message="Type your password again."),
+            EqualTo("password", message="Passwords must match."),
+        ],
+    )
+
+
 def _handle_field(label: str, normalize: Callable[[str | None], str | None], hint: str) -> Any:
     def check(form: FlaskForm, field: Field) -> None:
         try:

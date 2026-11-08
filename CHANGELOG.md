@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Password reset (#82). Log in links to "Forgot your password?", which always gives the same reply, so it can't reveal who has an account. The emailed link expires in an hour and stops working once the password changes. Requests share the login rate limit. A reset clears a lockout, verifies the email, and emails a notice that the password changed.
+
 ### Changed
 - Bulletin board redesign (#85). The owner replaced the rack: every page now uses a cork ground, a wood top bar, and plain square tickets, with leaf green for primary actions, links, and progress marks. The feed shows one large ticket at a time with a tear-off Chip in tab and Next ticket, replacing the scrolling list. On screens 960px and wider, the ticket sits beside a Chip in panel so people can give without leaving, and the post page uses the same split. The first ticket rewards follow-through (ADR 0013): overdue posters are out, a good record comes first, then first-time posters, then closest to goal. Positive feedback is capped per update, so a pile of kudos can't cancel real 🤨. Reviews also raised contrast on error text and the dark green hover, made the ticket stack visible in dark mode, and held post stories to a readable line length. `DESIGN.md` now describes this look.
 
