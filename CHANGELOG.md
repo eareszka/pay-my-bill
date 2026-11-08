@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Venmo pay buttons now open `account.venmo.com/pay`, Venmo's current web pay page. The old `venmo.com/?txn=pay` link was blocked with a 406.
+
 ### Added
 - Email through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks outbound SMTP. SMTP and the console backend still work as before.
 - Reports and an admin queue (PB-33, #68). Verified users can report a post or a person, with a reason and an optional note. Each person can have one open report per target, and admins get an email for every report and every flagged post. `/admin` shows flagged posts and open reports in one queue. Admins can approve a flagged post, whose 30 days then start at approval, remove a post, ban a user, or dismiss a report. A banned user's open posts are removed, their sessions end, and they can't log in. `flask --app app admin grant <email>` makes an admin (migration 0010).
