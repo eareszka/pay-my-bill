@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Added
 - Password reset (#82). Log in links to "Forgot your password?", which always gives the same reply, so it can't reveal who has an account. The emailed link expires in an hour and stops working once the password changes. Requests share the login rate limit. A reset clears a lockout, verifies the email, and emails a notice that the password changed.
+- Terms of Service and Privacy Policy pages (#32), as drafts pending legal review. They're linked in a new footer beside the Rules, and signup now asks people to confirm they're 18 or older and agree to both. `CONTACT_EMAIL` sets the address shown on the pages, and `render.yaml` lists the mail settings for Gmail SMTP.
+
+### Documentation
+- The roadmap and backlog now set out the owner's path to launch: match the concept, make it safe to open, go to production, run a closed beta, then the App Store.
 
 ### Changed
 - Bulletin board redesign (#85). The owner replaced the rack: every page now uses a cork ground, a wood top bar, and plain square tickets, with leaf green for primary actions, links, and progress marks. The feed shows one large ticket at a time with a tear-off Chip in tab and Next ticket, replacing the scrolling list. On screens 960px and wider, the ticket sits beside a Chip in panel so people can give without leaving, and the post page uses the same split. The first ticket rewards follow-through (ADR 0013): overdue posters are out, a good record comes first, then first-time posters, then closest to goal. Positive feedback is capped per update, so a pile of kudos can't cancel real 🤨. Reviews also raised contrast on error text and the dark green hover, made the ticket stack visible in dark mode, and held post stories to a readable line length. `DESIGN.md` now describes this look.

@@ -35,6 +35,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
         # Base URL for links in emails sent outside a request (the reminder command).
         APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),
+        CONTACT_EMAIL=os.environ.get("CONTACT_EMAIL", "support@example.com"),
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )
@@ -82,5 +83,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,
         PostStatus=models.PostStatus,
         ReactionKind=models.ReactionKind,
+        LEGAL_UPDATED="November 8, 2026",
+        CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
     )
     return app
