@@ -20,10 +20,17 @@ from werkzeug.wrappers import Response
 
 from app.auth import LOGIN_WINDOW, begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
-from app.forms import EmptyForm, LoginForm, SignupForm
+from app.forms import EmptyForm, LoginForm, ResetPasswordForm, ResetRequestForm, SignupForm
 from app.mail import send_email
-from app.models import User, utcnow
-from app.tokens import VERIFY_EMAIL, VERIFY_MAX_AGE, make_token, read_token
+from app.models import LoginAttempt, User, utcnow
+from app.tokens import (
+    RESET_MAX_AGE,
+    RESET_PASSWORD,
+    VERIFY_EMAIL,
+    VERIFY_MAX_AGE,
+    make_token,
+    read_token,
+)
 
 bp = Blueprint("auth", __name__)
 
@@ -165,6 +172,77 @@ def login() -> str | Response | tuple[str, int, dict[str, str]]:
             return redirect(next_page)
         form.password.errors.append("Wrong username, email, or password.")
     return render_template("auth/login.html", form=form)
+
+
+RESET_SENT = "If an account uses that email, we sent it a link to reset the password."
+
+
+def _send_quietly(to: str, subject: str, body: str) -> None:
+    # The reply never changes, so a mail failure is logged, not shown.
+    try:
+        send_email(to, subject, body)
+    except (smtplib.SMTPException, OSError):
+        current_app.logger.exception("Could not send %r", subject)
+
+
+@bp.route("/reset", methods=["GET", "POST"])
+def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
+    form = ResetRequestForm()
+    if form.validate_on_submit():
+        email = form.email.data or ""
+        if begin_login_attempt(f"reset:{email}", request.remote_addr) is None:
+            form.email.errors.append("Too many requests. Try again later.")
+            retry_after = str(int(LOGIN_WINDOW.total_seconds()))
+            return (
+                render_template("auth/reset_request.html", form=form),
+                429,
+                {"Retry-After": retry_after},
+            )
+        user = db.session.scalar(select(User).where(User.email == email))
+        if user is not None and not user.is_deleted:
+            # Bound to the password hash, so the link stops working once it's used.
+            token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+            link = url_for("auth.reset_password", token=token, _external=True)
+            _send_quietly(
+                user.email,
+                "Reset your Pay My Bill password",
+                f"Hi {user.username},\n\nSet a new password here:\n{link}\n\n"
+                "This link expires in 1 hour and works once. If you didn't ask for it, "
+                "you can ignore this email.",
+            )
+        flash(RESET_SENT, "info")
+        return redirect(url_for("auth.login"))
+    return render_template("auth/reset_request.html", form=form)
+
+
+@bp.route("/reset/<token>", methods=["GET", "POST"])
+def reset_password(token: str) -> str | Response:
+    payload = read_token(token, RESET_PASSWORD, RESET_MAX_AGE)
+    user = db.session.get(User, payload[0]) if payload else None
+    if user is None or payload is None or user.is_deleted or user.password_hash != payload[1]:
+        flash("That reset link is invalid, expired, or already used.", "error")
+        return redirect(url_for("auth.reset_request"))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.password_hash = generate_password_hash(form.password.data or "")
+        # The link came through their inbox, which proves the email.
+        if not user.is_verified:
+            user.email_verified_at = utcnow()
+        # Clears a lockout from the guesses that led here.
+        db.session.add(
+            LoginAttempt(identifier=user.username, ip=request.remote_addr, succeeded=True)
+        )
+        db.session.commit()
+        _send_quietly(
+            user.email,
+            "Your Pay My Bill password changed",
+            f"Hi {user.username},\n\nYour password was just changed. If this wasn't you, "
+            f"reset it again at {url_for('auth.reset_request', _external=True)} and tell us.",
+        )
+        logout_user()
+        flash("Your password is changed. Log in with the new one.", "success")
+        return redirect(url_for("auth.login"))
+    return render_template("auth/reset_form.html", form=form)
 
 
 @bp.post("/logout")

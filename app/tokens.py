@@ -3,6 +3,8 @@ from itsdangerous import BadSignature, URLSafeTimedSerializer
 
 VERIFY_EMAIL = "verify-email"
 VERIFY_MAX_AGE = 48 * 3600
+RESET_PASSWORD = "reset-password"  # noqa: S105 - a token salt, not a secret
+RESET_MAX_AGE = 3600
 
 
 def _serializer(purpose: str) -> URLSafeTimedSerializer:
