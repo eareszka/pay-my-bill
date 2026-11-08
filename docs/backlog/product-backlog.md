@@ -1,42 +1,8 @@
 # Product Backlog
 
-Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning. UI stories still need a wireframe to meet the Definition of Ready. Stories that depend on donations (PB-1 to PB-4) can't start until Sprint 2's confirm flow is merged.
+Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning. UI stories still need a wireframe to meet the Definition of Ready. `docs/roadmap.md` gives the order.
 
 ---
-
-### PB-1 Post a results update · #26 · 5 pts · P1 · epic:posts
-As a **recipient**, I want to **tell donors how their help was used** so that **they see it mattered**. (ADR 0008)
-- [ ] Given my post closed with at least one confirmed donation, when I open it, then I see a prompt to post an update.
-- [ ] Given a note under 20 characters, when I submit, then it's rejected with a message.
-- [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename (T7).
-- [ ] Given I post the update, then it shows on the post and every donor with a confirmed donation is emailed.
-- [ ] The form says receipts are never required and warns against sharing account numbers or medical details (T14).
-- [ ] Kudos and 👍/🤨 reactions can be added to an update; 🤨 counts are visible to admins.
-
-### PB-2 Block posting while an update is overdue · #27 · 3 pts · P1 · epic:safety
-As the **community**, we want **recipients to follow through** so that **people can't collect and vanish** (T12).
-- [ ] Given a post that owes an update, when 3 and 6 days have passed since it closed, then the recipient gets a reminder email.
-- [ ] Given the 7-day deadline has passed, when the recipient tries to create a post, then they're sent to the overdue post with an explanation.
-- [ ] Given they post the overdue update, when they try again, then posting works right away.
-- [ ] Overdue status is computed from dates, not a cron-only flag, so a missed job can't block or unblock anyone wrongly.
-
-### PB-3 Follow-through stat on profiles · #28 · 2 pts · P2 · epic:rewards
-- [ ] Given a user with results updates posted or overdue, when anyone views their profile, then it shows "Updated N of M posts."
-- [ ] Given a user with none posted or overdue, then the stat isn't shown.
-
-### PB-4 Auto-expire pending donations · #29 · 2 pts · P1 · epic:donations
-- [ ] Given a donation `pending` for 3 days, then the recipient gets one reminder to confirm or dispute.
-- [ ] Given a donation `pending` for 14 days, then it becomes `expired` and earns nothing (ADR 0004, T15).
-- [ ] The donor sees the expired status on their history.
-
-### PB-5 18+ attestation at signup · #30 · 1 pt · P0 · epic:accounts
-- [ ] Given the signup form, when I don't confirm I'm 18 or older, then no account is created.
-- [ ] The attestation time is stored on the user (T13).
-
-### PB-6 Delete my post and my account · #31 · 3 pts · P1 · epic:accounts
-- [ ] Given my open post with no confirmed donations, when I delete it, then it's gone from the feed and returns 404.
-- [ ] Given a post with confirmed donations, when I delete it, then the text and photo are removed but donors keep their credit.
-- [ ] Given I delete my account after confirming my password, then my profile, handles, and posts are removed or anonymized and I'm logged out (T14).
 
 ### PB-7 Terms of Service and Privacy Policy pages · #32 · 2 pts · P0 · epic:safety
 - [ ] `/terms` and `/privacy` exist and are linked in the footer and on the signup form.
@@ -48,6 +14,7 @@ As the **community**, we want **recipients to follow through** so that **people 
 
 ### PB-9 Spike: payment-app terms · #34 · 2 pts · P1 · spike
 - [ ] A short write-up in `docs/research/` on what Cash App, Venmo, and PayPal allow for soliciting personal payments, deep-link rules, and 1099-K implications for recipients.
+- [ ] Whether cosmetic perks (PB-30) fit Apple's Guideline 3.2.1(vii), that gifts stay optional and go entirely to the recipient.
 - [ ] Any required changes become backlog items or a new ADR.
 
 ### PB-10 Spike: product name and domain · #35 · 2 pts · P2 · spike
@@ -91,22 +58,18 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 - [ ] A GitHub Actions macOS workflow builds and signs the app and uploads it to TestFlight, with the signing secrets in GitHub secrets.
 
 ### PB-18 Apple Developer enrollment · #TBD · 1 pt · P1 · chore · v1.0 · owner
-- [ ] Decide on an individual or organization (LLC) account after the Phase 3 legal review. Get a D-U-N-S number if it's an organization.
+- [ ] Decide on an individual or organization (LLC) account after the Phase 5 legal review. Get a D-U-N-S number if it's an organization.
 - [ ] Enrolled ($99/year), with the account holder recorded in the README.
 
 ### PB-19 App Store listing and review pack · #TBD · 3 pts · P1 · chore · v1.0
 - [ ] App Store Connect listing: name, description, icon, 6.7" and 6.5" screenshots, a privacy policy URL, and a support URL.
-- [ ] A privacy label covering email, city and state, payment handles, and user content. An age rating that matches the 18+ rule.
+- [ ] A privacy label covering email, payment handles, and user content. An age rating that matches the 18+ rule.
 - [ ] A demo account and review notes covering link-out gifts (Guideline 3.2.1(vii)), reporting, blocking, and account deletion.
 - [ ] User-facing copy says "gift" or "chip in", never "charitable donation".
 
 ### PB-20 Photo on a results update · #69 · 2 pts · P3 · epic:posts
 Moved out of PB-1 by the owner (2026-11-02). Text-only updates ship first.
 - [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename (T7).
-
-### PB-21 Record a gift sent just before a post closed · #67 · 2 pts · P2 · epic:donations
-From the PR #66 review. A donor can pay in their app while the post closes, and then "I sent it" is refused, so the gift can't count.
-- [ ] Decide with the owner how long after closing a gift can still be recorded, and whether a closed post should show the form.
 
 ### PB-22 The 30 days start when a flagged post is approved · #68 · 1 pt · P1 · epic:safety
 From the PR #66 review. Do this with the admin queue, which adds approval. Today the clock runs from `created_at`, so time in review uses up a post's open window.
@@ -117,9 +80,99 @@ From the PR #72 review. Deleting a post hides its update and reactions, so admin
 - [ ] Given a post with 🤨 reactions, deleted or not, when an admin opens the queue, then they see the count.
 
 ### PB-24 Keep the stack steady while browsing · #87 · 2 pts · P2 · epic:posts
-From the PR #86 review. Next ticket uses a position, so a new or closed post can repeat or skip a ticket mid-browse. A stable cursor would fix it.
+From the PR #86 review. Next ticket uses a position, so a new or closed post can repeat or skip a ticket mid-browse. A stable cursor would fix it. Done as part of PB-27.
 - [ ] Given a post is added or closes while I'm browsing, when I tap Next ticket, then I don't see a repeat or miss a post.
 
 ### PB-25 Rotate older posts forward · #88 · 2 pts · P2 · epic:posts
-From the owner's choice of One Ticket at a Time. Posts deep in the stack may rarely be seen.
+From the owner's choice of One Ticket at a Time. Posts deep in the stack may rarely be seen. Revisit in the closed beta, since posts close at 30 days and PB-27 spaces new posts in.
 - [ ] Given a post far back in the stack, it gets a fair turn near the front.
+
+### PB-26 Owner's open design decisions from the board review · #89 · 2 pts · P2 · epic:posts
+From the PR #86 finish review. Each one is the owner's call, since it changes the approved look or flow.
+- [ ] Reaction emoji: keep 👍 and 🤨, or replace them.
+- [ ] Green links and progress marks: keep them, or reserve green for main buttons.
+- [ ] Rules and profile text on cork: move it onto white tickets, or leave it.
+- [ ] "I sent it" on the feed: stay at the same ticket, or go to the post page.
+- [ ] Need or Want on phones: add a small label, since only color shows it today.
+
+---
+
+## Match the concept (owner, 2026-11-04)
+
+### PB-27 Rank the whole stack · #TBD · 5 pts · P1 · epic:posts · v0.1-alpha
+As a **donor**, I want **the stack to lead with people who follow through and posts near their goal** so that **my gift goes somewhere it counts**. Only the first ticket is ranked today. Amends ADR 0013. Includes PB-24.
+- [ ] Each ticket's score combines the poster's record (updates plus capped kudos), thanks (capped low), and closeness to goal, counting only gifts and reactions from established accounts.
+- [ ] Every 4th ticket is the newest post not yet shown.
+- [ ] Overdue posters and posters with no way to be paid come last.
+- [ ] Given a post is added or closes while I'm browsing, when I move on, then I don't see a repeat or miss a post. Moving is by post, not by position.
+- [ ] The All, Needs, and Wants filters each keep this order.
+
+### PB-28 Remove local area · #TBD · 3 pts · P1 · epic:leaderboards · v0.1-alpha
+The owner sees no reason for it now. Updates ADR 0009, `AGENTS.md`, `PRODUCT.md`, `DESIGN.md`, and the threat model.
+- [ ] City and state are gone from signup, profiles, posts, and the database (the migration runs up and down).
+- [ ] Leaders is one list, still ranked by people helped.
+- [ ] The Local hero badge is gone.
+- [ ] A search finds no leftover references, apart from history in the changelog, old sprint records, and ADRs.
+
+### PB-29 Show donor rewards at the right moment · #TBD · 3 pts · P1 · epic:rewards · v0.1-alpha
+As a **donor**, I want to **see what my gift earned when it happens** so that **giving feels rewarding**. Builds on S5-4 (#80). Only confirmed gifts count (ADR 0004).
+- [ ] After "I sent it", the donor sees what happens next.
+- [ ] Once the recipient confirms, the donor sees the XP, streak, and any new badge.
+- [ ] The donor's level shows beside their username.
+- [ ] A donor is told when someone they helped posts an update.
+- [ ] `rules.html` no longer says donors get nothing back but thanks.
+
+### PB-30 Perks that unlock · #TBD · 3 pts · P2 · epic:rewards · v0.1-alpha
+As a **donor**, I want **levels to unlock something** so that **I have a reason to keep giving**. The owner picks the perks before this starts.
+- [ ] Perks are cosmetic only, such as a profile frame or a highlighted name.
+- [ ] A perk never changes where your own posts sit in the stack.
+- [ ] Unlocks come only from confirmed gifts, and PB-9 has checked them against Apple's rules.
+
+### PB-31 One-tap thank you on a confirmed gift · #TBD · 3 pts · P1 · epic:donations · v0.1-alpha
+As a **recipient**, I want to **thank a donor directly** so that **they know it mattered**, and it helps my place in the stack.
+- [ ] On a confirmed gift, the recipient can send one thank you, with an optional short note.
+- [ ] Only that donor sees it, by email and on a Gifts banner.
+- [ ] Thanks count toward the recipient's score with a low cap, and only for established donors, so a second account can't farm it.
+
+### PB-32 Simple navigation and clear tickets · #TBD · 3 pts · P1 · epic:posts · v0.1-alpha
+As **anyone**, I want to **find my way around and see what a person is asking for at a glance**. Goes through Impeccable, shown to the owner first. Settles PB-26.
+- [ ] The top bar reads feed, Post, Gifts, Leaders, profile, and Log out moves to the profile.
+- [ ] Rules, Terms, and Privacy are in a footer.
+- [ ] A gift that didn't arrive uses one word everywhere.
+- [ ] A ticket shows its title, "$X raised of $Y", and a Need or Want label on phones. The owner chooses whether to add a small progress bar.
+
+---
+
+## Safe to open and production
+
+### PB-33 Report a post or user, with an admin queue · #TBD · 5 pts · P0 · epic:safety · v0.1-alpha
+As the **community**, we want **a way to report and act on bad posts** (App Store Guideline 1.2). Keyword-flagged posts have no way to be approved today. Do PB-22 and PB-23 with this.
+- [ ] Any verified user can report a post or user, with a reason.
+- [ ] Admins see reports and flagged posts in one queue, and can approve, remove, or ban.
+- [ ] A banned user can't log in, and their open posts leave the feed.
+
+### PB-34 Production settings and security headers · #TBD · 2 pts · P0 · chore · v0.2-beta
+- [ ] Secure session cookies, security headers, and an upload limit are on in production.
+- [ ] The app refuses to start in production without `SECRET_KEY`.
+
+### PB-35 Scheduled jobs for reminders · #TBD · 1 pt · P1 · chore · v0.2-beta
+- [ ] `flask gifts remind` and `flask posts remind` run daily without anyone starting them.
+
+### PB-36 Installable web app · #TBD · 3 pts · P1 · v0.2-beta
+- [ ] A manifest and icons let people add the site to a phone's home screen, and an offline screen shows when there's no connection. Pages with money or personal data aren't cached.
+
+### PB-37 Browser tests in the repo · #TBD · 2 pts · P2 · chore · v0.2-beta
+- [ ] `tests/e2e` covers swiping and the chip-in flow.
+- [ ] Swiping has been checked by hand in Safari on an iPhone.
+
+### PB-38 Run the closed beta · #TBD · 3 pts · P1 · chore · v0.2-beta
+Follows PB-11's recruitment plan.
+- [ ] 10 to 30 invited people use the production site, and their feedback becomes issues.
+- [ ] PB-25 and PB-40 are decided from what they show.
+
+### PB-39 Lawyer review of Terms and Privacy · #TBD · 1 pt · P0 · chore · v1.0 · owner
+- [ ] A lawyer has reviewed both pages, and the owner has decided on an LLC, which decides the Apple account type in PB-18.
+
+### PB-40 Photos on posts · #TBD · 5 pts · P3 · epic:posts
+Comes after PB-33, since photos need moderation. Compare cloud storage options and bring the cost to the owner first, with an ADR (T7).
+- [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename.
