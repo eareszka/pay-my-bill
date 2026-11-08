@@ -194,6 +194,20 @@ def settle(donation: Donation, action: str) -> tuple[str, str]:
     amount, donor = format_cents(donation.amount_cents), donation.donor.username
     if not confirmed:
         return f"Marked {amount} from {donor} as not received.", "info"
+    post, funded = count_confirmed(donation, already_heard)
+    if funded:
+        return f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success"
+    if post.owes_update:
+        return (
+            f"Confirmed {amount} from {donor}. You have {UPDATE_DUE_DAYS} days "
+            "to post a results update.",
+            "success",
+        )
+    return f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success"
+
+
+def count_confirmed(donation: Donation, already_heard: bool) -> tuple[Post, bool]:
+    """Apply a just-committed confirmation to its post; returns the post and if it's funded."""
     # Lock the post as create() does, and re-read it after the commit so gifts
     # confirmed in parallel count and a post closed meanwhile stays closed.
     post = db.session.scalars(
@@ -212,15 +226,7 @@ def settle(donation: Donation, action: str) -> tuple[str, str]:
     if post.update_body and not already_heard:
         # The update went out before this gift counted, so this donor hasn't heard.
         send_update_notice(post, donation.donor)
-    if funded:
-        return f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success"
-    if post.owes_update:
-        return (
-            f"Confirmed {amount} from {donor}. You have {UPDATE_DUE_DAYS} days "
-            "to post a results update.",
-            "success",
-        )
-    return f"Confirmed {amount} from {donor}. Thanks for keeping it honest.", "success"
+    return post, funded
 
 
 @bp.post("/gifts/<int:donation_id>/<any(confirm, dispute):action>")

@@ -9,7 +9,24 @@
     <p class="update-due" data-gift-recorded="{{ post.id }}">Your {{ waiting_gift.amount_cents | cents }} gift is waiting for {{ poster }} to confirm.</p>
     <p class="hint">{% if post.is_open %}You can chip in again once it's confirmed or marked not received. {% endif %}<a href="{{ url_for('gifts.index') }}">See your gifts</a></p>
     <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
-  {% elif pay_options %}
+  {% elif pay_options or card_ready %}
+    {% if card_ready %}
+      <form method="post" action="{{ url_for('card.checkout', post_id=post.id) }}" class="card-gift" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if not current_user.is_authenticated %}
+          <p class="notice"><a href="{{ url_for('auth.login', next=url_for('posts.show', post_id=post.id)) }}">Log in first</a> so your gift counts. Gifts are only credited to an account.</p>
+        {% endif %}
+        <div class="field">
+          <label for="card-amount">Amount</label>
+          <input id="card-amount" name="amount" inputmode="decimal" autocomplete="off" required aria-describedby="card-amount-hint"{% if card_error %} aria-invalid="true" autofocus{% endif %} value="{{ request.form.get('amount', '') if card_error else '' }}">
+          <small id="card-amount-hint"{% if card_error %} class="error"{% endif %}>{{ card_error or ("From " ~ (min_card_gift | cents) ~ " up to " ~ (post.goal_cents | cents) ~ ".") }}</small>
+        </div>
+        <button type="submit" class="btn">Chip in instantly</button>
+        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You cover the card fee (about 3%), so {{ poster }} gets the full amount, and it counts right away.</p>
+      </form>
+      {% if pay_options %}<h3 class="section-title">Or pay in an app</h3>{% endif %}
+    {% endif %}
+    {% if pay_options %}
     <form method="post" action="{{ url_for('gifts.create', post_id=post.id) }}" class="chip-in" data-post="{{ post.id }}" novalidate>
       {{ form.csrf_token }}
       {# The first submit button is the default one; disabled, so Enter in the amount box never records a gift. #}
@@ -56,6 +73,7 @@
       {% endif %}
     </form>
     <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
+    {% endif %}
   {% else %}
     <p class="hint">{% if post.is_open %}{{ poster }} hasn't added a way to get paid yet. Check back soon.{% else %}This post has closed, and {{ poster }} no longer lists a payment app.{% endif %}</p>
   {% endif %}

@@ -11,3 +11,6 @@ A donation starts as `pending`. Only after the recipient marks it `confirmed` do
 ## Consequences
 - Rewards are only as honest as recipients are. Collusion is handled separately: per donor→recipient weekly cap, account-age gate, verified email, and admin flags (see `docs/threat-model.md`).
 - Donor rewards are delayed until the recipient confirms, so the confirm prompt has to be quick and noticeable.
+
+## Amendment (2026-11-08, ADR 0014)
+Card gifts paid through Stripe Checkout are recorded as confirmed when Stripe's signed webhook reports them paid, because the processor verified the payment and the recipient doesn't need to. A refund or card dispute reported by Stripe un-counts the gift by marking it disputed.

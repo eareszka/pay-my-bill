@@ -23,6 +23,7 @@ PENDING_GIFT_DAYS = 14
 POST_OPEN_DAYS = 30
 MIN_ACCOUNT_AGE_DAYS = 3  # T2: verified accounts this old count toward rewards and rank
 LATE_GIFT_HOURS = 24
+MIN_CARD_GIFT_CENTS = 500
 UPDATE_DUE_DAYS = 7
 DELETED_EMAIL_DOMAIN = "@deleted.invalid"
 DELETED_POST_TITLE = "Deleted post"
@@ -97,6 +98,7 @@ class PaymentMethod(StrEnum):
     CASHAPP = "cashapp"
     VENMO = "venmo"
     PAYPAL = "paypal"
+    CARD = "card"
 
     @property
     def label(self) -> str:
@@ -107,6 +109,7 @@ PAYMENT_LABELS = {
     PaymentMethod.CASHAPP: "Cash App",
     PaymentMethod.VENMO: "Venmo",
     PaymentMethod.PAYPAL: "PayPal",
+    PaymentMethod.CARD: "card",
 }
 
 
@@ -365,6 +368,10 @@ class Donation(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     reminded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Card gifts through Stripe (ADR 0014): the session makes webhooks idempotent.
+    stripe_session_id: Mapped[str | None] = mapped_column(String(255), unique=True)
+    stripe_payment_intent: Mapped[str | None] = mapped_column(String(255), index=True)
+    fee_cents: Mapped[int] = mapped_column(default=0, server_default="0")
 
     post: Mapped[Post] = relationship(back_populates="donations")
     donor: Mapped[User] = relationship()

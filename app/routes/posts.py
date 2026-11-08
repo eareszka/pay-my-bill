@@ -17,7 +17,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
-from app import format_date
+from app import format_date, stripe_pay
 from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.extensions import db
@@ -26,6 +26,7 @@ from app.mail import send_email
 from app.models import (
     LATE_GIFT_HOURS,
     MAX_OPEN_POSTS,
+    MIN_CARD_GIFT_CENTS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
     Post,
@@ -194,13 +195,21 @@ def chip_in_context(post: Post, form: GiftForm | None = None) -> dict[str, objec
             post.pending_gift_from(current_user.id) if current_user.is_authenticated else None
         ),
         "late_gift_hours": LATE_GIFT_HOURS,
+        "card_ready": stripe_pay.enabled() and post.user.stripe_ready and post.is_open,
+        "min_card_gift": MIN_CARD_GIFT_CENTS,
     }
 
 
-def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
+def render_post(
+    post: Post,
+    form: GiftForm,
+    update_form: ResultsUpdateForm | None = None,
+    card_error: str | None = None,
+) -> str:
     return render_template(
         "posts/show.html",
         post=post,
+        card_error=card_error,
         reactions=reaction_view(post) if post.update_body else None,
         update_form=update_form or ResultsUpdateForm(formdata=None),
         **chip_in_context(post, form),

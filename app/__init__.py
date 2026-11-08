@@ -63,6 +63,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     from app.routes.admin import bp as admin_bp
     from app.routes.auth import bp as auth_bp
+    from app.routes.card_gifts import bp as card_bp
     from app.routes.gifts import bp as gifts_bp
     from app.routes.health import bp as health_bp
     from app.routes.leaders import bp as leaders_bp
@@ -82,6 +83,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(reports_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(stripe_bp)
+    app.register_blueprint(card_bp)
 
     from app import stripe_pay
     from app.money import format_cents
