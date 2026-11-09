@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block body_class %}page stage-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
+{% block head %}{% if post and post.photo_key %}<link rel="preload" as="image" href="{{ photo_url(post.photo_key) }}" fetchpriority="high">{% endif %}{% endblock %}
 {% block content %}
   <div class="feed">
     <h1 class="sr-only">Help someone out</h1>
@@ -38,7 +39,7 @@
       {# The tickets either side stay inert in a template until a swipe reveals one. #}
       {% for side, neighbor in [("next", next_post), ("back", back_post)] if neighbor %}
         <template id="deck-under-{{ side }}">
-          {% with post = neighbor, is_owner = current_user.is_authenticated and current_user.id == neighbor.user_id %}
+          {% with post = neighbor, under = true, is_owner = current_user.is_authenticated and current_user.id == neighbor.user_id %}
             {% include "posts/_ticket.html" %}
           {% endwith %}
         </template>

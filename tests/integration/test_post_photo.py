@@ -240,3 +240,15 @@ def test_flagged_post_shows_its_photo_to_admins(
     db.session.commit()
     login_as(client, make_user("boss", is_admin=True))
     assert f'src="/media/{post.photo_key}"' in client.get("/admin").get_data(as_text=True)
+
+
+def test_feed_loads_the_visible_photo_first(app: Flask, client: FlaskClient, poster: User) -> None:
+    shown = with_photo(app, poster, "Shown first")
+    waiting = with_photo(app, poster, "Waiting underneath")
+    page = client.get("/").get_data(as_text=True)
+    first = shown if f'src="/media/{shown.photo_key}" alt="" decoding="sync"' in page else waiting
+    other = waiting if first is shown else shown
+    assert f'<link rel="preload" as="image" href="/media/{first.photo_key}"' in page
+    assert f'src="/media/{first.photo_key}" alt="" decoding="sync" fetchpriority="high"' in page
+    template = page[page.index('<template id="deck-under-next">') :]
+    assert f'src="/media/{other.photo_key}" alt="" decoding="async">' in template
