@@ -13,7 +13,8 @@ STRIPE_DOWN = "Stripe isn't answering right now. Try again in a minute."
 
 
 def _back() -> Response:
-    return redirect(url_for("profile.edit", _anchor="card-gifts"))
+    # The top of the page, where the flash shows; the section anchor scrolled past it.
+    return redirect(url_for("profile.edit"))
 
 
 def _onboard() -> Response:
