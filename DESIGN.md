@@ -179,7 +179,7 @@ The app is a black frame around one person. The shell (top bar, bottom nav, feed
 
 Away from the stage, the working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense. They follow the system color scheme: cool paper and white panels in light, near-black panels in dark. They share the same two typefaces, the same inverse filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no gradient except the scrim that keeps white text legible at the foot of a color field.
 
-The system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar and the stage becomes a framed 470px column standing beside a 400px Chip in panel on void.
+The system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar, and the feed card takes the post page's shape: a wide landscape ask joined to a 400px Chip in panel, with big Back and Next buttons outside it. On a monitor nobody has to drag.
 
 **Key Characteristics:**
 - Void-black shell that is always dark: top bar, bottom nav, feed stage, and post page.
@@ -249,7 +249,7 @@ The layout is mobile first and single column. Ordinary pages sit in a 640px cont
 
 On phones, the top bar is 52px tall and the nav is a fixed 64px bar at the bottom (plus the safe-area inset) with five icon-over-label items, the signed-in username in place of "You". The feed stage fills the height between the two bars (minimum 520px). Inside it, the All, Needs, and Wants tabs are centered at the top, the title sits mid-screen, and the foot holds meta, a three-line story, amounts, and the meter. The rail (Back, Next, and the count) sits at the right edge, and the full-width Chip in tab is at the bottom.
 
-At 960px the nav moves into a 60px top bar as icon-beside-label items, centered within 1120px. The feed becomes a two-column grid of a 470px stage and a 400px Chip in panel with a 28px gap. The stage is up to 836px tall with 18px corners, and the on-card Chip in tab is hidden because the panel replaces it. The post page becomes a fluid story column beside a 400px side panel. Below 380px, the card's right padding tightens to 76px so the title clears the rail. The body clips horizontal overflow, so a thrown card never adds a sideways scroll.
+At 960px the nav moves into a 60px top bar as icon-beside-label items, centered within 1120px. The feed becomes one wide card, centered within about 1240px: the ask (up to 660px wide, `min(620px, 100dvh - 230px)` tall, 460px minimum) joined to a 400px Chip in panel on surface, with 18px outer corners. The tabs sit centered above it. Back and Next are 60px outlined circles in 88px gutters outside the card, and the count with an "← → to move" hint sits centered below. The title rests just above who and where, as on the post hero. The on-card Chip in tab is hidden because the panel replaces it. Dragging still works but nothing depends on it, and a click or arrow key plays the same 180ms slide. The post page becomes a fluid story column beside a 400px side panel. Below 380px, the card's right padding tightens to 76px so the title clears the rail. The body clips horizontal overflow, so a thrown card never adds a sideways scroll.
 
 ## Elevation & Depth
 
@@ -287,7 +287,7 @@ State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes 
 - **Background:** surface (white in light, #17181c in dark). Inputs and notices inside a panel drop to the page background.
 - **Shadow Strategy:** none.
 - **Internal Padding:** 18px 16px with 12px gaps.
-- On the desktop feed and post side columns, the panel loses its fill and padding and sits directly on void.
+- On the desktop post page, the side panel loses its fill and padding and sits directly on void. On the desktop feed it is the right half of the card: surface fill, 28px padding, and the card's right-hand corners.
 
 ### Inputs / Fields
 - **Style:** a 1.5px edge stroke, 8px radius, 11px 13px padding, at least 48px tall (textareas 128px), with a bold label above and a 0.875rem hint below.

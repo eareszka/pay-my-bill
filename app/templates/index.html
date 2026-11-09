@@ -5,20 +5,15 @@
   <div class="feed">
     <h1 class="sr-only">Help someone out</h1>
     <div class="deck-layout">
+      <nav class="tabs" aria-label="Filter posts">
+        {% for value, label in [(None, "All"), ("need", "Needs"), ("want", "Wants")] %}
+          <a href="{{ url_for('main.index', kind=value) }}" {% if kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
       <div class="stage">
-        <nav class="tabs" aria-label="Filter posts">
-          {% for value, label in [(None, "All"), ("need", "Needs"), ("want", "Wants")] %}
-            <a href="{{ url_for('main.index', kind=value) }}" {% if kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
-          {% endfor %}
-        </nav>
         {% if post %}
           {% set is_owner = current_user.is_authenticated and current_user.id == post.user_id %}
           <div class="deck{% if total > 1 %} deck-stacked{% endif %}">{% include "posts/_ticket.html" %}</div>
-          <nav class="rail" aria-label="Tickets">
-            {% if position > 1 %}<a class="rail-btn deck-back" href="{{ url_for('main.index', kind=kind, n=position - 1) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg><span>Back</span></a>{% endif %}
-            {% if total > 1 %}<a class="rail-btn deck-next" href="{{ url_for('main.index', kind=kind, n=position + 1 if position < total else none) }}"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg><span>Next</span></a>{% endif %}
-            <span class="deck-count">{{ position }} of {{ total }}</span>
-          </nav>
         {% else %}
           <div class="stage-empty">
             <p class="stage-empty-title">No open posts here yet.</p>
@@ -27,6 +22,11 @@
         {% endif %}
       </div>
       {% if post %}
+        <nav class="rail" aria-label="Tickets">
+          {% if position > 1 %}<a class="rail-btn deck-back" href="{{ url_for('main.index', kind=kind, n=position - 1) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg><span>Back</span></a>{% endif %}
+          {% if total > 1 %}<a class="rail-btn deck-next" href="{{ url_for('main.index', kind=kind, n=position + 1 if position < total else none) }}"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg><span>Next</span></a>{% endif %}
+          <span class="deck-count">{{ position }} of {{ total }}{% if total > 1 %}<span class="deck-hint" aria-hidden="true"> · ← → to move</span>{% endif %}</span>
+        </nav>
         {# On a wide screen, give right here. On a phone, Chip in on the card opens the post instead. #}
         <aside class="deck-side">
           {% set show_amount = true %}
