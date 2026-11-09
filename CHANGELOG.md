@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Security
+- Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
+
 ### Changed
 - Emails sent during a page or webhook (verification, reset, gift and update notices, handle changes, admin alerts) now go out on a background thread, so a slow mail service no longer holds up sign-up or Stripe's webhook. Failures are still logged. Sign-up and resend now always say the link is on its way (#105).
 
