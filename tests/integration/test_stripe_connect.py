@@ -69,6 +69,15 @@ def test_connect_creates_account_and_redirects_to_stripe(
         "losses_collector": "stripe",
     }
     assert created["options"] == {"stripe_version": "2026-10-28.preview"}
+    # The business questions are answered for the recipient (#98).
+    merchant = created["params"]["configuration"]["merchant"]
+    assert merchant["mcc"] == "7299"
+    assert merchant["statement_descriptor"] == {"descriptor": "PAY MY BILL"}
+    assert merchant["support"] == {"url": "http://localhost/u/alice"}
+    profile = created["params"]["defaults"]["profile"]
+    assert profile["business_url"] == "http://localhost/u/alice"
+    assert "Nothing is sold" in profile["product_description"]
+    assert created["params"]["identity"]["individual"] == {"email": "alice@example.com"}
     params = fake_client.v2.core.account_links.create.call_args.kwargs["params"]
     assert params["account"] == "acct_123"
     onboarding = params["use_case"]["account_onboarding"]

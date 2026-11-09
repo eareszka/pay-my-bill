@@ -21,7 +21,10 @@ def _onboard() -> Response:
     if not stripe_pay.enabled():
         abort(404)
     try:
-        account_id = stripe_pay.ensure_account(current_user)
+        account_id = stripe_pay.ensure_account(
+            current_user,
+            url_for("profile.show", username=current_user.username, _external=True),
+        )
         db.session.commit()
         url = stripe_pay.onboarding_url(
             account_id,

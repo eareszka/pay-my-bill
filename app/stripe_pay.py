@@ -29,7 +29,17 @@ def account_ready(account: stripe.Account) -> bool:
     )
 
 
-def ensure_account(user: User) -> str:
+# Recipients are people taking gifts, not businesses, so we answer Stripe's business
+# questions for them and onboarding only asks about the person and their bank (#98).
+GIFT_MCC = "7299"  # Miscellaneous personal services
+STATEMENT_DESCRIPTOR = "PAY MY BILL"
+PRODUCT_DESCRIPTION = (
+    "Personal gifts from friends and community members through Pay My Bill, where people "
+    "post everyday wants and needs and others chip in by card. Nothing is sold."
+)
+
+
+def ensure_account(user: User, profile_url: str) -> str:
     if user.stripe_account_id is None:
         # Accounts v2: Stripe collects its fees from the recipient and covers losses
         # it can't recover (Managed Risk), and the recipient gets an Express dashboard.
@@ -38,15 +48,28 @@ def ensure_account(user: User) -> str:
                 "contact_email": user.email,
                 "display_name": user.username,
                 "dashboard": "express",
-                "identity": {"country": "US", "entity_type": "individual"},
+                "identity": {
+                    "country": "US",
+                    "entity_type": "individual",
+                    "individual": {"email": user.email},
+                },
                 "defaults": {
                     "responsibilities": {
                         "fees_collector": "stripe",
                         "losses_collector": "stripe",
-                    }
+                    },
+                    "profile": {
+                        "business_url": profile_url,
+                        "product_description": PRODUCT_DESCRIPTION,
+                    },
                 },
                 "configuration": {
-                    "merchant": {"capabilities": {"card_payments": {"requested": True}}}
+                    "merchant": {
+                        "capabilities": {"card_payments": {"requested": True}},
+                        "mcc": GIFT_MCC,
+                        "statement_descriptor": {"descriptor": STATEMENT_DESCRIPTOR},
+                        "support": {"url": profile_url},
+                    }
                 },
                 "metadata": {"user_id": str(user.id)},
             },

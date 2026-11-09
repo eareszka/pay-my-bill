@@ -31,3 +31,6 @@ Stripe test mode refused the original design. New platforms must create connecte
 
 ## Amendment (2026-11-09): international cards (#104)
 The donor's fee covers US card pricing only. Stripe charges about 1.5% more on cards issued outside the US, and with direct charges that extra comes out of the recipient's gift (about 30 cents on $20). The owner chose to accept this and disclose it on the card form rather than overcharge every donor, block foreign cards, or build a custom payment form. Revisit if foreign cards become common.
+
+## Amendment (2026-11-09): onboarding answers business questions (#98)
+Recipients are people, not businesses, so account creation fills in what Stripe asks a business: MCC 7299 (miscellaneous personal services), statement descriptor `PAY MY BILL`, the recipient's public profile as website and support URL, and a fixed product description saying nothing is sold. Checked in test mode, this removes the industry, website, description, and descriptor questions. Onboarding still asks for the person's name, birth date, address, SSN last 4, phone, support phone, and bank.
