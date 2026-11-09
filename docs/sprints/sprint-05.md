@@ -14,9 +14,12 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-5 Clear disputes | #81 | 3 | To do |
 | S5-7 Bulletin board and the top spot | #85 | 5 | Done |
 | S5-6 Password reset | #82 | 3 | To do |
-| S5-8 Swipe through the pile | #90 | 3 | In progress |
+| S5-8 Swipe through the pile | #90 | 3 | Done |
+| S5-9 New look: the card stack | #118 | 8 | In progress |
+| S5-10 Categories and show less | #119 | 5 | To do |
+| S5-11 How-it-works home page | #120 | 5 | To do |
 
-**Total:** 32 points (Sprint 4: 16).
+**Total:** 50 points (Sprint 4: 16).
 
 ## Daily log
 - 2026-11-03: Planned with the owner, who approved the order and chose an email plus a Gifts banner for confirmed gifts, and dates plus an optional payment-app name for matching. Did #77: hardening. Next: #78 safer chip-in. Blocked: none.
@@ -35,3 +38,6 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-04: The owner found that swiping showed a blank page before the next post loaded. The neighboring posts now sit in the page, so a swipe reveals one straight away, and the Chip in panel can't be used until the new page loads. Waiting on the owner's review of the feel. Blocked: none.
 - 2026-11-04: The owner restated the concept and chose whole-stack ranking with new posts spaced in, rewards at the right moment plus perks that unlock, a one-tap thank you, removing local area, and web first, then the App Store. Added PB-27 to PB-40 and rewrote the roadmap; none of it joins this sprint. Blocked: none.
 - 2026-11-08: The owner chose to launch tonight. #79, #80, and #81 are paused for Sprint 5b (`sprint-05b.md`), and they resume after launch. Blocked: none.
+- 2026-11-09: #90 merged (#91) after merging main into it; CI green, 647 tests at 100%. The owner asked for a new look that doesn't read as AI-made, modeled on dating-app swiping: replace the cork board through Impeccable, add post categories with a "show less" that pushes a category down the stack (swipe down or a button), and a scroll-driven how-it-works home page for new visitors. Added S5-9 (#118), S5-10 (#119), and S5-11 (#120). Started #118 with the Impeccable direction round. Next: the owner picks a direction. Blocked: none.
+- 2026-11-09: On the Impeccable decision page, the owner chose Full-Screen Feed over the dealt Postmarked, kept their own gestures (left next, right back, down show less), and chose category colors, a tall stage beside Chip in on desktop, and a dark feed with system-themed forms. Built #118: new shell, bottom nav, full-screen ask cards, rail, post page header, and every page restyled. 647 tests pass at 100%. Next: the finish review, then the new `DESIGN.md`. Blocked: none.
+- 2026-11-09: The owner found the desktop feed counterintuitive: a phone-shaped card on a monitor, while the post page already looked right. They chose a wide card with side arrows. On #118, the desktop feed now matches the post page (the ask and Chip in as one wide card, big Back and Next outside, arrow keys), and phones are unchanged. Blocked: none.

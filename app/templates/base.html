@@ -2,29 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}Pay My Bill{% endblock %}</title>
-  <meta name="theme-color" content="#4a2f1b" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1a110a" media="(prefers-color-scheme: dark)">
-  <link rel="preload" href="{{ url_for('static', filename='fonts/bitter-800.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preload" href="{{ url_for('static', filename='fonts/league-gothic-400.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-400.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
-<body>
+{% macro nav_link(endpoint, icon, label, extra="") %}
+  <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
+{% endmacro %}
+<body class="{% block body_class %}page{% endblock %}">
+  {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="topbar">
     <a class="brand" href="{{ url_for('main.index') }}">Pay My Bill</a>
     <nav aria-label="Main">
+      {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
-        <a href="{{ url_for('posts.new') }}">Post</a>
-        <a href="{{ url_for('gifts.index') }}">Gifts{% if pending_gift_count %} <span class="badge" aria-hidden="true">{{ pending_gift_count }}</span><span class="sr-only">, {{ pending_gift_count }} to confirm</span>{% endif %}</a>
-        <a href="{{ url_for('leaders.index') }}">Leaders</a>
-        {% if current_user.is_admin %}<a href="{{ url_for('admin.queue') }}">Admin</a>{% endif %}
-        <a class="nav-user" href="{{ url_for('profile.edit') }}">{{ current_user.username }}</a>
+        {{ nav_link("posts.new", "post", "Post") }}
+        {% set gift_badge %}{% if pending_gift_count %}<span class="badge" aria-hidden="true">{{ pending_gift_count }}</span><span class="sr-only">, {{ pending_gift_count }} to confirm</span>{% endif %}{% endset %}
+        {{ nav_link("gifts.index", "gift", "Gifts", gift_badge) }}
+        {{ nav_link("leaders.index", "leaders", "Leaders") }}
+        {% if current_user.is_admin %}{{ nav_link("admin.queue", "admin", "Admin") }}{% endif %}
+        <a class="nav-user" href="{{ url_for('profile.edit') }}"{% if request.endpoint == 'profile.edit' or (request.view_args and request.view_args.get('username') == current_user.username) %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-you"/></svg><span class="nav-label">{{ current_user.username }}</span></a>
       {% else %}
-        <a href="{{ url_for('leaders.index') }}">Leaders</a>
-        <a href="{{ url_for('auth.login') }}">Log in</a>
-        <a href="{{ url_for('auth.signup') }}">Sign up</a>
+        {{ nav_link("leaders.index", "leaders", "Leaders") }}
+        {{ nav_link("auth.login", "login", "Log in") }}
+        {{ nav_link("auth.signup", "you", "Sign up") }}
       {% endif %}
     </nav>
   </header>

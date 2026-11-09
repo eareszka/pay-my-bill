@@ -139,7 +139,7 @@ def test_viewer_outside_top_20_sees_their_rank(
 
 
 def test_logged_out_top_bar_links_leaders(client: FlaskClient) -> None:
-    assert 'href="/leaders">Leaders</a>' in client.get("/").get_data(as_text=True)
+    assert '<span class="nav-label">Leaders</span></a>' in client.get("/").get_data(as_text=True)
     page = client.get("/leaders?scope=state").get_data(as_text=True)
     assert 'aria-label="Where"' not in page
 
@@ -150,7 +150,7 @@ def test_top_bar_links_leaders_and_profile_holds_logout(
     me = person(make_user, "me")
     login_as(client, me)
     home = client.get("/").get_data(as_text=True)
-    assert 'href="/leaders">Leaders</a>' in home
+    assert 'href="/leaders"><svg' in home
     assert "Log out" not in home
     assert "Log out" in client.get("/profile").get_data(as_text=True)
 

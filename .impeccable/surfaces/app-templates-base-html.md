@@ -7,27 +7,28 @@ related_targets: ["app/templates/index.html","app/templates/posts/show.html","ap
 
 ## Scope
 
-The whole app shell and every page: feed, post page, gifts, leaders, profile, sign up and log in, forms, and rules. Visitor mode: Operate. Replaces the Seed Rack world.
+The whole app shell and every page: feed, post page, gifts, leaders, profile, sign up and log in, forms, rules, admin, and errors. Visitor mode: Operate. Replaces the cork-board world (owner, 2026-11-09). The logged-out home page has its own Persuade brief.
 
 ## Audience and task
 
-- Donors (primary user): on a phone, see who needs a hand, trust it, and chip in within a few taps.
-- Posters: ask plainly, confirm gifts, and report back to earn the top of the board.
-- States: top ticket or none, post with a photo or none, open, closed, funded, update owed or overdue, gift waiting, confirmed, not received, or expired, form errors, empty lists, long usernames, light and dark themes.
+- Donors (primary user): on a phone, see one person's ask at a time, swipe on or back, push a kind down, and chip in within a few taps.
+- Posters: ask plainly, confirm gifts, and report back to earn the top of the stack.
+- States: an ask or none, open, closed, funded, update owed or overdue, gift waiting, confirmed, not received, or expired, mid-drag in each direction, show-less undo, form errors, empty lists, long titles and usernames, light and dark on non-feed pages.
 
 ## Constraints
 
-- Owner brief (2026-11-03): simple and trustworthy, with personality. It must never feel like a sad charity page, a bank or finance app, a game or casino, a generic startup, or a typical scroll app. The rack was too cluttered and gave each post too little visibility.
-- Owner: a bulletin board with no thumbtacks. Each post is just a page or ticket. The large top ticket rewards posters who follow through (ADR 0013).
-- Poster photos are optional and come in a later story; a ticket with no photo must look complete.
-- Copy says "gift" or "chip in", never "donation" or "charity".
-- Works without JavaScript; 360px phones without horizontal scroll; light and dark.
+- Owner (2026-11-09): must not look AI-made, and must be coherent and simple. It's modeled on dating-app swiping, but you can go back. Motion is fast, readable, and stylized.
+- Gestures are pinned by the owner: left = next, right = back, down = show less, plus visible buttons for each. No vertical-snap feed.
+- No photos yet: a complete ask is a color field. Category colors arrive with #119; until then, Need and Want get one color each.
+- Feed and post stage are always dark. Forms, Gifts, Leaders, profile, and admin follow the system theme in the same type and accents.
+- Copy says "gift" or "chip in", never "donation" or "charity". Works without JavaScript, and at 360px without horizontal scroll.
 
 ## Direction contract
 
-THESIS: The community board at the door. One ticket fills your view at a time, and the first is earned by following through. It refuses the endless feed and the crowdfunding plea.
-OWN-WORLD: Flat cork ground and a dark wood top bar. Square white paper tickets with a soft shadow, light blue for wants. Leaf green for primary actions, including the tear-off tab with its dashed edge, and for links and progress marks (the owner approved these). Tomato only for errors and destructive actions. Bitter extra-bold for titles, Public Sans for everything else. No pins, no plant art, no faked cork texture.
-STORY: The visitor sees one person up close, then chips in or moves to the next. Everything sits on a ticket, so text never rests on a busy surface. After a post closes, the poster's own words take over.
-FIRST VIEWPORT: Wood top bar with brand left and Post, Gifts, Leaders, and user right. Underlined All, Needs, Wants tabs on cork. One large ticket filling the screen, with the stack peeking out behind it: a large photo when there is one, a large Bitter title, a short story, the amount, and a full-width green Chip in tab. Who and where live on the post page. Beneath it, the count and Next ticket. There is no scrolling list. On screens 960px and wider (the owner's choice, Give Right Here): the ticket on the left with who and where, the Chip in panel on the right so people can give without leaving, and the count and Next ticket below. The post page uses the same split. The owner sees the feed as swiping through mail and bills, like Tinder except you can go back: swipe left for next, right for back, and swiping never gives or passes on a post. Signature move: the tear-off Chip in tab on phones and the stack, plus the ten-mark row, which fills once on the post page.
-FORM: One Ticket at a Time, position 3 of 6 on the grounded list; the owner chose it after rejecting a grid as too cluttered and too much like a scroll site. seed:1ead20c5faed4470
+THESIS: One person's ask owns the whole screen. You flick through people the way you flick through a feed, but sideways, with a way back, and every ask is one tap from a real gift. It refuses the crowdfunding page, the card grid, and the endless vertical scroll.
+OWN-WORLD: A void-black shell (#0a0a0a, ink #121316, slate #1e2026, fog #5a6472) with pure white glyphs and type as the only interface ink. Each ask is a full-bleed, saturated category field that holds white text at 4.5:1 or better, under a soft bottom scrim. League Gothic for titles, set huge and tall. Public Sans for everything else. A white filled Chip in is the one primary action, outline buttons are secondary, and the rail glyphs are thin white line icons that fill when engaged. Tomato appears only for errors. No gradients beyond the scrim, no glass, no glow.
+STORY: The visitor sees one person's ask, huge, in its category's color. They chip in from the rail or the panel, flick to the next, flick back, or push that category down. After a post closes, the poster's thank-you takes over the stage.
+FIRST VIEWPORT: Phone: a thin top strip with the brand at left and All, Needs, Wants centered as white text tabs. The ask's color field fills the screen. The title sits mid-left in League Gothic at about 64px. Bottom left holds who · where · Need/Want, the 140-character story, and "$45 of $180" with a hairline progress bar. The right rail holds Chip in ($, filled white), Show less (↓), Back (↶), and Share, each labeled. A bottom nav bar on void reads Feed, Post, Gifts, Leaders, You. Desktop (960px and wider, revised by the owner on 2026-11-09 because the phone-shaped card read wrong on a monitor): the feed card takes the post page's shape. A wide landscape ask on the left is joined to the Chip in panel on the right as one card, the tabs sit above, big outlined Back and Next buttons sit outside the card, and the count with an arrow-key hint sits below. Clicks and arrow keys slide, and dragging is optional. Signature move: the color cut. As you drag, the next or previous ask's field is already there underneath, the target rail glyph lights, and on release the stage snaps in 180ms with no partial position. A down-drag drops the card and fills the Show less glyph.
+FORM: Full-Screen Feed (catalog challenger pop-culture-shelf-vertical-video-feed-surface, the owner's pick over the dealt Postmarked), turned sideways to match the owner's gestures. seed:9f96972bde8fa19e
+DEVIATIONS (disclosed after the #118 build): Chip in is a white button on each ask, not a rail glyph, so the money action travels with the person. The rail holds Back, Next, and the count, and Show less joins it in #119. Share is left out of #118's scope and filed as PB-44. The nav shows the signed-in username in place of "You", so people can see whose account they're in.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
