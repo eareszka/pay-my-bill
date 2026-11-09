@@ -33,6 +33,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAIL_USERNAME=os.environ.get("MAIL_USERNAME", ""),
         MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD", ""),
         BREVO_API_KEY=os.environ.get("BREVO_API_KEY", ""),
+        # Request-path email goes to a background thread; tests send inline.
+        MAIL_ASYNC=os.environ.get("MAIL_ASYNC", "1") != "0",
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
         # Base URL for links in emails sent outside a request (the reminder command).
         APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),

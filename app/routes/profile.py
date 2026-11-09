@@ -1,5 +1,3 @@
-import smtplib
-
 import stripe
 from flask import (
     Blueprint,
@@ -21,7 +19,7 @@ from app.accounts import anonymize
 from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
-from app.mail import send_email
+from app.mail import send_later
 from app.models import User
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 
@@ -51,10 +49,7 @@ def send_handle_change_notice(
         + "\n".join(lines)
         + "\n\nIf this wasn't you, change your password right away and contact us."
     )
-    try:
-        send_email(user.email, "Your payment handles changed", body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception("Could not send the handle-change notice to user %s", user.id)
+    send_later(user.email, "Your payment handles changed", body)
 
 
 @bp.route("/profile", methods=["GET", "POST"])

@@ -22,7 +22,7 @@ from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm, PostForm, ResultsUpdateForm
-from app.mail import send_email
+from app.mail import send_email, send_later
 from app.models import (
     LATE_GIFT_HOURS,
     MAX_OPEN_POSTS,
@@ -258,12 +258,7 @@ def send_update_notice(post: Post, donor: User) -> None:
         f"Hi {donor.username},\n\n{post.user.username} shared how it went "
         f'on "{post.title}", a post you chipped in on.\n\nRead it here:\n{link}'
     )
-    try:
-        send_email(donor.email, f"{post.user.username} shared how it went", body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception(
-            "Could not send the update notice for post %s to user %s", post.id, donor.id
-        )
+    send_later(donor.email, f"{post.user.username} shared how it went", body)
 
 
 @bp.post("/<int:post_id>/update")

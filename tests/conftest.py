@@ -31,6 +31,7 @@ def app() -> Iterator[Flask]:
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
             "WTF_CSRF_ENABLED": False,
+            "MAIL_ASYNC": False,
             "SERVER_NAME": "localhost",
         }
     )

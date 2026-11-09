@@ -234,10 +234,10 @@ def test_admin_email_failure_is_logged(
 ) -> None:
     make_user("creep")
     login_as(client, make_user("bob"))
-    with patch("app.routes.admin.send_email", side_effect=smtplib.SMTPException("down")):
+    with patch("app.mail.send_email", side_effect=smtplib.SMTPException("down")):
         resp = client.post("/report/user/creep", data={"reason": "spam"})
     assert resp.status_code == 302
-    assert "Could not email admin" in caplog.text
+    assert "Could not send" in caplog.text
 
 
 def test_grant_command(app: Flask, make_user: MakeUser) -> None:

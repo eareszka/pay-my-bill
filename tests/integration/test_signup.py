@@ -218,14 +218,15 @@ def test_signup_survives_mail_failure(
     def fail(*_: object) -> None:
         raise smtplib.SMTPServerDisconnected("down")
 
-    monkeypatch.setattr("app.routes.auth.send_email", fail)
+    monkeypatch.setattr("app.mail.send_email", fail)
     resp = client.post("/signup", data=FORM, follow_redirects=True)
-    assert b"couldn&#39;t send your verification email" in resp.data
+    # Mail goes out in the background, so the page can only promise it (#105).
+    assert b"Check your email to verify it" in resp.data
     assert b"Verify your email" in resp.data
     assert user_count() == 1
-    assert "Could not send the verification email" in caplog.text
+    assert "Could not send 'Verify your Pay My Bill email'" in caplog.text
     resp = client.post("/verify/resend", follow_redirects=True)
-    assert b"new verification link" not in resp.data
+    assert b"new verification link" in resp.data
 
 
 def test_malformed_session_user_id_is_anonymous(client: FlaskClient) -> None:

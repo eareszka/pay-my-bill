@@ -1,4 +1,3 @@
-import smtplib
 from typing import Any
 
 import stripe
@@ -12,7 +11,7 @@ from app import stripe_pay
 from app.auth import verified_required
 from app.extensions import csrf, db
 from app.forms import GiftForm
-from app.mail import send_email
+from app.mail import send_later
 from app.models import (
     MIN_CARD_GIFT_CENTS,
     Donation,
@@ -85,13 +84,6 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
     return redirect(url, code=303)
 
 
-def _quiet_email(to: str, subject: str, body: str) -> None:
-    try:
-        send_email(to, subject, body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception("Could not send %r", subject)
-
-
 def _meta_int(meta: dict[str, Any], key: str) -> int | None:
     value = str(meta.get(key, ""))
     return int(value) if value.isdigit() else None
@@ -149,7 +141,7 @@ def record_card_gift(session: dict[str, Any], account: str | None) -> None:
     post, funded = count_confirmed(donation, already_heard)
     amount = format_cents(donation.amount_cents)
     link = url_for("posts.show", post_id=post.id, _external=True)
-    _quiet_email(
+    send_later(
         post.user.email,
         f"{donor.username} sent you {amount}",
         f"Hi {post.user.username},\n\n{donor.username} chipped in {amount} by card for "
@@ -157,7 +149,7 @@ def record_card_gift(session: dict[str, Any], account: str | None) -> None:
         + ("\n\nYour post is fully funded!" if funded else "")
         + f"\n\n{link}",
     )
-    _quiet_email(
+    send_later(
         donor.email,
         f"Your {amount} gift to {post.user.username} went through",
         f'Hi {donor.username},\n\nYour {amount} gift for "{post.title}" went through '
