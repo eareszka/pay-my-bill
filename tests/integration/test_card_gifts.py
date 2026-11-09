@@ -88,6 +88,7 @@ def paid_event(
     return {
         "id": "evt_1",
         "object": "event",
+        "account": "acct_maria",
         "type": "checkout.session.completed",
         "data": {"object": session},
     }
@@ -135,7 +136,7 @@ def test_logged_out_visitor_is_asked_to_log_in(client: FlaskClient, post: Post) 
     assert "Log in first" in page
 
 
-def test_checkout_redirects_to_stripe_with_destination_charge(
+def test_checkout_redirects_to_stripe_with_direct_charge(
     client: FlaskClient, post: Post, donor: User, fake_client: MagicMock
 ) -> None:
     login_as(client, donor)
@@ -470,3 +471,33 @@ def test_card_option_shows_beside_a_waiting_app_gift(
     assert "waiting for maria_g to confirm" in page
     assert "You can still chip in instantly by card" in page
     assert "Chip in instantly" in page
+
+
+def test_gift_event_from_another_account_is_not_counted(
+    client: FlaskClient, post: Post, donor: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    event = paid_event(post, donor)
+    event["account"] = "acct_someone_else"
+    assert signed(client, event).status_code == 200
+    del event["account"]
+    event["data"]["object"]["id"] = "cs_2"
+    assert signed(client, event).status_code == 200
+    assert gifts() == []
+    assert "not the recipient of post" in caplog.text
+
+
+def test_failed_checkout_rechecks_the_recipient(
+    client: FlaskClient, post: Post, donor: User, recipient: User, fake_client: MagicMock
+) -> None:
+    login_as(client, donor)
+    fake_client.v1.checkout.sessions.create.side_effect = stripe.APIConnectionError("down")
+    fake_client.v1.accounts.retrieve.return_value = stripe.Account.construct_from(
+        {"id": "acct_maria", "charges_enabled": False, "payouts_enabled": True}, "sk_test_fake"
+    )
+    client.post(f"/posts/{post.id}/card", data={"amount": "20"})
+    db.session.refresh(recipient)
+    assert recipient.stripe_ready is False
+    fake_client.v1.accounts.retrieve.side_effect = stripe.APIConnectionError("down")
+    recipient.stripe_ready = True
+    db.session.commit()
+    assert client.post(f"/posts/{post.id}/card", data={"amount": "20"}).status_code == 400

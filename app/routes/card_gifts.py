@@ -74,6 +74,12 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
     except stripe.StripeError:
         current_app.logger.exception("Stripe checkout failed for post %s", post.id)
         url = ""
+        # The recipient's account may have lost card payments since we last looked.
+        try:
+            stripe_pay.refresh_ready(recipient)
+            db.session.commit()
+        except stripe.StripeError:
+            current_app.logger.exception("Stripe status check failed for user %s", recipient.id)
     if not url:
         return _card_error(post, "Stripe isn't answering right now. Try again in a minute.")
     return redirect(url, code=303)
@@ -91,7 +97,7 @@ def _meta_int(meta: dict[str, Any], key: str) -> int | None:
     return int(value) if value.isdigit() else None
 
 
-def record_card_gift(session: dict[str, Any]) -> None:
+def record_card_gift(session: dict[str, Any], account: str | None) -> None:
     if session.get("payment_status") != "paid":
         return
     if db.session.scalar(select(Donation.id).where(Donation.stripe_session_id == session["id"])):
@@ -107,6 +113,16 @@ def record_card_gift(session: dict[str, Any]) -> None:
     if post is None or donor is None or not gift_cents:
         # Acknowledged so Stripe stops retrying; admins can match it up from Stripe.
         current_app.logger.error("Paid checkout %s has unusable metadata", session["id"])
+        return
+    if account is None or account != post.user.stripe_account_id:
+        # Direct charges land on the recipient's account, so the event must come from the
+        # account of the post it claims to pay for, or the money went to someone else.
+        current_app.logger.error(
+            "Paid checkout %s came from %s, not the recipient of post %s",
+            session["id"],
+            account,
+            post.id,
+        )
         return
     already_heard = donor in post.confirmed_donors
     # The processor verified the payment, so it counts without the recipient (ADR 0014).
@@ -232,7 +248,7 @@ def webhook() -> tuple[str, int]:
     obj = event.data.object.to_dict()
     match event.type:
         case "checkout.session.completed" | "checkout.session.async_payment_succeeded":
-            record_card_gift(obj)
+            record_card_gift(obj, getattr(event, "account", None))
         case "charge.refunded" if obj.get("refunded"):
             uncount_card_gift(obj.get("payment_intent"), "refunded")
         case "charge.refunded":

@@ -1,5 +1,6 @@
 import smtplib
 
+import stripe
 from flask import (
     Blueprint,
     abort,
@@ -15,6 +16,7 @@ from sqlalchemy import select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
+from app import stripe_pay
 from app.accounts import anonymize
 from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
@@ -74,6 +76,13 @@ def edit() -> str | Response:
             send_handle_change_notice(user, changes)
         flash("Profile saved.", "success")
         return redirect(url_for("profile.edit"))
+    if stripe_pay.enabled() and user.stripe_account_id and not user.stripe_ready:
+        # Onboarding can finish later from Stripe's side, so check again while it's pending.
+        try:
+            stripe_pay.refresh_ready(user)
+            db.session.commit()
+        except stripe.StripeError:
+            current_app.logger.exception("Stripe status check failed for user %s", user.id)
     return render_template("profile/edit.html", form=form, delete_form=DeleteAccountForm())
 
 

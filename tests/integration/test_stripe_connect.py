@@ -55,6 +55,7 @@ def test_connect_creates_account_and_redirects_to_stripe(
 ) -> None:
     user = make_user("alice")
     login_as(client, user)
+    fake_client.v1.accounts.retrieve.return_value = account(charges=False)
     assert b"Connect Stripe" in client.get("/profile").data
     resp = client.post("/stripe/connect")
     assert resp.status_code == 302
@@ -179,3 +180,25 @@ def test_stripe_only_recipient_can_post_and_be_paid(
     db.session.add(post)
     db.session.commit()
     assert not make_user("bob").can_be_paid
+
+
+@pytest.mark.usefixtures("stripe_on")
+def test_profile_rechecks_a_pending_account(
+    client: FlaskClient,
+    make_user: MakeUser,
+    fake_client: MagicMock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    user = make_user("alice", stripe_account_id="acct_123")
+    login_as(client, user)
+    fake_client.v1.accounts.retrieve.return_value = account()
+    assert b"Payouts and bank details" in client.get("/profile").data
+    db.session.refresh(user)
+    assert user.stripe_ready is True
+    client.get("/profile")
+    assert fake_client.v1.accounts.retrieve.call_count == 1
+    user.stripe_ready = False
+    db.session.commit()
+    fake_client.v1.accounts.retrieve.side_effect = stripe.APIConnectionError("down")
+    assert client.get("/profile").status_code == 200
+    assert "Stripe status check failed" in caplog.text
