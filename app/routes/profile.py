@@ -14,7 +14,7 @@ from sqlalchemy import select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
-from app import stripe_pay
+from app import photos, stripe_pay
 from app.accounts import anonymize
 from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
@@ -93,8 +93,10 @@ def delete_account() -> str | Response | tuple[str, int]:
             delete_form.password.errors.append("Too many failed attempts. Try again later.")
         elif check_password_hash(user.password_hash, delete_form.password.data or ""):
             mark_login_succeeded(attempt)
-            anonymize(user)
+            photo_keys = anonymize(user)
             db.session.commit()
+            for key in photo_keys:
+                photos.discard(key)
             logout_user()
             flash("Your account was deleted.", "success")
             return redirect(url_for("main.index"))

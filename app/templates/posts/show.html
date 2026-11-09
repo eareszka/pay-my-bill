@@ -14,7 +14,8 @@
     <p class="notice">This post is {{ "funded" if post.status == PostStatus.FUNDED else "closed" }}{% if not post.takes_gifts %} and isn't taking gifts{% endif %}.</p>
   {% endif %}
   <article class="post post-{{ post.kind.value }}">
-    <header class="post-hero">
+    <header class="post-hero{% if post.photo_key %} has-photo{% endif %}">
+      {% if post.photo_key %}<img class="hero-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo from {{ post.user.username }}">{% endif %}
       <h1>{{ post.title }}</h1>
       {% include "posts/_meta.html" %}
       <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
@@ -72,6 +73,12 @@
       {% else %}
         <div class="actions">
           {% if post.is_open %}<a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, close=1) }}#delete">Close post</a>{% endif %}
+          {% if post.photo_key %}
+            <form method="post" action="{{ url_for('posts.delete_photo', post_id=post.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-secondary">Remove photo</button>
+            </form>
+          {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete {{ "update" if post.is_deleted else "post" }}</a>
         </div>
       {% endif %}
