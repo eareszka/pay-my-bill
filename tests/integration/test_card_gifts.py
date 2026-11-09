@@ -145,6 +145,7 @@ def test_checkout_redirects_to_stripe_with_direct_charge(
     assert resp.location == "https://checkout.stripe.com/c/pay/cs_1"
     params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
     assert params["line_items"][0]["price_data"]["unit_amount"] == 2_091
+    assert params["allowed_payment_method_types"] == ["card"]
     assert "transfer_data" not in params["payment_intent_data"]
     options = fake_client.v1.checkout.sessions.create.call_args.kwargs["options"]
     assert options == {"stripe_account": "acct_maria"}
