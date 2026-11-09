@@ -89,7 +89,7 @@ def test_send_later_logs_failures(
     app: Flask, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     def fail(*_: object) -> None:
-        raise OSError("down")
+        raise KeyError("MAIL_FROM")  # not a mail error, still logged
 
     monkeypatch.setattr("app.mail.send_email", fail)
     app.config["MAIL_ASYNC"] = True

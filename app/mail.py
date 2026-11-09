@@ -70,7 +70,8 @@ def _deliver(app: Flask, to: str, subject: str, body: str) -> None:
     with app.app_context():
         try:
             send_email(to, subject, body)
-        except (smtplib.SMTPException, OSError):
+        except Exception:
+            # Nothing reads the future, so every failure has to be logged here.
             app.logger.exception("Could not send %r", subject)
 
 
