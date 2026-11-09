@@ -128,11 +128,13 @@ As a **donor**, I want **levels to unlock something** so that **I have a reason 
 - [ ] A perk never changes where your own posts sit in the stack.
 - [ ] Unlocks come only from confirmed gifts, and PB-9 has checked them against Apple's rules.
 
-### PB-31 One-tap thank you on a confirmed gift · #TBD · 3 pts · P1 · epic:donations · v0.1-alpha
+### PB-31 One-tap thank you on a confirmed gift · #125 · 3 pts · P1 · epic:donations · v0.1-alpha
 As a **recipient**, I want to **thank a donor directly** so that **they know it mattered**, and it helps my place in the stack.
 - [ ] On a confirmed gift, the recipient can send one thank you, with an optional short note.
 - [ ] Only that donor sees it, by email and on a Gifts banner.
 - [ ] Thanks count toward the recipient's score with a low cap, and only for established donors, so a second account can't farm it.
+- [ ] (Owner, 2026-11-09) If the donor left a note with their gift (PB-45), the thank-you can answer it. One exchange per gift, no thread. Follows the message guardrails below.
+- [ ] The thank-you box opens inside the gift on the Gifts page once the poster confirms it. If the note is shared, the reply shows under it in "How it's going".
 
 ### PB-32 Simple navigation and clear tickets · #TBD · 3 pts · P1 · epic:posts · v0.1-alpha
 As **anyone**, I want to **find my way around and see what a person is asking for at a glance**. Goes through Impeccable, shown to the owner first. Settles PB-26.
@@ -200,3 +202,42 @@ ADR 0014. The owner applies. Nothing about real payments ships until this is don
 ### PB-44 Share an ask · #TBD · 2 pts · P2 · epic:posts
 From the #118 finish review: the full-screen feed's rail has room for Share.
 - [ ] A Share button on the rail and post page opens the phone's share sheet, or copies the post link where that isn't available.
+
+## Donors and posters talking (owner, 2026-11-09)
+The owner wants donors and posters to be able to talk and posters to keep donors in the loop, without open comments. Every message is short, tied to a real gift or post, and private unless stated otherwise. There are no threads: at most one reply. Order: after #119 and #120. PB-31 (thank-you with a reply, #125) belongs to this group.
+
+**Shared design** (the owner approved the mockup on 2026-11-09: https://claude.ai/artifact/5MUbEMb4eFFSVL7k9tS86n, built in Impeccable in the current look):
+- [ ] Each post has one list, "How it's going", newest first. It holds the poster's updates, gift notes their donors chose to share, and answered questions. Every item has the same shape: who, what kind ("update", "chipped in", "asked"), when, the text, and at most one indented reply from the poster.
+- [ ] On the post page, Chip in comes first and stays the one main action. Follow is a single quiet button. The list follows the story.
+- [ ] The feed card adds only one line when there's news ("Updated 2 hours ago"), never a preview box.
+- [ ] On a computer, the list is in the left column, and Chip in and Follow stay on the right.
+
+**Message guardrails** (apply to every story here):
+- [ ] Notes, replies, updates, and answers are plain text with a character limit. Phone numbers, links, emails, and payment handles are masked, so nobody gets pulled off the app (T3, T4).
+- [ ] Every message can be reported into the existing `/admin` queue, and admins can remove one message on its own. Blocking (PB-12) hides a blocked person's messages both ways.
+- [ ] Rate limits on writing, and emails batched to at most one a day per person per post.
+- [ ] Deleting a post or account removes its messages, the same as photos.
+
+### PB-45 Note with your gift · #124 · 3 pts · P1 · epic:donations
+As a **donor**, I want to **send a few kind words with my gift** so that **the person knows someone is rooting for them**.
+- [ ] When recording "I sent it" (or a card gift), the donor can add an optional note of up to 200 characters, behind an "Add a note to your gift" link, so the box is hidden until they want it.
+- [ ] The poster sees the note inside the gift on their Gifts page while confirming it.
+- [ ] The donor chooses whether the note also shows in the post's "How it's going" list, under the donor's username. It is private by default.
+- [ ] Only someone who recorded a gift can leave a note, so there's nothing for spammers to post into.
+
+### PB-46 Progress updates and following a post · #126 · 5 pts · P1 · epic:posts
+As a **poster**, I want to **tell donors how it's going while my post is open**, and as a **visitor** I want to **follow a post** so that **I see how it turns out**.
+- [ ] The poster can post a short update (up to 500 characters, with an optional photo through #122) while the post is open, at most 3 a day. The box sits at the top of "How it's going" on their own post.
+- [ ] Updates show in "How it's going". When the post closes, the results update (ADR 0008) is the newest entry.
+- [ ] Donors and followers get an email for new updates, at most one a day per post. They can stop following from the email or the post.
+- [ ] Anyone logged in can follow a post without giving.
+- [ ] Updates take kudos (a heart with a count, no 👍/🤨, and no replies), and only results updates count toward the top spot (ADR 0013).
+- [ ] The feed card shows "Updated <time> ago" for 3 days after an update.
+
+### PB-47 Questions before giving · #127 · 3 pts · P2 · epic:posts
+As a **visitor**, I want to **ask the poster a question before I give** so that **I can trust what I'm chipping in for**. Pairs with Trust information (#79).
+- [ ] A verified user can ask a question of up to 200 characters on an open post, from an "Ask <poster> a question" link at the end of "How it's going". It is private until answered.
+- [ ] The poster can answer it, which adds the question and answer together to "How it's going", or dismiss it. One answer per question, no thread.
+- [ ] A question that's never answered is never shown publicly.
+- [ ] At most 3 open questions per asker per post.
+
