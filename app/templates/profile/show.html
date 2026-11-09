@@ -20,6 +20,27 @@
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
   {% endif %}
   {% include "profile/_handles.html" %}
+  <section class="profile-posts" aria-labelledby="posts-title">
+    <h2 class="section-title" id="posts-title">Posts</h2>
+    {% if posts %}
+      <ul class="gift-list post-list">
+        {% for post in posts %}
+          <li>
+            <a class="gift-list-title" href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a>
+            <span class="gift-list-amount">{{ post.raised_cents | cents }}<span class="post-list-goal"> of {{ post.goal_cents | cents }}</span></span>
+            <span class="gift-list-meta"><span>{{ post.kind.value | capitalize }} · {{ post.state_label }} · {{ post.created_at | date }}</span>
+              {% if is_owner %}<span class="post-list-actions">{% if post.can_edit %}<a href="{{ url_for('posts.edit', post_id=post.id) }}">Edit<span class="sr-only"> {{ post.title }}</span></a>{% endif %}<a href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete<span class="sr-only"> {{ post.title }}</span></a></span>{% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if posts | length == post_limit %}<p class="hint gift-list-note">Showing the latest {{ post_limit }} posts.</p>{% endif %}
+    {% elif is_owner %}
+      <p class="empty">You haven't posted yet. <a href="{{ url_for('posts.new') }}">Ask for a hand</a>.</p>
+    {% else %}
+      <p class="empty">{{ user.username }} hasn't posted yet.</p>
+    {% endif %}
+  </section>
   {% if not current_user.is_authenticated or current_user.id != user.id %}
     <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>
   {% endif %}

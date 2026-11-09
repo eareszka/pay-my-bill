@@ -15,6 +15,7 @@
   <article class="post post-{{ post.kind.value }}">
     <h1>{{ post.title }}</h1>
     {% include "posts/_meta.html" %}
+    {% if post.edited_at %}<p class="hint post-edited">Edited {{ post.edited_at | date }}</p>{% endif %}
     {{ grow(post.progress_percent, "Progress toward goal") }}
     <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
     <p class="post-body">{{ post.body }}</p>
@@ -68,6 +69,7 @@
         </div>
       {% else %}
         <div class="actions">
+          {% if post.can_edit %}<a class="btn btn-secondary" href="{{ url_for('posts.edit', post_id=post.id) }}">Edit post</a>{% endif %}
           {% if post.is_open %}<a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, close=1) }}#delete">Close post</a>{% endif %}
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete {{ "update" if post.is_deleted else "post" }}</a>
         </div>

@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Profiles list the person's posts with their state and amount raised. Posters can edit or delete their own posts from there. Before the first gift, every field can be edited; after it, only the story. Edited posts show "Edited <date>", and an edit that hits the fundraising word list goes back to review (#116).
+
 ### Security
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
