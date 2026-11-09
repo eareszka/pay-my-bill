@@ -144,10 +144,9 @@ def test_checkout_redirects_to_stripe_with_destination_charge(
     assert resp.location == "https://checkout.stripe.com/c/pay/cs_1"
     params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
     assert params["line_items"][0]["price_data"]["unit_amount"] == 2_091
-    assert params["payment_intent_data"]["transfer_data"] == {
-        "destination": "acct_maria",
-        "amount": 2_000,
-    }
+    assert "transfer_data" not in params["payment_intent_data"]
+    options = fake_client.v1.checkout.sessions.create.call_args.kwargs["options"]
+    assert options == {"stripe_account": "acct_maria"}
     assert params["metadata"] == {
         "post_id": str(post.id),
         "donor_id": str(donor.id),
@@ -318,9 +317,8 @@ def test_account_updated_webhook_tracks_readiness(
     account = {
         "id": "acct_maria",
         "object": "account",
-        "details_submitted": True,
+        "charges_enabled": True,
         "payouts_enabled": False,
-        "capabilities": {"transfers": "active"},
     }
     event = {
         "id": "evt_3",
@@ -425,9 +423,8 @@ def test_connect_endpoint_secret_is_accepted(
     account = {
         "id": "acct_maria",
         "object": "account",
-        "details_submitted": True,
+        "charges_enabled": False,
         "payouts_enabled": True,
-        "capabilities": {"transfers": "inactive"},
     }
     event = {
         "id": "evt_5",

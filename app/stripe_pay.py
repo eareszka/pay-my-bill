@@ -16,38 +16,54 @@ def client() -> stripe.StripeClient:
     return stripe.StripeClient(current_app.config["STRIPE_SECRET_KEY"])
 
 
+# Express dashboards with Stripe covering losses (Managed Risk) are a public preview,
+# so account creation pins this version (ADR 0014).
+EXPRESS_MANAGED_RISK_VERSION = "2026-10-28.preview"
+
+
 def account_ready(account: stripe.Account) -> bool:
-    # Destination charges need the connected account able to take transfers and pay out.
+    # Direct charges need the account able to take card payments and pay out.
     # A new account may lack these keys, and StripeObject raises on a missing attribute.
-    capabilities = getattr(account, "capabilities", None)
-    transfers = getattr(capabilities, "transfers", None)
-    return bool(account.details_submitted and account.payouts_enabled and transfers == "active")
+    return bool(
+        getattr(account, "charges_enabled", False) and getattr(account, "payouts_enabled", False)
+    )
 
 
 def ensure_account(user: User) -> str:
     if user.stripe_account_id is None:
-        account = client().v1.accounts.create(
+        # Accounts v2: Stripe collects its fees from the recipient and covers losses
+        # it can't recover (Managed Risk), and the recipient gets an Express dashboard.
+        account = client().v2.core.accounts.create(
             params={
-                "type": "express",
-                "country": "US",
-                "email": user.email,
-                "capabilities": {"transfers": {"requested": True}},
-                "business_type": "individual",
-                "business_profile": {"product_description": "Personal gifts on Pay My Bill"},
+                "contact_email": user.email,
+                "display_name": user.username,
+                "dashboard": "express",
+                "identity": {"country": "US", "entity_type": "individual"},
+                "defaults": {
+                    "responsibilities": {
+                        "fees_collector": "stripe",
+                        "losses_collector": "stripe",
+                    }
+                },
+                "configuration": {
+                    "merchant": {"capabilities": {"card_payments": {"requested": True}}}
+                },
                 "metadata": {"user_id": str(user.id)},
-            }
+            },
+            options={"stripe_version": EXPRESS_MANAGED_RISK_VERSION},
         )
         user.stripe_account_id = account.id
     return user.stripe_account_id
 
 
 def onboarding_url(account_id: str, refresh_url: str, return_url: str) -> str:
-    link = client().v1.account_links.create(
+    link = client().v2.core.account_links.create(
         params={
             "account": account_id,
-            "refresh_url": refresh_url,
-            "return_url": return_url,
-            "type": "account_onboarding",
+            "use_case": {
+                "type": "account_onboarding",
+                "account_onboarding": {"return_url": return_url, "refresh_url": refresh_url},
+            },
         }
     )
     return link.url
@@ -111,16 +127,15 @@ def checkout_url(
                     },
                 }
             ],
-            # A destination charge: the recipient gets exactly the gift, and the fee
-            # covers Stripe's cut on the platform side (ADR 0014).
-            "payment_intent_data": {
-                "transfer_data": {"destination": destination, "amount": gift_cents},
-                "metadata": metadata,
-            },
+            # A direct charge on the recipient's account (Managed Risk, ADR 0014): Stripe
+            # takes its fee from the charge, which the donor's extra covers, so the
+            # recipient keeps the whole gift.
+            "payment_intent_data": {"metadata": metadata},
             "metadata": metadata,
             "success_url": success_url,
             "cancel_url": cancel_url,
-        }
+        },
+        options={"stripe_account": destination},
     )
     return session.url or ""
 

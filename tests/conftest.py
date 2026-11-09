@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable, Iterator
 
 import pytest
@@ -8,6 +9,17 @@ from werkzeug.security import generate_password_hash
 from app import create_app
 from app.extensions import db
 from app.models import User, utcnow
+
+# A developer's .env must never reach real services from tests. load_dotenv() never
+# overrides variables that are already set, so blanking them here wins.
+for _key in (
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_CONNECT_WEBHOOK_SECRET",
+    "BREVO_API_KEY",
+    "MAIL_SERVER",
+):
+    os.environ[_key] = ""
 
 PASSWORD = "correct-horse"  # noqa: S105 - test fixture
 
