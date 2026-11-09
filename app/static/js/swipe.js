@@ -35,6 +35,20 @@ const pose = (dx) => (calm.matches
   ? { opacity: 1 - Math.min(Math.abs(dx) / ticket.offsetWidth, 1) / 2 }
   : { transform: `translateX(${dx}px) rotate(${tilt(dx)}deg)` });
 
+// Load and decode the neighbors' photos now. A <template> never loads its images,
+// so without this a revealed card shows its bare color until the photo arrives.
+const warm = new Map();
+[nextUnder, backUnder].forEach((source) => {
+  const photo = source?.content.querySelector(".ticket-photo");
+  if (!photo) return;
+  const image = new Image();
+  image.className = photo.className;
+  image.alt = "";
+  image.src = photo.getAttribute("src");
+  image.decode?.().catch(() => {});
+  warm.set(source, image);
+});
+
 // Put the real neighboring ticket under this one, to be seen but not used.
 const reveal = (link) => {
   if (link === underFor) return;
@@ -44,6 +58,8 @@ const reveal = (link) => {
   const source = link === nextLink ? nextUnder : backUnder;
   const copy = link && source?.content.querySelector(".deck-ticket")?.cloneNode(true);
   if (!copy) return;
+  const ready = warm.get(source);
+  if (ready) copy.querySelector(".ticket-photo")?.replaceWith(ready);
   copy.classList.add("deck-under");
   copy.inert = true;
   copy.setAttribute("aria-hidden", "true");

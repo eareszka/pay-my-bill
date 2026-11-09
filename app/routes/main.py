@@ -1,13 +1,19 @@
-from flask import Blueprint, render_template, request
+import re
+
+from flask import Blueprint, abort, render_template, request, send_from_directory
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
+from werkzeug.wrappers import Response
 
 from app.extensions import db
 from app.models import Post, PostKind, open_posts
+from app.photos import LocalStore, store
 from app.routes.posts import chip_in_context
 from app.top_spot import top_post
 
 bp = Blueprint("main", __name__)
+
+PHOTO_KEY = re.compile(r"posts/[0-9a-f]{32}\.webp")
 
 
 def ticket_at(position: int, kind: PostKind | None, top: Post | None) -> Post | None:
@@ -68,3 +74,12 @@ def terms() -> str:
 @bp.get("/privacy")
 def privacy() -> str:
     return render_template("legal/privacy.html")
+
+
+@bp.get("/media/<path:key>")
+def media(key: str) -> Response:
+    # Local photos only; in production they come straight from the R2 bucket.
+    photo_store = store()
+    if not isinstance(photo_store, LocalStore) or not PHOTO_KEY.fullmatch(key):
+        abort(404)
+    return send_from_directory(photo_store.root, key, mimetype="image/webp", max_age=31536000)

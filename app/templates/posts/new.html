@@ -6,7 +6,7 @@
   {% if at_limit %}
     <p class="flash flash-error">You already have {{ MAX_OPEN_POSTS }} open posts. Close or finish one before posting again.</p>
   {% else %}
-    <form method="post" class="form page-form" novalidate data-once>
+    <form method="post" class="form page-form" enctype="multipart/form-data" novalidate data-once>
       {{ form.hidden_tag() }}
       <fieldset class="plain-group">
         <legend>{{ form.kind.label.text }}</legend>
@@ -19,6 +19,7 @@
       </fieldset>
       {{ field(form.title, maxlength=80) }}
       {{ field(form.body, rows=6, maxlength=2000) }}
+      {{ field(form.photo, accept=PHOTO_ACCEPT) }}
       {{ field(form.goal, inputmode="decimal", placeholder="$120") }}
       {% if form.require_rules %}
         {% call choice(form.accept_rules) %}I agree to the <a href="{{ url_for('main.rules') }}" target="_blank">Community Rules</a>{% endcall %}

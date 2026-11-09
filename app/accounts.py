@@ -13,22 +13,25 @@ from app.models import (
 )
 
 
-def delete_post(post: Post) -> None:
+def delete_post(post: Post) -> str | None:
+    """Delete or scrub a post. Returns its photo key, to discard once the change commits."""
+    photo_key, post.photo_key = post.photo_key, None
     # Any recorded gift keeps the post as a scrubbed shell, so donors keep their
     # credit and their "I sent it" record (T14). Only gift-free posts are removed.
     if not post.donations:
         db.session.delete(post)
-        return
+        return photo_key
     post.title = DELETED_POST_TITLE
     post.body = DELETED_POST_BODY
     post.update_body = None  # update_posted_at stays: the update was still made
     if post.status == PostStatus.OPEN:
         post.close()
+    return photo_key
 
 
-def anonymize(user: User) -> None:
-    for post in list(user.posts):
-        delete_post(post)
+def anonymize(user: User) -> list[str]:
+    """Scrub an account. Returns photo keys to discard once the change commits."""
+    photo_keys = [key for post in list(user.posts) if (key := delete_post(post))]
     db.session.execute(
         delete(LoginAttempt).where(LoginAttempt.identifier.in_((user.username, user.email)))
     )
@@ -39,3 +42,4 @@ def anonymize(user: User) -> None:
     user.email_verified_at = None
     user.city = user.state = None
     user.cashapp_handle = user.venmo_handle = user.paypal_handle = None
+    return photo_keys

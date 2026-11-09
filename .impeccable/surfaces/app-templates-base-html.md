@@ -19,7 +19,7 @@ The whole app shell and every page: feed, post page, gifts, leaders, profile, si
 
 - Owner (2026-11-09): must not look AI-made, and must be coherent and simple. It's modeled on dating-app swiping, but you can go back. Motion is fast, readable, and stylized.
 - Gestures are pinned by the owner: left = next, right = back, down = show less, plus visible buttons for each. No vertical-snap feed.
-- No photos yet: a complete ask is a color field. Category colors arrive with #119; until then, Need and Want get one color each.
+- Photos are optional (#122, ADR 0015). With a photo, the ask is the photo under a deeper scrim; without one, it is a color field. Category colors arrive with #119; until then, Need and Want get one color each.
 - Feed and post stage are always dark. Forms, Gifts, Leaders, profile, and admin follow the system theme in the same type and accents.
 - Copy says "gift" or "chip in", never "donation" or "charity". Works without JavaScript, and at 360px without horizontal scroll.
 

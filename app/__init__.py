@@ -42,6 +42,15 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
         STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
         STRIPE_CONNECT_WEBHOOK_SECRET=os.environ.get("STRIPE_CONNECT_WEBHOOK_SECRET", ""),
+        # Post photos go to Cloudflare R2 when a bucket is set, else to PHOTO_DIR (ADR 0015).
+        R2_ACCOUNT_ID=os.environ.get("R2_ACCOUNT_ID", ""),
+        R2_ACCESS_KEY_ID=os.environ.get("R2_ACCESS_KEY_ID", ""),
+        R2_SECRET_ACCESS_KEY=os.environ.get("R2_SECRET_ACCESS_KEY", ""),
+        R2_BUCKET=os.environ.get("R2_BUCKET", ""),
+        R2_PUBLIC_URL=os.environ.get("R2_PUBLIC_URL", ""),
+        PHOTO_DIR=os.environ.get("PHOTO_DIR", ""),
+        # An 8 MB photo plus the rest of the form.
+        MAX_CONTENT_LENGTH=9 * 1024 * 1024,
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )
@@ -59,7 +68,9 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     csrf.init_app(app)
     login_manager.init_app(app)
 
-    from app import auth, errors, seed  # noqa: F401
+    from app import auth, errors, photos, seed  # noqa: F401
+
+    photos.init_app(app)
 
     seed.register(app)
     errors.register(app)
@@ -99,7 +110,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         PostStatus=models.PostStatus,
         DonationStatus=models.DonationStatus,
         ReactionKind=models.ReactionKind,
-        LEGAL_UPDATED="November 8, 2026",
+        LEGAL_UPDATED="November 9, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
         stripe_enabled=stripe_pay.enabled,
     )

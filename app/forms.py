@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from wtforms import (
     BooleanField,
     EmailField,
@@ -27,6 +28,7 @@ from app.models import MAX_GOAL_CENTS, Post, PostKind, ReportReason
 from app.moderation import is_flagged
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
+from app.photos import PhotoError, process
 from app.regions import US_STATES
 
 
@@ -202,13 +204,27 @@ class PostForm(FlaskForm):
         validators=[DataRequired(message="Enter a goal amount.")],
         description=f"Up to {format_cents(MAX_GOAL_CENTS)}.",
     )
+    photo = FileField(
+        "Photo (optional)",
+        description="One photo, up to 8 MB: JPG, PNG, or WebP. We remove its location data.",
+    )
     accept_rules = BooleanField("I agree to the Community Rules")
 
     goal_cents = 0
+    photo_data: bytes | None = None
 
     def __init__(self, *args: Any, require_rules: bool = False, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.require_rules = require_rules
+
+    def validate_photo(self, field: Field) -> None:
+        upload = field.data
+        if not upload or not getattr(upload, "filename", ""):
+            return
+        try:
+            self.photo_data = process(upload.stream)
+        except PhotoError as error:
+            raise ValidationError(str(error)) from error
 
     def validate_accept_rules(self, field: Field) -> None:
         if self.require_rules and not field.data:

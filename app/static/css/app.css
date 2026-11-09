@@ -80,6 +80,10 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Keep the old page on screen until the next one has painted, so moving between asks never flashes. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 [hidden] { display: none !important; }
 
 body {
@@ -242,7 +246,12 @@ h3.section-title { font-size: 1rem; }
 /* While a card is moving, the real neighbor waits underneath it. */
 .is-moving > .deck-ticket { z-index: 2; user-select: none; }
 .deck .deck-under { z-index: 1; pointer-events: none; }
-.card-body { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; min-height: 0; padding: 64px 84px 18px 18px; }
+.card-body { position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; justify-content: flex-end; min-height: 0; padding: 64px 84px 18px 18px; }
+/* A poster's photo fills the card; the scrim deepens so the words stay readable on any photo. */
+.has-photo { background: var(--void); }
+.ticket-photo { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
+.has-photo .card-body { background: linear-gradient(to bottom, rgb(0 0 0 / 0.45), transparent 22%, transparent 38%, rgb(0 0 0 / 0.82)); }
+.has-photo .card-title { margin-block: auto 0; }
 .card-title { margin-block: auto; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; overflow-wrap: break-word; }
 .card-title a { color: inherit; text-decoration: none; }
 .card-title a::after { content: ""; position: absolute; inset: 0; }
@@ -329,6 +338,10 @@ h3.section-title { font-size: 1rem; }
 .post-hero .amounts strong { font-size: 2rem; }
 .post-hero .meter { height: 4px; }
 .post-hero :focus-visible { outline-color: var(--on-void); }
+.post-hero.has-photo { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: min(72vh, 600px); overflow: hidden; }
+.post-hero.has-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 35%, rgb(0 0 0 / 0.82)); }
+.post-hero.has-photo > :not(.hero-photo) { position: relative; z-index: 1; }
+.hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .card-head a { font-weight: 700; text-decoration: none; }
 .card-head a:hover { text-decoration: underline; }
 .post-body { max-width: 68ch; margin: 20px 0; font-size: 1.0625rem; white-space: pre-line; }
@@ -372,6 +385,9 @@ h3.section-title { font-size: 1rem; }
 .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline-offset: 1px; border-color: var(--ink); }
 .field [aria-invalid="true"], .field [aria-invalid="true"]:focus-visible { border-color: var(--bad); border-width: 2px; }
 .field textarea { min-height: 128px; }
+.field input[type="file"] { min-height: 0; padding: 10px; font-size: 0.9375rem; color: var(--muted); }
+.field input[type="file"]::file-selector-button { margin-right: 12px; padding: 8px 14px; font: inherit; font-weight: 700; color: var(--ink); background: transparent; border: 1.5px solid var(--edge); border-radius: var(--radius); cursor: pointer; }
+.field input[type="file"]::file-selector-button:hover { border-color: var(--ink); }
 .error, .field small.error { color: var(--bad-text); font-weight: 700; }
 .muted, .hint, .field small:not(.error) { color: var(--muted); }
 .hint { margin: 0; font-size: 0.9375rem; }
@@ -516,6 +532,7 @@ h3.section-title { font-size: 1rem; }
 .admin-item { margin-bottom: 12px; }
 .admin-item h3 { margin: 0 0 4px; font-size: 1rem; }
 .admin-item .actions { margin-top: 10px; }
+.admin-photo { display: block; width: 160px; height: 200px; margin-top: 8px; object-fit: cover; border-radius: var(--radius); }
 .legal h2 { margin: 24px 0 6px; font-size: 1.125rem; font-family: var(--sans); }
 .legal h2:first-of-type { margin-top: 8px; }
 .legal p { margin: 0 0 10px; }
@@ -578,6 +595,7 @@ h3.section-title { font-size: 1rem; }
   .stage-page .container-wide:not(:has(> .feed)) { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
   .post-hero { margin: 0; padding: 36px 32px 28px; border-radius: 18px; }
   .post-hero h1 { font-size: 5rem; }
+  .post-hero.has-photo { min-height: 520px; }
   .post:has(> .post-side > .group) { display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 28px; align-items: start; }
   .post:has(> .post-side > .group) > :not(.post-side) { grid-column: 1; }
   .post > .post-side:has(> .group) { grid-column: 2; grid-row: 1 / span 4; }

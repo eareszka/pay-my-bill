@@ -87,6 +87,15 @@ As a **new visitor**, I want to **understand how this works before signing up** 
 - [ ] Example cards are labeled as examples; no invented stats or testimonials.
 - [ ] Reduced motion and browsers without scroll-driven animation get a plain stacked page. The feed is one link away, at `/feed`.
 
+### S5-12 Photo on a post · #122 · 5 pts · P1
+As a **poster**, I want to **add a photo of what I need** so that **donors can see it**. The owner chose the full upload: Cloudflare R2, shown right away but reportable, and one photo per post (ADR 0015).
+- [ ] The post form takes one optional JPG, PNG, or WebP photo up to 8 MB. Anything else gets a clear message, and the rest of the form is kept.
+- [ ] The photo fills the feed card and the post page header, and the words stay readable.
+- [ ] Location and camera details are removed before the photo is stored.
+- [ ] The poster can remove their photo. People can report an inappropriate photo, and admins can remove just the photo.
+- [ ] Deleting a post or account deletes its photos.
+- [ ] Local dev seeds some posts with free placeholder photos.
+
 ## Wireframes (phone width, 360px)
 
 ```
