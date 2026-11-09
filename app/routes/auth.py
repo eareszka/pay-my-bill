@@ -1,10 +1,8 @@
-import smtplib
 from functools import cache
 from urllib.parse import urlsplit
 
 from flask import (
     Blueprint,
-    current_app,
     flash,
     redirect,
     render_template,
@@ -21,7 +19,7 @@ from werkzeug.wrappers import Response
 from app.auth import LOGIN_WINDOW, begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
 from app.forms import EmptyForm, LoginForm, ResetPasswordForm, ResetRequestForm, SignupForm
-from app.mail import send_email
+from app.mail import send_later
 from app.models import LoginAttempt, User, utcnow
 from app.tokens import (
     RESET_MAX_AGE,
@@ -52,22 +50,12 @@ def safe_next(target: str | None) -> str:
 def send_verification(user: User) -> None:
     token = make_token(user.id, user.email, VERIFY_EMAIL)
     link = url_for("auth.verify", token=token, _external=True)
-    send_email(
+    send_later(
         user.email,
         "Verify your Pay My Bill email",
         f"Hi {user.username},\n\nConfirm your email to start posting and chipping in:\n{link}\n\n"
         "This link expires in 48 hours.",
     )
-
-
-def try_send_verification(user: User) -> bool:
-    try:
-        send_verification(user)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception("Could not send the verification email to user %s", user.id)
-        flash("We couldn't send your verification email. Try resending it in a minute.", "error")
-        return False
-    return True
 
 
 @bp.route("/signup", methods=["GET", "POST"])
@@ -104,8 +92,8 @@ def signup() -> str | Response:
                 # Verifying takes a trip to their email; afterwards, back to what they were doing.
                 if request.args.get("next"):
                     session["after_verify"] = safe_next(request.args.get("next"))
-                if try_send_verification(user):
-                    flash("Account created. Check your email to verify it.", "success")
+                send_verification(user)
+                flash("Account created. Check your email to verify it.", "success")
                 return redirect(url_for("auth.verify_pending"))
     return render_template("auth/signup.html", form=form)
 
@@ -121,11 +109,8 @@ def verify_pending() -> str | Response:
 @bp.post("/verify/resend")
 @login_required
 def verify_resend() -> Response:
-    if (
-        EmptyForm().validate_on_submit()
-        and not current_user.is_verified
-        and try_send_verification(current_user)
-    ):
+    if EmptyForm().validate_on_submit() and not current_user.is_verified:
+        send_verification(current_user)
         flash("We sent you a new verification link.", "success")
     return redirect(url_for("auth.verify_pending"))
 
@@ -183,14 +168,6 @@ RESET_SENT = (
 )
 
 
-def _send_quietly(to: str, subject: str, body: str) -> None:
-    # The reply never changes, so a mail failure is logged, not shown.
-    try:
-        send_email(to, subject, body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception("Could not send %r", subject)
-
-
 @bp.route("/reset", methods=["GET", "POST"])
 def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
     form = ResetRequestForm()
@@ -209,7 +186,7 @@ def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
             # Bound to the password hash, so the link stops working once it's used.
             token = make_token(user.id, user.password_hash, RESET_PASSWORD)
             link = url_for("auth.reset_password", token=token, _external=True)
-            _send_quietly(
+            send_later(
                 user.email,
                 "Reset your Pay My Bill password",
                 f"Hi {user.username},\n\nSet a new password here:\n{link}\n\n"
@@ -239,7 +216,7 @@ def reset_password(token: str) -> str | Response:
             LoginAttempt(identifier=user.username, ip=request.remote_addr, succeeded=True)
         )
         db.session.commit()
-        _send_quietly(
+        send_later(
             user.email,
             "Your Pay My Bill password changed",
             f"Hi {user.username},\n\nYour password was just changed. If this wasn't you, "

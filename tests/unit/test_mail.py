@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from flask import Flask
 
-from app.mail import send_email
+from app.mail import send_email, send_later
 
 
 def test_console_backend_logs(app: Flask, caplog: pytest.LogCaptureFixture) -> None:
@@ -73,3 +73,28 @@ def test_brevo_bare_sender_and_errors_are_oserror(
     app.config.update(BREVO_API_KEY="key", MAIL_FROM="hi@example.com")
     with pytest.raises(OSError):
         send_email("a@example.com", "Hello", "Body")
+
+
+def test_send_later_runs_in_the_background(app: Flask, caplog: pytest.LogCaptureFixture) -> None:
+    app.config["MAIL_ASYNC"] = True
+    caplog.set_level(logging.INFO)
+    with app.app_context():
+        future = send_later("a@example.com", "Hello", "Body")
+    assert future is not None
+    future.result(timeout=5)
+    assert "Subject: Hello" in caplog.text
+
+
+def test_send_later_logs_failures(
+    app: Flask, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    def fail(*_: object) -> None:
+        raise OSError("down")
+
+    monkeypatch.setattr("app.mail.send_email", fail)
+    app.config["MAIL_ASYNC"] = True
+    with app.app_context():
+        future = send_later("a@example.com", "Hello", "Body")
+    assert future is not None
+    future.result(timeout=5)
+    assert "Could not send 'Hello'" in caplog.text

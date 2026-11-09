@@ -341,7 +341,7 @@ def test_account_updated_webhook_tracks_readiness(
 def test_webhook_emails_failing_is_logged(
     client: FlaskClient, post: Post, donor: User, caplog: pytest.LogCaptureFixture
 ) -> None:
-    with patch("app.routes.card_gifts.send_email", side_effect=smtplib.SMTPException("down")):
+    with patch("app.mail.send_email", side_effect=smtplib.SMTPException("down")):
         assert signed(client, paid_event(post, donor)).status_code == 200
     assert "Could not send" in caplog.text
     assert len(gifts()) == 1

@@ -153,11 +153,11 @@ def test_gift_saved_when_email_fails(
     def fail(*_: object) -> None:
         raise smtplib.SMTPException("down")
 
-    monkeypatch.setattr("app.routes.gifts.send_email", fail)
+    monkeypatch.setattr("app.mail.send_email", fail)
     login_as(client, donor)
     assert send(client, post).status_code == 302
     assert len(gifts()) == 1
-    assert "Could not send the gift notice" in caplog.text
+    assert "Could not send 'dev_tom sent you a gift'" in caplog.text
 
 
 def test_gift_up_to_goal_allowed(client: FlaskClient, post: Post, donor: User) -> None:

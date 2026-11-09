@@ -1,7 +1,5 @@
-import smtplib
-
 import click
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from sqlalchemy import or_, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
@@ -9,7 +7,7 @@ from werkzeug.wrappers import Response
 from app.auth import admin_required
 from app.extensions import db
 from app.forms import EmptyForm
-from app.mail import send_email
+from app.mail import send_later
 from app.models import Post, PostStatus, Report, User, utcnow
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -19,10 +17,7 @@ def notify_admins(subject: str, body: str) -> None:
     admins = db.session.scalars(select(User).where(User.is_admin.is_(True))).all()
     link = url_for("admin.queue", _external=True)
     for admin in admins:
-        try:
-            send_email(admin.email, subject, f"{body}\n\nReview it: {link}")
-        except (smtplib.SMTPException, OSError):
-            current_app.logger.exception("Could not email admin %s", admin.id)
+        send_later(admin.email, subject, f"{body}\n\nReview it: {link}")
 
 
 def _resolve(*where: object, resolution: str) -> None:

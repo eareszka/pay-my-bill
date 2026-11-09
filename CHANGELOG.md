@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Changed
+- Emails sent during a page or webhook (verification, reset, gift and update notices, handle changes, admin alerts) now go out on a background thread, so a slow mail service no longer holds up sign-up or Stripe's webhook. Failures are still logged. Sign-up and resend now always say the link is on its way (#105).
+
+### Changed
 - Stripe onboarding skips the business questions. Pay My Bill fills in the industry, website (the recipient's profile), product description, and statement descriptor, so recipients only give their personal and bank details (#98).
 
 ### Changed

@@ -21,7 +21,7 @@ from werkzeug.wrappers import Response
 from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm
-from app.mail import send_email
+from app.mail import send_email, send_later
 from app.models import (
     LATE_GIFT_HOURS,
     PENDING_GIFT_DAYS,
@@ -52,10 +52,7 @@ def send_gift_notice(donation: Donation) -> None:
         f"{answer_link(donation)}\n\n"
         f"Or see all your gifts: {url_for('gifts.index', _external=True)}"
     )
-    try:
-        send_email(post.user.email, f"{donation.donor.username} sent you a gift", body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception("Could not send the gift notice for donation %s", donation.id)
+    send_later(post.user.email, f"{donation.donor.username} sent you a gift", body)
 
 
 @bp.post("/posts/<int:post_id>/gifts")

@@ -110,13 +110,13 @@ def test_notice_failure_does_not_block_save(
     def fail(*_: object) -> None:
         raise smtplib.SMTPServerDisconnected("down")
 
-    monkeypatch.setattr("app.routes.profile.send_email", fail)
+    monkeypatch.setattr("app.mail.send_email", fail)
     user = make_user()
     login_as(client, user)
     resp = client.post("/profile", data=FORM, follow_redirects=True)
     assert b"Profile saved." in resp.data
     assert user.cashapp_handle == "$maria"
-    assert "Could not send the handle-change notice" in caplog.text
+    assert "Could not send 'Your payment handles changed'" in caplog.text
 
 
 def test_public_profile_without_handles(client: FlaskClient, make_user: MakeUser) -> None:

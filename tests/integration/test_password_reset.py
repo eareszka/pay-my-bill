@@ -124,6 +124,6 @@ def test_reset_clears_a_login_lockout(
 
 def test_mail_failure_keeps_the_same_reply(client: FlaskClient, make_user: MakeUser) -> None:
     make_user("alice")
-    with patch("app.routes.auth.send_email", side_effect=smtplib.SMTPException("down")):
+    with patch("app.mail.send_email", side_effect=smtplib.SMTPException("down")):
         resp = client.post("/reset", data={"email": "alice@example.com"}, follow_redirects=True)
     assert b"If an account uses that email" in resp.data
