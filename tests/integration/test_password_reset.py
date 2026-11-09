@@ -35,6 +35,7 @@ def test_same_reply_whether_or_not_the_account_exists(
     assert known.status_code == unknown.status_code == 200
     assert b"If an account uses that email" in known.data
     assert b"If an account uses that email" in unknown.data
+    assert b"Check your spam or junk folder" in known.data
     assert caplog.text.count("Reset your Pay My Bill password") == 1
 
 

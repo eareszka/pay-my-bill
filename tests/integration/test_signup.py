@@ -138,6 +138,7 @@ def test_verify_pending_page(client: FlaskClient, make_user: MakeUser) -> None:
     resp = client.get("/verify/pending")
     assert b"Verify your email" in resp.data
     assert b"bob@example.com" in resp.data
+    assert b"Check your spam or junk folder" in resp.data
 
 
 def test_verify_pending_redirects_verified_user(client: FlaskClient, make_user: MakeUser) -> None:
