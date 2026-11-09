@@ -15,10 +15,10 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-7 Bulletin board and the top spot | #85 | 5 | Done |
 | S5-6 Password reset | #82 | 3 | To do |
 | S5-8 Swipe through the pile | #90 | 3 | Done |
-| S5-9 New look: the card stack | #118 | 8 | In progress |
+| S5-9 New look: the card stack | #118 | 8 | Done |
 | S5-10 Categories and show less | #119 | 5 | To do |
 | S5-11 How-it-works home page | #120 | 5 | To do |
-| S5-12 Photo on a post | #122 | 5 | In progress |
+| S5-12 Photo on a post | #122 | 5 | Done |
 
 **Total:** 55 points (Sprint 4: 16).
 
@@ -44,3 +44,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-09: The #118 finish review asked for 8 fixes, all applied and scored resolved (ship); PR #121 is open. The owner asked for placeholder photos to test uploads, then chose the full upload story (#122): R2 storage, shown right away but reportable, one photo per post. Built it on top of #118 with ADR 0015, migration 0014 (after 0012; re-point it if #116's 0013 lands first), and CC0 seed photos from Wikimedia Commons. 681 tests pass at 100%. Blocked: the owner needs a Cloudflare R2 bucket and five `R2_*` settings on Render before staging keeps photos.
 - 2026-11-09: The owner found the desktop feed counterintuitive: a phone-shaped card on a monitor, while the post page already looked right. They chose a wide card with side arrows. On #118, the desktop feed now matches the post page (the ask and Chip in as one wide card, big Back and Next outside, arrow keys), and phones are unchanged. Blocked: none.
 - 2026-11-09: The owner saw a flicker moving between asks with and without photos. #122 now loads and decodes neighbor photos as the feed opens, paints the visible photo first (preloaded, high priority, decoded right away), keeps the old page on screen until the next one paints (a cross-document view transition with no animation), and shows near-black under a loading photo, not the category color. Blocked: none.
+- 2026-11-09: The owner approved the look and the flicker fix. #118 merged (#121) and #122 merged (#123), and staging serves both. Photos on staging last only once R2 is set up. The owner asked how donors and posters can talk. They chose four backlog stories with no threads: a note with your gift (PB-45, #124), a thank-you with a reply (PB-31, #125), progress updates with following (PB-46, #126), and questions before giving (PB-47, #127), with shared guardrails. They come after #119 and #120. Next: the owner confirms the #119 category list. Blocked: none.
