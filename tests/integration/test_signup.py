@@ -12,7 +12,7 @@ from werkzeug.security import check_password_hash
 from app import create_app
 from app.auth import verified_required
 from app.extensions import db
-from app.models import User, as_utc, utcnow
+from app.models import LoginAttempt, User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
 from tests.conftest import MakeUser, login_as
 
@@ -154,6 +154,25 @@ def test_resend_sends_new_link(
         resp = client.post("/verify/resend", follow_redirects=True)
     assert b"new verification link" in resp.data
     assert "/verify/" in caplog.text
+
+
+def test_resend_is_limited_per_hour(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    user = make_user(verified=False)
+    login_as(client, user)
+    for _ in range(3):
+        assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data
+    caplog.clear()
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/verify/resend", follow_redirects=True)
+    assert b"try again in an hour" in resp.data
+    assert "/verify/" not in caplog.text
+    # The limit lifts once the earlier emails are an hour old.
+    for row in db.session.scalars(select(LoginAttempt)):
+        row.created_at = utcnow() - timedelta(hours=1, minutes=1)
+    db.session.commit()
+    assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data
 
 
 def test_verified_required_prompts_unverified_user() -> None:

@@ -16,7 +16,13 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.wrappers import Response
 
-from app.auth import LOGIN_WINDOW, begin_login_attempt, login_required, mark_login_succeeded
+from app.auth import (
+    LOGIN_WINDOW,
+    allow_verification_email,
+    begin_login_attempt,
+    login_required,
+    mark_login_succeeded,
+)
 from app.extensions import db
 from app.forms import EmptyForm, LoginForm, ResetPasswordForm, ResetRequestForm, SignupForm
 from app.mail import send_later
@@ -47,7 +53,9 @@ def safe_next(target: str | None) -> str:
     return url_for("main.index")
 
 
-def send_verification(user: User) -> None:
+def send_verification(user: User) -> bool:
+    if not allow_verification_email(user.id):
+        return False
     token = make_token(user.id, user.email, VERIFY_EMAIL)
     link = url_for("auth.verify", token=token, _external=True)
     send_later(
@@ -56,6 +64,7 @@ def send_verification(user: User) -> None:
         f"Hi {user.username},\n\nConfirm your email to start posting and chipping in:\n{link}\n\n"
         "This link expires in 48 hours.",
     )
+    return True
 
 
 @bp.route("/signup", methods=["GET", "POST"])
@@ -110,8 +119,14 @@ def verify_pending() -> str | Response:
 @login_required
 def verify_resend() -> Response:
     if EmptyForm().validate_on_submit() and not current_user.is_verified:
-        send_verification(current_user)
-        flash("We sent you a new verification link.", "success")
+        if send_verification(current_user):
+            flash("We sent you a new verification link.", "success")
+        else:
+            flash(
+                "We've sent a few links already. Check your spam or junk folder, "
+                "or try again in an hour.",
+                "error",
+            )
     return redirect(url_for("auth.verify_pending"))
 
 

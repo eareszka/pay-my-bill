@@ -15,6 +15,10 @@ from app.models import LoginAttempt, User, utcnow
 MAX_FAILED_LOGINS = 5
 MAX_FAILED_LOGINS_PER_IP = 20
 LOGIN_WINDOW = timedelta(minutes=15)
+# Signup's email plus two resends an hour, so one account can't drain the
+# daily email quota (#14).
+MAX_VERIFY_EMAILS = 3
+VERIFY_EMAIL_WINDOW = timedelta(hours=1)
 
 
 def load_user(user_id: str) -> User | None:
@@ -67,6 +71,20 @@ def begin_login_attempt(identifier: str, ip: str | None) -> LoginAttempt | None:
     ):
         return None
     return attempt
+
+
+def allow_verification_email(user_id: int) -> bool:
+    """Record a verification email for the user, unless they've hit the hourly limit.
+
+    Rows have no IP, so they never count toward the per-IP login throttle.
+    """
+    identifier = f"verify:{user_id}"
+    since = utcnow() - VERIFY_EMAIL_WINDOW
+    if _failures_since(since, LoginAttempt.identifier == identifier) >= MAX_VERIFY_EMAILS:
+        return False
+    db.session.add(LoginAttempt(identifier=identifier, ip=None, succeeded=False))
+    db.session.commit()
+    return True
 
 
 def mark_login_succeeded(attempt: LoginAttempt) -> None:
