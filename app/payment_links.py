@@ -41,7 +41,7 @@ class PayOption(NamedTuple):
 # Base pay URL per app and how an amount is appended to it (done in the browser).
 PAY_URLS = {
     PaymentMethod.CASHAPP: ("https://cash.app/{}", "/"),
-    PaymentMethod.VENMO: ("https://venmo.com/?txn=pay&recipients={}", "&amount="),
+    PaymentMethod.VENMO: ("https://account.venmo.com/pay?txn=pay&recipients={}", "&amount="),
     PaymentMethod.PAYPAL: ("https://paypal.me/{}", "/"),
 }
 

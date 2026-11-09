@@ -3,8 +3,49 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Security
+- Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
+
+### Changed
+- Emails sent during a page or webhook (verification, reset, gift and update notices, handle changes, admin alerts) now go out on a background thread, so a slow mail service no longer holds up sign-up or Stripe's webhook. Failures are still logged. Sign-up and resend now always say the link is on its way (#105).
+
+### Changed
+- Stripe onboarding skips the business questions. Pay My Bill fills in the industry, website (the recipient's profile), product description, and statement descriptor, so recipients only give their personal and bank details (#98).
+
+### Changed
+- The verify page and the password reset message tell people to check their spam or junk folder, and to mark the email "Not spam" on the verify page. Without a domain of our own, Pay My Bill's emails often land there.
+
+### Changed
+- The database moved from Render's free Postgres, which expires, to Neon's free tier (ADR 0005 amendment, #33).
+
+### Changed
+- The card form says that a card from outside the US costs a little more, and that it comes out of the gift (#104).
+
+### Fixed
+- Card checkout offers only cards, Apple Pay, and Google Pay. Other methods have different fees that the donor's fee doesn't cover (#108).
+
+### Changed
+- Card gifts now use Stripe Managed Risk (ADR 0014 amendment). Recipient accounts are created with Accounts v2 with Stripe covering losses, and gifts are direct charges on the recipient's account. Refunds and disputes come out of the recipient's Stripe balance, not the platform's. The test setup also blanks Stripe and mail keys, so a developer's `.env` can't reach real services from tests.
+
 ### Added
 - Swipe through the pile (#90). On the feed, swipe left for the next ticket and right to go back, with the ticket moving like mail being dealt off a pile and the real neighboring post already underneath. Back, Next ticket, and the arrow keys play the same motion. Swiping never gives or hides a post, and the links still work without JavaScript.
+- Instant card gifts (PB-43, ADR 0014). When the recipient has connected Stripe, the Chip in panel leads with Chip in instantly: card, Apple Pay, or Google Pay through Stripe Checkout, from $5 up to the goal. The donor covers the card fee, so the recipient gets the whole gift as a destination charge. A signed webhook records the gift as confirmed at once, with no recipient step (amending ADR 0004), and emails both sides. Retried deliveries are ignored. Refunds and card disputes un-count the gift and email admins. `account.updated` keeps each recipient's readiness current. App links stay as the fallback. The Terms add the Stripe Connected Account Agreement, and the Privacy Policy names Stripe (migration 0012).
+- Recipients can connect Stripe (PB-42, ADR 0014). With `STRIPE_SECRET_KEY` set, the profile has a Card and Apple Pay gifts section that starts Stripe-hosted Express onboarding. Coming back records whether the account can take transfers and pay out, and connected recipients get a link to their Stripe payouts page. A recipient with only Stripe connected can now post (migration 0011).
+
+### Added
+- One-tap confirm. The "sent you a gift" email now links to a page that asks "Did $20 arrive?" with Yes and No buttons, and it works without logging in. The link is signed, tied to that recipient, and expires with the gift after 14 days. Opening it only shows the question, so email scanners can't answer it. Confirming from email does everything confirming on the Gifts page does.
+
+### Fixed
+- Venmo pay buttons now open `account.venmo.com/pay`, Venmo's current web pay page. The old `venmo.com/?txn=pay` link was blocked with a 406.
+
+### Added
+- Email through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks outbound SMTP. SMTP and the console backend still work as before.
+- Reports and an admin queue (PB-33, #68). Verified users can report a post or a person, with a reason and an optional note. Each person can have one open report per target, and admins get an email for every report and every flagged post. `/admin` shows flagged posts and open reports in one queue. Admins can approve a flagged post, whose 30 days then start at approval, remove a post, ban a user, or dismiss a report. A banned user's open posts are removed, their sessions end, and they can't log in. `flask --app app admin grant <email>` makes an admin (migration 0010).
+- Password reset (#82). Log in links to "Forgot your password?", which always gives the same reply, so it can't reveal who has an account. The emailed link expires in an hour and stops working once the password changes. Requests share the login rate limit. A reset clears a lockout, verifies the email, and emails a notice that the password changed.
+- Terms of Service and Privacy Policy pages (#32), as drafts pending legal review. They're linked in a new footer beside the Rules, and signup now asks people to confirm they're 18 or older and agree to both. `CONTACT_EMAIL` sets the address shown on the pages, and `render.yaml` lists the mail settings for Gmail SMTP.
+
+### Documentation
+- The roadmap and backlog now set out the owner's path to launch: match the concept, make it safe to open, go to production, run a closed beta, then the App Store.
 
 ### Changed
 - Bulletin board redesign (#85). The owner replaced the rack: every page now uses a cork ground, a wood top bar, and plain square tickets, with leaf green for primary actions, links, and progress marks. The feed shows one large ticket at a time with a tear-off Chip in tab and Next ticket, replacing the scrolling list. On screens 960px and wider, the ticket sits beside a Chip in panel so people can give without leaving, and the post page uses the same split. The first ticket rewards follow-through (ADR 0013): overdue posters are out, a good record comes first, then first-time posters, then closest to goal. Positive feedback is capped per update, so a pile of kudos can't cancel real 🤨. Reviews also raised contrast on error text and the dark green hover, made the ticket stack visible in dark mode, and held post stories to a readable line length. `DESIGN.md` now describes this look.

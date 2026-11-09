@@ -23,7 +23,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app.models import MAX_GOAL_CENTS, Post, PostKind
+from app.models import MAX_GOAL_CENTS, Post, PostKind, ReportReason
 from app.moderation import is_flagged
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
@@ -73,8 +73,12 @@ class SignupForm(FlaskForm):
         ],
     )
     adult = BooleanField(
-        "I'm 18 or older",
-        validators=[DataRequired(message="You need to be 18 or older to join.")],
+        "I'm 18 or older and agree to the Terms and Privacy Policy",
+        validators=[
+            DataRequired(
+                message="You need to be 18 or older and agree to the Terms and Privacy Policy."
+            )
+        ],
     )
 
 
@@ -92,6 +96,35 @@ class LoginForm(FlaskForm):
         validators=[
             DataRequired(message="Enter your password."),
             Length(max=128, message="Passwords are up to 128 characters."),
+        ],
+    )
+
+
+class ResetRequestForm(FlaskForm):
+    email = EmailField(
+        "Email",
+        filters=[_lower],
+        validators=[
+            DataRequired(message="Enter your email."),
+            Email(check_deliverability=False, message="Enter a valid email address."),
+            Length(max=240, message="Emails here are up to 240 characters."),
+        ],
+    )
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(
+        "New password",
+        validators=[
+            DataRequired(message="Choose a password."),
+            Length(min=8, max=128, message="Passwords are 8 to 128 characters."),
+        ],
+    )
+    confirm = PasswordField(
+        "Confirm new password",
+        validators=[
+            DataRequired(message="Type your password again."),
+            EqualTo("password", message="Passwords must match."),
         ],
     )
 
@@ -258,6 +291,19 @@ class DeleteAccountForm(FlaskForm):
             DataRequired(message="Enter your password."),
             Length(max=128, message="Passwords are up to 128 characters."),
         ],
+    )
+
+
+class ReportForm(FlaskForm):
+    reason = RadioField(
+        "What's wrong?",
+        choices=[SelectChoice(r.value, r.label) for r in ReportReason],
+        validators=[DataRequired(message="Choose a reason.")],
+    )
+    details = TextAreaField(
+        "Anything else we should know? (optional)",
+        filters=[_strip_to_none],
+        validators=[Length(max=500, message="Keep it under 500 characters.")],
     )
 
 

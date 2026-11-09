@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_field.html" import field %}
+{% block title %}Report · Pay My Bill{% endblock %}
+{% block content %}
+  <h1>Report {{ what }}</h1>
+  <form method="post" class="form page-form" novalidate>
+    {{ form.hidden_tag() }}
+    <fieldset class="field">
+      <legend>{{ form.reason.label.text }}</legend>
+      {% for option in form.reason %}
+        <label class="choice">{{ option() }} <span>{{ option.label.text }}</span></label>
+      {% endfor %}
+      {% if form.reason.errors %}<small class="error" id="reason-error">{{ form.reason.errors | join(" ") }}</small>{% endif %}
+    </fieldset>
+    {{ field(form.details, rows=3) }}
+    <p class="hint">Reports are private. Only admins see who sent them.</p>
+    <button type="submit" class="btn">Send report</button>
+  </form>
+{% endblock %}

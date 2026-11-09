@@ -32,9 +32,16 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAIL_PORT=int(os.environ.get("MAIL_PORT") or 587),
         MAIL_USERNAME=os.environ.get("MAIL_USERNAME", ""),
         MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD", ""),
+        BREVO_API_KEY=os.environ.get("BREVO_API_KEY", ""),
+        # Request-path email goes to a background thread; tests send inline.
+        MAIL_ASYNC=os.environ.get("MAIL_ASYNC", "1") != "0",
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
         # Base URL for links in emails sent outside a request (the reminder command).
         APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),
+        CONTACT_EMAIL=os.environ.get("CONTACT_EMAIL", "support@example.com"),
+        STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
+        STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
+        STRIPE_CONNECT_WEBHOOK_SECRET=os.environ.get("STRIPE_CONNECT_WEBHOOK_SECRET", ""),
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )
@@ -57,13 +64,17 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     seed.register(app)
     errors.register(app)
 
+    from app.routes.admin import bp as admin_bp
     from app.routes.auth import bp as auth_bp
+    from app.routes.card_gifts import bp as card_bp
     from app.routes.gifts import bp as gifts_bp
     from app.routes.health import bp as health_bp
     from app.routes.leaders import bp as leaders_bp
     from app.routes.main import bp as main_bp
     from app.routes.posts import bp as posts_bp
     from app.routes.profile import bp as profile_bp
+    from app.routes.reports import bp as reports_bp
+    from app.routes.stripe_connect import bp as stripe_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(main_bp)
@@ -72,7 +83,12 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(posts_bp)
     app.register_blueprint(gifts_bp)
     app.register_blueprint(leaders_bp)
+    app.register_blueprint(reports_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(stripe_bp)
+    app.register_blueprint(card_bp)
 
+    from app import stripe_pay
     from app.money import format_cents
 
     app.add_template_filter(format_cents, "cents")
@@ -81,6 +97,10 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAX_GOAL=format_cents(models.MAX_GOAL_CENTS),
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,
         PostStatus=models.PostStatus,
+        DonationStatus=models.DonationStatus,
         ReactionKind=models.ReactionKind,
+        LEGAL_UPDATED="November 8, 2026",
+        CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
+        stripe_enabled=stripe_pay.enabled,
     )
     return app

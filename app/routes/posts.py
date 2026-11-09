@@ -17,15 +17,16 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
-from app import format_date
+from app import format_date, stripe_pay
 from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.extensions import db
 from app.forms import GiftForm, PostForm, ResultsUpdateForm
-from app.mail import send_email
+from app.mail import send_email, send_later
 from app.models import (
     LATE_GIFT_HOURS,
     MAX_OPEN_POSTS,
+    MIN_CARD_GIFT_CENTS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
     Post,
@@ -40,6 +41,7 @@ from app.models import (
 )
 from app.moderation import is_flagged
 from app.payment_links import pay_options
+from app.routes.admin import notify_admins
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
@@ -95,8 +97,11 @@ def new() -> str | Response | tuple[str, int]:
     if overdue:
         flash("You have an overdue results update. Post it before creating a new post.", "info")
         return redirect(url_for("posts.show", post_id=overdue.id, _anchor="update"))
-    if not user.has_payment_handle:
-        flash("Add a Cash App, Venmo, or PayPal handle so people can pay you.", "info")
+    if not user.can_be_paid:
+        flash(
+            "Connect Stripe or add a Cash App, Venmo, or PayPal handle so people can pay you.",
+            "info",
+        )
         return redirect(url_for("profile.edit"))
     form = PostForm(require_rules=user.rules_accepted_at is None)
     if form.is_submitted():
@@ -122,6 +127,10 @@ def new() -> str | Response | tuple[str, int]:
         db.session.add(post)
         db.session.commit()
         if flagged:
+            notify_admins(
+                "A post is waiting for review",
+                f"{user.username}'s post “{post.title}” matched the fundraising word list.",
+            )
             flash("Thanks! Your post will show in the feed after a quick review.", "info")
         else:
             flash("Your post is live.", "success")
@@ -186,13 +195,21 @@ def chip_in_context(post: Post, form: GiftForm | None = None) -> dict[str, objec
             post.pending_gift_from(current_user.id) if current_user.is_authenticated else None
         ),
         "late_gift_hours": LATE_GIFT_HOURS,
+        "card_ready": stripe_pay.enabled() and post.user.stripe_ready and post.is_open,
+        "min_card_gift": MIN_CARD_GIFT_CENTS,
     }
 
 
-def render_post(post: Post, form: GiftForm, update_form: ResultsUpdateForm | None = None) -> str:
+def render_post(
+    post: Post,
+    form: GiftForm,
+    update_form: ResultsUpdateForm | None = None,
+    card_error: str | None = None,
+) -> str:
     return render_template(
         "posts/show.html",
         post=post,
+        card_error=card_error,
         reactions=reaction_view(post) if post.update_body else None,
         update_form=update_form or ResultsUpdateForm(formdata=None),
         **chip_in_context(post, form),
@@ -241,12 +258,7 @@ def send_update_notice(post: Post, donor: User) -> None:
         f"Hi {donor.username},\n\n{post.user.username} shared how it went "
         f'on "{post.title}", a post you chipped in on.\n\nRead it here:\n{link}'
     )
-    try:
-        send_email(donor.email, f"{post.user.username} shared how it went", body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception(
-            "Could not send the update notice for post %s to user %s", post.id, donor.id
-        )
+    send_later(donor.email, f"{post.user.username} shared how it went", body)
 
 
 @bp.post("/<int:post_id>/update")

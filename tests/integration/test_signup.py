@@ -12,7 +12,7 @@ from werkzeug.security import check_password_hash
 from app import create_app
 from app.auth import verified_required
 from app.extensions import db
-from app.models import User, as_utc, utcnow
+from app.models import LoginAttempt, User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
 from tests.conftest import MakeUser, login_as
 
@@ -138,6 +138,7 @@ def test_verify_pending_page(client: FlaskClient, make_user: MakeUser) -> None:
     resp = client.get("/verify/pending")
     assert b"Verify your email" in resp.data
     assert b"bob@example.com" in resp.data
+    assert b"Check your spam or junk folder" in resp.data
 
 
 def test_verify_pending_redirects_verified_user(client: FlaskClient, make_user: MakeUser) -> None:
@@ -153,6 +154,25 @@ def test_resend_sends_new_link(
         resp = client.post("/verify/resend", follow_redirects=True)
     assert b"new verification link" in resp.data
     assert "/verify/" in caplog.text
+
+
+def test_resend_is_limited_per_hour(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    user = make_user(verified=False)
+    login_as(client, user)
+    for _ in range(3):
+        assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data
+    caplog.clear()
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/verify/resend", follow_redirects=True)
+    assert b"try again in an hour" in resp.data
+    assert "/verify/" not in caplog.text
+    # The limit lifts once the earlier emails are an hour old.
+    for row in db.session.scalars(select(LoginAttempt)):
+        row.created_at = utcnow() - timedelta(hours=1, minutes=1)
+    db.session.commit()
+    assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data
 
 
 def test_verified_required_prompts_unverified_user() -> None:
@@ -217,14 +237,15 @@ def test_signup_survives_mail_failure(
     def fail(*_: object) -> None:
         raise smtplib.SMTPServerDisconnected("down")
 
-    monkeypatch.setattr("app.routes.auth.send_email", fail)
+    monkeypatch.setattr("app.mail.send_email", fail)
     resp = client.post("/signup", data=FORM, follow_redirects=True)
-    assert b"couldn&#39;t send your verification email" in resp.data
+    # Mail goes out in the background, so the page can only promise it (#105).
+    assert b"Check your email to verify it" in resp.data
     assert b"Verify your email" in resp.data
     assert user_count() == 1
-    assert "Could not send the verification email" in caplog.text
+    assert "Could not send 'Verify your Pay My Bill email'" in caplog.text
     resp = client.post("/verify/resend", follow_redirects=True)
-    assert b"new verification link" not in resp.data
+    assert b"new verification link" in resp.data
 
 
 def test_malformed_session_user_id_is_anonymous(client: FlaskClient) -> None:
@@ -245,7 +266,9 @@ def test_proxy_headers_make_https_links(
 def test_signup_requires_18_plus(client: FlaskClient) -> None:
     resp = client.post("/signup", data={k: v for k, v in FORM.items() if k != "adult"})
     assert resp.status_code == 200
-    assert "You need to be 18 or older to join." in resp.get_data(as_text=True)
+    assert "You need to be 18 or older and agree to the Terms and Privacy Policy." in resp.get_data(
+        as_text=True
+    )
     assert user_count() == 0
 
 

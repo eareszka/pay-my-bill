@@ -23,6 +23,7 @@ PENDING_GIFT_DAYS = 14
 POST_OPEN_DAYS = 30
 MIN_ACCOUNT_AGE_DAYS = 3  # T2: verified accounts this old count toward rewards and rank
 LATE_GIFT_HOURS = 24
+MIN_CARD_GIFT_CENTS = 500
 UPDATE_DUE_DAYS = 7
 DELETED_EMAIL_DOMAIN = "@deleted.invalid"
 DELETED_POST_TITLE = "Deleted post"
@@ -70,10 +71,34 @@ class ReactionKind(StrEnum):
     HMM = "hmm"
 
 
+class ReportReason(StrEnum):
+    SCAM = "scam"
+    BUSINESS = "business"
+    HARASSMENT = "harassment"
+    PRIVATE_INFO = "private_info"
+    SPAM = "spam"
+    OTHER = "other"
+
+    @property
+    def label(self) -> str:
+        return REPORT_REASON_LABELS[self]
+
+
+REPORT_REASON_LABELS = {
+    ReportReason.SCAM: "Scam or false story",
+    ReportReason.BUSINESS: "Business or investment fundraising",
+    ReportReason.HARASSMENT: "Harassment, hate, or threats",
+    ReportReason.PRIVATE_INFO: "Shares private information",
+    ReportReason.SPAM: "Spam",
+    ReportReason.OTHER: "Something else",
+}
+
+
 class PaymentMethod(StrEnum):
     CASHAPP = "cashapp"
     VENMO = "venmo"
     PAYPAL = "paypal"
+    CARD = "card"
 
     @property
     def label(self) -> str:
@@ -84,6 +109,7 @@ PAYMENT_LABELS = {
     PaymentMethod.CASHAPP: "Cash App",
     PaymentMethod.VENMO: "Venmo",
     PaymentMethod.PAYPAL: "PayPal",
+    PaymentMethod.CARD: "card",
 }
 
 
@@ -131,6 +157,9 @@ class User(Base):
     rules_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     adult_attested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_admin: Mapped[bool] = mapped_column(default=False)
+    banned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    stripe_account_id: Mapped[str | None] = mapped_column(String(64), unique=True)
+    stripe_ready: Mapped[bool] = mapped_column(default=False, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")
@@ -155,8 +184,16 @@ class User(Base):
         return self.email.endswith(DELETED_EMAIL_DOMAIN)
 
     @property
+    def is_banned(self) -> bool:
+        return self.banned_at is not None
+
+    @property
     def has_payment_handle(self) -> bool:
         return any((self.cashapp_handle, self.venmo_handle, self.paypal_handle))
+
+    @property
+    def can_be_paid(self) -> bool:
+        return self.has_payment_handle or self.stripe_ready
 
 
 class Post(Base):
@@ -189,6 +226,9 @@ class Post(Base):
         back_populates="post", cascade="all, delete-orphan", lazy="selectin"
     )
     reactions: Mapped[list["Reaction"]] = relationship(cascade="all, delete-orphan")
+    reports: Mapped[list["Report"]] = relationship(
+        back_populates="post", cascade="all, delete-orphan"
+    )
 
     @property
     def is_deleted(self) -> bool:
@@ -328,6 +368,10 @@ class Donation(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     reminded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Card gifts through Stripe (ADR 0014): the session makes webhooks idempotent.
+    stripe_session_id: Mapped[str | None] = mapped_column(String(255), unique=True)
+    stripe_payment_intent: Mapped[str | None] = mapped_column(String(255), index=True)
+    fee_cents: Mapped[int] = mapped_column(default=0, server_default="0")
 
     post: Mapped[Post] = relationship(back_populates="donations")
     donor: Mapped[User] = relationship()
@@ -358,6 +402,28 @@ class Reaction(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     kind: Mapped[ReactionKind] = mapped_column(_enum_column(ReactionKind, "reaction_kind"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Report(Base):
+    __tablename__ = "reports"
+    __table_args__ = (
+        CheckConstraint("(post_id IS NULL) <> (user_id IS NULL)", name="one_target"),
+        Index("ix_reports_resolved_at", "resolved_at"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reporter_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), index=True)
+    reason: Mapped[ReportReason] = mapped_column(_enum_column(ReportReason, "report_reason"))
+    details: Mapped[str | None] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolution: Mapped[str | None] = mapped_column(String(20))
+
+    reporter: Mapped[User] = relationship(foreign_keys=[reporter_id])
+    post: Mapped["Post | None"] = relationship(foreign_keys=[post_id], back_populates="reports")
+    user: Mapped[User | None] = relationship(foreign_keys=[user_id])
 
 
 class LoginAttempt(Base):

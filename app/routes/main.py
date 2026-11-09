@@ -58,3 +58,13 @@ def index() -> str:
 @bp.get("/rules")
 def rules() -> str:
     return render_template("rules.html")
+
+
+@bp.get("/terms")
+def terms() -> str:
+    return render_template("legal/terms.html")
+
+
+@bp.get("/privacy")
+def privacy() -> str:
+    return render_template("legal/privacy.html")

@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Any, cast
 
 import flask_login
-from flask import flash, redirect, request, url_for
+from flask import abort, flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy import ColumnElement, func, select
 from werkzeug.wrappers import Response
@@ -15,6 +15,10 @@ from app.models import LoginAttempt, User, utcnow
 MAX_FAILED_LOGINS = 5
 MAX_FAILED_LOGINS_PER_IP = 20
 LOGIN_WINDOW = timedelta(minutes=15)
+# Signup's email plus two resends an hour, so one account can't drain the
+# daily email quota (#14).
+MAX_VERIFY_EMAILS = 3
+VERIFY_EMAIL_WINDOW = timedelta(hours=1)
 
 
 def load_user(user_id: str) -> User | None:
@@ -22,8 +26,8 @@ def load_user(user_id: str) -> User | None:
         user = db.session.get(User, int(user_id))
     except ValueError:
         return None
-    # A deleted account's other sessions end on their next request.
-    return None if user is None or user.is_deleted else user
+    # A deleted or banned account's sessions end on their next request.
+    return None if user is None or user.is_deleted or user.is_banned else user
 
 
 def unauthorized() -> Response:
@@ -69,6 +73,20 @@ def begin_login_attempt(identifier: str, ip: str | None) -> LoginAttempt | None:
     return attempt
 
 
+def allow_verification_email(user_id: int) -> bool:
+    """Record a verification email for the user, unless they've hit the hourly limit.
+
+    Rows have no IP, so they never count toward the per-IP login throttle.
+    """
+    identifier = f"verify:{user_id}"
+    since = utcnow() - VERIFY_EMAIL_WINDOW
+    if _failures_since(since, LoginAttempt.identifier == identifier) >= MAX_VERIFY_EMAILS:
+        return False
+    db.session.add(LoginAttempt(identifier=identifier, ip=None, succeeded=False))
+    db.session.commit()
+    return True
+
+
 def mark_login_succeeded(attempt: LoginAttempt) -> None:
     attempt.succeeded = True
     db.session.commit()
@@ -76,6 +94,16 @@ def mark_login_succeeded(attempt: LoginAttempt) -> None:
 
 def login_required[F: Callable[..., Any]](view: F) -> F:
     return cast(F, flask_login.login_required(view))
+
+
+def admin_required[F: Callable[..., Any]](view: F) -> F:
+    @wraps(view)
+    def wrapped(*args: Any, **kwargs: Any) -> Any:
+        if not current_user.is_admin:
+            abort(404)
+        return view(*args, **kwargs)
+
+    return login_required(cast(F, wrapped))
 
 
 def verified_required[F: Callable[..., Any]](view: F) -> F:

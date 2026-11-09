@@ -1,5 +1,4 @@
-import smtplib
-
+import stripe
 from flask import (
     Blueprint,
     abort,
@@ -15,11 +14,12 @@ from sqlalchemy import select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
+from app import stripe_pay
 from app.accounts import anonymize
 from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
-from app.mail import send_email
+from app.mail import send_later
 from app.models import User
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 
@@ -49,10 +49,7 @@ def send_handle_change_notice(
         + "\n".join(lines)
         + "\n\nIf this wasn't you, change your password right away and contact us."
     )
-    try:
-        send_email(user.email, "Your payment handles changed", body)
-    except (smtplib.SMTPException, OSError):
-        current_app.logger.exception("Could not send the handle-change notice to user %s", user.id)
+    send_later(user.email, "Your payment handles changed", body)
 
 
 @bp.route("/profile", methods=["GET", "POST"])
@@ -74,6 +71,13 @@ def edit() -> str | Response:
             send_handle_change_notice(user, changes)
         flash("Profile saved.", "success")
         return redirect(url_for("profile.edit"))
+    if stripe_pay.enabled() and user.stripe_account_id and not user.stripe_ready:
+        # Onboarding can finish later from Stripe's side, so check again while it's pending.
+        try:
+            stripe_pay.refresh_ready(user)
+            db.session.commit()
+        except stripe.StripeError:
+            current_app.logger.exception("Stripe status check failed for user %s", user.id)
     return render_template("profile/edit.html", form=form, delete_form=DeleteAccountForm())
 
 

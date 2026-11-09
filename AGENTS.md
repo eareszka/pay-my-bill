@@ -69,7 +69,7 @@ flask --app app run
 - The private GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
 - **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
 - **Branch protection isn't available** (it needs GitHub Pro on private repos), so the PR-only rule is enforced by convention. Follow it strictly.
-- **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The free Postgres expires 30 days after creation (around 2026-11-26), so recreate or upgrade it before then.
+- **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The database is Neon's free Postgres (it doesn't expire), with `DATABASE_URL` set in the Render dashboard (ADR 0005 amendment, #33).
 - The Sprint 0 Review and Retro are left for the owner to write on Sunday.
 - **Sprint 1, "Users can sign up and post"** is done: issues #1–#7 (23 points) merged through PRs #12, #13, #16–#20. The app has sign-up with email verification, log in and out with a DB-backed lockout (migration 0002, ADR 0007), a profile with region and payment handles, post creation with the $1,000 cap, 2 open posts, Community Rules, and the fundraising keyword flag, a feed, and post detail pages. Tests: 199, 100% coverage.
 - Key modules: `app/auth.py` (typed `login_required`, `verified_required`, login throttle), `app/mail.py` (console unless `MAIL_SERVER` is set), `app/tokens.py`, `app/moderation.py`, `app/money.py` (dollars ↔ cents), `app/payment_links.py` (handle normalization; Sprint 2 adds deep links), and `app/regions.py`. Templates live in `app/templates/` and use `_field.html` and `posts/_meta.html`/`_progress.html` partials.
@@ -79,6 +79,8 @@ flask --app app run
 - **Product backlog:** `docs/backlog/product-backlog.md` lists the stories and spikes from ADRs 0008/0009 and threat-model cases T11–T15, each with a GitHub issue. Pull from it at Sprint Planning.
 
 - **Sprint 4, "Follow-through"** is done: issues #65, #26, #27, #64, and #28 (16 points) merged through PRs #66, #70, #71, #72, and #74. Posts close by hand or on their own at 30 days (`Post.is_open`, `open_posts()`), and results updates, the overdue block, and the follow-through stat all come from dates when read. Reminders run through `flask --app app posts remind`. Migrations 0006–0009. Rules are in the ADR 0008 amendments.
+
+- **Sprint 5b, "Launch"** (2026-11-08): Terms and Privacy (#93), password reset (#94), reports and the admin queue at `/admin` (#95, migration 0010, `app/routes/admin.py` and `app/routes/reports.py`), and Brevo email (#96). Mail goes through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks SMTP. Make an admin with `flask --app app admin grant <email>`. Sprint 5's #79, #80, and #81 are paused.
 
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:
