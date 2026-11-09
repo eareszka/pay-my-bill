@@ -35,14 +35,17 @@ def add_post(owner: User, title: str = "Rent", **fields: Any) -> Post:
     return post
 
 
-def add_gift(post: Post, donor: User) -> None:
+def add_gift(
+    post: Post, donor: User, status: DonationStatus = DonationStatus.CONFIRMED, **fields: Any
+) -> None:
     db.session.add(
         Donation(
             post=post,
             donor=donor,
             amount_cents=2_000,
             method=PaymentMethod.VENMO,
-            status=DonationStatus.CONFIRMED,
+            status=status,
+            **fields,
         )
     )
     db.session.commit()
@@ -100,6 +103,29 @@ def test_only_the_story_changes_after_a_gift(
     db.session.refresh(post)
     assert (post.kind, post.title, post.goal_cents) == (PostKind.NEED, "Rent", 9_000)
     assert post.body == "My front tires are bald."
+
+
+@pytest.mark.parametrize(
+    ("status", "fields", "locked"),
+    [
+        (DonationStatus.PENDING, {}, True),
+        (DonationStatus.PENDING, {"created_at": utcnow() - timedelta(days=15)}, False),
+        (DonationStatus.DISPUTED, {}, False),
+    ],
+)
+def test_waiting_gifts_lock_but_failed_ones_dont(
+    client: FlaskClient,
+    poster: User,
+    make_user: MakeUser,
+    status: DonationStatus,
+    fields: dict[str, Any],
+    locked: bool,
+) -> None:
+    post = add_post(poster)
+    add_gift(post, make_user("dev_tom"), status, **fields)
+    login_as(client, poster)
+    page = client.get(f"/posts/{post.id}/edit").get_data(as_text=True)
+    assert ('name="title"' not in page) is locked
 
 
 def test_invalid_edit_shows_errors(client: FlaskClient, poster: User) -> None:

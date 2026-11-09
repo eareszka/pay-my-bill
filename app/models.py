@@ -242,8 +242,13 @@ class Post(Base):
     @property
     def story_only(self) -> bool:
         # Once someone has chipped in, the ask they gave to stays put; only the story
-        # can change (#116).
-        return bool(self.donations)
+        # can change (#116). A gift still waiting may be money on its way, so it counts;
+        # a disputed or expired claim doesn't.
+        return any(
+            gift.status == DonationStatus.CONFIRMED
+            or (gift.status == DonationStatus.PENDING and not gift.is_expired)
+            for gift in self.donations
+        )
 
     @property
     def state_label(self) -> str:
