@@ -110,6 +110,7 @@ def test_post_page_offers_instant_card_gift(client: FlaskClient, post: Post, don
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Chip in instantly" in page
     assert "You cover the card fee" in page
+    assert "A card from outside the US costs a little more" in page
     assert "Or pay in an app" not in page
 
 

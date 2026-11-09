@@ -28,3 +28,6 @@ Stripe test mode refused the original design. New platforms must create connecte
 - Refunds and disputes come out of the recipient's Stripe balance, and Stripe covers losses it can't recover. This settles #103. Connect account and payout fees are billed to recipients under Stripe's own pricing, so most of #104 no longer falls on the platform.
 - Card-gift events now come from connected accounts, so they arrive on the Connect webhook endpoint.
 - Readiness means `charges_enabled` and `payouts_enabled`.
+
+## Amendment (2026-11-09): international cards (#104)
+The donor's fee covers US card pricing only. Stripe charges about 1.5% more on cards issued outside the US, and with direct charges that extra comes out of the recipient's gift (about 30 cents on $20). The owner chose to accept this and disclose it on the card form rather than overcharge every donor, block foreign cards, or build a custom payment form. Revisit if foreign cards become common.
