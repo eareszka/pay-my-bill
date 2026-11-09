@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Changed
+- The card form says that a card from outside the US costs a little more, and that it comes out of the gift (#104).
+
 ### Fixed
 - Card checkout offers only cards, Apple Pay, and Google Pay. Other methods have different fees that the donor's fee doesn't cover (#108).
 

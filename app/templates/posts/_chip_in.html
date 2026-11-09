@@ -11,7 +11,7 @@
           <small id="card-amount-hint"{% if card_error %} class="error"{% endif %}>{{ card_error or ("From " ~ (min_card_gift | cents) ~ " up to " ~ (post.goal_cents | cents) ~ ".") }}</small>
         </div>
         <button type="submit" class="btn">Chip in instantly</button>
-        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You cover the card fee (about 3%), so {{ poster }} gets the full amount, and it counts right away.</p>
+        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You cover the card fee (about 3%), so {{ poster }} gets the full amount, and it counts right away. A card from outside the US costs a little more, which comes out of the gift.</p>
       </form>
 {% endmacro %}
 <section class="group" id="chip-in">
