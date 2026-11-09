@@ -5,7 +5,7 @@ const deck = document.querySelector(".deck");
 const nextLink = document.querySelector(".deck-next");
 const backLink = document.querySelector(".deck-back");
 const panel = document.querySelector(".deck-side");
-const stage = document.querySelector(".stage");
+const layout = document.querySelector(".deck-layout");
 const nextUnder = document.getElementById("deck-under-next");
 const backUnder = document.getElementById("deck-under-back");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -53,9 +53,9 @@ const reveal = (link) => {
 
 // Light the rail glyph for where the card is headed.
 const toward = (link) => {
-  if (!stage) return;
-  if (link) stage.dataset.toward = link === nextLink ? "next" : "back";
-  else delete stage.dataset.toward;
+  if (!layout) return;
+  if (link) layout.dataset.toward = link === nextLink ? "next" : "back";
+  else delete layout.dataset.toward;
 };
 
 const moving = (on) => {

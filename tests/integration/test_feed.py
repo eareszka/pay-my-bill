@@ -297,3 +297,14 @@ def test_neighbor_checks_its_own_owner(client: FlaskClient, make_user: MakeUser)
         page = client.get(f"/?n={position}").get_data(as_text=True)
         under = under_card(page, "next") or under_card(page, "back")
         assert ("tear-tab" in under) == ("Their post" in under)
+
+
+def test_tabs_and_rail_sit_around_the_stage(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user()
+    for i in range(2):
+        add_post(user, f"Post number {i}")
+    page = client.get("/").get_data(as_text=True)
+    stage = page.index('<div class="stage">')
+    assert page.index('<nav class="tabs"') < stage < page.index('<nav class="rail"')
+    assert page.index('<nav class="rail"') < page.index('<aside class="deck-side">')
+    assert "← → to move" in page

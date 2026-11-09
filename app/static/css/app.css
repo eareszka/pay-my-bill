@@ -192,6 +192,8 @@ h3.section-title { font-size: 1rem; }
 
 /* The feed stage: one person's ask owns the screen. */
 .container-wide:has(> .feed) { max-width: none; padding: 0; }
+/* On phones the tabs and rail float over the stage; on wide screens they sit around the card. */
+.deck-layout { position: relative; }
 .stage {
   position: relative;
   height: calc(100dvh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom));
@@ -200,7 +202,7 @@ h3.section-title { font-size: 1rem; }
   color: var(--on-void);
   background: var(--void);
 }
-.stage .tabs {
+.deck-layout > .tabs {
   position: absolute;
   inset: 0 0 auto;
   z-index: 3;
@@ -212,7 +214,7 @@ h3.section-title { font-size: 1rem; }
   border: 0;
   pointer-events: none;
 }
-.stage .tabs a {
+.deck-layout > .tabs a {
   padding: 6px 0;
   font-weight: 700;
   color: rgb(255 255 255 / 0.92);
@@ -220,9 +222,9 @@ h3.section-title { font-size: 1rem; }
   border-bottom: 2px solid transparent;
   pointer-events: auto;
 }
-.stage .tabs a:hover, .stage .tabs a[aria-current="page"] { color: var(--on-void); }
-.stage .tabs a[aria-current="page"] { border-bottom-color: var(--on-void); }
-.stage .tabs :focus-visible { outline-color: var(--on-void); }
+.deck-layout > .tabs a:hover, .deck-layout > .tabs a[aria-current="page"] { color: var(--on-void); }
+.deck-layout > .tabs a[aria-current="page"] { border-bottom-color: var(--on-void); }
+.deck-layout > .tabs :focus-visible { outline-color: var(--on-void); }
 
 .deck { position: absolute; inset: 0; }
 .ticket { --field: var(--need); }
@@ -302,9 +304,10 @@ h3.section-title { font-size: 1rem; }
 .rail-btn:hover .icon { color: var(--void); background: var(--on-void); filter: none; }
 .rail-btn:focus-visible { outline: none; }
 .rail-btn:focus-visible .icon { color: var(--void); background: var(--on-void); filter: none; outline: 2px solid var(--on-void); outline-offset: 2px; }
-.stage[data-toward="next"] .deck-next .icon, .stage[data-toward="back"] .deck-back .icon { color: var(--void); background: var(--on-void); filter: none; transform: scale(1.08); }
+.deck-layout[data-toward="next"] .deck-next .icon, .deck-layout[data-toward="back"] .deck-back .icon { color: var(--void); background: var(--on-void); filter: none; transform: scale(1.08); }
 .deck-back { order: 1; }
 .deck-next { order: 2; }
+.deck-hint { display: none; }
 .deck-count { order: 3; font-size: 0.75rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--on-void); }
 .stage-empty { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 64px 24px; }
 .stage-empty p { margin: 0; color: var(--on-void-muted); }
@@ -557,14 +560,33 @@ h3.section-title { font-size: 1rem; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
   .container { padding: 28px 16px; }
-  .feed { max-width: 1120px; margin: 0 auto; padding: 28px 24px 8px; }
-  .deck-layout { display: grid; grid-template-columns: 470px 400px; justify-content: center; gap: 28px; align-items: start; }
-  .stage { height: min(836px, calc(100dvh - var(--bar-h) - 100px)); min-height: 600px; border-radius: 18px; }
-  .deck-side { display: flex; flex-direction: column; }
+  /* The feed card takes the post page's shape: the ask on the left, Chip in on the right, arrows outside. */
+  .feed { max-width: 1240px; margin: 0 auto; padding: 20px 24px 8px; }
+  .deck-layout {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 660px) 400px 88px;
+    grid-template-areas: "tabs tabs tabs tabs" "back stage side next" ". count count .";
+    justify-content: center;
+    align-items: center;
+    row-gap: 16px;
+  }
+  .deck-layout > .tabs { position: static; grid-area: tabs; padding: 0; }
+  .stage { grid-area: stage; height: min(620px, calc(100dvh - var(--bar-h) - 170px)); min-height: 460px; border-radius: 18px 0 0 18px; }
+  .deck-layout:not(:has(.deck-side)) .stage { grid-column: stage / side; border-radius: 18px; }
+  .deck-side { grid-area: side; align-self: stretch; display: flex; flex-direction: column; overflow-y: auto; padding: 28px; background: var(--surface); border-radius: 0 18px 18px 0; }
   .deck-side .group, .post .post-side > .group { padding: 0; background: none; border-radius: 0; }
   .deck-side .group { margin: 0; }
   .deck .tear-tab { display: none; }
-  .card-body { padding-bottom: 28px; }
+  .card-body { padding: 32px; }
+  .card-title { margin-block: auto 0; }
+  .rail { display: contents; }
+  .deck-back { grid-area: back; justify-self: start; }
+  .deck-next { grid-area: next; justify-self: end; }
+  .rail-btn { font-size: 0.8125rem; color: var(--on-void-muted); }
+  .rail-btn:hover { color: var(--on-void); }
+  .rail-btn .icon { width: 60px; height: 60px; padding: 17px; color: var(--on-void); border: 1.5px solid rgb(255 255 255 / 0.3); filter: none; }
+  .deck-count { grid-area: count; justify-self: center; font-size: 0.8125rem; color: var(--on-void-muted); }
+  .deck-hint { display: inline; font-weight: 400; }
   .stage-page .container-wide:not(:has(> .feed)) { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
   .post-hero { margin: 0; padding: 36px 32px 28px; border-radius: 18px; }
   .post-hero h1 { font-size: 5rem; }
