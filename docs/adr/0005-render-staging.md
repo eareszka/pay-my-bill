@@ -21,3 +21,6 @@ Render was chosen over Fly.io because:
 
 ## Amendment (2026-10-28, #23)
 SQLAlchemy 2.1 made psycopg 3 the default driver for `postgresql://` URLs, so the psycopg2-only install crashed at boot and every staging deploy after #12 failed. The driver is now `psycopg[binary]` (v3). `create_app` rewrites any Postgres URL scheme to `postgresql+psycopg://`, and SQLAlchemy is pinned to `>=2.1,<2.2` so a future default change can't silently break deploys again. The hosting decision is unchanged.
+
+## Amendment (2026-11-09): database on Neon (#33)
+Render's free Postgres is deleted 30 days after creation, which would have lost every account and post around 2026-11-26. The owner chose a no-cost fix: the database moved to Neon's free tier (AWS us-west-2, beside Render's Oregon region), which doesn't expire. The web service still runs on Render, and `DATABASE_URL` is now a dashboard secret instead of a link to a Render database. The data was copied table by table and the row counts were checked to match, at Alembic revision 0012. Neon's free tier caps storage at 0.5 GB and suspends compute when idle, so the first query after a quiet spell is a little slower.

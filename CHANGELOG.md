@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Changed
+- The database moved from Render's free Postgres, which expires, to Neon's free tier (ADR 0005 amendment, #33).
+
+### Changed
 - The card form says that a card from outside the US costs a little more, and that it comes out of the gift (#104).
 
 ### Fixed
