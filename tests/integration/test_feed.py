@@ -99,11 +99,11 @@ def test_next_and_back_walk_the_stack_and_wrap(client: FlaskClient, make_user: M
     for i in range(3):
         add_post(user, f"Post number {i}", kind=PostKind.WANT)
     first = client.get("/?kind=want").get_data(as_text=True)
-    assert 'href="/?kind=want&amp;n=2">Next ticket' in first
-    assert ">Back</a>" not in first
+    assert 'class="rail-btn deck-next" href="/?kind=want&amp;n=2"' in first
+    assert "deck-back" not in first
     last = client.get("/?kind=want&n=3").get_data(as_text=True)
-    assert 'href="/?kind=want&amp;n=2">Back' in last
-    assert 'href="/?kind=want">Next ticket' in last
+    assert 'class="rail-btn deck-back" href="/?kind=want&amp;n=2"' in last
+    assert 'class="rail-btn deck-next" href="/?kind=want"' in last
 
 
 @pytest.mark.parametrize("bad", ["0", "-3", "abc", "99999999999999999999", "4"])
@@ -119,15 +119,17 @@ def test_position_off_the_stack_shows_the_first_ticket(
 def test_only_ticket_has_no_next_or_stack(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
     page = client.get("/").get_data(as_text=True)
-    assert "Next ticket" not in page
+    assert "deck-next" not in page
     assert "deck-stacked" not in page
     assert "1 of 1" in page
 
 
-def test_who_and_where_are_for_wide_screens_only(client: FlaskClient, make_user: MakeUser) -> None:
+def test_ticket_says_who_where_and_kind(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(city="Tampa", state="FL"), "Only post")
     page = client.get("/").get_data(as_text=True)
-    assert page.index('class="wide-only"') < page.index("Tampa, FL")
+    ticket = page[page.index('class="ticket deck-ticket') :]
+    assert "Need · " in ticket
+    assert ticket.index("Tampa, FL") < ticket.index('class="meter"')
     assert 'class="grow"' not in page
 
 
@@ -177,15 +179,16 @@ def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
 
 
 def test_layout_has_mobile_viewport(client: FlaskClient) -> None:
-    assert b'name="viewport" content="width=device-width, initial-scale=1"' in client.get("/").data
+    viewport = b'name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"'
+    assert viewport in client.get("/").data
 
 
 @pytest.mark.parametrize(
-    ("raised", "marks"),
-    [(0, 0), (1, 1), (100, 1), (5_000, 5), (9_100, 9), (9_999, 9), (10_000, 10)],
+    ("raised", "width"),
+    [(0, 0), (1, 1), (100, 1), (5_000, 50), (9_100, 91), (9_999, 99), (10_000, 100)],
 )
-def test_progress_marks_only_look_full_when_funded(
-    client: FlaskClient, make_user: MakeUser, raised: int, marks: int
+def test_progress_bar_only_looks_full_when_funded(
+    client: FlaskClient, make_user: MakeUser, raised: int, width: int
 ) -> None:
     poster, donor = make_user(), make_user("dev_tom")
     post = Post(user=poster, kind=PostKind.NEED, title="Rent", body="Short.", goal_cents=10_000)
@@ -200,11 +203,11 @@ def test_progress_marks_only_look_full_when_funded(
         )
     db.session.add(post)
     db.session.commit()
-    assert client.get(f"/posts/{post.id}").get_data(as_text=True).count('class="on"') == marks
+    assert f'<i style="--p: {width}%">' in client.get(f"/posts/{post.id}").get_data(as_text=True)
 
 
-def test_heading_is_visible_to_visitors(client: FlaskClient) -> None:
-    assert "<h1>Help someone out</h1>" in client.get("/").get_data(as_text=True)
+def test_heading_is_for_screen_readers_only(client: FlaskClient) -> None:
+    assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/").get_data(as_text=True)
 
 
 def test_heading_steps_back_for_members(client: FlaskClient, make_user: MakeUser) -> None:

@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Changed
+- New look: the card stack (#118). The owner replaced the cork board through Impeccable with a full-screen feed: each person's ask fills the screen in its own color (red for a need, blue for a want, until categories arrive in #119), with a tall League Gothic title, who and where, the story, and the amount on the card. Back and Next sit on a rail at the right edge, and the one you drag toward lights up as the real next ask shows underneath. Swipes snap in 180ms. Chip in is a white button on every ask. The shell is void black with a bottom nav on phones (Feed, Post, Gifts, Leaders, you) that moves into the top bar on wide screens. The feed and post pages are always dark, and forms, Gifts, Leaders, and profiles follow the system light or dark setting in the same type. On screens 960px and wider, the stage stands beside the Chip in panel. League Gothic replaces Bitter (both OFL).
+
 ### Security
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 

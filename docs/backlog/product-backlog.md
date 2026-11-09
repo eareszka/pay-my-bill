@@ -196,3 +196,7 @@ ADR 0014. The owner applies. Nothing about real payments ships until this is don
 - [ ] A signed, idempotent webhook records the gift as confirmed at once (amending ADR 0004), and the donor sees their rewards.
 - [ ] Refunds and disputes from Stripe un-count the gift and flag it in the admin queue.
 - [ ] Terms and Privacy are updated for card gifts.
+
+### PB-44 Share an ask · #TBD · 2 pts · P2 · epic:posts
+From the #118 finish review: the full-screen feed's rail has room for Share.
+- [ ] A Share button on the rail and post page opens the phone's share sheet, or copies the post link where that isn't available.

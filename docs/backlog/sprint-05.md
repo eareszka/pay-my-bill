@@ -66,6 +66,27 @@ The owner sees the feed as swiping through mail and bills, like Tinder except yo
 - [ ] Swiping never gives, passes on, or hides a post.
 - [ ] Reduced motion gets a quick fade. Without JavaScript, the links work as before.
 
+### S5-9 New look: the card stack · #118 · 8 pts · P1
+The owner wants the app to stop looking AI-made and to read as one simple system on phone and desktop, swiping through people's wants and needs like a dating app, except you can go back. Replaces the cork board through Impeccable; the owner picks the direction. Folds in PB-32 and settles PB-26.
+- [ ] Every page uses the new world, and the feed is a card stack: one card at a time with the real next card underneath, left for next, right for back.
+- [ ] Motion is fast (250ms or less), readable, and defined once. Dragging shows where the card will go. Reduced motion gets a fade.
+- [ ] The top bar reads feed, Post, Gifts, Leaders, profile. Log out moves to the profile, and Rules, Terms, and Privacy sit in the footer. Phone cards say Need or Want in words.
+- [ ] Works at 360px without horizontal scroll, in light and dark, and without JavaScript.
+- [ ] Ends with the Impeccable finish review and a new `DESIGN.md`.
+
+### S5-10 Categories and show less · #119 · 5 pts · P1
+As a **donor**, I want to **see less of a kind of post I don't care about** so that **the stack shows me what I'd chip in on**. Amends ADR 0013 in a new ADR.
+- [ ] Posters pick a category (the owner confirms the list), and existing posts become Other.
+- [ ] Swiping a card down, or its Show less button, moves that category later in my stack. It never hides a post, and the first ticket stays the follow-through pick.
+- [ ] I can undo right away and later from my profile.
+- [ ] Logged out, the choice lives in a cookie and joins my account when I log in.
+
+### S5-11 How-it-works home page · #120 · 5 pts · P1
+As a **new visitor**, I want to **understand how this works before signing up** so that **I trust it**. The owner chose a scroll-driven story.
+- [ ] Logged-out visitors land on a scroll-driven page: someone posts, you chip in through their own app, they confirm, you earn credit and they say thanks. It ends at the sign-up form.
+- [ ] Example cards are labeled as examples; no invented stats or testimonials.
+- [ ] Reduced motion and browsers without scroll-driven animation get a plain stacked page. The feed is one link away, at `/feed`.
+
 ## Wireframes (phone width, 360px)
 
 ```

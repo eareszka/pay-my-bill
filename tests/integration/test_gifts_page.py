@@ -179,7 +179,7 @@ def test_no_badge_for_the_donor(client: FlaskClient, poster: User, donor: User) 
     add_gift(add_post(poster), donor)
     login_as(client, donor)
     page = client.get("/").get_data(as_text=True)
-    assert 'href="/gifts">Gifts</a>' in page
+    assert '<span class="nav-label">Gifts</span></a>' in page
     assert 'class="badge"' not in page
 
 

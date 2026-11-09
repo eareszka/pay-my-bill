@@ -5,6 +5,7 @@ const deck = document.querySelector(".deck");
 const nextLink = document.querySelector(".deck-next");
 const backLink = document.querySelector(".deck-back");
 const panel = document.querySelector(".deck-side");
+const stage = document.querySelector(".stage");
 const nextUnder = document.getElementById("deck-under-next");
 const backUnder = document.getElementById("deck-under-back");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -14,7 +15,7 @@ const COMMIT_SHARE = 0.3; // of the ticket's width
 const FLICK_PX_PER_MS = 0.5;
 const FLICK_MIN_PX = 30;
 const FLICK_WINDOW_MS = 100;
-const MAX_TILT_DEG = 6;
+const MAX_TILT_DEG = 4;
 const RESIST = 0.25; // how far the ticket gives when there's nowhere to go
 const SETTLE = "cubic-bezier(0.16, 1, 0.3, 1)";
 const THROW = "cubic-bezier(0.4, 0, 1, 1)";
@@ -50,9 +51,19 @@ const reveal = (link) => {
   under = copy;
 };
 
+// Light the rail glyph for where the card is headed.
+const toward = (link) => {
+  if (!stage) return;
+  if (link) stage.dataset.toward = link === nextLink ? "next" : "back";
+  else delete stage.dataset.toward;
+};
+
 const moving = (on) => {
   deck.classList.toggle("is-moving", on);
-  if (!on) reveal(null);
+  if (!on) {
+    reveal(null);
+    toward(null);
+  }
 };
 
 // Play the ticket off the pile, leaving its neighbor in place, then follow the link.
@@ -62,6 +73,7 @@ const leave = (link, dx = 0) => {
   prefetch(link);
   moving(true);
   reveal(link);
+  toward(link);
   if (panel) {
     panel.inert = true;
     panel.classList.add("is-waiting");
@@ -76,7 +88,7 @@ const leave = (link, dx = 0) => {
     ? [{ opacity: pose(dx).opacity }, { opacity: 0 }]
     : [pose(dx), { transform: `translateX(${end}px) rotate(${tilt(end)}deg)` }];
   const flight = ticket.animate(keyframes, {
-    duration: calm.matches ? 120 : 200,
+    duration: calm.matches ? 120 : 180,
     easing: THROW,
     fill: "forwards",
   });
@@ -88,7 +100,7 @@ const settle = (dx) => {
   ticket.style.opacity = "";
   const back = ticket.animate
     ? ticket.animate([pose(dx), calm.matches ? { opacity: 1 } : { transform: "none" }], {
-      duration: calm.matches ? 120 : 250,
+      duration: calm.matches ? 120 : 200,
       easing: SETTLE,
     })
     : null;
@@ -149,6 +161,7 @@ const onMove = (event) => {
   const target = raw < 0 ? nextLink : backLink;
   prefetch(target);
   reveal(target);
+  toward(Math.abs(raw) > START_DRAG_PX * 3 ? target : null);
   press.dx = target ? raw : raw * RESIST;
   press.trail.push({ x: event.clientX, at: event.timeStamp });
   Object.assign(ticket.style, pose(press.dx));

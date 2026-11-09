@@ -1,9 +1,13 @@
+{% from "posts/_progress.html" import meter %}
 <article class="ticket deck-ticket ticket-{{ post.kind.value }}">
   <div class="card-body">
     <h2 class="card-title"><a href="{{ url_for('posts.show', post_id=post.id) }}"><span class="sr-only">{{ post.kind.value | capitalize }}: </span>{{ post.title }}</a></h2>
-    <div class="wide-only">{% include "posts/_meta.html" %}</div>
-    <p class="ticket-story">{{ post.body | truncate(140) }}</p>
-    <p class="amounts narrow-only"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
+    <div class="ticket-foot">
+      {% include "posts/_meta.html" %}
+      <p class="ticket-story">{{ post.body | truncate(140) }}</p>
+      <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
+      {{ meter(post.progress_percent) }}
+    </div>
   </div>
   {% if post.user.can_be_paid and not is_owner %}<a class="tear-tab" href="{{ url_for('posts.show', post_id=post.id, _anchor='chip-in') }}">Chip in<span class="sr-only"> on {{ post.title }}</span></a>{% endif %}
 </article>
