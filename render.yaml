@@ -29,13 +29,7 @@ services:
         sync: false
       - key: STRIPE_CONNECT_WEBHOOK_SECRET
         sync: false
+      # Neon's free Postgres, which doesn't expire like Render's free database (#33).
+      # Set in the dashboard to Neon's direct (unpooled) connection string.
       - key: DATABASE_URL
-        fromDatabase:
-          name: pay-my-bill-staging-db
-          property: connectionString
-
-databases:
-  - name: pay-my-bill-staging-db
-    plan: free
-    databaseName: pay_my_bill
-    user: pay_my_bill
+        sync: false
