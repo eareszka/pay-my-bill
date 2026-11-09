@@ -20,3 +20,11 @@ Use **Stripe Connect with Express accounts**, after Stripe approves the use case
 - Fees are about 2.9% + 30¢ per gift, plus a monthly fee per active connected account.
 - Recipients may get 1099-Ks. The Terms and Privacy pages need updating before launch, and the LLC and lawyer review (PB-39) move earlier.
 - New config: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`. Webhooks must be idempotent.
+
+## Amendment (2026-11-09): Managed Risk, direct charges, Accounts v2
+Stripe test mode refused the original design. New platforms must create connected accounts with **Accounts v2**, and Express accounts with the platform liable for losses need a loss-liability review. The owner chose to have **Stripe cover losses (Managed Risk)**:
+- Accounts are created with `POST /v2/core/accounts`: `dashboard: express`, `defaults.responsibilities.fees_collector` and `losses_collector` both `stripe`, and the `card_payments` merchant capability. Express dashboards with Managed Risk are a public preview, so account creation pins `Stripe-Version: 2026-10-28.preview`. Onboarding uses v2 account links.
+- Gifts are **direct charges** on the recipient's account (Checkout with the `Stripe-Account` header), since Managed Risk doesn't support destination charges. Stripe takes its fee from the charge, the donor's gross-up covers it, and the recipient keeps the whole gift. Pay My Bill takes no fee.
+- Refunds and disputes come out of the recipient's Stripe balance, and Stripe covers losses it can't recover. This settles #103. Connect account and payout fees are billed to recipients under Stripe's own pricing, so most of #104 no longer falls on the platform.
+- Card-gift events now come from connected accounts, so they arrive on the Connect webhook endpoint.
+- Readiness means `charges_enabled` and `payouts_enabled`.
