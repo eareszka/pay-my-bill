@@ -112,6 +112,9 @@ def checkout_url(
     session = client().v1.checkout.sessions.create(
         params={
             "mode": "payment",
+            # The fee gross-up assumes card pricing, so no Klarna, bank, or crypto.
+            # Apple Pay and Google Pay are card wallets and still show.
+            "allowed_payment_method_types": ["card"],
             "customer_email": donor_email,
             "line_items": [
                 {

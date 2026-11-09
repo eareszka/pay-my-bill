@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Card checkout offers only cards, Apple Pay, and Google Pay. Other methods have different fees that the donor's fee doesn't cover (#108).
+
 ### Changed
 - Card gifts now use Stripe Managed Risk (ADR 0014 amendment). Recipient accounts are created with Accounts v2 with Stripe covering losses, and gifts are direct charges on the recipient's account. Refunds and disputes come out of the recipient's Stripe balance, not the platform's. The test setup also blanks Stripe and mail keys, so a developer's `.env` can't reach real services from tests.
 
