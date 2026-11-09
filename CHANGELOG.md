@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Changed
+- Stripe onboarding skips the business questions. Pay My Bill fills in the industry, website (the recipient's profile), product description, and statement descriptor, so recipients only give their personal and bank details (#98).
+
+### Changed
 - The verify page and the password reset message tell people to check their spam or junk folder, and to mark the email "Not spam" on the verify page. Without a domain of our own, Pay My Bill's emails often land there.
 
 ### Changed
