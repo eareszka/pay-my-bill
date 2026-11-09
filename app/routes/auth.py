@@ -177,7 +177,10 @@ def login() -> str | Response | tuple[str, int, dict[str, str]]:
     return render_template("auth/login.html", form=form)
 
 
-RESET_SENT = "If an account uses that email, we sent it a link to reset the password."
+RESET_SENT = (
+    "If an account uses that email, we sent it a link to reset the password. "
+    "Not there after a minute? Check your spam or junk folder."
+)
 
 
 def _send_quietly(to: str, subject: str, body: str) -> None:

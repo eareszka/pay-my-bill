@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Changed
+- The verify page and the password reset message tell people to check their spam or junk folder, and to mark the email "Not spam" on the verify page. Without a domain of our own, Pay My Bill's emails often land there.
+
+### Changed
 - The database moved from Render's free Postgres, which expires, to Neon's free tier (ADR 0005 amendment, #33).
 
 ### Changed
