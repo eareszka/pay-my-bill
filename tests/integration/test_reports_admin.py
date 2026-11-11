@@ -280,3 +280,9 @@ def test_a_ban_hides_the_user_everywhere(
     client.post("/logout")
     g.pop("_login_user", None)
     assert client.get("/u/creep").status_code == 404
+
+
+def test_a_banned_user_cannot_be_reported(client: FlaskClient, make_user: MakeUser) -> None:
+    creep = make_user("creep", banned_at=utcnow())
+    login_as(client, make_user("alice"))
+    assert client.get(f"/report/user/{creep.username}").status_code == 404

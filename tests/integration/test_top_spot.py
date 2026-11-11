@@ -323,3 +323,16 @@ def test_pile_of_kudos_cannot_cancel_real_doubts(make_user: MakeUser, donor: Use
     open_post(doubted)
     newcomer = open_post(make_user("new_one"))
     assert top_post() is newcomer
+
+
+def test_a_banned_donor_earns_nobody_the_top(make_user: MakeUser, donor: User) -> None:
+    keeper = make_user("keeper")
+    past = past_post(keeper, donor)
+    react(past, donor, ReactionKind.KUDOS)
+    earned = open_post(keeper)
+    newcomer = open_post(make_user("new_one"), make_user("giver", created_at=OLD), raised=500)
+    assert top_post() is earned
+    donor.banned_at = utcnow()
+    db.session.commit()
+    # Without that record the keeper is just another poster, and progress decides.
+    assert top_post() is newcomer
