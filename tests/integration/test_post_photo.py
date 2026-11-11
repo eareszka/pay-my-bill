@@ -252,3 +252,28 @@ def test_feed_loads_the_visible_photo_first(app: Flask, client: FlaskClient, pos
     assert f'src="/media/{first.photo_key}" alt="" decoding="sync" fetchpriority="high"' in page
     template = page[page.index('<template id="deck-under-next">') :]
     assert f'src="/media/{other.photo_key}" alt="" decoding="async">' in template
+
+
+def test_removing_a_post_deletes_its_photo(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    post = with_photo(app, make_user("maria_g"))
+    file, url = stored(app, post), f"/media/{post.photo_key}"
+    assert client.get(url).status_code == 200
+    login_as(client, make_user("boss", is_admin=True))
+    client.post(f"/admin/posts/{post.id}/remove")
+    assert post.photo_key is None
+    assert not file.exists()
+    assert client.get(url).status_code == 404
+
+
+def test_a_ban_deletes_the_photos_of_removed_posts(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    owner = make_user("maria_g")
+    post = with_photo(app, owner)
+    file = stored(app, post)
+    login_as(client, make_user("boss", is_admin=True))
+    client.post(f"/admin/users/{owner.id}/ban")
+    assert post.photo_key is None
+    assert not file.exists()

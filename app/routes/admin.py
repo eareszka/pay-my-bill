@@ -81,8 +81,11 @@ def approve(post_id: int) -> Response:
 def remove(post_id: int) -> Response:
     post = _post(post_id)
     post.status = PostStatus.REMOVED
+    # A removed post's photo goes too, or its URL stays public (#144).
+    photo_key, post.photo_key = post.photo_key, None
     _resolve(Report.post_id == post.id, resolution="removed")
     db.session.commit()
+    photos.discard(photo_key)
     flash(f"Removed “{post.title}”.", "success")
     return redirect(url_for("admin.queue"))
 
@@ -103,9 +106,13 @@ def remove_photo(post_id: int) -> Response:
 
 def _ban(user: User) -> None:
     user.banned_at = utcnow()
+    photo_keys: list[str] = []
     for post in user.posts:
         if post.status in (PostStatus.OPEN, PostStatus.PENDING_REVIEW):
             post.status = PostStatus.REMOVED
+            if post.photo_key:
+                photo_keys.append(post.photo_key)
+                post.photo_key = None
     _resolve(
         or_(Report.user_id == user.id, Report.post_id.in_([p.id for p in user.posts])),
         resolution="banned",
@@ -120,6 +127,8 @@ def ban(user_id: int) -> Response:
         abort(404)
     _ban(user)
     db.session.commit()
+    for key in photo_keys:
+        photos.discard(key)
     flash(f"Banned {user.username}. Their open posts are removed.", "success")
     return redirect(url_for("admin.queue"))
 
