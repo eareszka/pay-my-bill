@@ -22,8 +22,12 @@ jobs:
           cache: pip
       - name: Install
         # The locked versions Render deploys, then the dev tools.
+        # pip check fails if pyproject needs something the lock lacks, which would
+        # pass here and then crash on Render's --no-deps install.
         run: |
           pip install --require-hashes -r requirements.lock
+          pip install --no-deps -e .
+          pip check
           pip install -e ".[dev]"
       - name: Lint
         run: ruff check . && ruff format --check .
