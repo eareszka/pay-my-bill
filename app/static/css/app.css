@@ -477,6 +477,7 @@ h3.section-title { font-size: 1rem; }
 .gift-section { margin-bottom: 36px; }
 .gift-section > .section-title { margin-bottom: 4px; }
 .gift-section > .hint { margin-bottom: 12px; }
+.cards { margin: 0; padding: 0; list-style: none; }
 .gift { padding: 16px 0; border-top: 1px solid var(--line); }
 .gift + .gift { margin-top: 0; }
 :where(.gift) p { margin: 0; }
@@ -527,7 +528,16 @@ h3.section-title { font-size: 1rem; }
 .empty { color: var(--muted); }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }
+.profile-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.profile-head h1 { min-width: 0; overflow-wrap: anywhere; }
+.profile-head .btn { flex: none; min-height: 40px; padding: 6px 14px; }
+.profile-tabs { margin-top: 32px; }
+.profile-tabs + .gift-section, .profile-tabs + .profile-posts { margin-top: 0; }
 .profile-posts { margin-top: 32px; }
+.gift-section + .profile-posts { margin-top: 28px; }
+.post-list .meter { grid-column: 1 / -1; margin: 6px 0 2px; }
+.settings-back { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 700; text-decoration: none; }
+.settings-back .icon { width: 18px; height: 18px; }
 .post-list-goal { font-weight: 400; color: var(--muted); }
 .post-list-actions { display: inline-flex; gap: 16px; margin-left: auto; }
 .post-list-actions a { display: inline-block; padding-block: 8px; margin-block: -8px; font-weight: 700; color: var(--ink); }

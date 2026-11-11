@@ -254,14 +254,6 @@ class Post(Base):
         )
 
     @property
-    def state_label(self) -> str:
-        if self.status == PostStatus.PENDING_REVIEW:
-            return "In review"
-        if self.status == PostStatus.FUNDED:
-            return "Funded"
-        return "Open" if self.is_open else "Closed"
-
-    @property
     def closes_at(self) -> datetime:
         # When it closed, or when it will close on its own.
         if self.closed_at is not None:

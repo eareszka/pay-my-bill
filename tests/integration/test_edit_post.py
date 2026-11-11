@@ -211,9 +211,9 @@ def test_profile_lists_public_posts(client: FlaskClient, poster: User, make_user
     login_as(client, make_user("dev_tom"))
     page = client.get("/u/maria_g").get_data(as_text=True)
     assert "Groceries" in page
-    assert "Need · Open" in page
-    assert "Need · Funded" in page
-    assert "Need · Closed" in page
+    assert 'Need · <span class="chip">Open until ' in page
+    assert 'Need · <span class="chip chip-confirmed">Funded</span>' in page
+    assert 'Need · <span class="chip chip-expired">Closed</span>' in page
     assert "$0<span" in page
     for hidden in ("Hidden", "Gone", DELETED_POST_TITLE):
         assert hidden not in page
@@ -227,7 +227,7 @@ def test_owner_sees_review_posts_and_actions(client: FlaskClient, poster: User) 
     done = add_post(poster, "Old bill", status=PostStatus.CLOSED, closed_at=utcnow())
     login_as(client, poster)
     page = client.get("/u/maria_g").get_data(as_text=True)
-    assert "Need · In review" in page
+    assert 'Need · <span class="chip">In review</span>' in page
     assert f'href="/posts/{open_post.id}/edit"' in page
     assert f'href="/posts/{review.id}/edit"' in page
     assert f'href="/posts/{done.id}/edit"' not in page

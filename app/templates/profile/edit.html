@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% from "_field.html" import field %}
-{% block title %}Your profile · Pay My Bill{% endblock %}
+{% block title %}Settings · Pay My Bill{% endblock %}
 {% block content %}
-  <h1>Your profile</h1>
+  <a class="settings-back" href="{{ url_for('profile.show', username=current_user.username) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Your profile</a>
+  <h1>Settings</h1>
   <form method="post" class="form" novalidate>
     {{ form.hidden_tag() }}
     <fieldset class="group">

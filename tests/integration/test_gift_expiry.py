@@ -63,7 +63,7 @@ def test_expired_gift_leaves_to_confirm_and_badge(
 ) -> None:
     add_gift(add_post(poster), donor, days_old=15)
     login_as(client, poster)
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/gifts", follow_redirects=True).get_data(as_text=True)
     assert "To confirm" not in page
     assert 'class="badge"' not in page
 
@@ -71,24 +71,24 @@ def test_expired_gift_leaves_to_confirm_and_badge(
 def test_gift_under_14_days_still_waits(client: FlaskClient, poster: User, donor: User) -> None:
     add_gift(add_post(poster), donor, days_old=13.9)
     login_as(client, poster)
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/gifts", follow_redirects=True).get_data(as_text=True)
     assert '<span class="count">1</span>' in page
 
 
 def test_expired_gift_cannot_be_confirmed(client: FlaskClient, poster: User, donor: User) -> None:
     gift = add_gift(add_post(poster), donor, days_old=15)
     login_as(client, poster)
-    assert client.post(f"/gifts/{gift.id}/confirm").location == "/gifts"
+    assert client.post(f"/gifts/{gift.id}/confirm").location == "/u/maria_g"
     assert gift.status is DonationStatus.PENDING
     assert gift.post.raised_cents == 0
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/gifts", follow_redirects=True).get_data(as_text=True)
     assert "That gift expired after 14 days, so it can&#39;t count." in page
 
 
 def test_donor_sees_expired_status(client: FlaskClient, poster: User, donor: User) -> None:
     add_gift(add_post(poster), donor, days_old=15)
     login_as(client, donor)
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/gifts?tab=chipped", follow_redirects=True).get_data(as_text=True)
     assert 'chip-expired">Expired' in page
 
 
@@ -159,7 +159,7 @@ def test_remind_retries_after_email_failure(
 def test_expired_gift_can_still_be_disputed(client: FlaskClient, poster: User, donor: User) -> None:
     gift = add_gift(add_post(poster), donor, days_old=15)
     login_as(client, poster)
-    assert client.post(f"/gifts/{gift.id}/dispute").location == "/gifts"
+    assert client.post(f"/gifts/{gift.id}/dispute").location == "/u/maria_g"
     assert gift.status is DonationStatus.DISPUTED
 
 
