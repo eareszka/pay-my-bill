@@ -1,6 +1,3 @@
-{% macro grow(percent, label) %}
-  {% set filled = 10 if percent >= 100 else [(percent + 9) // 10, 9] | min %}
-  <div class="grow" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ percent }}" aria-label="{{ label }}">
-    {% for n in range(10) %}<i{% if n < filled %} class="on" style="--n: {{ n }}"{% endif %}></i>{% endfor %}
-  </div>
+{% macro meter(percent, label=none) %}
+  <div class="meter"{% if label %} role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ percent }}" aria-label="{{ label }}"{% else %} aria-hidden="true"{% endif %}><i style="--p: {{ percent }}%"></i></div>
 {% endmacro %}

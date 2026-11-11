@@ -1,489 +1,333 @@
 ---
 name: Pay My Bill
-description: A community bulletin board for everyday wants and needs. One ticket up close, one green tab to chip in.
+description: One person's ask owns the screen. Flick sideways through people, flick back, and chip in with one tap.
 colors:
-  action: "#1f5a3d"
-  action-hover: "#17452f"
-  on-action: "#ffffff"
-  mark: "#1f5a3d"
-  mark-empty: "#e4ddd2"
-  link-surface: "#1f5a3d"
-  link-on-ground: "#231a12"
-  want: "#cfe3f5"
-  tomato: "#b8452c"
-  tomato-hover: "#9d3a24"
-  tomato-text: "#9d3a24"
-  on-tomato: "#ffffff"
-  ground: "#c49a6c"
-  bar: "#4a2f1b"
-  on-bar: "#ffffff"
+  void: "#0a0a0a"
+  slate: "#1e2026"
+  on-void: "#ffffff"
+  on-void-muted: "#a7aebb"
+  need: "#b8300f"
+  want: "#2445c8"
+  bg: "#f3f4f7"
   surface: "#ffffff"
-  ink: "#231a12"
-  ink-on-light: "#231a12"
-  on-ground: "#231a12"
-  muted-surface: "#54463a"
-  muted-on-ground: "#2f2114"
-  line: "#d8ccbd"
-  rule: "#4a2f1b"
-  stack-1: "#cfe3f5"
-  stack-2: "#efe6d8"
-  tint-info: "#efe6d8"
-  tint-good: "#d9eadf"
-  tint-bad: "#f7dfd8"
-  action-dark: "#2c7a53"
-  action-hover-dark: "#256a48"
-  mark-dark: "#62c390"
-  mark-empty-dark: "#453628"
-  link-surface-dark: "#86d8ac"
-  link-on-ground-dark: "#f3ebdf"
-  want-dark: "#1b2f3f"
-  tomato-dark: "#f08a72"
-  tomato-hover-dark: "#f5a28e"
-  tomato-text-dark: "#f08a72"
-  on-tomato-dark: "#231a12"
-  ground-dark: "#33261a"
-  bar-dark: "#1a110a"
-  surface-dark: "#1e1711"
-  ink-dark: "#f3ebdf"
-  on-ground-dark: "#f3ebdf"
-  muted-surface-dark: "#c4b5a2"
-  muted-on-ground-dark: "#dccdb9"
-  line-dark: "#453628"
-  rule-dark: "#dccdb9"
-  stack-1-dark: "#4a6a85"
-  stack-2-dark: "#6b5540"
-  tint-info-dark: "#33291e"
-  tint-good-dark: "#1d3d2c"
-  tint-bad-dark: "#43241c"
+  ink: "#121316"
+  muted: "#4a5260"
+  line: "#dfe2e8"
+  edge: "#8a919d"
+  action-bg: "#121316"
+  action-fg: "#ffffff"
+  action-hover: "#2a2f39"
+  good: "#12784a"
+  good-tint: "#dcf1e6"
+  bad: "#c4302b"
+  bad-text: "#b0261f"
+  bad-tint: "#fbe3e1"
+  info-tint: "#e6e8ee"
+  mark-empty: "#dfe2e8"
+  surface-dark: "#17181c"
+  ink-dark: "#f2f3f5"
+  line-dark: "#2a2f39"
+  edge-dark: "#6b7380"
+  action-hover-dark: "#d9dce2"
+  good-dark: "#3ecf8e"
+  good-tint-dark: "#12301f"
+  bad-dark: "#ff6b61"
+  bad-text-dark: "#ff8a82"
+  bad-tint-dark: "#3a1714"
 typography:
+  display-hero:
+    fontFamily: "League Gothic, Arial Narrow, sans-serif"
+    fontSize: "clamp(3.25rem, 15vw, 4.75rem)"
+    fontWeight: 400
+    lineHeight: 0.92
+    letterSpacing: "0.005em"
   display:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "2.625rem"
-    fontWeight: 800
-    lineHeight: 1.15
-  post-title:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "2.375rem"
-    fontWeight: 800
-    lineHeight: 1.15
-  ticket-title:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "2.125rem"
-    fontWeight: 800
-    lineHeight: 1.15
-  headline:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "1.75rem"
-    fontWeight: 800
-    lineHeight: 1.15
-  title:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "1.25rem"
-    fontWeight: 800
-    lineHeight: 1.15
+    fontFamily: "League Gothic, Arial Narrow, sans-serif"
+    fontSize: "clamp(2.5rem, 11vw, 3.25rem)"
+    fontWeight: 400
+    lineHeight: 0.95
+    letterSpacing: "0.01em"
   brand:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "1.125rem"
-    fontWeight: 800
-    lineHeight: 1.15
-  list-title:
-    fontFamily: "Bitter, Georgia, serif"
-    fontSize: "1.0625rem"
-    fontWeight: 800
-    lineHeight: 1.2
-  amount-panel:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 700
-    lineHeight: 1.5
-  gift-amount:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1.625rem"
-    fontWeight: 700
-    lineHeight: 1.2
-  amount-ticket:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1.5rem"
-    fontWeight: 700
-    lineHeight: 1.5
-  story:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1.125rem"
+    fontFamily: "League Gothic, Arial Narrow, sans-serif"
+    fontSize: "1.75rem"
     fontWeight: 400
-    lineHeight: 1.5
-  tear-tab:
+    lineHeight: 1
+    letterSpacing: "0.02em"
+  title:
     fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 700
-    lineHeight: 1.5
-  amount:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 700
-    lineHeight: 1.5
-  story-phone:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1.0625rem"
-    fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.3
   body:
     fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.5
-  label:
+  figure:
     fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "1rem"
+    fontSize: "1.75rem"
     fontWeight: 700
-    lineHeight: 1.5
-  hint:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "0.9375rem"
-    fontWeight: 400
-    lineHeight: 1.5
-  fine:
-    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 400
-    lineHeight: 1.5
-  count:
+    lineHeight: 1
+    fontFeature: "tnum"
+  label:
     fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 700
-    lineHeight: 1.67
+    lineHeight: 1.2
 rounded:
-  paper: "0px"
-  disputed: "2px"
-  control: "3px"
-  tag: "4px"
-  mark: "5px"
-  count: "10px"
-spacing:
-  hairline: "4px"
-  tight: "8px"
-  stack: "12px"
+  hairline: "2px"
+  sm: "6px"
+  md: "8px"
+  tab: "12px"
   panel: "14px"
-  page: "16px"
-  split: "24px"
-  ticket-wide: "28px"
-  section: "32px"
+  stage: "18px"
+  round: "50%"
+spacing:
+  xs: "4px"
+  sm: "8px"
+  md: "12px"
+  lg: "16px"
+  xl: "28px"
 components:
   button-primary:
-    backgroundColor: "{colors.action}"
-    textColor: "{colors.on-action}"
-    typography: "{typography.label}"
-    rounded: "{rounded.control}"
+    backgroundColor: "{colors.action-bg}"
+    textColor: "{colors.action-fg}"
+    rounded: "{rounded.md}"
     padding: "10px 18px"
-    height: "44px"
+    height: "46px"
+    typography: "{typography.body}"
   button-primary-hover:
     backgroundColor: "{colors.action-hover}"
+  button-primary-stage:
+    backgroundColor: "{colors.on-void}"
+    textColor: "{colors.void}"
+    rounded: "{rounded.md}"
+    padding: "10px 18px"
+    height: "46px"
+  button-primary-stage-hover:
+    backgroundColor: "{colors.action-hover-dark}"
   button-secondary:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "transparent"
     textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.control}"
+    rounded: "{rounded.md}"
     padding: "10px 18px"
-    height: "44px"
+    height: "46px"
   button-danger:
-    backgroundColor: "{colors.tomato}"
-    textColor: "{colors.on-tomato}"
-    typography: "{typography.label}"
-    rounded: "{rounded.control}"
+    backgroundColor: "{colors.bad}"
+    textColor: "{colors.on-void}"
+    rounded: "{rounded.md}"
     padding: "10px 18px"
-    height: "44px"
+    height: "46px"
   button-danger-hover:
-    backgroundColor: "{colors.tomato-hover}"
+    backgroundColor: "{colors.bad-text}"
+  chip-in-tab:
+    backgroundColor: "{colors.on-void}"
+    textColor: "{colors.void}"
+    rounded: "{rounded.tab}"
+    padding: "15px"
+  chip-in-tab-hover:
+    backgroundColor: "{colors.info-tint}"
+  ticket-need:
+    backgroundColor: "{colors.need}"
+    textColor: "{colors.on-void}"
+    typography: "{typography.display-hero}"
+    padding: "64px 84px 18px 18px"
+  ticket-want:
+    backgroundColor: "{colors.want}"
+    textColor: "{colors.on-void}"
+    typography: "{typography.display-hero}"
+    padding: "64px 84px 18px 18px"
   input:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
-    typography: "{typography.body}"
-    rounded: "{rounded.control}"
-    padding: "10px 12px"
-    height: "46px"
-  ticket:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "16px"
-  ticket-want:
-    backgroundColor: "{colors.want}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "16px"
-  tear-tab:
-    backgroundColor: "{colors.action}"
-    textColor: "{colors.on-action}"
-    typography: "{typography.tear-tab}"
-    rounded: "{rounded.paper}"
-    padding: "15px"
-  tear-tab-hover:
-    backgroundColor: "{colors.action-hover}"
-  chip-in-panel:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "14px"
-    width: "416px"
+    rounded: "{rounded.md}"
+    padding: "11px 13px"
+    height: "48px"
   panel:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "14px"
-  topbar:
-    backgroundColor: "{colors.bar}"
-    textColor: "{colors.on-bar}"
-  mark-on:
-    backgroundColor: "{colors.mark}"
-    rounded: "{rounded.mark}"
-    height: "13px"
-  mark-empty:
+    rounded: "{rounded.panel}"
+    padding: "18px 16px"
+  nav-bar:
+    backgroundColor: "{colors.void}"
+    textColor: "{colors.on-void-muted}"
+    height: "64px"
+    typography: "{typography.label}"
+  nav-bar-active:
+    textColor: "{colors.on-void}"
+  rail-glyph:
+    textColor: "{colors.on-void}"
+    rounded: "{rounded.round}"
+    size: "52px"
+    padding: "12px"
+  rail-glyph-lit:
+    backgroundColor: "{colors.on-void}"
+    textColor: "{colors.void}"
+  meter:
     backgroundColor: "{colors.mark-empty}"
-    rounded: "{rounded.mark}"
-    height: "13px"
-  flash-info:
-    backgroundColor: "{colors.tint-info}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "10px 12px"
-  flash-success:
-    backgroundColor: "{colors.tint-good}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "10px 12px"
-  flash-error:
-    backgroundColor: "{colors.tint-bad}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.paper}"
-    padding: "10px 12px"
+    rounded: "{rounded.hairline}"
+    height: "4px"
 ---
 
 # Design System: Pay My Bill
 
 ## Overview
 
-**Creative North Star: "The Community Board at the Door"**
+**Creative North Star: "The Color Cut"**
 
-Pay My Bill is a community bulletin board, and the owner chose that world. Each post is a plain square ticket on cork: a big slab title, a short story, and how much has come in so far. A visitor sees one person up close, then chips in or moves on to the next ticket. The ticket reads simple and trustworthy, with its personality coming from the heavy title, the warm cork, and the green tab you tear off to help.
+The app is a black frame around one person. The shell (top bar, bottom nav, feed stage, post page) is void black, and inside it a single ask fills the screen as a saturated color field with its title set huge in condensed uppercase. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's color is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. White is the only interface ink on the stage. The one money action, Chip in, is a white filled tab that travels with the person.
 
-The materials are stated, not imitated. Cork is one flat tan and the wood bar is one flat brown, with no grain, texture, or image behind either. Paper is the only thing that lifts, on one soft shadow. There are no thumbtacks. Phones get One Ticket at a Time, with a green tear-off Chip in tab. Screens 960px and wider get Give Right Here, with the ticket and the Chip in panel side by side in a centered layout. The owner tried a full-browser layout and rejected it, so a full-width layout is not wanted.
+Away from the stage, the working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense. They follow the system color scheme: cool paper and white panels in light, near-black panels in dark. They share the same two typefaces, the same inverse filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no gradient except the scrim that keeps white text legible at the foot of a color field.
 
-The owner's brief rules out five looks: a sad charity page, a bank or finance app, a game or casino, a generic startup, and a typical scroll app. Light and dark themes follow the system setting and keep the same roles: dark is the same board with the lights down, not a different world.
+The system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar, and the feed card takes the post page's shape: a wide landscape ask joined to a 400px Chip in panel, with big Back and Next buttons outside it. On a monitor nobody has to drag.
 
 **Key Characteristics:**
-- One ticket at a time, with the rest of the stack peeking out behind it, instead of a grid or an endless list.
-- Flat cork and a flat wood bar, with no faked material and no thumbtacks.
-- Square paper tickets on one soft shadow: white for needs, light blue for wants.
-- Green for primary actions, links, and progress marks. Tomato for errors and destructive actions.
-- Two typefaces: Bitter extra-bold for titles, Public Sans for everything else, including all money.
+- Void-black shell that is always dark: top bar, bottom nav, feed stage, and post page.
+- One full-bleed color field per ask (Need or Want) under a bottom scrim, with white type only.
+- League Gothic uppercase for titles, set huge and tall. Public Sans for everything else.
+- Inverse filled primary (ink on light, white on dark), outlined secondary, and tomato only for errors and destructive acts.
+- Hairline meter, hairline rows, and Lucide 2px line icons.
+- Sideways gestures with a way back: left = next, right = back, each mirrored by a labeled rail button.
 
 ## Colors
 
-A warm brown board with paper on top, one working green, and one warm colour for trouble.
+A monochrome shell (void, ink, white, cool grays) carries the interface, and saturated category fields carry the people.
 
 ### Primary
-- **Leaf Green** (#1f5a3d light, #2c7a53 dark; hover #17452f light, #256a48 dark): Primary buttons and the tear-off Chip in tab, always with white text (8.11:1 light, 5.23:1 dark).
-- **Progress Green** (#1f5a3d light, #62c390 dark): Filled progress marks and the confirmed-gift dot, plus the pressed-reaction border and the text caret. It lightens in dark mode so it stays visible on dark paper, and form choices tint with it there.
-- **Paper Link Green** (#1f5a3d light, #86d8ac dark): Underlined links on paper. Links on cork use Cork Link Ink instead, because leaf green only reaches 3.16:1 on cork.
+- **Need Ember** (need): the full-bleed field behind a Need ask on the feed card and the post-page hero. It holds white text at about 6:1.
+- **Want Cobalt** (want): the field behind a Want ask in the same places. It holds white text at about 7.6:1.
 
-### Secondary
-- **Want Blue** (#cfe3f5 light, #1b2f3f dark): The paper of a want, on the ticket and the post page.
-
-### Tertiary
-- **Tomato** (#b8452c light, #f08a72 dark; hover #9d3a24 light, #f5a28e dark): Destructive buttons, invalid-field borders, and the disputed mark. Button text is white in light mode and dark ink in dark mode.
-- **Tomato Text** (#9d3a24 light, #f08a72 dark): Words that report an error or a disputed gift. It holds at least 5.2:1 on white paper, want blue, and the bad tint.
+These two are provisional category colors. Story #119 replaces them with per-category fields, which must keep white text at 4.5:1 or better under the scrim.
 
 ### Neutral
-- **Cork** (#c49a6c light, #33261a dark): The page behind everything. A flat fill, and a real reading surface: ink holds 6.67:1 in light and 12.39:1 in dark.
-- **Wood** (#4a2f1b light, #1a110a dark): The top bar, the browser theme colour, and text selection. White text sits on it in both themes.
-- **Paper** (#ffffff light, #1e1711 dark): Need tickets, post pages, panels, forms, form fields, and secondary buttons.
-- **Ink** (#231a12 light, #f3ebdf dark): Text on paper, plus the shared focus ring. Cork text uses the same values through its own on-cork token, and Ink on Light (#231a12) stays dark in both themes for the white count capsule in the bar.
-- **Muted on Paper** (#54463a light, #c4b5a2 dark): Hints, metadata, and field borders on paper and tints.
-- **Muted on Cork** (#2f2114 light, #dccdb9 dark): Inactive tabs and hints that sit directly on cork.
-- **Cork Link Ink** (#231a12 light, #f3ebdf dark): Underlined links that sit directly on cork.
-- **Paper Line** (#d8ccbd light, #453628 dark): Dividers inside a sheet, such as list rows and the rule between a post and its panels.
-- **Board Rule** (#4a2f1b light, #dccdb9 dark): The tab rules and the rule above the danger zone, both on cork.
-- **Empty Mark** (#e4ddd2 light, #453628 dark): Unfilled progress marks, outlined with a faint inner ring so they still show on want blue.
-- **Stack Edges** (#cfe3f5 and #efe6d8 light, #4a6a85 and #6b5540 dark): The two sheet edges peeking out above a ticket when more tickets wait. They show only that more tickets exist, not what kind. In light mode the first matches Want Blue, so a blue edge can show on the Needs tab; that overlap is open drift, not a precedent.
-- **Info Tint** (#efe6d8 light, #33291e dark): Neutral flashes and notices.
-- **Good Tint** (#d9eadf light, #1d3d2c dark): Success flashes, earned-badge tags, your own leaderboard row, and pressed reactions.
-- **Bad Tint** (#f7dfd8 light, #43241c dark): Error flashes and notices, with ink text.
+- **Void** (void): the shell (top bar, phone bottom nav, feed stage, and the page behind the post on stage pages) and the dark-mode page background. It is also the text color on white controls set on void.
+- **Slate** (slate): the active nav item's fill on desktop, the nav's top border, and dark-mode info notices.
+- **Pure White** (on-void): all text, glyphs, the Chip in tab, and lit rail glyphs on the stage and fields.
+- **Fog Gray** (on-void-muted): inactive nav labels and secondary text on void, and the dark-mode muted text.
+- **Cool Paper** (bg): the light-mode page background, and the background of inputs inside panels.
+- **Panel White** / **Panel Night** (surface / surface-dark): panels, inputs, and the rewards block.
+- **Ink** / **Ink Light** (ink / ink-dark): body text, focus rings, selected tabs, and meter fill.
+- **Muted Slate** (muted): hints, metadata, ranks, and counts.
+- **Hairline** (line / line-dark): row dividers, tab underlines, and section rules.
+- **Edge** (edge / edge-dark): input and secondary-button strokes, and the scrollbar thumb.
+
+### Status
+- **Follow-through Green** (good, good-tint): confirmed state marks, success flashes, the "you" row on Leaders, pressed reactions, and badges. In dark mode it shifts to good-dark.
+- **Tomato** (bad, bad-text, bad-tint): errors, invalid fields, disputed marks, error flashes, and the destructive button. In dark mode it shifts to bad-dark and bad-text-dark.
 
 ### Named Rules
+**The White Ink Rule.** On the stage and on any color field, white is the only interface ink: text, glyphs, the Chip in tab, and focus rings. Nothing colored sits on a colored field.
 
-**The Working Green Rule.** Green is used for primary actions, links, and progress marks, as the owner decided. Green never colours the bar, the ground, the paper, or a decoration.
+**The Tomato Is Trouble Rule.** The bad family appears only for errors, disputed gifts, and destructive actions. It is never decoration, never a category, and never the Chip in color.
 
-**The One Decision Rule.** A panel offers one primary green decision at a time. A set of equal pay-app choices counts as one decision. Everything else on that panel is secondary.
-
-**The Tomato Rule.** Tomato means an error or a destructive action. It never decorates and never signals urgency on its own.
-
-**The Flat Materials Rule.** Cork and wood are flat fills. No grain, texture, gradient, or image may fake either material, in either theme.
+**The Always-Void Stage Rule.** The shell and any page that carries an ask's field stay dark whatever the system setting. Ordinary pages follow `prefers-color-scheme`, and the stage forces the dark token set.
 
 ## Typography
 
-**Display Font:** Bitter 800 (with Georgia, serif)
+**Display Font:** League Gothic 400 (with Arial Narrow, sans-serif)
 **Body Font:** Public Sans 400 and 700 (with system-ui, -apple-system, Segoe UI, sans-serif)
 
-**Character:** A heavy slab that could be hand-lettered across the top of a notice, beside a plain public-signage sans whose unslashed zeros read cleanly on money. All three font files are self-hosted, with `font-display: swap`.
+**Character:** A tall, condensed poster face shouts the ask, and a plain civic sans does all the explaining. The contrast in width and weight does the hierarchy work, so no third face or decorative weight is needed.
 
 ### Hierarchy
-- **Display** (800, 2.625rem, 1.15): The ticket title and the post title at 960px and wider.
-- **Post Title** (800, 2.375rem at most, 1.15): The post title below 960px, fluid from 1.75rem at 8vw.
-- **Ticket Title** (800, 2.125rem at most, 1.15): The ticket title below 960px, fluid from 1.75rem at 8vw.
-- **Headline** (800, 1.75rem, 1.15): Page titles such as Gifts, Leaders, and Log in.
-- **Title** (800, 1.25rem, 1.15): Panel and section titles, the level on a profile, and the "did you send it" question. A nested section title steps down to 1.0625rem.
-- **Brand** (800, 1.125rem, 1.15): The name in the top bar and form-group legends.
-- **List Title** (800, 1.0625rem, 1.2): Post titles in the gift list.
-- **Panel Amount** (700, 1.875rem, 1.5): The raised figure at the top of the Chip in panel on the board, beside the goal in regular weight.
-- **Gift Amount** (700, 1.625rem, 1.2): The amount on a gift waiting to be confirmed.
-- **Ticket Amount** (700, 1.5rem, 1.5): The raised figure on a phone ticket, beside the goal at 1.0625rem.
-- **Story** (400, 1.125rem, 1.5): The short story on a ticket at 960px and wider.
-- **Tear Tab** (700, 1.125rem, 1.5): The Chip in label on the tear-off tab.
-- **Amount** (700, 1.125rem, 1.5): The raised figure on the post page.
-- **Phone Story** (400, 1.0625rem, 1.5): The short story on a ticket below 960px.
-- **Body** (400, 1rem, 1.5): All running text. A post's story stops at 70ch.
-- **Label** (700, 1rem, 1.5): Field labels, buttons, tabs, and the ticket count.
-- **Hint** (400, 0.9375rem, 1.5): Guidance on cork and inside panels, and who and where on the post page. Top-bar links use this size at 700.
-- **Fine** (400, 0.875rem, 1.5): Who and where on a ticket, field help and errors, state marks at 700, and badge tags at 700.
-- **Count** (700, 0.75rem, 20px line): The number in the top-bar capsule.
-
-Titles use balanced wrapping, and paragraphs and list items use pretty wrapping. Long usernames are cut with an ellipsis in the top bar. Everywhere else, long text wraps at any character so nothing overflows.
+- **Display Hero** (League Gothic 400, clamp 3.25 to 4.75rem, line-height 0.92, uppercase): the ask's title on the feed card. On the post-page hero it runs clamp 3 to 4.5rem, and 5rem at 960px and wider.
+- **Display** (League Gothic 400, clamp 2.5 to 3.25rem, line-height 0.95, uppercase): page titles (Gifts, Leaders, Ask for a hand), the empty-stage title, and the level on the profile.
+- **Brand** (League Gothic 400, 1.75rem, uppercase): the "Pay My Bill" wordmark in the top bar.
+- **Title** (Public Sans 700, 1.125rem, line-height 1.3): section titles such as Chip in, My gifts, and Results update.
+- **Figure** (Public Sans 700, 1.75rem, tabular numerals): raised amounts and gift amounts. It grows to 2rem in the post hero and the side panel.
+- **Body** (Public Sans 400, 1rem, line-height 1.5): everything else. Post stories run at 1.0625rem and max 68ch.
+- **Label** (Public Sans 700, 0.75rem): nav and rail labels and the deck count.
 
 ### Named Rules
+**The Two Voices Rule.** League Gothic is only for titles and the wordmark, always uppercase. Every sentence, label, number, and control is Public Sans. Don't use a system face for display.
 
-**The Two Voices Rule.** Bitter 800 is for titles only. Everything else, and all money, is Public Sans at 400 or 700. No other weights are loaded, so none may be requested.
-
-**The Size Carries Rank Rule.** Rank comes from size and the shift of typeface. There is no uppercase, no letterspacing, and no small label above a heading anywhere in the system.
-
-**The Money Lines Up Rule.** Figures in lists and columns are right-aligned with tabular numerals, tight against what they belong to.
+**The Tabular Money Rule.** Every amount, count, rank, and badge number uses tabular numerals.
 
 ## Layout
 
-The board and the post page use the only two-part layout, and it changes at 960px. Every other page (Gifts, Leaders, profile, forms, log in, rules, and errors) stays one centered column of 640px at most, with 16px page padding, at every screen size. The wood bar's colour runs edge to edge. Its contents line up to 608px below 960px and 1120px from 960px up.
+The layout is mobile first and single column. Ordinary pages sit in a 640px container with 16px padding (28px top and bottom at 960px and wider). Rhythm comes from 8, 12, and 16px gaps inside forms and panels, 18px panel padding, and 28px between major desktop columns.
 
-**Below 960px: One Ticket at a Time.** The owner's choice, after a grid of posts was rejected as cluttered and too much like a scroll site. One centered ticket, 480px at most, sits under the All, Needs, and Wants tabs. It fills the screen down to the Next ticket row, up to 520px tall, with the story at the top and the amount pushed to the bottom above the Chip in tab. The post page is one 608px sheet with its panels below the story.
+On phones, the top bar is 52px tall and the nav is a fixed 64px bar at the bottom (plus the safe-area inset) with five icon-over-label items, the signed-in username in place of "You". The feed stage fills the height between the two bars (minimum 520px). Inside it, the All, Needs, and Wants tabs are centered at the top, the title sits mid-screen, and the foot holds meta, a three-line story, amounts, and the meter. The rail (Back, Next, and the count) sits at the right edge, and the full-width Chip in tab is at the bottom.
 
-**960px and wider: Give Right Here.** The owner's choice, so people can give without leaving. The layout is centered, 1152px at most with 16px padding (`.container-wide`), leaving 1120px of content. The ticket takes the left side with who and where, and a fixed 416px Chip in panel stands right beside it with a 24px gap, at matching height. The ticket has a 520px minimum height and 28px padding, and the count and Next ticket sit below both. The post page uses the same split inside one sheet whenever it has a panel to show, with a 28px gap and a 2px paper line between the two sides. With no panel to show, the post stays one sheet at full 1120px, its story still stopped at 70ch.
-
-Spacing steps are 4px within a label and control, 8px between related actions, 12px between stacked pieces, 14px inside panels and between form fields, 16px on ticket bodies and at the page edge, 24px above the danger zone and across the board's split, and 32px between sections on Gifts. Forms are full-width single columns, and paired actions sit side by side and wrap.
-
-Every page must work at 360px without horizontal scroll. Below 400px the top bar tightens to 12px padding and its links drop to 0.875rem. Pay-app buttons share a row and wrap at a 96px minimum.
-
-### Named Rules
-
-**The One Ticket Rule.** The board shows one ticket at a time, on every screen size. It never becomes a grid, a rack, or an endless list.
-
-**The Give Right Here Rule.** At 960px and wider, the ticket and the Chip in panel stand side by side. On phones, the same step is one tap away through the tear-off tab.
-
-**The Centered Board Rule.** A full-width layout is not wanted: the owner tried a full-browser layout and rejected it. Page content stays inside the centered 1152px container at any screen size, and the extra width is plain cork.
+At 960px the nav moves into a 60px top bar as icon-beside-label items, centered within 1120px. The feed becomes one wide card, centered within about 1240px: the ask (up to 660px wide, `min(620px, 100dvh - 230px)` tall, 460px minimum) joined to a 400px Chip in panel on surface, with 18px outer corners. The tabs sit centered above it. Back and Next are 60px outlined circles in 88px gutters outside the card, and the count with an "← → to move" hint sits centered below. The title rests just above who and where, as on the post hero. The on-card Chip in tab is hidden because the panel replaces it. Dragging still works but nothing depends on it, and a click or arrow key plays the same 180ms slide. The post page becomes a fluid story column beside a 400px side panel. Below 380px, the card's right padding tightens to 76px so the title clears the rail. The body clips horizontal overflow, so a thrown card never adds a sideways scroll.
 
 ## Elevation & Depth
 
-Paper lifts and nothing else does. Every sheet on the board (tickets, stack edges, post pages, panels, forms, gift cards, lists, flashes, and notices) casts the same soft shadow onto the cork, and the wood bar casts none. Inside a sheet, depth stops: panels and notices within a post or the Chip in form lose their shadow and become part of the same page, divided by a 2px paper line where they need one. There is no hover lift.
+The system is flat. Depth comes from tonal layering (void, then the color field, then white controls) and, during a drag, from the real neighboring ask sitting underneath the one in your hand. The only soft shadow is a legibility aid on the rail glyphs over bright fields, and it disappears when a glyph lights.
 
 ### Shadow Vocabulary
-- **Paper shadow** (`box-shadow: 0 2px 5px rgba(50, 30, 10, 0.35)` light, `0 2px 5px rgba(0, 0, 0, 0.5)` dark): Every sheet on the cork. In dark mode it does most of the work of separating paper from the board.
-- **Pressed reaction** (`box-shadow: inset 0 0 0 1px var(--mark)`): Doubles the border weight on a reaction that is on.
-- **Empty mark ring** (`box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 35%, transparent)`): Outlines an unfilled progress mark.
+- **Glyph lift** (`filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.45))`): only on unlit rail glyphs over a color field.
 
 ### Named Rules
-
-**The One Sheet of Paper Rule.** All paper uses the one soft shadow, at rest. A sheet on a sheet gets no second shadow, and no shadow gets harder, offset, or larger to win attention.
+**The Scrim Only Rule.** The one gradient is the bottom scrim on a color field (transparent to 40% black over the lower half on cards, and over the lower 60% on the post hero). No other gradients, glass, glow, or box shadows.
 
 ## Shapes
 
-Paper is cut square, with no radius on tickets, post pages, panels, forms, gift cards, or flashes. Controls are only slightly softened: 3px on buttons, fields, and the skip link. Small pieces keep their own forms: 5px on progress marks, 4px on earned-badge tags, and a 10px capsule on the top-bar count. Round dots mark gift states, and the disputed mark alone is a 2px-cornered square, so it differs in shape as well as colour. Borders are 1.5px on controls, 2px under tabs and for rules, and 1px between list rows. The one dashed line in the system is the 2px white tear edge on the Chip in tab.
-
-### Named Rules
-
-**The Square Paper Rule.** Anything that reads as a sheet of paper has square corners. Pill buttons and large rounded cards do not belong on this board.
-
-**The No Thumbtacks Rule.** Tickets are not pinned, taped, tilted, or otherwise dressed up, and the owner has ruled out thumbtacks. Paper, a shadow, and the tear-off tab are all the board needs.
+Corners are gentle and scale with the size of the object: 2px on the meter, 6px on badges, 8px on buttons, inputs, flashes, and desktop nav items, 12px on the Chip in tab, 14px on panels, and 18px on the desktop stage and post hero. On phones the stage and hero bleed edge to edge with no corners. Rail glyphs sit in 52px circles that fill white when engaged. Borders are 1px hairlines for structure, 1.5px for control strokes, and 2px for invalid fields and tab underlines.
 
 ## Components
 
-### Ticket
-The signature container, and the only post on the board at one time. A ticket with no photo is complete.
-- **Structure:** A Bitter title, a short story cut to 140 characters, and the amount. Who and where appear on the ticket at 960px and wider, and on the post page at every width. The kind shows in the paper colour, white for a need and Want Blue for a want, and at 960px and wider the who-and-where line also says it in words.
-- **Interaction:** The whole ticket opens the post, through a link stretched over the title. The poster's name and the Chip in tab stay their own targets above that layer. Hover underlines the title. Focus draws a 3px ink ring just inside the ticket edge.
-- **Stack:** When more than one ticket is waiting, two sheet edges peek out above the ticket, 12px and 6px narrower on each side and sharing the paper shadow. A lone ticket has no stack.
-- **Photo state (planned, not built):** Optional poster photos come in a later story. No tokens or styles exist for them yet.
-
-### Tear-Off Chip In Tab
-The phone's one action on a ticket: a full-width leaf-green tab along the ticket's bottom edge, with white 700 text and a 2px dashed white tear line on top. It has square corners and 15px padding, and hover deepens the green. Its focus ring is white and inset, so it stays on the tab. It opens the post page at the Chip in panel. It appears below 960px only, and is left off when the viewer is the poster or the poster has no payment app.
-
-### Chip In Panel
-The giving step: the amount field, the pay-app buttons, then a separate "Sent it?" step. On the board at 960px and wider it is its own white sheet beside the ticket, 416px wide and matching the ticket's height, with the raised amount at the top. On the post page it is part of the sheet, taking on the sheet's colour. Pay-app buttons are the panel's one primary decision and "I sent it" is secondary, until the page asks whether you sent it, when that button becomes the primary.
-
-### Ten-Mark Row
-Ten equal marks that fill left to right with 4px gaps, always with an amount or XP figure beside them. Any progress shows at least one mark, and the tenth fills only at 100%.
-- **Post page:** 13px tall. Filled marks grow in once on load, 280ms each with a 45ms stagger. Reduced motion shows them filled at once.
-- **Profile:** 9px tall with no motion, for progress toward the next level.
-- **Board ticket:** No row. The amount in words does the work, so the row keeps its moment on the post page.
-
 ### Buttons
-Plain and sure of themselves.
-- **Shape:** Slightly softened corners (3px), at least 44px tall, with 10px 18px padding and a 1.5px border.
-- **Primary:** Leaf green with white text at 700.
-- **Secondary:** Paper fill, ink text, muted border. Used for Next ticket, Back, Cancel, "I sent it", "Didn't get it", and the entry points to close or delete. The hover darkens only the border.
-- **Danger:** Tomato fill. It appears only on the confirming step of a delete or dispute; the step before it is secondary.
-- **Hover / Focus:** Fill and border colours shift over 120ms ease-out, and a press drops the button 1px. Focus is the shared 3px ink ring at 2px offset.
-- **Disabled:** 55% opacity with a not-allowed cursor.
+Plain and confident. There is one inverse fill, and everything else is drawn in outline.
+- **Shape:** gently rounded (8px), at least 46px tall, padding 10px 18px, Public Sans 700.
+- **Primary:** ink fill with white text on light pages, and white fill with void text on dark pages and the stage. Hover shifts the fill one step (action-hover). Pressing scales it to 0.98.
+- **Secondary:** transparent with a 1.5px edge stroke and ink text. Hover darkens the stroke to ink.
+- **Danger:** a tomato fill used only for confirmed destructive acts such as deleting a post. Its text is white on light pages and void on dark.
+- **Disabled:** 50% opacity with a not-allowed cursor.
+- **Focus:** a 2px ink outline offset by 2px everywhere (white on void).
 
-### Reactions
-A secondary button with 8px 14px padding and tabular counts. When on, it takes the good tint and a progress-green double border. Visitors who cannot react see the counts as plain muted text instead of a disabled button.
+### Chip in Tab
+The money action rides on the ask. It is a full-width white tab with a 12px radius, 15px padding, void text at 1.0625rem 700, and 18px margins from the field's edges. Hover is #e6e8ee. It links to the post's Chip in section, and on desktop the side panel replaces it.
 
-### Cards / Containers
-- **Corner Style:** Square.
-- **Background:** Paper on cork, or Want Blue for a want.
-- **Shadow Strategy:** The paper shadow; none for a sheet inside a sheet.
-- **Border:** None. In forced-colors mode each sheet gains a 1px border.
-- **Internal Padding:** 16px on ticket bodies and full-page forms, 14px on panels and gift cards, and 12px 14px on list rows, which are divided by a 1px paper line.
+### State Marks
+State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes a 0.875rem 700 label. Confirmed is a filled green dot, disputed is a filled tomato square with tomato text, expired is a filled gray dot, and waiting is an empty ring.
+
+### Panels
+- **Corner Style:** 14px.
+- **Background:** surface (white in light, #17181c in dark). Inputs and notices inside a panel drop to the page background.
+- **Shadow Strategy:** none.
+- **Internal Padding:** 18px 16px with 12px gaps.
+- On the desktop post page, the side panel loses its fill and padding and sits directly on void. On the desktop feed it is the right half of the card: surface fill, 28px padding, and the card's right-hand corners.
 
 ### Inputs / Fields
-- **Style:** Paper fill, 1.5px muted border, 3px corners, 10px 12px padding, at least 46px tall (textareas 120px). The label sits above in 700 and the hint below in muted.
-- **Focus:** The 3px ink ring at no offset, and the border turns ink.
-- **Error:** A 2px tomato border, with the message below in tomato text at 700, linked to the field.
-- **Choices:** 20px radios and checkboxes tinted by the theme accent, in 32px rows.
+- **Style:** a 1.5px edge stroke, 8px radius, 11px 13px padding, at least 48px tall (textareas 128px), with a bold label above and a 0.875rem hint below.
+- **Hover / Focus:** the stroke turns ink, and focus adds a 2px ink outline offset by 1px.
+- **Error:** a 2px tomato stroke, with the hint swapped for a bold bad-text message.
 
 ### Navigation
-- **Top bar:** Flat wood band. Brand at left in Bitter; links at right in 700 and 0.9375rem, with 12px vertical padding for reach. Hover adds a 2px underline. A count of waiting gifts is a white capsule with dark text. Focus turns the ring white.
-- **Tabs:** 700 muted text on cork over a 2px board rule. The current tab goes full ink with a 4px underline that sits on the rule. A second tab row stacks directly under the first where a page has two filters.
-- **Ticket row:** Under the ticket, on cork: a secondary Back after the first ticket, the "2 of 8" count in 700, and a secondary Next ticket pushed to the right, which returns to the first ticket from the last.
+- **Phone:** a fixed void bar at the bottom with Lucide 24px icons over 0.75rem 700 labels in fog gray. The current page turns white and its icon stroke thickens to 2.5. A white count badge marks gifts waiting to be confirmed.
+- **Desktop (960px and wider):** the same items, inline in the top bar with 20px icons and 0.9375rem labels. The current page gets a slate fill with 8px corners.
+- **Tabs:** text tabs with a 2px underline on the current tab (white on the stage, ink elsewhere) and muted inactive tabs over a hairline.
 
-### State Mark
-One device for every gift state: a small mark before a 0.875rem, 700 label. It carries no pill or background.
-- **Waiting:** Hollow muted ring.
-- **Confirmed:** Filled progress-green dot.
-- **Not received:** Tomato square with tomato text.
-- **Expired:** Empty-mark dot with muted text.
+### Lists
+Dense hairline rows with no cards inside cards. Gift and leader lists are bounded top and bottom by 1px lines, with 1px dividers between rows and 12px row padding. Titles are bold, amounts are right-aligned and tabular, and metadata wraps in muted 0.9375rem. Leaders use a three-column subgrid (rank, name, people).
 
-### Flashes and Notices
-Full-width tinted sheets above the content with ink text, 10px 12px padding, and square corners: info, success, or error by tint and words. Error flashes are announced as alerts.
+### Meter
+The single progress device. It is a 4px hairline track with 2px corners and an ink fill to the percentage. On a color field it becomes a 30% white track with a white fill, and 3px tall on the card. In forced-colors mode it is drawn in CanvasText.
+
+### The Deck (signature)
+One ask per screen, with a real link for each move. Dragging past 8px picks up the card. It follows the finger with a tilt of up to 4deg, and the neighboring ask's field is revealed underneath. After 24px of travel, the rail glyph for the target lights (white disc, void glyph, scale 1.08). A release past 30% of the card's width, or a flick faster than 0.5px/ms, throws it off the screen in 180ms with `cubic-bezier(0.4, 0, 1, 1)` and follows the link. Otherwise it settles back in 200ms with `cubic-bezier(0.16, 1, 0.3, 1)`. With no neighbor, the card gives at 25% resistance. With reduced motion, the card fades instead of moving (120ms). Gestures: left = next, right = back, and down = show less arrives in #119.
+
+### Photo State
+A post may carry one poster photo (ADR 0015). On the feed card it fills the field edge to edge (`object-fit: cover`) under a deeper scrim: 45% black at the top for the tabs, clear through the middle, and 82% black at the foot for the words. The title drops to sit just above the foot, so the photo's middle stays clear. On the post page the color-field header grows to `min(72vh, 600px)` (520px on desktop), with the photo behind it and a scrim to 82% at the foot. The ask's color stays underneath while the photo loads. A post with no photo is complete and never shows an empty frame.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** show one ticket at a time on the board, with the stack peeking out when more wait.
-- **Do** keep the tear-off Chip in tab on phones and put the ticket and Chip in panel side by side from 960px.
-- **Do** keep the board and post page inside the centered 1152px container, and leave the other pages in the 640px column.
-- **Do** use green for primary actions, links on paper, and progress marks, and switch to Cork Link Ink for links on cork.
-- **Do** give cork text the on-cork muted and link tokens, and paper text the on-paper ones.
-- **Do** treat a ticket with no photo as finished.
-- **Do** show progress with the ten-mark row and state the same fact in words beside it.
-- **Do** put one primary green decision in a panel, and make any delete or dispute a two-step move ending in tomato.
-- **Do** keep money in Public Sans, with tabular numerals wherever figures are listed in a column.
-- **Do** check every new surface in both themes and at 360px wide.
+- **Do** keep the top bar, bottom nav, feed stage, and post page void (#0a0a0a) in both color schemes, and let every other page follow `prefers-color-scheme`.
+- **Do** give each ask a full-bleed color field with the bottom scrim and white type, and check that any new category color holds white at 4.5:1 or better.
+- **Do** set titles in League Gothic uppercase and everything else in Public Sans, with tabular numerals for money and counts.
+- **Do** use the inverse filled button for the screen's main action, and outline everything else.
+- **Do** show progress only with the hairline meter, and lists only as hairline rows.
+- **Do** use Lucide line icons at a 2px stroke from the `_icons.html` sprite, always with a visible text label.
+- **Do** back every gesture with a labeled button and a real link, so the feed works without JavaScript and at 360px with no horizontal scroll.
+- **Do** say "gift" and "chip in" in interface copy.
 
 ### Don't:
-- **Don't** build a full-width layout. The owner tried a full-browser layout and rejected it.
-- **Don't** put posts back in a grid, a rack, or a scrolling list on the board.
-- **Don't** add thumbtacks, pins, tape, tilted tickets, or plant art.
-- **Don't** fake cork or wood with grain, texture, gradients, or images.
-- **Don't** use green as decoration, or on the bar, the ground, or a sheet of paper.
-- **Don't** use tomato for emphasis, urgency, or decoration.
-- **Don't** drift toward a sad charity page, a bank or finance app, a game or casino, a generic startup, or a typical scroll app.
-- **Don't** add hard offset shadows, hover lifts, or a second shadow on a sheet inside a sheet.
-- **Don't** add pill buttons, large rounded cards, or small uppercase labels above headings.
-- **Don't** load another weight or typeface, or set money in Bitter.
-- **Don't** render an empty image frame for a post with no photo, or treat the planned photo state as shipped.
-- **Don't** extend the reaction emoji into a general icon set. They are the content of those two reactions and nothing more.
+- **Don't** use tomato for anything but errors, disputed gifts, and destructive actions.
+- **Don't** add box shadows, glass, glow, or gradients other than the field scrim.
+- **Don't** put colored text or colored controls on a color field. It's white or nothing.
+- **Don't** turn state into pills or badges with fills. Use a shape and a word.
+- **Don't** add a second progress style (rings, segmented bars, or percentages as hero numbers).
+- **Don't** nest cards in panels or lay asks out as a card grid or vertical-scroll feed.
+- **Don't** say "donation" or "charity" anywhere in the interface.

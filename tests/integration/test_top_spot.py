@@ -291,7 +291,7 @@ def test_earned_ticket_comes_first_and_is_not_repeated(
     assert "1 of 2" in first
     second = client.get("/?n=2").get_data(as_text=True)
     assert other.title in second
-    assert top.title not in second
+    assert top.title not in second.split("<template")[0]
 
 
 def test_stack_without_a_top_is_newest_first(client: FlaskClient, make_user: MakeUser) -> None:

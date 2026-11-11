@@ -77,6 +77,7 @@ class ReportReason(StrEnum):
     HARASSMENT = "harassment"
     PRIVATE_INFO = "private_info"
     SPAM = "spam"
+    PHOTO = "photo"
     OTHER = "other"
 
     @property
@@ -90,6 +91,7 @@ REPORT_REASON_LABELS = {
     ReportReason.HARASSMENT: "Harassment, hate, or threats",
     ReportReason.PRIVATE_INFO: "Shares private information",
     ReportReason.SPAM: "Spam",
+    ReportReason.PHOTO: "Inappropriate photo",
     ReportReason.OTHER: "Something else",
 }
 
@@ -221,6 +223,7 @@ class Post(Base):
     update_posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     update_reminders_sent: Mapped[int] = mapped_column(default=0, server_default="0")
     edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    photo_key: Mapped[str | None] = mapped_column(String(80))
 
     user: Mapped[User] = relationship(back_populates="posts")
     donations: Mapped[list["Donation"]] = relationship(

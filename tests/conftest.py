@@ -1,5 +1,6 @@
 import os
 from collections.abc import Callable, Iterator
+from pathlib import Path
 
 import pytest
 from flask import Flask
@@ -18,6 +19,9 @@ for _key in (
     "STRIPE_CONNECT_WEBHOOK_SECRET",
     "BREVO_API_KEY",
     "MAIL_SERVER",
+    "R2_BUCKET",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
 ):
     os.environ[_key] = ""
 
@@ -25,9 +29,11 @@ PASSWORD = "correct-horse"  # noqa: S105 - test fixture
 
 
 @pytest.fixture
-def app() -> Iterator[Flask]:
+def app(tmp_path: Path) -> Iterator[Flask]:
     app = create_app(
         {
+            "PHOTO_DIR": str(tmp_path / "photos"),
+            "R2_BUCKET": "",
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
             "WTF_CSRF_ENABLED": False,

@@ -1,11 +1,13 @@
 import random
 from datetime import timedelta
+from pathlib import Path
 
 import click
 from flask import Flask, current_app
 from sqlalchemy import func, select
 from werkzeug.security import generate_password_hash
 
+from app import photos
 from app.extensions import db
 from app.models import (
     Donation,
@@ -62,6 +64,16 @@ WANTS = [
     ("Guitar strings and a tuner", "Teaching myself guitar."),
     ("Board game for game night", "Our group has played the same game for a year."),
 ]
+# Placeholder photos for some posts, so the photo state can be seen locally (SOURCES.md).
+SEED_PHOTO_DIR = Path(__file__).parent / "seed_photos"
+SEED_PHOTOS = {
+    "Art supplies": "art-supplies.jpg",
+    "Birthday cake for my son": "birthday-cake.jpg",
+    "Groceries until payday": "groceries.jpg",
+    "Guitar strings and a tuner": "guitar.jpg",
+    "New running shoes": "running-shoes.jpg",
+}
+
 FLAGGED = ("Help launch my startup", "Looking for seed money for my small business LLC.")
 SECONDARY_STATUSES = [PostStatus.FUNDED, PostStatus.CLOSED, PostStatus.PENDING_REVIEW]
 
@@ -152,6 +164,10 @@ def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tupl
                     closed_at=now if status in (PostStatus.FUNDED, PostStatus.CLOSED) else None,
                 )
             )
+    for post in posts:
+        if post.title in SEED_PHOTOS:
+            with (SEED_PHOTO_DIR / SEED_PHOTOS[post.title]).open("rb") as source:
+                post.photo_key = photos.save(photos.process(source))
     db.session.add_all([*users, *posts, *seed_donations(users, posts)])
     db.session.commit()
     return len(users), len(posts)

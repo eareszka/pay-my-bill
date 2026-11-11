@@ -15,6 +15,7 @@
       <h3><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h3>
       <p class="hint">by {{ post.user.username }} · {{ post.goal_cents | cents }} · {{ post.created_at | date }}</p>
       <p>{{ post.body }}</p>
+      {% if post.photo_key %}<img class="admin-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo on this post" loading="lazy">{% endif %}
       <div class="actions">
         {{ action("admin.approve", "Approve", "btn", post_id=post.id) }}
         {{ action("admin.remove", "Remove", "btn btn-danger", post_id=post.id) }}
@@ -34,7 +35,9 @@
       {% endif %}
       <p><strong>{{ report.reason.label }}</strong> · from {{ report.reporter.username }} · {{ report.created_at | date }}</p>
       {% if report.details %}<p>{{ report.details }}</p>{% endif %}
+      {% if report.post and report.post.photo_key %}<img class="admin-photo" src="{{ photo_url(report.post.photo_key) }}" alt="Photo on this post" loading="lazy">{% endif %}
       <div class="actions">
+        {% if report.post and report.post.photo_key %}{{ action("admin.remove_photo", "Remove photo", "btn btn-danger", post_id=report.post.id) }}{% endif %}
         {% if report.post and report.post.status != PostStatus.REMOVED %}{{ action("admin.remove", "Remove post", "btn btn-danger", post_id=report.post.id) }}{% endif %}
         {% set offender = report.post.user if report.post else report.user %}
         {% if not offender.is_banned and not offender.is_admin %}{{ action("admin.ban", "Ban " ~ offender.username, "btn btn-danger", user_id=offender.id) }}{% endif %}

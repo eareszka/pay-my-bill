@@ -58,6 +58,44 @@ The owner found the rack too cluttered and chose a bulletin board with no thumbt
 
 ---
 
+### S5-8 Swipe through the pile · #90 · 3 pts · P1
+The owner sees the feed as swiping through mail and bills, like Tinder except you can go back. Added mid-sprint by the owner, with motion only and no change to the approved look.
+- [ ] Swiping left shows the next ticket, and swiping right shows the previous one, with the real post already underneath and no blank stage. On the first ticket, a right swipe springs back.
+- [ ] Letting go early settles the ticket back. Scrolling still works over the ticket, and a drag never opens the post or Chip in.
+- [ ] Back, Next ticket, and the arrow keys play the same motion, and the arrow keys do nothing while typing.
+- [ ] Swiping never gives, passes on, or hides a post.
+- [ ] Reduced motion gets a quick fade. Without JavaScript, the links work as before.
+
+### S5-9 New look: the card stack · #118 · 8 pts · P1
+The owner wants the app to stop looking AI-made and to read as one simple system on phone and desktop, swiping through people's wants and needs like a dating app, except you can go back. Replaces the cork board through Impeccable; the owner picks the direction. Folds in PB-32 and settles PB-26.
+- [ ] Every page uses the new world, and the feed is a card stack: one card at a time with the real next card underneath, left for next, right for back.
+- [ ] Motion is fast (250ms or less), readable, and defined once. Dragging shows where the card will go. Reduced motion gets a fade.
+- [ ] The top bar reads feed, Post, Gifts, Leaders, profile. Log out moves to the profile, and Rules, Terms, and Privacy sit in the footer. Phone cards say Need or Want in words.
+- [ ] Works at 360px without horizontal scroll, in light and dark, and without JavaScript.
+- [ ] Ends with the Impeccable finish review and a new `DESIGN.md`.
+
+### S5-10 Categories and show less · #119 · 5 pts · P1
+As a **donor**, I want to **see less of a kind of post I don't care about** so that **the stack shows me what I'd chip in on**. Amends ADR 0013 in a new ADR.
+- [ ] Posters pick a category from the list the owner confirmed on 2026-11-11: Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, and Other. Existing posts become Other.
+- [ ] Swiping a card down, or its Show less button, moves that category later in my stack. It never hides a post, and the first ticket stays the follow-through pick.
+- [ ] I can undo right away and later from my profile.
+- [ ] Logged out, the choice lives in a cookie and joins my account when I log in.
+
+### S5-11 How-it-works home page · #120 · 5 pts · P1
+As a **new visitor**, I want to **understand how this works before signing up** so that **I trust it**. The owner chose a scroll-driven story.
+- [ ] Logged-out visitors land on a scroll-driven page: someone posts, you chip in through their own app, they confirm, you earn credit and they say thanks. It ends at the sign-up form.
+- [ ] Example cards are labeled as examples; no invented stats or testimonials.
+- [ ] Reduced motion and browsers without scroll-driven animation get a plain stacked page. The feed is one link away, at `/feed`.
+
+### S5-12 Photo on a post · #122 · 5 pts · P1
+As a **poster**, I want to **add a photo of what I need** so that **donors can see it**. The owner chose the full upload: Cloudflare R2, shown right away but reportable, and one photo per post (ADR 0015).
+- [ ] The post form takes one optional JPG, PNG, or WebP photo up to 8 MB. Anything else gets a clear message, and the rest of the form is kept.
+- [ ] The photo fills the feed card and the post page header, and the words stay readable.
+- [ ] Location and camera details are removed before the photo is stored.
+- [ ] The poster can remove their photo. People can report an inappropriate photo, and admins can remove just the photo.
+- [ ] Deleting a post or account deletes its photos.
+- [ ] Local dev seeds some posts with free placeholder photos.
+
 ## Wireframes (phone width, 360px)
 
 ```

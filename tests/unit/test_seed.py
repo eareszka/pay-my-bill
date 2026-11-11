@@ -1,4 +1,5 @@
 from collections import Counter
+from pathlib import Path
 
 import pytest
 from flask import Flask
@@ -6,7 +7,7 @@ from sqlalchemy import select
 
 from app.extensions import db
 from app.models import MAX_GOAL_CENTS, Donation, DonationStatus, Post, PostStatus, User
-from app.seed import SeedError, seed
+from app.seed import SEED_PHOTOS, SeedError, seed
 
 
 def test_seed_creates_users_and_posts(app: Flask) -> None:
@@ -76,3 +77,12 @@ def test_seeded_closed_posts_have_a_close_date(app: Flask) -> None:
         (post.closed_at is not None) == (post.status in (PostStatus.FUNDED, PostStatus.CLOSED))
         for post in posts
     )
+
+
+def test_seed_gives_some_posts_placeholder_photos(app: Flask) -> None:
+    seed()
+    with_photo = [p for p in db.session.scalars(select(Post)) if p.photo_key]
+    assert {p.title for p in with_photo} <= set(SEED_PHOTOS)
+    assert with_photo
+    for post in with_photo:
+        assert (Path(app.config["PHOTO_DIR"]) / str(post.photo_key)).exists()

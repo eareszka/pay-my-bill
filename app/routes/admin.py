@@ -4,11 +4,12 @@ from sqlalchemy import or_, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
+from app import photos
 from app.auth import admin_required
 from app.extensions import db
 from app.forms import EmptyForm
 from app.mail import send_later
-from app.models import Post, PostStatus, Report, User, utcnow
+from app.models import Post, PostStatus, Report, ReportReason, User, utcnow
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -75,6 +76,20 @@ def remove(post_id: int) -> Response:
     _resolve(Report.post_id == post.id, resolution="removed")
     db.session.commit()
     flash(f"Removed “{post.title}”.", "success")
+    return redirect(url_for("admin.queue"))
+
+
+@bp.post("/posts/<int:post_id>/remove-photo")
+@admin_required
+def remove_photo(post_id: int) -> Response:
+    post = _post(post_id)
+    photo_key, post.photo_key = post.photo_key, None
+    _resolve(
+        Report.post_id == post.id, Report.reason == ReportReason.PHOTO, resolution="photo_removed"
+    )
+    db.session.commit()
+    photos.discard(photo_key)
+    flash(f"Removed the photo from “{post.title}”.", "success")
     return redirect(url_for("admin.queue"))
 
 
