@@ -3,7 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from flask.testing import FlaskClient
 from sqlalchemy import select
 
@@ -294,3 +294,22 @@ def test_admins_get_one_report_email_an_hour(
         db.session.commit()
     assert sent == [1, 0, 1, 0, 1, 0, 1, 0]
     assert "wait in the queue" in caplog.text
+
+
+def test_a_login_typed_as_the_marker_cannot_silence_report_emails(
+    app: Flask,
+    client: FlaskClient,
+    make_user: MakeUser,
+    admin: User,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from app.routes.reports import REPORT_EMAIL_IDENTIFIER
+
+    # Logged out, someone fails a login as the marker before each report (#175).
+    app.test_client().post("/login", data={"identifier": REPORT_EMAIL_IDENTIFIER, "password": "x"})
+    # Requests in the fixture's app context share g, so forget that visitor.
+    g.pop("_login_user", None)
+    post = make_post(make_user("poster"))
+    login_as(client, make_user("bob"))
+    client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+    assert caplog.text.count("New report on Pay My Bill") == 1

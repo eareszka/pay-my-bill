@@ -52,7 +52,11 @@ def _file(
     # of reports can't keep the admins from ever hearing.
     last_email = db.session.scalar(
         select(func.max(LoginAttempt.created_at)).where(
-            LoginAttempt.identifier == REPORT_EMAIL_IDENTIFIER
+            LoginAttempt.identifier == REPORT_EMAIL_IDENTIFIER,
+            # Only rows written here: a login typed as the marker stores the caller's IP
+            # and a failure, so it can't pass for a sent email.
+            LoginAttempt.ip.is_(None),
+            LoginAttempt.succeeded.is_(True),
         )
     )
     email_admins = last_email is None or as_utc(last_email) <= utcnow() - REPORT_EMAIL_GAP
