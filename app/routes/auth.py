@@ -39,6 +39,7 @@ from app.tokens import (
     password_digest,
     read_token,
 )
+from app.urls import site_url
 
 bp = Blueprint("auth", __name__)
 
@@ -61,7 +62,7 @@ def send_verification(user: User) -> bool:
     if not allow_verification_email(user.id):
         return False
     token = make_token(user.id, user.email, VERIFY_EMAIL)
-    link = url_for("auth.verify", token=token, _external=True)
+    link = site_url("auth.verify", token=token)
     send_later(
         user.email,
         "Verify your Pay My Bill email",
@@ -211,7 +212,7 @@ def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
             # Bound to a digest of the password hash, so the link stops working
             # once it's used without carrying the hash itself.
             token = make_token(user.id, password_digest(user.password_hash), RESET_PASSWORD)
-            link = url_for("auth.reset_password", token=token, _external=True)
+            link = site_url("auth.reset_password", token=token)
             send_later(
                 user.email,
                 "Reset your Pay My Bill password",
@@ -262,7 +263,7 @@ def reset_password(token: str) -> str | Response:
             user.email,
             "Your Pay My Bill password changed",
             f"Hi {user.username},\n\nYour password was just changed. If this wasn't you, "
-            f"reset it again at {url_for('auth.reset_request', _external=True)} and tell us.",
+            f"reset it again at {site_url('auth.reset_request')} and tell us.",
         )
         logout_user()
         flash("Your password is changed. Log in with the new one.", "success")

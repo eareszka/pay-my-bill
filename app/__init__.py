@@ -37,7 +37,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         # Request-path email goes to a background thread; tests send inline.
         MAIL_ASYNC=os.environ.get("MAIL_ASYNC", "1") != "0",
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
-        # Base URL for links in emails sent outside a request (the reminder command).
+        # The site address every absolute link is built from (app/urls.py), never the Host header.
         APP_URL=app_url,
         # Secure wherever the site is served over HTTPS; local http dev still works.
         SESSION_COOKIE_SECURE=app_url.startswith("https://"),

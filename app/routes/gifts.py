@@ -40,6 +40,7 @@ from app.models import (
 from app.money import format_cents
 from app.routes.posts import MAX_DB_INT, render_post, send_update_notice
 from app.tokens import GIFT_ANSWER, make_token, read_token
+from app.urls import site_url
 
 bp = Blueprint("gifts", __name__)
 
@@ -51,7 +52,7 @@ def send_gift_notice(donation: Donation) -> None:
         f"{format_cents(donation.amount_cents)} via {donation.method.label} "
         f'for "{post.title}".\n\nCheck {donation.method.label}, then answer in one tap:\n'
         f"{answer_link(donation)}\n\n"
-        f"Or see them on your profile: {url_for('gifts.index', _external=True)}"
+        f"Or see them on your profile: {site_url('gifts.index')}"
     )
     send_later(post.user.email, f"{donation.donor.username} sent you a gift", body)
 
@@ -236,7 +237,7 @@ def resolve(donation_id: int, action: str) -> Response:
 
 def answer_link(donation: Donation) -> str:
     token = make_token(donation.id, str(donation.post.user_id), GIFT_ANSWER)
-    return url_for("gifts.answer", token=token, _external=True)
+    return site_url("gifts.answer", token=token)
 
 
 def answer_target(token: str) -> tuple[int, int]:

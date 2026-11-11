@@ -21,6 +21,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The admin queue flags possible fake helping: a donor where 3 or more of the people they helped got nothing from anyone outside that group (banned accounts don't count as outside) and joined within a day of each other. Each flag shows what the donor gave each account, and admins can ban the donor alone or the donor and the flagged accounts together. Flags never change the leaderboard, and gifts of any size still count (#140).
 - The session cookie is now Secure on HTTPS (decided from `APP_URL`) and SameSite=Lax everywhere. Every page sends a strict Content Security Policy (scripts, styles, and fonts from the site only, photos from the site or R2, forms only to the site or Stripe), refuses to be framed, and sends nosniff and a same-origin referrer policy. HTTPS deployments also send HSTS for a year (#142).
 - When an admin removes a post, or bans a user and so removes their open posts, the photos are deleted too. Before, the post was gone but its photo link still worked (#144).
+- Links in emails and the return links sent to Stripe are now built from `APP_URL`, not the address the request came in on, so a forged Host header can't send someone a reset or verify link pointing at another site (#150).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed

@@ -43,6 +43,7 @@ from app.moderation import is_flagged
 from app.money import format_cents
 from app.payment_links import pay_options
 from app.routes.admin import notify_admins
+from app.urls import site_url
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
@@ -264,7 +265,7 @@ def close(post_id: int) -> Response:
 def send_update_notice(post: Post, donor: User) -> None:
     if donor.is_deleted:
         return
-    link = url_for("posts.show", post_id=post.id, _external=True)
+    link = site_url("posts.show", post_id=post.id)
     body = (
         f"Hi {donor.username},\n\n{post.user.username} shared how it went "
         f'on "{post.title}", a post you chipped in on.\n\nRead it here:\n{link}'
