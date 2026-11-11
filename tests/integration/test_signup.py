@@ -4,17 +4,17 @@ import smtplib
 from datetime import timedelta
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from flask.testing import FlaskClient
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from werkzeug.security import check_password_hash
 
 from app import create_app
-from app.auth import verified_required
+from app.auth import MAX_SIGNUPS_PER_IP, SIGNUP_WINDOW, verified_required
 from app.extensions import db
 from app.models import LoginAttempt, User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
-from tests.conftest import MakeUser, login_as
+from tests.conftest import PASSWORD, MakeUser, login_as
 
 FORM = {
     "username": "New_User",
@@ -286,3 +286,40 @@ def test_field_errors_are_linked_for_screen_readers(client: FlaskClient) -> None
     assert (
         '<small class="error" id="username-error">Usernames are 3 to 30 characters.</small>' in page
     )
+
+
+def signup_as(client: FlaskClient, n: int, ip: str = "203.0.113.7") -> int:
+    form = {**FORM, "username": f"user{n}", "email": f"user{n}@example.com"}
+    status = client.post("/signup", data=form, environ_base={"REMOTE_ADDR": ip}).status_code
+    # Requests in the fixture's app context share g, so forget who signed up.
+    g.pop("_login_user", None)
+    return status
+
+
+def test_signups_are_limited_per_address(app: Flask) -> None:
+    for n in range(MAX_SIGNUPS_PER_IP):
+        assert signup_as(app.test_client(), n) == 302
+    resp = app.test_client().post(
+        "/signup",
+        data={**FORM, "username": "one_more", "email": "more@example.com"},
+        environ_base={"REMOTE_ADDR": "203.0.113.7"},
+    )
+    assert resp.status_code == 429
+    assert resp.headers["Retry-After"] == str(int(SIGNUP_WINDOW.total_seconds()))
+    assert b"Too many new accounts from your network" in resp.data
+    assert user_count() == MAX_SIGNUPS_PER_IP
+    # Another address is unaffected, and the window passing lifts the limit.
+    assert signup_as(app.test_client(), 100, ip="198.51.100.9") == 302
+    db.session.execute(
+        update(LoginAttempt).values(created_at=utcnow() - SIGNUP_WINDOW - timedelta(minutes=1))
+    )
+    db.session.commit()
+    assert signup_as(app.test_client(), 101) == 302
+
+
+def test_signups_do_not_count_toward_the_login_lockout(app: Flask, make_user: MakeUser) -> None:
+    make_user("alice")
+    for n in range(MAX_SIGNUPS_PER_IP):
+        signup_as(app.test_client(), n, ip="127.0.0.1")
+    resp = app.test_client().post("/login", data={"identifier": "alice", "password": PASSWORD})
+    assert resp.status_code == 302

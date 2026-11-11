@@ -19,6 +19,10 @@ LOGIN_WINDOW = timedelta(minutes=15)
 # daily email quota (#14).
 MAX_VERIFY_EMAILS = 3
 VERIFY_EMAIL_WINDOW = timedelta(hours=1)
+# Room for a household or campus network behind one address, not a farm of
+# accounts or a stream of verification emails to strangers (#137).
+MAX_SIGNUPS_PER_IP = 10
+SIGNUP_WINDOW = timedelta(hours=1)
 
 
 def load_user(user_id: str) -> User | None:
@@ -85,6 +89,25 @@ def allow_verification_email(user_id: int) -> bool:
     db.session.add(LoginAttempt(identifier=identifier, ip=None, succeeded=False))
     db.session.commit()
     return True
+
+
+def allow_signup(ip: str | None) -> bool:
+    """Record a signup attempt from this address, then say whether it's under the limit.
+
+    Rows are marked succeeded so they never count toward the login lockout.
+    """
+    db.session.add(LoginAttempt(identifier="signup", ip=ip, succeeded=True))
+    db.session.commit()
+    count = db.session.scalar(
+        select(func.count())
+        .select_from(LoginAttempt)
+        .where(
+            LoginAttempt.identifier == "signup",
+            LoginAttempt.ip == ip,
+            LoginAttempt.created_at >= utcnow() - SIGNUP_WINDOW,
+        )
+    )
+    return (count or 0) <= MAX_SIGNUPS_PER_IP
 
 
 def mark_login_succeeded(attempt: LoginAttempt) -> None:

@@ -18,6 +18,8 @@ from werkzeug.wrappers import Response
 
 from app.auth import (
     LOGIN_WINDOW,
+    SIGNUP_WINDOW,
+    allow_signup,
     allow_verification_email,
     begin_login_attempt,
     login_required,
@@ -68,11 +70,15 @@ def send_verification(user: User) -> bool:
 
 
 @bp.route("/signup", methods=["GET", "POST"])
-def signup() -> str | Response:
+def signup() -> str | Response | tuple[str, int, dict[str, str]]:
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
     form = SignupForm()
     if form.validate_on_submit():
+        if not allow_signup(request.remote_addr):
+            form.email.errors.append("Too many new accounts from your network. Try again later.")
+            retry_after = str(int(SIGNUP_WINDOW.total_seconds()))
+            return render_template("auth/signup.html", form=form), 429, {"Retry-After": retry_after}
         taken = db.session.scalars(
             select(User).where(
                 or_(User.username == form.username.data, User.email == form.email.data)
