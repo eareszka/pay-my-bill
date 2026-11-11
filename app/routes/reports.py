@@ -6,9 +6,9 @@ from werkzeug.wrappers import Response
 from app.auth import verified_required
 from app.extensions import db
 from app.forms import ReportForm
-from app.models import Post, Report, ReportReason, User
+from app.models import MAX_DB_INT, Post, Report, ReportReason, User
 from app.routes.admin import notify_admins
-from app.routes.posts import MAX_DB_INT, can_view
+from app.routes.posts import can_view
 
 bp = Blueprint("reports", __name__, url_prefix="/report")
 

@@ -25,6 +25,7 @@ from app.forms import GiftForm
 from app.mail import send_email, send_later
 from app.models import (
     LATE_GIFT_HOURS,
+    MAX_DB_INT,
     PENDING_GIFT_DAYS,
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
@@ -38,7 +39,7 @@ from app.models import (
     utcnow,
 )
 from app.money import format_cents
-from app.routes.posts import MAX_DB_INT, render_post, send_update_notice
+from app.routes.posts import render_post, send_update_notice
 from app.tokens import GIFT_ANSWER, make_token, read_token
 from app.urls import site_url
 

@@ -25,6 +25,7 @@ from app.forms import GiftForm, PostForm, ResultsUpdateForm
 from app.mail import send_email, send_later
 from app.models import (
     LATE_GIFT_HOURS,
+    MAX_DB_INT,
     MAX_OPEN_POSTS,
     MIN_CARD_GIFT_CENTS,
     PUBLIC_STATUSES,
@@ -47,7 +48,6 @@ from app.urls import site_url
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
-MAX_DB_INT = 2**31 - 1
 DUPLICATE_POST_SECONDS = 60
 
 

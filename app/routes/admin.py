@@ -1,5 +1,6 @@
 import click
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask_login import current_user
 from sqlalchemy import or_, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
@@ -10,7 +11,16 @@ from app.extensions import db
 from app.farm_flags import CLUSTER_SIZE, suspected_farms
 from app.forms import EmptyForm
 from app.mail import send_later
-from app.models import Post, PostStatus, Report, ReportReason, User, utcnow
+from app.models import (
+    MAX_DB_INT,
+    AdminAction,
+    Post,
+    PostStatus,
+    Report,
+    ReportReason,
+    User,
+    utcnow,
+)
 from app.urls import site_url
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -32,10 +42,23 @@ def _resolve(*where: object, resolution: str) -> None:
 
 
 def _post(post_id: int) -> Post:
-    post = db.session.get(Post, post_id)
+    post = db.session.get(Post, post_id) if post_id <= MAX_DB_INT else None
     if post is None:
         abort(404)
     return post
+
+
+def _log(action: str, target: str) -> None:
+    """Record an admin action; it commits with the change it describes."""
+    admin_id = current_user.id if current_user and current_user.is_authenticated else None
+    db.session.add(AdminAction(admin_id=admin_id, action=action, target=target[:200]))
+
+
+def _about(post: Post) -> str:
+    return f"post {post.id} by {post.user.username}: {post.title}"
+
+
+RECENT_ACTIONS = 25
 
 
 @bp.get("")
@@ -53,12 +76,19 @@ def queue() -> str:
         .where(Report.resolved_at.is_(None))
         .order_by(Report.created_at)
     ).all()
+    actions = db.session.scalars(
+        select(AdminAction)
+        .options(joinedload(AdminAction.admin))
+        .order_by(AdminAction.created_at.desc(), AdminAction.id.desc())
+        .limit(RECENT_ACTIONS)
+    ).all()
     return render_template(
         "admin/queue.html",
         flagged=flagged,
         reports=reports,
         farms=suspected_farms(),
         cluster_size=CLUSTER_SIZE,
+        actions=actions,
         form=EmptyForm(),
     )
 
@@ -72,6 +102,7 @@ def approve(post_id: int) -> Response:
         # Its 30 days start now, so time in review doesn't use up the window (#68).
         post.created_at = utcnow()
         _resolve(Report.post_id == post.id, resolution="approved")
+        _log("approve", _about(post))
         db.session.commit()
         flash(f"Approved “{post.title}”.", "success")
     return redirect(url_for("admin.queue"))
@@ -85,6 +116,7 @@ def remove(post_id: int) -> Response:
     # A removed post's photo goes too, or its URL stays public (#144).
     photo_key, post.photo_key = post.photo_key, None
     _resolve(Report.post_id == post.id, resolution="removed")
+    _log("remove post", _about(post))
     db.session.commit()
     photos.discard(photo_key)
     flash(f"Removed “{post.title}”.", "success")
@@ -99,6 +131,7 @@ def remove_photo(post_id: int) -> Response:
     _resolve(
         Report.post_id == post.id, Report.reason == ReportReason.PHOTO, resolution="photo_removed"
     )
+    _log("remove photo", _about(post))
     db.session.commit()
     photos.discard(photo_key)
     flash(f"Removed the photo from “{post.title}”.", "success")
@@ -108,6 +141,7 @@ def remove_photo(post_id: int) -> Response:
 def _ban(user: User) -> list[str]:
     """Ban the user. Returns photo keys to discard once the change commits."""
     user.banned_at = utcnow()
+    _log("ban", f"user {user.username}")
     photo_keys: list[str] = []
     # Every post goes, closed and funded ones too, so gifts to them stop
     # counting toward anyone's rewards (#147).
@@ -126,7 +160,7 @@ def _ban(user: User) -> list[str]:
 @bp.post("/users/<int:user_id>/ban")
 @admin_required
 def ban(user_id: int) -> Response:
-    user = db.session.get(User, user_id)
+    user = db.session.get(User, user_id) if user_id <= MAX_DB_INT else None
     if user is None or user.is_admin:
         abort(404)
     photo_keys = _ban(user)
@@ -159,7 +193,15 @@ def ban_cluster(user_id: int) -> Response:
 @bp.post("/reports/<int:report_id>/dismiss")
 @admin_required
 def dismiss(report_id: int) -> Response:
-    _resolve(Report.id == report_id, resolution="dismissed")
+    report = db.session.get(Report, report_id) if report_id <= MAX_DB_INT else None
+    if report is None:
+        abort(404)
+    _resolve(Report.id == report.id, resolution="dismissed")
+    if report.post:
+        target = _about(report.post)
+    else:
+        target = f"user {report.user.username}" if report.user else "a user"
+    _log("dismiss report", f"report {report.id} on {target}")
     db.session.commit()
     flash("Report dismissed.", "success")
     return redirect(url_for("admin.queue"))
@@ -173,5 +215,23 @@ def grant_command(email: str) -> None:
     if user is None:
         raise click.ClickException(f"No account uses {email}.")
     user.is_admin = True
+    _log("grant admin", f"user {user.username}")
     db.session.commit()
     click.echo(f"{user.username} is now an admin.")
+
+
+@bp.cli.command("revoke")
+@click.argument("email")
+def revoke_command(email: str) -> None:
+    """Take admin away from the account with this email."""
+    user = db.session.scalar(select(User).where(User.email == email.strip().lower()))
+    if user is None:
+        raise click.ClickException(f"No account uses {email}.")
+    if not user.is_admin:
+        raise click.ClickException(f"{user.username} isn't an admin.")
+    user.is_admin = False
+    _log("revoke admin", f"user {user.username}")
+    db.session.commit()
+    click.echo(f"{user.username} is no longer an admin.")
+    if not db.session.scalar(select(User.id).where(User.is_admin.is_(True))):
+        click.echo("Warning: no admins are left, so nobody can open /admin.", err=True)

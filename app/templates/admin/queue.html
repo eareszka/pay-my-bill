@@ -67,4 +67,15 @@
   {% else %}
     <p class="empty">Nothing looks off.</p>
   {% endfor %}
+
+  <h2>Recent admin actions</h2>
+  {% if actions %}
+    <ul class="admin-log">
+      {% for entry in actions %}
+        <li>{{ entry.created_at | date }} · {{ entry.admin.username if entry.admin else "command line" }} · {{ entry.action }} · {{ entry.target }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">No admin actions yet.</p>
+  {% endif %}
 {% endblock %}

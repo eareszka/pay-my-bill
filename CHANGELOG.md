@@ -36,6 +36,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The Stripe refresh link, where Stripe sends people when an onboarding link expires, only renews onboarding already started. It no longer creates a Stripe account, so a link from another site can't make one for a logged-in user (#167).
 - Deleting an account now also clears its password-reset and verification-email throttle rows, so a deleted user's email address doesn't stay in the database (#169).
 - Logging out now clears the whole session, so nothing from the visit (a saved way back, the form token) carries over to whoever uses the browser next (#171).
+- Admins can be removed with `flask --app app admin revoke <email>`. Every admin action (approve, remove a post or photo, ban, dismiss, grant, revoke) is recorded with who did it and when, and /admin lists the 25 most recent. Admin pages return 404 for ids too large for the database instead of an error (#173, migration 0017).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed

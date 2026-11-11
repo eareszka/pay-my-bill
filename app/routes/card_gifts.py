@@ -13,6 +13,7 @@ from app.extensions import csrf, db
 from app.forms import GiftForm
 from app.mail import send_later
 from app.models import (
+    MAX_DB_INT,
     MIN_CARD_GIFT_CENTS,
     Donation,
     DonationStatus,
@@ -27,7 +28,7 @@ from app.models import (
 from app.money import format_cents, parse_dollars
 from app.routes.admin import notify_admins
 from app.routes.gifts import count_confirmed
-from app.routes.posts import MAX_DB_INT, can_view, render_post
+from app.routes.posts import can_view, render_post
 from app.urls import site_url
 
 bp = Blueprint("card", __name__)
