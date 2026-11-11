@@ -73,7 +73,7 @@ def test_others_see_no_delete(client: FlaskClient, poster: User, donor: User) ->
 def test_delete_post_without_gifts(client: FlaskClient, poster: User) -> None:
     post_id = add_post(poster).id
     login_as(client, poster)
-    assert client.post(f"/posts/{post_id}/delete").location == "/"
+    assert client.post(f"/posts/{post_id}/delete").location == "/feed"
     assert count(Post) == 0
     assert client.get(f"/posts/{post_id}").status_code == 404
 
@@ -169,7 +169,7 @@ def test_delete_account_anonymizes_and_logs_out(
     plain_id, poster_id = plain.id, poster.id
     login_as(client, poster)
     resp = client.post("/account/delete", data={"password": PASSWORD})
-    assert resp.location == "/"
+    assert resp.location == "/feed"
     user = db.session.get(User, poster_id)
     assert user is not None
     assert user.username == f"deleted-{poster_id}"

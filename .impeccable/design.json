@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-09T00:00:00Z",
+  "generatedAt": "2026-11-11T00:00:00Z",
   "title": "Design System: Pay My Bill",
   "extensions": {
     "colorMeta": {
@@ -643,6 +643,16 @@
         "name": "press",
         "value": "scale(0.98)",
         "purpose": "Button active state."
+      },
+      {
+        "name": "home-cut",
+        "value": "clip-path inset(0 0 0 100%) to inset(0), linear, animation-timeline view(), range entry 0% to entry 100%",
+        "purpose": "Home page step fields wipe in from the right; only under @supports (animation-timeline: view()) and prefers-reduced-motion: no-preference."
+      },
+      {
+        "name": "home-follow",
+        "value": "opacity 0.2 and translateX(56px) to rest, linear, view() entry 0% to 80%",
+        "purpose": "A home step's example piece follows its field in."
       }
     ],
     "breakpoints": [
@@ -800,7 +810,8 @@
       "**Do** show progress only with the hairline meter, and lists only as hairline rows.",
       "**Do** use Lucide line icons at a 2px stroke from the `_icons.html` sprite, always with a visible text label.",
       "**Do** back every gesture with a labeled button and a real link, so the feed works without JavaScript and at 360px with no horizontal scroll.",
-      "**Do** say \"gift\" and \"chip in\" in interface copy."
+      "**Do** say \"gift\" and \"chip in\" in interface copy.",
+      "**Do** label every demo piece of the app \"Example\" with the outlined tag, and make it mirror the real component and its real state exactly."
     ],
     "donts": [
       "**Don't** use tomato for anything but errors, disputed gifts, and destructive actions.",
@@ -809,7 +820,8 @@
       "**Don't** turn state into pills or badges with fills. Use a shape and a word.",
       "**Don't** add a second progress style (rings, segmented bars, or percentages as hero numbers).",
       "**Don't** nest cards in panels or lay asks out as a card grid or vertical-scroll feed.",
-      "**Don't** say \"donation\" or \"charity\" anywhere in the interface."
+      "**Don't** say \"donation\" or \"charity\" anywhere in the interface.",
+      "**Don't** invent stats, counts, testimonials, or quotes on marketing surfaces. The proof is the real app pieces, labeled Example."
     ]
   }
 }

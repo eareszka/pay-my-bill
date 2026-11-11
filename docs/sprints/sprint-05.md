@@ -17,7 +17,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-8 Swipe through the pile | #90 | 3 | Done |
 | S5-9 New look: the card stack | #118 | 8 | Done |
 | S5-10 Categories and show less | #119 | 5 | To do |
-| S5-11 How-it-works home page | #120 | 5 | To do |
+| S5-11 How-it-works home page | #120 | 5 | In review |
 | S5-12 Photo on a post | #122 | 5 | Done |
 | S5-13 You: my posts and chipped in | #132 | 3 | Done |
 
@@ -64,3 +64,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-11: Built #155 for audit finding #11: gthread gunicorn (1 worker, 4 threads, 60s timeout), one photo decode at a time with JPEG draft decoding, and a 1 MB body cap outside `/posts/new`. The audit found #152's guard fails open when FLASK_ENV is missing; that's the owner's call. Blocked: #9, on staging data.
 - 2026-11-11: The owner asked to drop the word "donor" from everything users see. Replaced it on the leaderboard, post and account delete prompts, Community Rules, and the pending-gift reminder email, with a test that those pages never show it. Code names and docs stay as written. Blocked: none.
 - 2026-11-11: The audit passed #152 (PR #154) after it was changed to fail closed. It failed #155: CSRF reads the form before the view raises the body limit, so photos over 1 MB got a 413 with CSRF on; fixing it. Built #158 for audit finding #12: `moderation.normalize()` folds disguises before matching, and the owner's eight words are added. Blocked: #9, on staging data.
+- 2026-11-11: #120 built through Impeccable. The owner picked the Color Cut scroll structure (split doors, real app pieces labeled Example, a sideways cut per step, ending at sign-up). `/` is the home page for logged-out visitors, and the feed moved to `/feed` with old links redirecting. Next: the finish review and the owner's look at screenshots. Blocked: none.

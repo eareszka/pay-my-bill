@@ -114,7 +114,7 @@ def test_feed_card_links_to_detail(client: FlaskClient, owner: User) -> None:
     post = add_post(owner)
     assert (
         f'href="/posts/{post.id}"><span class="sr-only">Need: </span>Electric bill help'.encode()
-        in client.get("/").data
+        in client.get("/feed").data
     )
 
 

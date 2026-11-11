@@ -34,7 +34,7 @@ def test_login_success_lands_on_feed(
     user = make_user("alice")
     resp = client.post("/login", data={"identifier": identifier, "password": PASSWORD})
     assert resp.status_code == 302
-    assert resp.location == "/"
+    assert resp.location == "/feed"
     assert logged_in_as(client) == user.get_id()
     attempt = db.session.scalars(select(LoginAttempt)).one()
     assert (attempt.identifier, attempt.succeeded) == ("alice", True)
@@ -81,9 +81,9 @@ def test_rate_limit_window_expires(client: FlaskClient, make_user: MakeUser) -> 
     ("next_", "expected"),
     [
         ("/verify/pending", "/verify/pending"),
-        ("https://evil.example.com/", "/"),
-        ("//evil.example.com/", "/"),
-        (r"/\evil.example.com", "/"),
+        ("https://evil.example.com/", "/feed"),
+        ("//evil.example.com/", "/feed"),
+        (r"/\evil.example.com", "/feed"),
     ],
 )
 def test_login_next_must_be_local(

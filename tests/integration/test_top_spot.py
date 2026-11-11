@@ -285,11 +285,11 @@ def test_earned_ticket_comes_first_and_is_not_repeated(
     past_post(keeper, donor)
     top = open_post(keeper)
     other = open_post(make_user("second"))
-    first = client.get("/").get_data(as_text=True)
+    first = client.get("/feed").get_data(as_text=True)
     assert top.title in first
     assert f'href="/posts/{top.id}#chip-in">Chip in' in first
     assert "1 of 2" in first
-    second = client.get("/?n=2").get_data(as_text=True)
+    second = client.get("/feed?n=2").get_data(as_text=True)
     assert other.title in second
     assert top.title not in second.split("<template")[0]
 
@@ -302,7 +302,7 @@ def test_stack_without_a_top_is_newest_first(client: FlaskClient, make_user: Mak
     older.created_at = utcnow() - timedelta(hours=2)
     owner.venmo_handle = None
     db.session.commit()
-    assert newer.title in client.get("/").get_data(as_text=True)
+    assert newer.title in client.get("/feed").get_data(as_text=True)
     assert top_post() is None
 
 
@@ -310,7 +310,7 @@ def test_own_top_post_has_no_chip_in_tab(client: FlaskClient, make_user: MakeUse
     owner = make_user("first")
     open_post(owner)
     login_as(client, owner)
-    assert "tear-tab" not in client.get("/").get_data(as_text=True)
+    assert "tear-tab" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_pile_of_kudos_cannot_cancel_real_doubts(make_user: MakeUser, donor: User) -> None:
