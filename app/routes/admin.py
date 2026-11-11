@@ -7,6 +7,7 @@ from werkzeug.wrappers import Response
 from app import photos
 from app.auth import admin_required
 from app.extensions import db
+from app.farm_flags import CLUSTER_SIZE, suspected_farms
 from app.forms import EmptyForm
 from app.mail import send_later
 from app.models import Post, PostStatus, Report, ReportReason, User, utcnow
@@ -51,7 +52,14 @@ def queue() -> str:
         .where(Report.resolved_at.is_(None))
         .order_by(Report.created_at)
     ).all()
-    return render_template("admin/queue.html", flagged=flagged, reports=reports, form=EmptyForm())
+    return render_template(
+        "admin/queue.html",
+        flagged=flagged,
+        reports=reports,
+        farms=suspected_farms(),
+        cluster_size=CLUSTER_SIZE,
+        form=EmptyForm(),
+    )
 
 
 @bp.post("/posts/<int:post_id>/approve")

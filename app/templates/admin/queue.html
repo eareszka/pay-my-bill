@@ -47,4 +47,19 @@
   {% else %}
     <p class="empty">No open reports.</p>
   {% endfor %}
+
+  <h2>Possible fake helping ({{ farms | length }})</h2>
+  <p class="hint">Donors where {{ cluster_size }} or more of the people they helped got gifts from nobody else and joined within a day of each other. A flag only asks you to look; it doesn't change the leaderboard.</p>
+  {% for flag in farms %}
+    <article class="page-form admin-item">
+      <h3>Donor: <a href="{{ url_for('profile.show', username=flag.donor.username) }}">{{ flag.donor.username }}</a></h3>
+      <p>Helped {{ flag.helped }} {{ "person" if flag.helped == 1 else "people" }}. {{ flag.cluster | length }} joined together and only got gifts from them:
+        {% for person in flag.cluster %}<a href="{{ url_for('profile.show', username=person.username) }}">{{ person.username }}</a> ({{ person.created_at | date }}){{ ", " if not loop.last }}{% endfor %}</p>
+      {% if not flag.donor.is_admin %}
+        <div class="actions">{{ action("admin.ban", "Ban " ~ flag.donor.username, "btn btn-danger", user_id=flag.donor.id) }}</div>
+      {% endif %}
+    </article>
+  {% else %}
+    <p class="empty">Nothing looks off.</p>
+  {% endfor %}
 {% endblock %}
