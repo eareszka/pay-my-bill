@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -62,6 +62,14 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     from app import models  # noqa: F401
     from app.extensions import csrf, db, login_manager, migrate
+    from app.photos import MAX_UPLOAD_BYTES
+
+    @app.before_request
+    def photo_upload_limit() -> None:
+        # The new-post form is the only one with a photo, so the only one allowed a large
+        # body. Registered before CSRF, which reads the form in its own before_request (#155).
+        if request.endpoint == "posts.new":
+            request.max_content_length = MAX_UPLOAD_BYTES
 
     db.init_app(app)
     migrate.init_app(app, db)

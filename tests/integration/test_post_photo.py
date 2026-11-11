@@ -266,3 +266,62 @@ def test_only_the_new_post_form_takes_a_large_body(client: FlaskClient, poster: 
     assert "isn&#39;t a photo we can read" in resp.get_data(as_text=True)
     resp = client.post("/profile", data={"city": "x" * (2 * 1024 * 1024)})
     assert resp.status_code == 413
+
+
+def test_large_photo_passes_csrf_on(tmp_path: Path) -> None:
+    # CSRF reads the form before any view runs, so the larger limit must already be
+    # in place by then (#155). Other tests run with CSRF off and can't see this.
+    import os
+    import re
+
+    from werkzeug.security import generate_password_hash
+
+    from app import create_app
+    from app.models import utcnow
+
+    app = create_app(
+        {
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            "PHOTO_DIR": str(tmp_path),
+            "R2_BUCKET": "",
+            "MAIL_ASYNC": False,
+        }
+    )
+    with app.app_context():
+        db.create_all()
+        db.session.add(
+            User(
+                username="maria_g",
+                email="maria@example.com",
+                password_hash=generate_password_hash(PASSWORD),
+                email_verified_at=utcnow(),
+                venmo_handle="@maria-g",
+            )
+        )
+        db.session.commit()
+    client = app.test_client()
+
+    def token(path: str) -> str:
+        found = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', client.get(path).text)
+        assert found is not None
+        return found.group(1)
+
+    client.post(
+        "/login",
+        data={"identifier": "maria_g", "password": PASSWORD, "csrf_token": token("/login")},
+    )
+    noisy = io.BytesIO()
+    Image.frombytes("RGB", (1200, 1200), os.urandom(1200 * 1200 * 3)).save(
+        noisy, "JPEG", quality=95
+    )
+    assert noisy.tell() > 1024 * 1024
+    noisy.seek(0)
+    resp = client.post(
+        "/posts/new",
+        data={**FORM, "csrf_token": token("/posts/new"), "photo": (noisy, "big.jpg")},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 302
+    with app.app_context():
+        assert db.session.scalars(select(Post)).one().photo_key
