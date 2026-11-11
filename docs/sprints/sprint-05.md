@@ -19,7 +19,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-10 Categories and show less | #119 | 5 | To do |
 | S5-11 How-it-works home page | #120 | 5 | To do |
 | S5-12 Photo on a post | #122 | 5 | Done |
-| S5-13 You: my posts and chipped in | #132 | 3 | In review |
+| S5-13 You: my posts and chipped in | #132 | 3 | Done |
 
 **Total:** 58 points (Sprint 4: 16).
 
@@ -49,3 +49,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-09: The owner approved the simplified messages mockup made with Impeccable: one "How it's going" list per post, Chip in first, Follow as one quiet button, notes behind a link, the thank-you inside the gift, and a single "Updated" line on the feed card. PB-31 and PB-45 to PB-47 now say so. Blocked: none.
 - 2026-11-11: The owner set up Cloudflare R2 (bucket `pay-my-bill-staging`, public development URL, five `R2_*` settings on Render). A test post's photo loads from R2 as WebP with the one-year immutable cache header. Still to check: it survives the next deploy. Added PB-48 to move photos to a custom domain before launch. The owner confirmed the #119 category list as drafted. Next: #119. Blocked: none.
 - 2026-11-11: The owner asked for an easy way to see the posts they created and the ones they chipped in on, under a profile tab, with Impeccable deciding the design in the current look. #116 (PR #117) was brought into the new look (migration renumbered to 0015 after 0014) and merged with the owner's OK. Added S5-13 (#132): You opens your own profile with Posts and Chipped in tabs and a Settings button, Gifts folds into You with its badge, and old `/gifts` links redirect. Also fixed stray bullets on the confirm list left from the #118 rewrite. Waiting on the owner's review of screenshots. Blocked: none.
+- 2026-11-11: The owner approved the You page, and #132 merged (#138). The owner chose outlined pay-app buttons next to "Chip in instantly" and dropping "donor" from the copy; both land as small chores. Started #120 (home page) through Impeccable: the owner wants the story split for givers and askers, told with real app pieces. Structure choice is on Impeccable's decision page. Blocked: none.

@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Changed
+- When a post offers "Chip in instantly" by card, the Cash App, Venmo, and PayPal buttons below it are outlined, so the card stays the one filled button. With no card option they stay filled (owner, 2026-11-11).
+
 ### Added
 - Your posts and what you chipped in on, in one place (#132). "You" in the nav opens your own profile, with Posts and Chipped in tabs and a Settings button. Posts starts with any gifts waiting for you to confirm, then each post with what comes next: open until a date, update due, or update overdue. The Gifts tab folds into You (its count badge moves there), and old Gifts links still work. Visitors see your posts but not what you gave. The confirm list no longer shows stray bullets.
 - Profiles list the person's posts with their state and amount raised. Posters can edit or delete their own posts from there. Before the first gift, every field can be edited; after it, only the story. Edited posts show "Edited <date>", and an edit that hits the fundraising word list goes back to review (#116).

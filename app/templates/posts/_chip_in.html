@@ -55,7 +55,7 @@
         {% if post.is_open %}
           <div class="pay-buttons">
             {% for option in pay_options %}
-              <a class="btn" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" data-label="{{ option.label }}" data-handle="{{ option.handle }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
+              <a class="btn{% if card_ready %} btn-secondary{% endif %}" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" data-label="{{ option.label }}" data-handle="{{ option.handle }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
             {% endfor %}
           </div>
           <p class="hint">Opens {{ poster }}'s page in the app. Pay My Bill never holds money.</p>

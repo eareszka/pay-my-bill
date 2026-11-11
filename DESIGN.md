@@ -271,7 +271,7 @@ Corners are gentle and scale with the size of the object: 2px on the meter, 6px 
 Plain and confident. There is one inverse fill, and everything else is drawn in outline.
 - **Shape:** gently rounded (8px), at least 46px tall, padding 10px 18px, Public Sans 700.
 - **Primary:** ink fill with white text on light pages, and white fill with void text on dark pages and the stage. Hover shifts the fill one step (action-hover). Pressing scales it to 0.98.
-- **Secondary:** transparent with a 1.5px edge stroke and ink text. Hover darkens the stroke to ink.
+- **Secondary:** transparent with a 1.5px edge stroke and ink text. Hover darkens the stroke to ink. The Cash App, Venmo, and PayPal buttons are secondary when "Chip in instantly" sits above them, and primary when they're the only way to pay.
 - **Danger:** a tomato fill used only for confirmed destructive acts such as deleting a post. Its text is white on light pages and void on dark.
 - **Disabled:** 50% opacity with a not-allowed cursor.
 - **Focus:** a 2px ink outline offset by 2px everywhere (white on void).
