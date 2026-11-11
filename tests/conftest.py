@@ -24,6 +24,8 @@ for _key in (
     "R2_SECRET_ACCESS_KEY",
 ):
     os.environ[_key] = ""
+# Tests run as local development; the production checks have their own tests.
+os.environ["FLASK_ENV"] = "development"
 
 PASSWORD = "correct-horse"  # noqa: S105 - test fixture
 

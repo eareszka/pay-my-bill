@@ -25,6 +25,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The session cookie is now Secure on HTTPS (decided from `APP_URL`) and SameSite=Lax everywhere. Every page sends a strict Content Security Policy (scripts, styles, and fonts from the site only, photos from the site or R2, forms only to the site or Stripe), refuses to be framed, and sends nosniff and a same-origin referrer policy. HTTPS deployments also send HSTS for a year (#142).
 - When an admin removes a post, or bans a user and so removes their open posts, the photos are deleted too. Before, the post was gone but its photo link still worked (#144).
 - Links in emails and the return links sent to Stripe are now built from `APP_URL`, not the address the request came in on, so a forged Host header can't send someone a reset or verify link pointing at another site (#150).
+- The app refuses to start unless `SECRET_KEY` is a random value of at least 32 characters and `APP_URL` is https. Only clear development (`FLASK_ENV=development`, debug mode, or tests) can skip this, so a deploy that forgets a variable fails loudly instead of running insecurely. Before, a deploy missing the key would have made sessions and email links forgeable, and one missing `APP_URL` would have sent http://localhost links with an insecure cookie (#152).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed

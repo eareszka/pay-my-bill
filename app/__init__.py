@@ -18,6 +18,33 @@ def database_url(raw: str) -> str:
     return raw
 
 
+DEV_SECRET_KEY = "dev-only-not-secret"  # noqa: S105 - the local-only fallback
+# Long enough that a placeholder, typo, or test value can't sign real sessions.
+MIN_SECRET_KEY_LENGTH = 32
+DEV_HINT = "For local work, set FLASK_ENV=development (see .env.example)."
+
+
+def is_development(app: Flask) -> bool:
+    return (
+        app.testing or app.debug or os.environ.get("FLASK_ENV", "").strip().lower() == "development"
+    )
+
+
+def check_production(config: dict[str, Any]) -> None:
+    """Refuse to start with forgeable or http-only settings (#152).
+
+    Runs everywhere but clear development, so a deploy that forgets one more
+    variable fails loudly instead of running on the local fallback key.
+    """
+    if len(config["SECRET_KEY"].strip()) < MIN_SECRET_KEY_LENGTH:
+        raise RuntimeError(
+            f"Set SECRET_KEY to a random value of at least {MIN_SECRET_KEY_LENGTH} characters. "
+            + DEV_HINT
+        )
+    if not str(config["APP_URL"]).startswith("https://"):
+        raise RuntimeError("Set APP_URL to the site's https address. " + DEV_HINT)
+
+
 def format_date(value: datetime) -> str:
     return f"{value:%b} {value.day}, {value.year}"
 
@@ -27,7 +54,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app = Flask(__name__)
     app_url = os.environ.get("APP_URL", "http://localhost:5000")
     app.config.update(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-not-secret"),
+        SECRET_KEY=os.environ.get("SECRET_KEY", DEV_SECRET_KEY),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db"),
         MAIL_SERVER=os.environ.get("MAIL_SERVER", ""),
         MAIL_PORT=int(os.environ.get("MAIL_PORT") or 587),
@@ -60,6 +87,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     )
     if config:
         app.config.update(config)
+    if not is_development(app):
+        check_production(app.config)
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url(app.config["SQLALCHEMY_DATABASE_URI"])
     app.logger.setLevel(logging.INFO)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
