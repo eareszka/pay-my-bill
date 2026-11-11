@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Community app where people post everyday wants and needs and others chip in. Not for business fundraising."
 requires-python = ">=3.12"
 dependencies = [
-    "flask>=3.0",
+    "flask>=3.1",
     "flask-sqlalchemy>=3.1",
     "sqlalchemy>=2.1,<2.2",
     "flask-login>=0.6",
