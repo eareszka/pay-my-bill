@@ -153,8 +153,8 @@ As the **community**, we want **a way to report and act on bad posts** (App Stor
 - [ ] Admins see reports and flagged posts in one queue, and can approve, remove, or ban.
 - [ ] A banned user can't log in, and their open posts leave the feed.
 
-### PB-34 Production settings and security headers · #TBD · 2 pts · P0 · chore · v0.2-beta
-- [ ] Secure session cookies, security headers, and an upload limit are on in production.
+### PB-34 Production settings and security headers · #142 · 2 pts · P0 · chore · v0.2-beta
+- [x] Secure session cookies, security headers, and an upload limit are on in production.
 - [ ] The app refuses to start in production without `SECRET_KEY`.
 
 ### PB-35 Scheduled jobs for reminders · #TBD · 1 pt · P1 · chore · v0.2-beta
