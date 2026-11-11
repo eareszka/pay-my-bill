@@ -4,11 +4,12 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
+from flask import Flask
 from flask.testing import FlaskClient
 from werkzeug.security import check_password_hash
 
 from app.extensions import db
-from app.models import LoginAttempt, utcnow
+from app.models import LoginAttempt, User, utcnow
 from app.tokens import RESET_PASSWORD, make_token
 from tests.conftest import PASSWORD, MakeUser
 
@@ -127,3 +128,48 @@ def test_mail_failure_keeps_the_same_reply(client: FlaskClient, make_user: MakeU
     with patch("app.mail.send_email", side_effect=smtplib.SMTPException("down")):
         resp = client.post("/reset", data={"email": "alice@example.com"}, follow_redirects=True)
     assert b"If an account uses that email" in resp.data
+
+
+def test_reset_ends_sessions_from_before_it(
+    app: Flask, client: FlaskClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Someone signs up with alice's email and stays logged in (#130).
+    squatter = app.test_client()
+    squatter.post(
+        "/signup",
+        data={
+            "username": "squatter",
+            "email": "alice@example.com",
+            "password": PASSWORD,
+            "confirm": PASSWORD,
+            "adult": "y",
+            "rules": "y",
+        },
+    )
+    user = db.session.query(User).filter_by(email="alice@example.com").one()
+    assert squatter.get("/profile").status_code == 200
+
+    # Alice claims the account through her inbox.
+    client.post("/reset", data={"email": "alice@example.com"})
+    client.post(reset_link(caplog), data={"password": NEW, "confirm": NEW})
+    db.session.refresh(user)
+    assert user.is_verified
+
+    resp = squatter.get("/profile")
+    assert resp.status_code == 302
+    assert "/login" in resp.location
+    assert (
+        client.post("/login", data={"identifier": "alice@example.com", "password": NEW}).status_code
+        == 302
+    )
+    assert client.get("/profile").status_code == 200
+
+
+def test_session_without_current_version_is_anonymous(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    user = make_user("alice")
+    for stale in (str(user.id), f"{user.id}:{user.session_version + 1}", f"{user.id}:"):
+        with client.session_transaction() as session:
+            session["_user_id"] = stale
+        assert client.get("/profile").status_code == 302

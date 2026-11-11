@@ -75,5 +75,5 @@ def make_user(app: Flask) -> MakeUser:
 
 def login_as(client: FlaskClient, user: User) -> None:
     with client.session_transaction() as session:
-        session["_user_id"] = str(user.id)
+        session["_user_id"] = user.get_id()
         session["_fresh"] = True

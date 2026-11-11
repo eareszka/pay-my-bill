@@ -35,7 +35,7 @@ def test_login_success_lands_on_feed(
     resp = client.post("/login", data={"identifier": identifier, "password": PASSWORD})
     assert resp.status_code == 302
     assert resp.location == "/"
-    assert logged_in_as(client) == str(user.id)
+    assert logged_in_as(client) == user.get_id()
     attempt = db.session.scalars(select(LoginAttempt)).one()
     assert (attempt.identifier, attempt.succeeded) == ("alice", True)
 
@@ -149,3 +149,12 @@ def test_locked_attempts_are_recorded(client: FlaskClient, make_user: MakeUser) 
 def test_unauthorized_get_keeps_next_post_drops_it(client: FlaskClient) -> None:
     assert client.get("/verify/pending").location == "/login?next=/verify/pending"
     assert client.post("/verify/resend").location == "/login"
+
+
+def test_login_starts_a_fresh_session(client: FlaskClient, make_user: MakeUser) -> None:
+    make_user("alice")
+    with client.session_transaction() as session:
+        session["planted"] = "from before login"
+    client.post("/login", data={"identifier": "alice", "password": PASSWORD})
+    with client.session_transaction() as session:
+        assert "planted" not in session
