@@ -422,3 +422,35 @@ def test_line_breaks_count_as_one_character(client: FlaskClient, poster: User, d
     assert len(note) > 2000
     client.post(f"/posts/{post.id}/update", data={"note": note})
     assert post.update_body == note.replace("\r\n", "\n")
+
+
+def test_everyday_words_pass_in_an_update(client: FlaskClient, poster: User, donor: User) -> None:
+    # Posts send "shop" or "Angel" to review; updates are refused outright, so they use
+    # only the original list (#158).
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    note = "Thank you all! I went to the shop with Angel and bought groceries."
+    client.post(f"/posts/{post.id}/update", data={"note": note})
+    assert post.update_body == note
+
+
+def test_a_refused_update_names_the_word(client: FlaskClient, poster: User, donor: User) -> None:
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    response = client.post(
+        f"/posts/{post.id}/update", data={"note": "Thanks! Next I'm raising money for my startup."}
+    )
+    assert "“startup” reads like fundraising" in response.get_data(as_text=True)
+
+
+def test_an_oversized_update_is_refused_without_scanning(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    from unittest.mock import patch
+
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    with patch("app.forms.update_flagged_keywords") as scan:
+        response = client.post(f"/posts/{post.id}/update", data={"note": "1" * 50_000})
+    assert "20 to 2,000 characters" in response.get_data(as_text=True)
+    scan.assert_not_called()
