@@ -1,5 +1,5 @@
 import click
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from sqlalchemy import or_, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
@@ -7,6 +7,7 @@ from werkzeug.wrappers import Response
 from app import photos
 from app.auth import admin_required
 from app.extensions import db
+from app.farm_flags import CLUSTER_SIZE, suspected_farms
 from app.forms import EmptyForm
 from app.mail import send_later
 from app.models import Post, PostStatus, Report, ReportReason, User, utcnow
@@ -51,7 +52,14 @@ def queue() -> str:
         .where(Report.resolved_at.is_(None))
         .order_by(Report.created_at)
     ).all()
-    return render_template("admin/queue.html", flagged=flagged, reports=reports, form=EmptyForm())
+    return render_template(
+        "admin/queue.html",
+        flagged=flagged,
+        reports=reports,
+        farms=suspected_farms(),
+        cluster_size=CLUSTER_SIZE,
+        form=EmptyForm(),
+    )
 
 
 @bp.post("/posts/<int:post_id>/approve")
@@ -96,12 +104,8 @@ def remove_photo(post_id: int) -> Response:
     return redirect(url_for("admin.queue"))
 
 
-@bp.post("/users/<int:user_id>/ban")
-@admin_required
-def ban(user_id: int) -> Response:
-    user = db.session.get(User, user_id)
-    if user is None or user.is_admin:
-        abort(404)
+def _ban(user: User) -> list[str]:
+    """Ban the user. Returns photo keys to discard once the change commits."""
     user.banned_at = utcnow()
     photo_keys: list[str] = []
     # Every post goes, closed and funded ones too, so gifts to them stop
@@ -115,10 +119,39 @@ def ban(user_id: int) -> Response:
         or_(Report.user_id == user.id, Report.post_id.in_([p.id for p in user.posts])),
         resolution="banned",
     )
+    return photo_keys
+
+
+@bp.post("/users/<int:user_id>/ban")
+@admin_required
+def ban(user_id: int) -> Response:
+    user = db.session.get(User, user_id)
+    if user is None or user.is_admin:
+        abort(404)
+    photo_keys = _ban(user)
     db.session.commit()
     for key in photo_keys:
         photos.discard(key)
     flash(f"Banned {user.username}. Their posts and profile are hidden.", "success")
+    return redirect(url_for("admin.queue"))
+
+
+@bp.post("/users/<int:user_id>/ban-cluster")
+@admin_required
+def ban_cluster(user_id: int) -> Response:
+    # Recomputed here, so only accounts the queue still flags are banned.
+    flag = next((f for f in suspected_farms() if f.donor.id == user_id), None)
+    if flag is None:
+        abort(404)
+    # Only the accounts the admin saw, never one that joined the cluster since.
+    seen = {int(id_) for id_ in request.args.get("ids", "").split(",") if id_.isdigit()}
+    cluster = [u for u in flag.cluster if u.id in seen]
+    targets = [u for u in (flag.donor, *cluster) if not u.is_admin and not u.is_banned]
+    photo_keys = [key for user in targets for key in _ban(user)]
+    db.session.commit()
+    for key in photo_keys:
+        photos.discard(key)
+    flash(f"Banned {', '.join(u.username for u in targets)}.", "success")
     return redirect(url_for("admin.queue"))
 
 
