@@ -251,3 +251,43 @@ def test_grant_command(app: Flask, make_user: MakeUser) -> None:
     missing = runner.invoke(args=["admin", "grant", "nobody@example.com"])
     assert missing.exit_code != 0
     assert "No account uses" in missing.output
+
+
+def test_reports_are_limited_per_day(client: FlaskClient, make_user: MakeUser, admin: User) -> None:
+    from app.routes.reports import MAX_REPORTS_PER_DAY, REPORT_WINDOW
+
+    posts = [make_post(make_user(f"poster{n}")) for n in range(MAX_REPORTS_PER_DAY + 1)]
+    login_as(client, make_user("bob"))
+    for post in posts[:-1]:
+        client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+    resp = client.post(
+        f"/report/post/{posts[-1].id}", data={"reason": "spam"}, follow_redirects=True
+    )
+    assert f"sent {MAX_REPORTS_PER_DAY} reports today. Try again tomorrow." in resp.get_data(
+        as_text=True
+    )
+    assert len(open_reports()) == MAX_REPORTS_PER_DAY
+    # A day later there's room again.
+    for report in open_reports():
+        report.created_at = utcnow() - REPORT_WINDOW - timedelta(minutes=1)
+    db.session.commit()
+    client.post(f"/report/post/{posts[-1].id}", data={"reason": "spam"})
+    assert len(open_reports()) == MAX_REPORTS_PER_DAY + 1
+
+
+def test_admins_get_one_report_email_an_hour(
+    client: FlaskClient, make_user: MakeUser, admin: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    from app.routes.reports import REPORT_EMAIL_GAP
+
+    first, second, third = (make_post(make_user(f"poster{n}")) for n in range(3))
+    login_as(client, make_user("bob"))
+    client.post(f"/report/post/{first.id}", data={"reason": "spam"})
+    client.post(f"/report/post/{second.id}", data={"reason": "spam"})
+    assert caplog.text.count("New report on Pay My Bill") == 1
+    assert "wait in the queue" in caplog.text
+    for report in open_reports():
+        report.created_at = utcnow() - REPORT_EMAIL_GAP - timedelta(minutes=1)
+    db.session.commit()
+    client.post(f"/report/post/{third.id}", data={"reason": "spam"})
+    assert caplog.text.count("New report on Pay My Bill") == 2
