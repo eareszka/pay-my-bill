@@ -49,8 +49,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         R2_BUCKET=os.environ.get("R2_BUCKET", ""),
         R2_PUBLIC_URL=os.environ.get("R2_PUBLIC_URL", ""),
         PHOTO_DIR=os.environ.get("PHOTO_DIR", ""),
-        # An 8 MB photo plus the rest of the form.
-        MAX_CONTENT_LENGTH=9 * 1024 * 1024,
+        # Forms are small; the photo upload raises its own limit (#155).
+        MAX_CONTENT_LENGTH=1024 * 1024,
         # Donors leave for their payment app mid-form, so tokens last for the session.
         WTF_CSRF_TIME_LIMIT=None,
     )

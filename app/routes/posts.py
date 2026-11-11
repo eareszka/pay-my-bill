@@ -93,6 +93,8 @@ def overdue_post(user: User) -> Post | None:
 @bp.route("/new", methods=["GET", "POST"])
 @verified_required
 def new() -> str | Response | tuple[str, int]:
+    # The only form that takes a photo, so the only one allowed a large body.
+    request.max_content_length = photos.MAX_UPLOAD_BYTES
     user: User = current_user
     overdue = overdue_post(user)
     if overdue:

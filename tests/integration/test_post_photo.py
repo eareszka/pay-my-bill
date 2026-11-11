@@ -252,3 +252,17 @@ def test_feed_loads_the_visible_photo_first(app: Flask, client: FlaskClient, pos
     assert f'src="/media/{first.photo_key}" alt="" decoding="sync" fetchpriority="high"' in page
     template = page[page.index('<template id="deck-under-next">') :]
     assert f'src="/media/{other.photo_key}" alt="" decoding="async">' in template
+
+
+def test_only_the_new_post_form_takes_a_large_body(client: FlaskClient, poster: User) -> None:
+    two_mb = io.BytesIO(b"\0" * (2 * 1024 * 1024))
+    resp = client.post(
+        "/posts/new",
+        data={**FORM, "photo": (two_mb, "big.jpg")},
+        content_type="multipart/form-data",
+    )
+    # Read and refused as a photo, not cut off for size.
+    assert resp.status_code == 200
+    assert "isn&#39;t a photo we can read" in resp.get_data(as_text=True)
+    resp = client.post("/profile", data={"city": "x" * (2 * 1024 * 1024)})
+    assert resp.status_code == 413
