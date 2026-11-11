@@ -39,6 +39,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Admins can be removed with `flask --app app admin revoke <email>`. Every admin action (approve, remove a post or photo, ban, dismiss, grant, revoke) is recorded with who did it and when, and /admin lists the 25 most recent. Admin pages return 404 for ids too large for the database instead of an error (#173, migration 0017).
 - Each account can file 10 reports a day, and admins get at most one report email an hour, timed from the last email sent. Later reports wait in the queue, so one account can't flood the queue or the admins' inboxes (#175).
 - Deploys install exact, hash-checked dependency versions from a new `requirements.lock`, the same ones the tests run against, instead of whatever is newest. CI audits that lock, scans the whole git history for secrets with a checksum-verified gitleaks, pins its Actions to commit hashes, and runs with a read-only token (#177).
+- Failed logins typed as an account's internal throttle name no longer count against that account's three verification emails an hour, so a stranger can't hold back someone's verification email (#179).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed

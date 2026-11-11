@@ -389,3 +389,18 @@ def test_verify_email_says_what_to_do_if_you_did_not_sign_up(
     client.post("/signup", data=FORM)
     assert "Didn't sign up for Pay My Bill?" in caplog.text
     assert "/reset" in caplog.text
+
+
+def test_logins_typed_as_the_marker_do_not_use_up_emails(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    from app.auth import MAX_VERIFY_EMAILS
+
+    user = make_user(verified=False)
+    # A logged-out visitor fails logins as this user's marker (#179).
+    stranger = app.test_client()
+    for _ in range(MAX_VERIFY_EMAILS + 1):
+        stranger.post("/login", data={"identifier": f"verify:{user.id}", "password": "x"})
+    g.pop("_login_user", None)
+    login_as(client, user)
+    assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data
