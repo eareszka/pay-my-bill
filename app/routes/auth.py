@@ -236,9 +236,17 @@ def reset_password(token: str) -> str | Response:
         # Logs out everyone, including whoever signed up with this email before
         # its owner claimed it (#130).
         user.end_sessions()
-        # The link came through their inbox, which proves the email.
-        if not user.is_verified:
+        # The link came through their inbox, which proves the email. Whoever
+        # set the account up before that may not be them, so their payment
+        # handles and region go (#133).
+        claimed = not user.is_verified
+        if claimed:
             user.email_verified_at = utcnow()
+            claimed = any(
+                (user.cashapp_handle, user.venmo_handle, user.paypal_handle, user.city, user.state)
+            )
+            user.cashapp_handle = user.venmo_handle = user.paypal_handle = None
+            user.city = user.state = None
         # Clears a lockout from the guesses that led here.
         db.session.add(
             LoginAttempt(identifier=user.username, ip=request.remote_addr, succeeded=True)
@@ -252,6 +260,12 @@ def reset_password(token: str) -> str | Response:
         )
         logout_user()
         flash("Your password is changed. Log in with the new one.", "success")
+        if claimed:
+            flash(
+                "This account was set up before you confirmed your email, so we cleared "
+                "its payment handles and city. Add yours on your profile.",
+                "info",
+            )
         return redirect(url_for("auth.login"))
     return render_template("auth/reset_form.html", form=form)
 

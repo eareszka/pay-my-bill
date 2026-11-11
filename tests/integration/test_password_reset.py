@@ -11,8 +11,6 @@ from werkzeug.security import check_password_hash
 
 from app.extensions import db
 from app.models import LoginAttempt, User, utcnow
-from app.tokens import RESET_PASSWORD, make_token
-from app.models import LoginAttempt, utcnow
 from app.tokens import RESET_PASSWORD, make_token, password_digest
 from tests.conftest import PASSWORD, MakeUser
 
@@ -176,6 +174,8 @@ def test_session_without_current_version_is_anonymous(
         with client.session_transaction() as session:
             session["_user_id"] = stale
         assert client.get("/profile").status_code == 302
+
+
 def test_link_does_not_carry_the_password_hash(
     client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
 ) -> None:
@@ -193,3 +193,52 @@ def test_link_bound_to_the_raw_hash_is_refused(client: FlaskClient, make_user: M
     user = make_user("alice")
     token = make_token(user.id, user.password_hash, RESET_PASSWORD)
     assert client.get(f"/reset/{token}").location.endswith("/reset")
+
+
+def test_claiming_an_unverified_account_clears_its_handles(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Set up by someone else before the email's owner claimed it (#133).
+    user = make_user(
+        "alice",
+        verified=False,
+        venmo_handle="squatter",
+        cashapp_handle="squatter",
+        paypal_handle="squatter",
+        city="Madison",
+        state="WI",
+    )
+    client.post("/reset", data={"email": "alice@example.com"})
+    resp = client.post(
+        reset_link(caplog), data={"password": NEW, "confirm": NEW}, follow_redirects=True
+    )
+    assert b"we cleared its payment handles and city" in resp.data
+    db.session.refresh(user)
+    assert user.is_verified
+    assert (user.cashapp_handle, user.venmo_handle, user.paypal_handle) == (None, None, None)
+    assert (user.city, user.state) == (None, None)
+
+
+def test_claiming_a_bare_unverified_account_says_nothing_extra(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    make_user("alice", verified=False)
+    client.post("/reset", data={"email": "alice@example.com"})
+    resp = client.post(
+        reset_link(caplog), data={"password": NEW, "confirm": NEW}, follow_redirects=True
+    )
+    assert b"Your password is changed" in resp.data
+    assert b"we cleared" not in resp.data
+
+
+def test_reset_keeps_a_verified_accounts_handles(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    user = make_user("alice", venmo_handle="alice-v", city="Madison", state="WI")
+    client.post("/reset", data={"email": "alice@example.com"})
+    resp = client.post(
+        reset_link(caplog), data={"password": NEW, "confirm": NEW}, follow_redirects=True
+    )
+    assert b"we cleared" not in resp.data
+    db.session.refresh(user)
+    assert (user.venmo_handle, user.city, user.state) == ("alice-v", "Madison", "WI")
