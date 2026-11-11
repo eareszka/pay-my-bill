@@ -13,6 +13,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Security
 - Resetting a password now logs out every session on that account, so someone who signed up with another person's email and stayed logged in loses access once the real owner claims it through a reset link. Logging in or signing up also starts a fresh session (#130, migration 0016). Everyone gets logged out once when this deploys.
+- Password reset links no longer carry the account's password hash. Signed links can be read by anyone who sees them, so a forwarded or logged reset email could have been cracked offline. Links now hold a keyed digest instead, and still work only once (#134). Reset links sent before this deploys stop working; ask for a new one.
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed

@@ -6,11 +6,14 @@ from unittest.mock import patch
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
+from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import check_password_hash
 
 from app.extensions import db
 from app.models import LoginAttempt, User, utcnow
 from app.tokens import RESET_PASSWORD, make_token
+from app.models import LoginAttempt, utcnow
+from app.tokens import RESET_PASSWORD, make_token, password_digest
 from tests.conftest import PASSWORD, MakeUser
 
 NEW = "brand-new-pass"
@@ -83,7 +86,7 @@ def test_mismatched_passwords_are_refused(
 
 def test_expired_link_is_refused(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user("alice")
-    token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+    token = make_token(user.id, password_digest(user.password_hash), RESET_PASSWORD)
     later = utcnow() + timedelta(hours=2)
     with patch("itsdangerous.timed.time.time", return_value=later.timestamp()):
         resp = client.get(f"/reset/{token}", follow_redirects=True)
@@ -95,7 +98,7 @@ def test_garbage_and_deleted_accounts_are_refused(client: FlaskClient, make_user
     user = make_user("gone")
     user.email = "x@deleted.invalid"
     db.session.commit()
-    token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+    token = make_token(user.id, password_digest(user.password_hash), RESET_PASSWORD)
     assert client.get(f"/reset/{token}").location.endswith("/reset")
     client.post("/reset", data={"email": "x@deleted.invalid"})
 
@@ -173,3 +176,20 @@ def test_session_without_current_version_is_anonymous(
         with client.session_transaction() as session:
             session["_user_id"] = stale
         assert client.get("/profile").status_code == 302
+def test_link_does_not_carry_the_password_hash(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    user = make_user("alice")
+    client.post("/reset", data={"email": "alice@example.com"})
+    token = reset_link(caplog).removeprefix("/reset/")
+    # Signed, not encrypted: anyone can read the payload without the key (#134).
+    valid, payload = URLSafeTimedSerializer("not-the-key").loads_unsafe(token)
+    assert not valid
+    assert payload == [user.id, password_digest(user.password_hash)]
+    assert "scrypt" not in str(payload)
+
+
+def test_link_bound_to_the_raw_hash_is_refused(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user("alice")
+    token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+    assert client.get(f"/reset/{token}").location.endswith("/reset")
