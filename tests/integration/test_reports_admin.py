@@ -347,3 +347,65 @@ def test_grant_and_revoke_commands(app: Flask, make_user: MakeUser) -> None:
     assert "No account uses" in runner.invoke(args=["admin", "revoke", "nobody@example.com"]).output
     logged = [(a.admin_id, a.action, a.target) for a in db.session.scalars(select(AdminAction))]
     assert logged == [(None, "grant admin", "user helper"), (None, "revoke admin", "user helper")]
+
+
+def test_reports_are_limited_per_day(client: FlaskClient, make_user: MakeUser, admin: User) -> None:
+    from app.routes.reports import MAX_REPORTS_PER_DAY, REPORT_WINDOW
+
+    posts = [make_post(make_user(f"poster{n}")) for n in range(MAX_REPORTS_PER_DAY + 1)]
+    login_as(client, make_user("bob"))
+    for post in posts[:-1]:
+        client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+    resp = client.post(
+        f"/report/post/{posts[-1].id}", data={"reason": "spam"}, follow_redirects=True
+    )
+    assert f"sent {MAX_REPORTS_PER_DAY} reports today. Try again tomorrow." in resp.get_data(
+        as_text=True
+    )
+    assert len(open_reports()) == MAX_REPORTS_PER_DAY
+    # A day later there's room again.
+    for report in open_reports():
+        report.created_at = utcnow() - REPORT_WINDOW - timedelta(minutes=1)
+    db.session.commit()
+    client.post(f"/report/post/{posts[-1].id}", data={"reason": "spam"})
+    assert len(open_reports()) == MAX_REPORTS_PER_DAY + 1
+
+
+def test_admins_get_one_report_email_an_hour(
+    client: FlaskClient, make_user: MakeUser, admin: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    from app.models import LoginAttempt
+
+    # Eight reports from eight accounts, 50 minutes apart: a steady trickle must not
+    # silence the emails, so they go out on the 1st, 3rd, 5th and 7th.
+    sent = []
+    for n in range(8):
+        post = make_post(make_user(f"poster{n}"))
+        login_as(client, make_user(f"reporter{n}"))
+        before = caplog.text.count("New report on Pay My Bill")
+        client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+        sent.append(caplog.text.count("New report on Pay My Bill") - before)
+        for row in [*open_reports(), *db.session.scalars(select(LoginAttempt))]:
+            row.created_at -= timedelta(minutes=50)
+        db.session.commit()
+    assert sent == [1, 0, 1, 0, 1, 0, 1, 0]
+    assert "wait in the queue" in caplog.text
+
+
+def test_a_login_typed_as_the_marker_cannot_silence_report_emails(
+    app: Flask,
+    client: FlaskClient,
+    make_user: MakeUser,
+    admin: User,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from app.routes.reports import REPORT_EMAIL_IDENTIFIER
+
+    # Logged out, someone fails a login as the marker before each report (#175).
+    app.test_client().post("/login", data={"identifier": REPORT_EMAIL_IDENTIFIER, "password": "x"})
+    # Requests in the fixture's app context share g, so forget that visitor.
+    g.pop("_login_user", None)
+    post = make_post(make_user("poster"))
+    login_as(client, make_user("bob"))
+    client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+    assert caplog.text.count("New report on Pay My Bill") == 1

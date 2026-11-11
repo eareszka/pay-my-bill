@@ -37,6 +37,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Deleting an account now also clears its password-reset and verification-email throttle rows, so a deleted user's email address doesn't stay in the database (#169).
 - Logging out now clears the whole session, so nothing from the visit (a saved way back, the form token) carries over to whoever uses the browser next (#171).
 - Admins can be removed with `flask --app app admin revoke <email>`. Every admin action (approve, remove a post or photo, ban, dismiss, grant, revoke) is recorded with who did it and when, and /admin lists the 25 most recent. Admin pages return 404 for ids too large for the database instead of an error (#173, migration 0017).
+- Each account can file 10 reports a day, and admins get at most one report email an hour, timed from the last email sent. Later reports wait in the queue, so one account can't flood the queue or the admins' inboxes (#175).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed
