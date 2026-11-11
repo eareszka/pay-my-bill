@@ -445,6 +445,27 @@ class Report(Base):
     user: Mapped[User | None] = relationship(foreign_keys=[user_id])
 
 
+# The largest id Postgres's INTEGER holds; a bigger one in a URL would error, not 404.
+MAX_DB_INT = 2**31 - 1
+
+
+class AdminAction(Base):
+    """What an admin did, and when, shown at the bottom of /admin (#173)."""
+
+    __tablename__ = "admin_actions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # Empty for the command line (grant, revoke), which has no logged-in admin.
+    admin_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    action: Mapped[str] = mapped_column(String(30))
+    target: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, index=True
+    )
+
+    admin: Mapped[User | None] = relationship()
+
+
 class LoginAttempt(Base):
     __tablename__ = "login_attempts"
     __table_args__ = (Index("ix_login_attempts_identifier_created_at", "identifier", "created_at"),)

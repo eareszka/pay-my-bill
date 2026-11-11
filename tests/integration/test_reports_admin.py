@@ -251,3 +251,59 @@ def test_grant_command(app: Flask, make_user: MakeUser) -> None:
     missing = runner.invoke(args=["admin", "grant", "nobody@example.com"])
     assert missing.exit_code != 0
     assert "No account uses" in missing.output
+
+
+def test_admin_actions_are_logged_and_shown(
+    client: FlaskClient, make_user: MakeUser, admin: User
+) -> None:
+    from app.models import AdminAction
+
+    creep = make_user("creep")
+    flagged = make_post(creep, PostStatus.PENDING_REVIEW)
+    flagged.title = "Seed money"
+    spam = make_post(make_user("spammer"))
+    report = Report(reporter=admin, user=make_user("odd_one"), reason=ReportReason.OTHER)
+    db.session.add(report)
+    db.session.commit()
+    login_as(client, admin)
+    assert b"No admin actions yet." in client.get("/admin").data
+    client.post(f"/admin/posts/{flagged.id}/approve")
+    client.post(f"/admin/posts/{spam.id}/remove")
+    client.post(f"/admin/reports/{report.id}/dismiss")
+    client.post(f"/admin/users/{creep.id}/ban")
+    logged = [(a.admin_id, a.action) for a in db.session.scalars(select(AdminAction))]
+    assert logged == [
+        (admin.id, "approve"),
+        (admin.id, "remove post"),
+        (admin.id, "dismiss report"),
+        (admin.id, "ban"),
+    ]
+    page = client.get("/admin").get_data(as_text=True)
+    assert f"boss · approve · post {flagged.id} by creep: Seed money" in page
+    assert f"boss · dismiss report · report {report.id} on user odd_one" in page
+    assert "boss · ban · user creep" in page
+
+
+def test_huge_ids_are_404(client: FlaskClient, admin: User) -> None:
+    login_as(client, admin)
+    for path in ("/admin/posts/99999999999/remove", "/admin/users/99999999999/ban"):
+        assert client.post(path).status_code == 404
+    assert client.post("/admin/reports/99999999999/dismiss").status_code == 404
+    assert client.post("/admin/reports/1/dismiss").status_code == 404
+
+
+def test_grant_and_revoke_commands(app: Flask, make_user: MakeUser) -> None:
+    from app.models import AdminAction
+
+    user = make_user("helper")
+    runner = app.test_cli_runner()
+    assert "is now an admin" in runner.invoke(args=["admin", "grant", "Helper@Example.com"]).output
+    assert user.is_admin
+    assert (
+        "no longer an admin" in runner.invoke(args=["admin", "revoke", "helper@example.com"]).output
+    )
+    assert not user.is_admin
+    assert "isn't an admin" in runner.invoke(args=["admin", "revoke", "helper@example.com"]).output
+    assert "No account uses" in runner.invoke(args=["admin", "revoke", "nobody@example.com"]).output
+    logged = [(a.admin_id, a.action, a.target) for a in db.session.scalars(select(AdminAction))]
+    assert logged == [(None, "grant admin", "user helper"), (None, "revoke admin", "user helper")]
