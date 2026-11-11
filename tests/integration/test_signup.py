@@ -14,7 +14,7 @@ from app.auth import verified_required
 from app.extensions import db
 from app.models import LoginAttempt, User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
-from tests.conftest import MakeUser, login_as
+from tests.conftest import PASSWORD, MakeUser, login_as
 
 FORM = {
     "username": "New_User",
@@ -286,3 +286,38 @@ def test_field_errors_are_linked_for_screen_readers(client: FlaskClient) -> None
     assert (
         '<small class="error" id="username-error">Usernames are 3 to 30 characters.</small>' in page
     )
+
+
+def test_a_logged_out_verify_link_asks_to_log_in_first(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    # Someone signed up with this inbox's address; its owner clicks the link (#160).
+    user = make_user("squatter", verified=False)
+    token = make_token(user.id, user.email, VERIFY_EMAIL)
+    resp = client.get(f"/verify/{token}")
+    assert "/login?next=/verify/" in resp.location
+    assert not user.is_verified
+    page = client.get(resp.location).get_data(as_text=True)
+    assert "Reset its password to claim it." in page
+
+    # The account's own login then finishes it and lands on the home page.
+    resp = client.post(resp.location, data={"identifier": "squatter", "password": PASSWORD})
+    resp = client.get(resp.location)
+    assert user.is_verified
+    assert resp.location == "/"
+
+
+def test_another_accounts_session_cannot_verify(client: FlaskClient, make_user: MakeUser) -> None:
+    target = make_user("target", verified=False)
+    login_as(client, make_user("someone"))
+    resp = client.get(f"/verify/{make_token(target.id, target.email, VERIFY_EMAIL)}")
+    assert resp.location == "/"
+    assert not target.is_verified
+
+
+def test_verify_email_says_what_to_do_if_you_did_not_sign_up(
+    client: FlaskClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    client.post("/signup", data=FORM)
+    assert "Didn't sign up for Pay My Bill?" in caplog.text
+    assert "/reset" in caplog.text
