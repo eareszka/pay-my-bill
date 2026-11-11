@@ -180,9 +180,14 @@ def test_banned_user_is_logged_out_and_cant_log_in(
     creep.banned_at = utcnow()
     db.session.commit()
     assert client.get("/profile").status_code == 302
-    resp = client.post("/login", data={"identifier": "creep", "password": PASSWORD})
-    assert resp.status_code == 200
-    assert b"This account has been suspended." in resp.data
+    right = client.post("/login", data={"identifier": "creep", "password": PASSWORD})
+    wrong = client.post("/login", data={"identifier": "creep", "password": "not-it"})
+    # Same reply either way, so it never confirms a guessed password.
+    assert right.status_code == wrong.status_code == 200
+    for resp in (right, wrong):
+        assert b"Wrong username, email, or password." in resp.data
+        assert b"suspended" not in resp.data
+    assert client.get("/profile").status_code == 302
 
 
 def test_admin_dismisses_a_report(client: FlaskClient, make_user: MakeUser, admin: User) -> None:
