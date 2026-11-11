@@ -36,7 +36,7 @@ def check_production(config: dict[str, Any]) -> None:
     Runs everywhere but clear development, so a deploy that forgets one more
     variable fails loudly instead of running on the local fallback key.
     """
-    if len(config["SECRET_KEY"]) < MIN_SECRET_KEY_LENGTH:
+    if len(config["SECRET_KEY"].strip()) < MIN_SECRET_KEY_LENGTH:
         raise RuntimeError(
             f"Set SECRET_KEY to a random value of at least {MIN_SECRET_KEY_LENGTH} characters. "
             + DEV_HINT

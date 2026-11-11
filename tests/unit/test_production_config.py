@@ -18,7 +18,7 @@ def deployed(monkeypatch: pytest.MonkeyPatch, flask_env: str | None = None, **en
 
 
 @pytest.mark.parametrize("flask_env", [None, "production", "Production", " production", "staging"])
-@pytest.mark.parametrize("key", [None, "", "change-me", DEV_SECRET_KEY, "x" * 31])
+@pytest.mark.parametrize("key", [None, "", "change-me", DEV_SECRET_KEY, "x" * 31, " " * 40])
 def test_anything_but_development_needs_a_real_key(
     monkeypatch: pytest.MonkeyPatch, flask_env: str | None, key: str | None
 ) -> None:
