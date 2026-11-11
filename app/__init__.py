@@ -25,6 +25,7 @@ def format_date(value: datetime) -> str:
 def create_app(config: dict[str, Any] | None = None) -> Flask:
     load_dotenv()
     app = Flask(__name__)
+    app_url = os.environ.get("APP_URL", "http://localhost:5000")
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-not-secret"),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db"),
@@ -37,7 +38,10 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAIL_ASYNC=os.environ.get("MAIL_ASYNC", "1") != "0",
         MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
         # Base URL for links in emails sent outside a request (the reminder command).
-        APP_URL=os.environ.get("APP_URL", "http://localhost:5000"),
+        APP_URL=app_url,
+        # Secure wherever the site is served over HTTPS; local http dev still works.
+        SESSION_COOKIE_SECURE=app_url.startswith("https://"),
+        SESSION_COOKIE_SAMESITE="Lax",
         CONTACT_EMAIL=os.environ.get("CONTACT_EMAIL", "support@example.com"),
         STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
         STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
@@ -68,9 +72,10 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     csrf.init_app(app)
     login_manager.init_app(app)
 
-    from app import auth, errors, photos, seed  # noqa: F401
+    from app import auth, errors, photos, security, seed  # noqa: F401
 
     photos.init_app(app)
+    security.init_app(app)
 
     seed.register(app)
     errors.register(app)
