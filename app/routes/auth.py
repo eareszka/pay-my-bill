@@ -63,11 +63,14 @@ def send_verification(user: User) -> bool:
         return False
     token = make_token(user.id, user.email, VERIFY_EMAIL)
     link = site_url("auth.verify", token=token)
+    reset = site_url("auth.reset_request")
     send_later(
         user.email,
         "Verify your Pay My Bill email",
         f"Hi {user.username},\n\nConfirm your email to start posting and chipping in:\n{link}\n\n"
-        "This link expires in 48 hours.",
+        "This link expires in 48 hours.\n\n"
+        "Didn't sign up for Pay My Bill? Someone may have used your email. You can ignore "
+        f"this email, or take the account by resetting its password at {reset}",
     )
     return True
 
@@ -147,11 +150,29 @@ def verify(token: str) -> Response:
     if user is None or payload is None or user.email != payload[1]:
         flash("That verification link is invalid or has expired.", "error")
         return redirect(url_for("main.index"))
-    if not user.is_verified:
-        user.email_verified_at = utcnow()
-        db.session.commit()
+    if user.is_verified:
+        flash("Your email is already verified.", "info")
+        return redirect(url_for("main.index"))
+    # Only the account's own session can verify it, so whoever signed up with
+    # someone else's email can't get the inbox's owner to confirm it for them (#160).
+    if not current_user.is_authenticated:
+        flash(
+            "Log in to confirm your email. Didn't make this account? "
+            "Reset its password to claim it.",
+            "info",
+        )
+        return redirect(url_for("auth.login", next=url_for("auth.verify", token=token)))
+    if current_user.id != user.id:
+        flash("That link is for a different account. Log out and log in to that one.", "error")
+        return redirect(url_for("main.index"))
+    user.email_verified_at = utcnow()
+    db.session.commit()
     flash("Your email is verified. Welcome!", "success")
-    return redirect(session.pop("after_verify", url_for("main.index")))
+    after = session.pop("after_verify", None)
+    # Logging in from the link itself leaves the link as the way back.
+    if not after or after.startswith("/verify/"):
+        after = url_for("main.index")
+    return redirect(after)
 
 
 @bp.route("/login", methods=["GET", "POST"])
