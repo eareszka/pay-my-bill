@@ -32,9 +32,9 @@ def delete_post(post: Post) -> str | None:
 def anonymize(user: User) -> list[str]:
     """Scrub an account. Returns photo keys to discard once the change commits."""
     photo_keys = [key for post in list(user.posts) if (key := delete_post(post))]
-    db.session.execute(
-        delete(LoginAttempt).where(LoginAttempt.identifier.in_((user.username, user.email)))
-    )
+    # Every throttle row that names the account, so its email doesn't outlive it (#169).
+    identifiers = (user.username, user.email, f"reset:{user.email}", f"verify:{user.id}")
+    db.session.execute(delete(LoginAttempt).where(LoginAttempt.identifier.in_(identifiers)))
     db.session.execute(delete(Reaction).where(Reaction.user_id == user.id))
     user.username = f"deleted-{user.id}"
     user.email = f"deleted-{user.id}{DELETED_EMAIL_DOMAIN}"
