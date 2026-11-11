@@ -19,7 +19,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-10 Categories and show less | #119 | 5 | To do |
 | S5-11 How-it-works home page | #120 | 5 | To do |
 | S5-12 Photo on a post | #122 | 5 | Done |
-| S5-13 You: my posts and chipped in | #132 | 3 | In review |
+| S5-13 You: my posts and chipped in | #132 | 3 | Done |
 
 **Total:** 58 points (Sprint 4: 16).
 
@@ -59,3 +59,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-11: The audit passed #142 (PR #143). form-action now allows any Stripe host, so a Stripe hop can't kill a payment button; click the three Stripe buttons on staging after deploy. Built #144 for audit finding #6: admin remove and ban delete the photos of the posts they remove. Blocked: #9, on staging data.
 - 2026-11-11: The audit passed #144 (PR #145). Built #147 for audit finding #7, as the owner chose: a ban removes every post and photo, drops the user from the boards, and hides the profile from everyone but admins. Stacked on #144, with #140 merged in so `_ban()` returns photo keys for both single and cluster bans. Merge order: #141, #145, then #148. Blocked: #9, on staging data.
 - 2026-11-11: Built #150 for audit finding #8: a new `app/urls.site_url()` builds every absolute link from `APP_URL`, replacing all 13 `url_for(..., _external=True)` calls. Blocked: #9, on staging data.
+- 2026-11-11: The owner approved the You page, and #132 merged (#138). The owner chose outlined pay-app buttons next to "Chip in instantly" and dropping "donor" from the copy; both land as small chores. Started #120 (home page) through Impeccable: the owner wants the story split for givers and askers, told with real app pieces. Structure choice is on Impeccable's decision page. Blocked: none.
