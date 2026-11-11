@@ -323,3 +323,28 @@ def test_signups_do_not_count_toward_the_login_lockout(app: Flask, make_user: Ma
         signup_as(app.test_client(), n, ip="127.0.0.1")
     resp = app.test_client().post("/login", data={"identifier": "alice", "password": PASSWORD})
     assert resp.status_code == 302
+
+
+def test_an_account_named_signup_gets_no_lockout_relief(app: Flask, make_user: MakeUser) -> None:
+    make_user("signup")
+    client = app.test_client()
+    for n in range(7):
+        # A signup between guesses must not reset the guess count.
+        signup_as(app.test_client(), n, ip="127.0.0.1")
+        client.post("/login", data={"identifier": "signup", "password": "wrong-guess"})
+    resp = client.post("/login", data={"identifier": "signup", "password": "wrong-guess"})
+    assert resp.status_code == 429
+
+
+def test_deleting_an_account_named_signup_keeps_the_limit(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    for n in range(MAX_SIGNUPS_PER_IP):
+        signup_as(app.test_client(), n)
+    named_signup = make_user("signup")
+    login_as(client, named_signup)
+    client.post("/account/delete", data={"password": PASSWORD})
+    g.pop("_login_user", None)
+    db.session.refresh(named_signup)
+    assert named_signup.is_deleted
+    assert signup_as(app.test_client(), 99) == 429

@@ -23,6 +23,8 @@ VERIFY_EMAIL_WINDOW = timedelta(hours=1)
 # accounts or a stream of verification emails to strangers (#137).
 MAX_SIGNUPS_PER_IP = 10
 SIGNUP_WINDOW = timedelta(hours=1)
+# The colon keeps it apart from every username, like "reset:" and "verify:".
+SIGNUP_IDENTIFIER = "signup:"
 
 
 def load_user(user_id: str) -> User | None:
@@ -96,13 +98,13 @@ def allow_signup(ip: str | None) -> bool:
 
     Rows are marked succeeded so they never count toward the login lockout.
     """
-    db.session.add(LoginAttempt(identifier="signup", ip=ip, succeeded=True))
+    db.session.add(LoginAttempt(identifier=SIGNUP_IDENTIFIER, ip=ip, succeeded=True))
     db.session.commit()
     count = db.session.scalar(
         select(func.count())
         .select_from(LoginAttempt)
         .where(
-            LoginAttempt.identifier == "signup",
+            LoginAttempt.identifier == SIGNUP_IDENTIFIER,
             LoginAttempt.ip == ip,
             LoginAttempt.created_at >= utcnow() - SIGNUP_WINDOW,
         )
