@@ -149,3 +149,13 @@ def test_locked_attempts_are_recorded(client: FlaskClient, make_user: MakeUser) 
 def test_unauthorized_get_keeps_next_post_drops_it(client: FlaskClient) -> None:
     assert client.get("/verify/pending").location == "/login?next=/verify/pending"
     assert client.post("/verify/resend").location == "/login"
+
+
+def test_logout_clears_the_whole_session(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("alice"))
+    with client.session_transaction() as session:
+        session["after_verify"] = "/posts/7"
+        session["csrf_token"] = "old-token"  # noqa: S105 - a test value
+    client.post("/logout")
+    with client.session_transaction() as session:
+        assert set(session) <= {"_flashes"}
