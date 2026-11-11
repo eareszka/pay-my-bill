@@ -300,5 +300,8 @@ def reset_password(token: str) -> str | Response:
 @bp.post("/logout")
 def logout() -> Response:
     logout_user()
+    # Nothing from this visit (a saved way back, the CSRF token) carries over to
+    # whoever uses the browser next (#171).
+    session.clear()
     flash("You're logged out.", "info")
     return redirect(url_for("main.index"))

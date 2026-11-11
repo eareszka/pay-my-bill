@@ -158,3 +158,13 @@ def test_login_starts_a_fresh_session(client: FlaskClient, make_user: MakeUser) 
     client.post("/login", data={"identifier": "alice", "password": PASSWORD})
     with client.session_transaction() as session:
         assert "planted" not in session
+
+
+def test_logout_clears_the_whole_session(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("alice"))
+    with client.session_transaction() as session:
+        session["after_verify"] = "/posts/7"
+        session["csrf_token"] = "old-token"  # noqa: S105 - a test value
+    client.post("/logout")
+    with client.session_transaction() as session:
+        assert set(session) <= {"_flashes"}
