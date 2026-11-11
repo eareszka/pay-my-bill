@@ -98,3 +98,20 @@ def test_send_later_logs_failures(
     assert future is not None
     future.result(timeout=5)
     assert "Could not send 'Hello'" in caplog.text
+
+
+def test_console_backend_hides_bodies_outside_development(
+    app: Flask, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # A deployed server that forgot its mail key must not log reset links (#165).
+    monkeypatch.setenv("FLASK_ENV", "production")
+    monkeypatch.setattr(app, "testing", False)
+    with caplog.at_level(logging.INFO):
+        send_email("a@example.com", "Reset", "https://pay.example/reset/secret-token")
+    assert "No mail provider is set" in caplog.text
+    assert "To: a@example.com Subject: Reset" in caplog.text
+    assert "secret-token" not in caplog.text
+    monkeypatch.setenv("FLASK_ENV", " Development ")
+    with caplog.at_level(logging.INFO):
+        send_email("a@example.com", "Reset", "https://pay.example/reset/dev-token")
+    assert "dev-token" in caplog.text

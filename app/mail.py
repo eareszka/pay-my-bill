@@ -1,4 +1,5 @@
 import json
+import os
 import smtplib
 import ssl
 import urllib.request
@@ -37,6 +38,13 @@ def _send_brevo(api_key: str, sender: str, to: str, subject: str, body: str) -> 
         pass
 
 
+def _show_bodies() -> bool:
+    # Local work reads links from the log. Anywhere else a body may hold a reset or
+    # verify link, which must not sit in shared logs (#165).
+    env = os.environ.get("FLASK_ENV", "").strip().lower()
+    return current_app.testing or current_app.debug or env == "development"
+
+
 def send_email(to: str, subject: str, body: str) -> None:
     cfg = current_app.config
     msg = EmailMessage()
@@ -48,9 +56,16 @@ def send_email(to: str, subject: str, body: str) -> None:
         _send_brevo(cfg["BREVO_API_KEY"], cfg["MAIL_FROM"], to, subject, body)
         return
     if not cfg["MAIL_SERVER"]:
-        current_app.logger.info(
-            "Email (console backend)\nTo: %s\nSubject: %s\n\n%s", to, subject, body
-        )
+        if _show_bodies():
+            current_app.logger.info(
+                "Email (console backend)\nTo: %s\nSubject: %s\n\n%s", to, subject, body
+            )
+        else:
+            current_app.logger.warning(
+                "No mail provider is set, so this email was not sent. To: %s Subject: %s",
+                to,
+                subject,
+            )
         return
     context = ssl.create_default_context()
     smtp: smtplib.SMTP
