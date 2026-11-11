@@ -203,6 +203,10 @@ ADR 0014. The owner applies. Nothing about real payments ships until this is don
 From the #118 finish review: the full-screen feed's rail has room for Share.
 - [ ] A Share button on the rail and post page opens the phone's share sheet, or copies the post link where that isn't available.
 
+### PB-48 Photos on our own domain · #TBD · 1 pt · P1 · epic:launch
+Staging serves photos from R2's public development URL, which Cloudflare rate-limits and doesn't intend for production (ADR 0015).
+- [ ] Before launch, connect a custom domain to the production bucket, turn off its development URL, and set `R2_PUBLIC_URL` to the custom domain.
+
 ## Donors and posters talking (owner, 2026-11-09)
 The owner wants donors and posters to be able to talk and posters to keep donors in the loop, without open comments. Every message is short, tied to a real gift or post, and private unless stated otherwise. There are no threads: at most one reply. Order: after #119 and #120. PB-31 (thank-you with a reply, #125) belongs to this group.
 

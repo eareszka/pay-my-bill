@@ -18,14 +18,14 @@ This is a record of what the owner asked for and decided in one working session,
 | Motion | 180ms throw, 200ms settle, a 4° tilt, and the rail glyph lights toward the drag target. Reduced motion gets a fade | #118 |
 | Photos | Full upload story: Cloudflare R2, shown right away but reportable, one photo per post. Location data is stripped. The dev seed uses CC0 photos | #122 → PR #123, ADR 0015 |
 | Flicker | Neighbor photos load and decode on page open, the visible photo is drawn first, and the old page stays until the next one is ready | PR #123 |
-| Show less | Post categories. Show less pushes a category down the stack and never hides it, with undo. The category list is not confirmed yet | #119 (to do) |
+| Show less | Post categories. Show less pushes a category down the stack and never hides it, with undo. The owner confirmed the list on 2026-11-11: Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, and Other | #119 (to do) |
 | Home page | A scroll-driven how-it-works page for logged-out visitors that ends at sign-up | #120 (to do) |
 | Messages | Four stories, no threads: a note with your gift (#124), a thank-you with a reply (#125), progress updates with following (#126), and questions before giving (#127) | Backlog, PR #128 |
 | Messages design | One **"How it's going"** list per post (updates, shared gift notes, answered questions, newest first, the same item shape, at most one reply). Chip in comes first, Follow is one quiet button, notes sit behind a link, the thank-you opens inside the gift, and the feed card gets one "Updated" line | Approved mockup: `docs/design/mockups/post-messages.html` (also https://claude.ai/artifact/5MUbEMb4eFFSVL7k9tS86n) |
 
 ## Still open
-- **Owner:** set up Cloudflare R2 and the five `R2_*` settings on Render. Until then, photos on staging are lost on each redeploy. The steps are in PR #123.
-- **Owner:** confirm the #119 category list. The draft is Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, and Other.
+- ~~Owner: set up Cloudflare R2.~~ Done 2026-11-11: the bucket `pay-my-bill-staging`, its public development URL, and the five `R2_*` settings are on Render, and a test photo loads from R2. Still to check: the test photo survives the next deploy. Before launch, move photos to a custom domain (PB-48).
+- ~~Owner: confirm the #119 category list.~~ Confirmed 2026-11-11 as drafted.
 - **Owner:** keep the Venmo and PayPal buttons filled next to "Chip in instantly", or make them outlined?
 - **Owner:** should "donor" go from the copy, like "donation"?
 - Share button: PB-44.

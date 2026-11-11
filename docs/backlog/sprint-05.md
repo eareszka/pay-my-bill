@@ -76,7 +76,7 @@ The owner wants the app to stop looking AI-made and to read as one simple system
 
 ### S5-10 Categories and show less · #119 · 5 pts · P1
 As a **donor**, I want to **see less of a kind of post I don't care about** so that **the stack shows me what I'd chip in on**. Amends ADR 0013 in a new ADR.
-- [ ] Posters pick a category (the owner confirms the list), and existing posts become Other.
+- [ ] Posters pick a category from the list the owner confirmed on 2026-11-11: Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, and Other. Existing posts become Other.
 - [ ] Swiping a card down, or its Show less button, moves that category later in my stack. It never hides a post, and the first ticket stays the follow-through pick.
 - [ ] I can undo right away and later from my profile.
 - [ ] Logged out, the choice lives in a cookie and joins my account when I log in.
