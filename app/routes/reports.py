@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 from app.auth import verified_required
 from app.extensions import db
 from app.forms import ReportForm
-from app.models import Post, Report, ReportReason, User, utcnow
+from app.models import LoginAttempt, Post, Report, ReportReason, User, as_utc, utcnow
 from app.routes.admin import notify_admins
 from app.routes.posts import MAX_DB_INT, can_view
 
@@ -19,6 +19,8 @@ bp = Blueprint("reports", __name__, url_prefix="/report")
 MAX_REPORTS_PER_DAY = 10
 REPORT_WINDOW = timedelta(days=1)
 REPORT_EMAIL_GAP = timedelta(hours=1)
+# A throttle row marks each report email; the colon keeps it apart from usernames.
+REPORT_EMAIL_IDENTIFIER = "report-mail:"
 
 
 def _reports_since(since: timedelta, *where: ColumnElement[bool]) -> int:
@@ -46,8 +48,16 @@ def _file(
     if _reports_since(REPORT_WINDOW, Report.reporter_id == current_user.id) >= MAX_REPORTS_PER_DAY:
         flash(f"You've sent {MAX_REPORTS_PER_DAY} reports today. Try again tomorrow.", "error")
         return
-    # Only the first report in an hour emails the admins.
-    email_admins = _reports_since(REPORT_EMAIL_GAP) == 0
+    # At most one report email an hour, timed from the last email, so a steady trickle
+    # of reports can't keep the admins from ever hearing.
+    last_email = db.session.scalar(
+        select(func.max(LoginAttempt.created_at)).where(
+            LoginAttempt.identifier == REPORT_EMAIL_IDENTIFIER
+        )
+    )
+    email_admins = last_email is None or as_utc(last_email) <= utcnow() - REPORT_EMAIL_GAP
+    if email_admins:
+        db.session.add(LoginAttempt(identifier=REPORT_EMAIL_IDENTIFIER, ip=None, succeeded=True))
     reason = ReportReason(form.reason.data)
     db.session.add(
         Report(

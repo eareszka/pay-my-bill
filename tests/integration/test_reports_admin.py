@@ -278,16 +278,19 @@ def test_reports_are_limited_per_day(client: FlaskClient, make_user: MakeUser, a
 def test_admins_get_one_report_email_an_hour(
     client: FlaskClient, make_user: MakeUser, admin: User, caplog: pytest.LogCaptureFixture
 ) -> None:
-    from app.routes.reports import REPORT_EMAIL_GAP
+    from app.models import LoginAttempt
 
-    first, second, third = (make_post(make_user(f"poster{n}")) for n in range(3))
-    login_as(client, make_user("bob"))
-    client.post(f"/report/post/{first.id}", data={"reason": "spam"})
-    client.post(f"/report/post/{second.id}", data={"reason": "spam"})
-    assert caplog.text.count("New report on Pay My Bill") == 1
+    # Eight reports from eight accounts, 50 minutes apart: a steady trickle must not
+    # silence the emails, so they go out on the 1st, 3rd, 5th and 7th.
+    sent = []
+    for n in range(8):
+        post = make_post(make_user(f"poster{n}"))
+        login_as(client, make_user(f"reporter{n}"))
+        before = caplog.text.count("New report on Pay My Bill")
+        client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+        sent.append(caplog.text.count("New report on Pay My Bill") - before)
+        for row in [*open_reports(), *db.session.scalars(select(LoginAttempt))]:
+            row.created_at -= timedelta(minutes=50)
+        db.session.commit()
+    assert sent == [1, 0, 1, 0, 1, 0, 1, 0]
     assert "wait in the queue" in caplog.text
-    for report in open_reports():
-        report.created_at = utcnow() - REPORT_EMAIL_GAP - timedelta(minutes=1)
-    db.session.commit()
-    client.post(f"/report/post/{third.id}", data={"reason": "spam"})
-    assert caplog.text.count("New report on Pay My Bill") == 2
