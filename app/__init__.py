@@ -18,6 +18,19 @@ def database_url(raw: str) -> str:
     return raw
 
 
+DEV_SECRET_KEY = "dev-only-not-secret"  # noqa: S105 - the local-only fallback
+# Placeholders that must never sign a production session or email token.
+PLACEHOLDER_KEYS = {DEV_SECRET_KEY, "change-me", ""}
+
+
+def check_production(config: dict[str, Any]) -> None:
+    """Refuse to start a production app that would run with forgeable or http-only settings."""
+    if config["SECRET_KEY"] in PLACEHOLDER_KEYS:
+        raise RuntimeError("Set SECRET_KEY: production can't run on a placeholder key.")
+    if not str(config["APP_URL"]).startswith("https://"):
+        raise RuntimeError("Set APP_URL to the site's https address in production.")
+
+
 def format_date(value: datetime) -> str:
     return f"{value:%b} {value.day}, {value.year}"
 
@@ -26,7 +39,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     load_dotenv()
     app = Flask(__name__)
     app.config.update(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-not-secret"),
+        SECRET_KEY=os.environ.get("SECRET_KEY", DEV_SECRET_KEY),
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///pay_my_bill.db"),
         MAIL_SERVER=os.environ.get("MAIL_SERVER", ""),
         MAIL_PORT=int(os.environ.get("MAIL_PORT") or 587),
@@ -56,6 +69,9 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     )
     if config:
         app.config.update(config)
+    # Render sets FLASK_ENV=production (render.yaml); local runs and tests don't.
+    if os.environ.get("FLASK_ENV") == "production" and not app.testing:
+        check_production(app.config)
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url(app.config["SQLALCHEMY_DATABASE_URI"])
     app.logger.setLevel(logging.INFO)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
