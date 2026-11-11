@@ -19,8 +19,9 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-10 Categories and show less | #119 | 5 | To do |
 | S5-11 How-it-works home page | #120 | 5 | To do |
 | S5-12 Photo on a post | #122 | 5 | Done |
+| S5-13 You: my posts and chipped in | #132 | 3 | In review |
 
-**Total:** 55 points (Sprint 4: 16).
+**Total:** 58 points (Sprint 4: 16).
 
 ## Daily log
 - 2026-11-03: Planned with the owner, who approved the order and chose an email plus a Gifts banner for confirmed gifts, and dates plus an optional payment-app name for matching. Did #77: hardening. Next: #78 safer chip-in. Blocked: none.
@@ -47,3 +48,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-09: The owner approved the look and the flicker fix. #118 merged (#121) and #122 merged (#123), and staging serves both. Photos on staging last only once R2 is set up. The owner asked how donors and posters can talk. They chose four backlog stories with no threads: a note with your gift (PB-45, #124), a thank-you with a reply (PB-31, #125), progress updates with following (PB-46, #126), and questions before giving (PB-47, #127), with shared guardrails. They come after #119 and #120. Next: the owner confirms the #119 category list. Blocked: none.
 - 2026-11-09: The owner approved the simplified messages mockup made with Impeccable: one "How it's going" list per post, Chip in first, Follow as one quiet button, notes behind a link, the thank-you inside the gift, and a single "Updated" line on the feed card. PB-31 and PB-45 to PB-47 now say so. Blocked: none.
 - 2026-11-11: The owner set up Cloudflare R2 (bucket `pay-my-bill-staging`, public development URL, five `R2_*` settings on Render). A test post's photo loads from R2 as WebP with the one-year immutable cache header. Still to check: it survives the next deploy. Added PB-48 to move photos to a custom domain before launch. The owner confirmed the #119 category list as drafted. Next: #119. Blocked: none.
+- 2026-11-11: The owner asked for an easy way to see the posts they created and the ones they chipped in on, under a profile tab, with Impeccable deciding the design in the current look. #116 (PR #117) was brought into the new look (migration renumbered to 0015 after 0014) and merged with the owner's OK. Added S5-13 (#132): You opens your own profile with Posts and Chipped in tabs and a Settings button, Gifts folds into You with its badge, and old `/gifts` links redirect. Also fixed stray bullets on the confirm list left from the #118 rewrite. Waiting on the owner's review of screenshots. Blocked: none.

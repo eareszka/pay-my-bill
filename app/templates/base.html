@@ -23,10 +23,9 @@
       {% if current_user.is_authenticated %}
         {{ nav_link("posts.new", "post", "Post") }}
         {% set gift_badge %}{% if pending_gift_count %}<span class="badge" aria-hidden="true">{{ pending_gift_count }}</span><span class="sr-only">, {{ pending_gift_count }} to confirm</span>{% endif %}{% endset %}
-        {{ nav_link("gifts.index", "gift", "Gifts", gift_badge) }}
         {{ nav_link("leaders.index", "leaders", "Leaders") }}
         {% if current_user.is_admin %}{{ nav_link("admin.queue", "admin", "Admin") }}{% endif %}
-        <a class="nav-user" href="{{ url_for('profile.edit') }}"{% if request.endpoint == 'profile.edit' or (request.view_args and request.view_args.get('username') == current_user.username) %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-you"/></svg><span class="nav-label">{{ current_user.username }}</span></a>
+        <a class="nav-user" href="{{ url_for('profile.show', username=current_user.username) }}"{% if request.endpoint == 'profile.edit' or (request.view_args and request.view_args.get('username') == current_user.username) %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-you"/></svg><span class="nav-label">{{ current_user.username }}</span>{{ gift_badge }}</a>
       {% else %}
         {{ nav_link("leaders.index", "leaders", "Leaders") }}
         {{ nav_link("auth.login", "login", "Log in") }}

@@ -29,6 +29,7 @@ from app.models import (
     User,
 )
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
+from app.routes import gifts as gift_routes
 
 bp = Blueprint("profile", __name__)
 
@@ -119,11 +120,11 @@ PROFILE_POST_LIMIT = 20
 @bp.get("/u/<username>")
 def show(username: str) -> str:
     user = db.session.scalar(select(User).where(User.username == username.lower()))
-    if user is None or not user.is_verified:
+    is_owner = user is not None and current_user.is_authenticated and current_user.id == user.id
+    if user is None or not (user.is_verified or is_owner):
         abort(404)
     gifts = confirmed_gifts(user)
     stats = progress(gifts)
-    is_owner = current_user.is_authenticated and current_user.id == user.id
     shown = [*PUBLIC_STATUSES, PostStatus.PENDING_REVIEW] if is_owner else PUBLIC_STATUSES
     posts = db.session.scalars(
         select(Post)
@@ -135,6 +136,7 @@ def show(username: str) -> str:
         .order_by(Post.created_at.desc(), Post.id.desc())
         .limit(PROFILE_POST_LIMIT)
     ).all()
+    tab = "chipped" if is_owner and request.args.get("tab") == "chipped" else "posts"
     return render_template(
         "profile/show.html",
         user=user,
@@ -145,4 +147,9 @@ def show(username: str) -> str:
         posts=posts,
         is_owner=is_owner,
         post_limit=PROFILE_POST_LIMIT,
+        tab=tab,
+        to_confirm=gift_routes.pending_for(user) if is_owner and tab == "posts" else [],
+        sent=gift_routes.sent_by(user) if is_owner and tab == "chipped" else [],
+        sent_limit=gift_routes.MY_GIFTS_LIMIT,
+        disputing=request.args.get("dispute", type=int),
     )

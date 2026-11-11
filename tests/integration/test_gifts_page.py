@@ -42,6 +42,14 @@ def test_requires_login(client: FlaskClient) -> None:
     assert client.get("/gifts").location.startswith("/login")
 
 
+def test_gifts_page_moved_to_profile(client: FlaskClient, poster: User) -> None:
+    login_as(client, poster)
+    assert client.get("/gifts").location == "/u/maria_g"
+    assert client.get("/gifts?dispute=4&tab=chipped&x=1").location == (
+        "/u/maria_g?dispute=4&tab=chipped"
+    )
+
+
 def test_lists_gifts_to_confirm_and_my_gifts(
     client: FlaskClient, poster: User, donor: User, make_user: MakeUser
 ) -> None:
@@ -52,16 +60,18 @@ def test_lists_gifts_to_confirm_and_my_gifts(
     add_gift(other, donor, 900)
     add_gift(other, poster, 1_500, DonationStatus.DISPUTED)
     login_as(client, poster)
-    page = client.get("/gifts").get_data(as_text=True)
-    to_confirm, sent = page.split("My gifts")
+    to_confirm = client.get("/gifts", follow_redirects=True).get_data(as_text=True)
+    sent = client.get("/u/maria_g?tab=chipped").get_data(as_text=True)
+    assert "To confirm" not in sent
+    assert '<span class="gift-list-amount">$20</span>' not in sent
     assert '<span class="count">1</span>' in to_confirm
     assert '<p class="gift-amount">$20</p>' in to_confirm
     assert "via Venmo from" in to_confirm
-    assert "$7" not in to_confirm
-    assert "$9" not in to_confirm
+    assert '<p class="gift-amount">$7</p>' not in to_confirm
+    assert '<p class="gift-amount">$9</p>' not in to_confirm
     gift_id = waiting.id
     assert f'action="/gifts/{gift_id}/confirm"' in to_confirm
-    assert f'href="/gifts?dispute={gift_id}#gift-{gift_id}">Didn\'t get it</a>' in to_confirm
+    assert f'href="/u/maria_g?dispute={gift_id}#gift-{gift_id}">Didn\'t get it</a>' in to_confirm
     assert "Dispute this gift?" not in to_confirm
     assert '<span class="gift-list-amount">$15</span>' in sent
     assert 'chip-disputed">Not received' in sent
@@ -71,20 +81,21 @@ def test_dispute_asks_before_acting(client: FlaskClient, poster: User, donor: Us
     first = add_gift(add_post(poster), donor, 2_000)
     second = add_gift(first.post, donor, 500)
     login_as(client, poster)
-    page = client.get(f"/gifts?dispute={first.id}").get_data(as_text=True)
+    page = client.get(f"/gifts?dispute={first.id}", follow_redirects=True).get_data(as_text=True)
     assert "Dispute this gift? dev_tom won't get credit for $20." in page
     assert f'action="/gifts/{first.id}/dispute"' in page
     assert f'action="/gifts/{first.id}/confirm"' not in page
-    assert f'href="/gifts#gift-{first.id}">Cancel</a>' in page
+    assert f'href="/u/maria_g#gift-{first.id}">Cancel</a>' in page
     assert f'action="/gifts/{second.id}/confirm"' in page
     assert first.status is DonationStatus.PENDING
 
 
 def test_empty_states(client: FlaskClient, poster: User) -> None:
     login_as(client, poster)
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/gifts", follow_redirects=True).get_data(as_text=True)
     assert "To confirm" not in page
-    assert "No gifts yet." in page
+    assert "You haven't posted yet." in page
+    assert "No gifts yet." in client.get("/u/maria_g?tab=chipped").get_data(as_text=True)
 
 
 def test_confirm_counts_toward_progress(client: FlaskClient, poster: User, donor: User) -> None:
@@ -92,22 +103,26 @@ def test_confirm_counts_toward_progress(client: FlaskClient, poster: User, donor
     gift = add_gift(post, donor, 2_000)
     login_as(client, poster)
     resp = resolve(client, gift)
-    assert resp.location == "/gifts"
+    assert resp.location == "/u/maria_g"
     assert gift.status is DonationStatus.CONFIRMED
     assert gift.resolved_at is not None
     assert (post.raised_cents, post.status) == (2_000, PostStatus.OPEN)
-    assert "Confirmed $20 from dev_tom." in client.get("/gifts").get_data(as_text=True)
+    assert "Confirmed $20 from dev_tom." in client.get("/gifts", follow_redirects=True).get_data(
+        as_text=True
+    )
 
 
 def test_dispute_does_not_count(client: FlaskClient, poster: User, donor: User) -> None:
     post = add_post(poster)
     gift = add_gift(post, donor)
     login_as(client, poster)
-    assert resolve(client, gift, "dispute").location == "/gifts"
+    assert resolve(client, gift, "dispute").location == "/u/maria_g"
     assert gift.status is DonationStatus.DISPUTED
     assert gift.resolved_at is not None
     assert post.raised_cents == 0
-    assert "Marked $20 from dev_tom as not received." in client.get("/gifts").get_data(as_text=True)
+    assert "Marked $20 from dev_tom as not received." in client.get(
+        "/gifts", follow_redirects=True
+    ).get_data(as_text=True)
 
 
 def test_confirm_reaching_goal_funds_post(client: FlaskClient, poster: User, donor: User) -> None:
@@ -117,7 +132,9 @@ def test_confirm_reaching_goal_funds_post(client: FlaskClient, poster: User, don
     login_as(client, poster)
     resolve(client, gift)
     assert post.status is PostStatus.FUNDED
-    assert "&#34;Rent&#34; is fully funded!" in client.get("/gifts").get_data(as_text=True)
+    assert "&#34;Rent&#34; is fully funded!" in client.get(
+        "/gifts", follow_redirects=True
+    ).get_data(as_text=True)
     assert "Rent" not in client.get("/").get_data(as_text=True)
 
 
@@ -156,9 +173,11 @@ def test_unknown_gift_or_action(client: FlaskClient, poster: User, donor: User, 
 def test_already_handled(client: FlaskClient, poster: User, donor: User) -> None:
     gift = add_gift(add_post(poster), donor, status=DonationStatus.CONFIRMED)
     login_as(client, poster)
-    assert resolve(client, gift, "dispute").location == "/gifts"
+    assert resolve(client, gift, "dispute").location == "/u/maria_g"
     assert gift.status is DonationStatus.CONFIRMED
-    assert "That gift was already handled." in client.get("/gifts").get_data(as_text=True)
+    assert "That gift was already handled." in client.get("/gifts", follow_redirects=True).get_data(
+        as_text=True
+    )
 
 
 def test_nav_badge_counts_gifts_waiting(client: FlaskClient, poster: User, donor: User) -> None:
@@ -179,7 +198,7 @@ def test_no_badge_for_the_donor(client: FlaskClient, poster: User, donor: User) 
     add_gift(add_post(poster), donor)
     login_as(client, donor)
     page = client.get("/").get_data(as_text=True)
-    assert '<span class="nav-label">Gifts</span></a>' in page
+    assert '<span class="nav-label">Gifts</span>' not in page
     assert 'class="badge"' not in page
 
 
@@ -192,7 +211,7 @@ def test_removed_posts_drop_out(client: FlaskClient, poster: User, donor: User) 
     gift.post.status = PostStatus.REMOVED
     db.session.commit()
     login_as(client, poster)
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/gifts", follow_redirects=True).get_data(as_text=True)
     assert "To confirm" not in page
     assert 'class="badge"' not in page
     assert resolve(client, gift).status_code == 404
@@ -206,9 +225,9 @@ def test_my_gifts_says_when_it_is_cut_off(
     post = add_post(poster)
     add_gift(post, donor)
     login_as(client, donor)
-    assert "Showing your latest" not in client.get("/gifts").get_data(as_text=True)
+    assert "Showing your latest" not in client.get("/u/dev_tom?tab=chipped").get_data(as_text=True)
     add_gift(post, donor, 500)
     add_gift(post, donor, 700)
-    page = client.get("/gifts").get_data(as_text=True)
+    page = client.get("/u/dev_tom?tab=chipped").get_data(as_text=True)
     assert page.count('class="gift-list-amount"') == 2
     assert "Showing your latest 2 gifts." in page

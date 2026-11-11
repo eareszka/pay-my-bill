@@ -247,7 +247,7 @@ These two are provisional category colors. Story #119 replaces them with per-cat
 
 The layout is mobile first and single column. Ordinary pages sit in a 640px container with 16px padding (28px top and bottom at 960px and wider). Rhythm comes from 8, 12, and 16px gaps inside forms and panels, 18px panel padding, and 28px between major desktop columns.
 
-On phones, the top bar is 52px tall and the nav is a fixed 64px bar at the bottom (plus the safe-area inset) with five icon-over-label items, the signed-in username in place of "You". The feed stage fills the height between the two bars (minimum 520px). Inside it, the All, Needs, and Wants tabs are centered at the top, the title sits mid-screen, and the foot holds meta, a three-line story, amounts, and the meter. The rail (Back, Next, and the count) sits at the right edge, and the full-width Chip in tab is at the bottom.
+On phones, the top bar is 52px tall and the nav is a fixed 64px bar at the bottom (plus the safe-area inset) with four icon-over-label items (Feed, Post, Leaders, and the signed-in username in place of "You"; admins also get Admin). The feed stage fills the height between the two bars (minimum 520px). Inside it, the All, Needs, and Wants tabs are centered at the top, the title sits mid-screen, and the foot holds meta, a three-line story, amounts, and the meter. The rail (Back, Next, and the count) sits at the right edge, and the full-width Chip in tab is at the bottom.
 
 At 960px the nav moves into a 60px top bar as icon-beside-label items, centered within 1120px. The feed becomes one wide card, centered within about 1240px: the ask (up to 660px wide, `min(620px, 100dvh - 230px)` tall, 460px minimum) joined to a 400px Chip in panel on surface, with 18px outer corners. The tabs sit centered above it. Back and Next are 60px outlined circles in 88px gutters outside the card, and the count with an "← → to move" hint sits centered below. The title rests just above who and where, as on the post hero. The on-card Chip in tab is hidden because the panel replaces it. Dragging still works but nothing depends on it, and a click or arrow key plays the same 180ms slide. The post page becomes a fluid story column beside a 400px side panel. Below 380px, the card's right padding tightens to 76px so the title clears the rail. The body clips horizontal overflow, so a thrown card never adds a sideways scroll.
 
@@ -295,12 +295,15 @@ State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes 
 - **Error:** a 2px tomato stroke, with the hint swapped for a bold bad-text message.
 
 ### Navigation
-- **Phone:** a fixed void bar at the bottom with Lucide 24px icons over 0.75rem 700 labels in fog gray. The current page turns white and its icon stroke thickens to 2.5. A white count badge marks gifts waiting to be confirmed.
+- **Phone:** a fixed void bar at the bottom with Lucide 24px icons over 0.75rem 700 labels in fog gray. The current page turns white and its icon stroke thickens to 2.5. A white count badge on You marks gifts waiting to be confirmed. You opens your own profile, where Gifts now lives.
 - **Desktop (960px and wider):** the same items, inline in the top bar with 20px icons and 0.9375rem labels. The current page gets a slate fill with 8px corners.
 - **Tabs:** text tabs with a 2px underline on the current tab (white on the stage, ink elsewhere) and muted inactive tabs over a hairline.
 
 ### Lists
 Dense hairline rows with no cards inside cards. Gift and leader lists are bounded top and bottom by 1px lines, with 1px dividers between rows and 12px row padding. Titles are bold, amounts are right-aligned and tabular, and metadata wraps in muted 0.9375rem. Leaders use a three-column subgrid (rank, name, people).
+
+### The You Page
+Your own profile is the home for your stuff (#132). The header is your name in Display with an outlined Settings button on the right, your region, the rewards panel, and your handles. Below, text tabs (real links) switch between **Posts** and **Chipped in**. Posts starts with To confirm when gifts are waiting, then your posts as hairline rows: the bold title, "$X of $Y" on the right, the hairline meter while open, and "Need · " plus one state mark that says what's next (Open until a date, Update due by a date, Update overdue as the disputed mark, Funded, In review, Closed), with small Post update, Edit, and Delete links. Chipped in lists your gifts with their state marks. Visitors see the header, handles, and public posts only, never what you gave. Settings (`/profile`) is a form page with a "← Your profile" link.
 
 ### Meter
 The single progress device. It is a 4px hairline track with 2px corners and an ink fill to the percentage. On a color field it becomes a 30% white track with a white fill, and 3px tall on the card. In forced-colors mode it is drawn in CanvasText.

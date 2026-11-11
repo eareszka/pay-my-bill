@@ -21,6 +21,7 @@ This is a record of what the owner asked for and decided in one working session,
 | Show less | Post categories. Show less pushes a category down the stack and never hides it, with undo. The owner confirmed the list on 2026-11-11: Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, and Other | #119 (to do) |
 | Home page | A scroll-driven how-it-works page for logged-out visitors that ends at sign-up | #120 (to do) |
 | Messages | Four stories, no threads: a note with your gift (#124), a thank-you with a reply (#125), progress updates with following (#126), and questions before giving (#127) | Backlog, PR #128 |
+| You page (2026-11-11) | You opens your own profile: Posts (to confirm first, then your posts with what's next) and Chipped in tabs, Settings as a button. Gifts folds into You; visitors see your posts, never what you gave | #132 |
 | Messages design | One **"How it's going"** list per post (updates, shared gift notes, answered questions, newest first, the same item shape, at most one reply). Chip in comes first, Follow is one quiet button, notes sit behind a link, the thank-you opens inside the gift, and the feed card gets one "Updated" line | Approved mockup: `docs/design/mockups/post-messages.html` (also https://claude.ai/artifact/5MUbEMb4eFFSVL7k9tS86n) |
 
 ## Still open

@@ -2,7 +2,10 @@
 {% from "posts/_progress.html" import meter %}
 {% block title %}{{ user.username }} · Pay My Bill{% endblock %}
 {% block content %}
-  <h1>{{ user.username }}</h1>
+  <div class="profile-head">
+    <h1>{{ user.username }}</h1>
+    {% if is_owner %}<a class="btn btn-secondary" href="{{ url_for('profile.edit') }}">Settings</a>{% endif %}
+  </div>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
   <section class="rewards" aria-label="Giving">
     <p class="rewards-level">Level {{ progress.level }}</p>
@@ -20,27 +23,20 @@
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
   {% endif %}
   {% include "profile/_handles.html" %}
-  <section class="profile-posts" aria-labelledby="posts-title">
-    <h2 class="section-title" id="posts-title">Posts</h2>
-    {% if posts %}
-      <ul class="gift-list post-list">
-        {% for post in posts %}
-          <li>
-            <a class="gift-list-title" href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a>
-            <span class="gift-list-amount">{{ post.raised_cents | cents }}<span class="post-list-goal"> of {{ post.goal_cents | cents }}</span></span>
-            <span class="gift-list-meta"><span>{{ post.kind.value | capitalize }} · {{ post.state_label }} · {{ post.created_at | date }}</span>
-              {% if is_owner %}<span class="post-list-actions">{% if post.can_edit %}<a href="{{ url_for('posts.edit', post_id=post.id) }}">Edit<span class="sr-only"> {{ post.title }}</span></a>{% endif %}<a href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete<span class="sr-only"> {{ post.title }}</span></a></span>{% endif %}
-            </span>
-          </li>
-        {% endfor %}
-      </ul>
-      {% if posts | length == post_limit %}<p class="hint gift-list-note">Showing the latest {{ post_limit }} posts.</p>{% endif %}
-    {% elif is_owner %}
-      <p class="empty">You haven't posted yet. <a href="{{ url_for('posts.new') }}">Ask for a hand</a>.</p>
+  {% if is_owner %}
+    <nav class="tabs profile-tabs" aria-label="Your lists">
+      <a href="{{ url_for('profile.show', username=user.username) }}"{% if tab == "posts" %} aria-current="page"{% endif %}>Posts</a>
+      <a href="{{ url_for('profile.show', username=user.username, tab='chipped') }}"{% if tab == "chipped" %} aria-current="page"{% endif %}>Chipped in</a>
+    </nav>
+    {% if tab == "chipped" %}
+      {% include "gifts/_sent.html" %}
     {% else %}
-      <p class="empty">{{ user.username }} hasn't posted yet.</p>
+      {% if to_confirm %}{% include "gifts/_to_confirm.html" %}{% endif %}
+      {% include "profile/_posts.html" %}
     {% endif %}
-  </section>
+  {% else %}
+    {% include "profile/_posts.html" %}
+  {% endif %}
   {% if not current_user.is_authenticated or current_user.id != user.id %}
     <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>
   {% endif %}

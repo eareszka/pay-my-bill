@@ -1,0 +1,36 @@
+{% from "posts/_progress.html" import meter %}
+<section class="profile-posts" aria-labelledby="posts-title">
+  <h2 class="{{ 'sr-only' if is_owner and not to_confirm else 'section-title' }}" id="posts-title">{{ "Your posts" if is_owner else "Posts" }}</h2>
+  {% if posts %}
+    <ul class="gift-list post-list">
+      {% for post in posts %}
+        <li>
+          <a class="gift-list-title" href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a>
+          <span class="gift-list-amount">{{ post.raised_cents | cents }}<span class="post-list-goal"> of {{ post.goal_cents | cents }}</span></span>
+          {% if post.is_open %}{{ meter(post.progress_percent) }}{% endif %}
+          <span class="gift-list-meta">
+            {%- if is_owner and post.update_overdue %}{% set mark, label = "disputed", "Update overdue" %}
+            {%- elif is_owner and post.owes_update %}{% set mark, label = "", "Update due by " ~ (post.update_last_day | date) %}
+            {%- elif post.is_open %}{% set mark, label = "", "Open until " ~ (post.last_open_day | date) %}
+            {%- elif post.status == PostStatus.FUNDED %}{% set mark, label = "confirmed", "Funded" %}
+            {%- elif post.status == PostStatus.PENDING_REVIEW %}{% set mark, label = "", "In review" %}
+            {%- else %}{% set mark, label = "expired", "Closed" %}{% endif %}
+            <span>{{ post.kind.value | capitalize }} · <span class="chip{% if mark %} chip-{{ mark }}{% endif %}">{{ label }}</span></span>
+            {% if is_owner %}
+              <span class="post-list-actions">
+                {% if post.owes_update %}<a href="{{ url_for('posts.show', post_id=post.id) }}#update">Post update<span class="sr-only"> for {{ post.title }}</span></a>{% endif %}
+                {% if post.can_edit %}<a href="{{ url_for('posts.edit', post_id=post.id) }}">Edit<span class="sr-only"> {{ post.title }}</span></a>{% endif %}
+                <a href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete<span class="sr-only"> {{ post.title }}</span></a>
+              </span>
+            {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+    {% if posts | length == post_limit %}<p class="hint gift-list-note">Showing the latest {{ post_limit }} posts.</p>{% endif %}
+  {% elif is_owner %}
+    <p class="empty">You haven't posted yet. <a href="{{ url_for('posts.new') }}">Ask for a hand</a>.</p>
+  {% else %}
+    <p class="empty">{{ user.username }} hasn't posted yet.</p>
+  {% endif %}
+</section>

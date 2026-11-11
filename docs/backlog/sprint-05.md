@@ -96,6 +96,13 @@ As a **poster**, I want to **add a photo of what I need** so that **donors can s
 - [ ] Deleting a post or account deletes its photos.
 - [ ] Local dev seeds some posts with free placeholder photos.
 
+### S5-13 You: my posts and chipped in · #132 · 3 pts · P1
+As a **user**, I want **one place to see the posts I created and the posts I chipped in on**, on my phone and on a computer. The owner asked Impeccable to decide the design in the current look (2026-11-11). Builds on #116 (PR #117).
+- [ ] "You" in the nav opens my own profile with Posts and Chipped in tabs and a Settings button. Gifts folds into You, and its badge moves there.
+- [ ] Posts starts with gifts waiting for me to confirm, then my posts with what comes next (open until, update due, update overdue).
+- [ ] Chipped in lists my gifts with their state. Only I see it; visitors see my posts.
+- [ ] Old `/gifts` links and emails still work.
+
 ## Wireframes (phone width, 360px)
 
 ```

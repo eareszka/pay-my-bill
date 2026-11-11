@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Your posts and what you chipped in on, in one place (#132). "You" in the nav opens your own profile, with Posts and Chipped in tabs and a Settings button. Posts starts with any gifts waiting for you to confirm, then each post with what comes next: open until a date, update due, or update overdue. The Gifts tab folds into You (its count badge moves there), and old Gifts links still work. Visitors see your posts but not what you gave. The confirm list no longer shows stray bullets.
 - Profiles list the person's posts with their state and amount raised. Posters can edit or delete their own posts from there. Before the first gift, every field can be edited; after it, only the story. Edited posts show "Edited <date>", and an edit that hits the fundraising word list goes back to review (#116).
 - A photo on a post (#122, ADR 0015). Posters can add one optional JPG, PNG, or WebP photo, up to 8 MB. It fills the card on the feed and the header on the post page. Every photo is turned upright, shrunk to 1600px, and rebuilt as a WebP with its hidden details removed, including where it was taken. Photos are stored in Cloudflare R2 when `R2_*` is set, or in a local folder otherwise. Posters can remove their photo, people can report an "Inappropriate photo", and admins can remove just the photo from the queue. Deleting a post or account deletes its photos. The Privacy page says so. The local seed gives five posts CC0 placeholder photos.
 

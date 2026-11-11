@@ -1,6 +1,7 @@
 import smtplib
 from collections import defaultdict
 from datetime import timedelta
+from typing import Any
 
 import click
 from flask import (
@@ -50,7 +51,7 @@ def send_gift_notice(donation: Donation) -> None:
         f"{format_cents(donation.amount_cents)} via {donation.method.label} "
         f'for "{post.title}".\n\nCheck {donation.method.label}, then answer in one tap:\n'
         f"{answer_link(donation)}\n\n"
-        f"Or see all your gifts: {url_for('gifts.index', _external=True)}"
+        f"Or see them on your profile: {url_for('gifts.index', _external=True)}"
     )
     send_later(post.user.email, f"{donation.donor.username} sent you a gift", body)
 
@@ -138,24 +139,24 @@ def pending_gift_count() -> dict[str, int]:
     return {"pending_gift_count": count or 0}
 
 
+def sent_by(user: User) -> list[Donation]:
+    return list(
+        db.session.scalars(
+            select(Donation)
+            .options(joinedload(Donation.post).joinedload(Post.user))
+            .where(Donation.donor_id == user.id)
+            .order_by(Donation.created_at.desc(), Donation.id.desc())
+            .limit(MY_GIFTS_LIMIT)
+        )
+    )
+
+
 @bp.get("/gifts")
 @login_required
-def index() -> str:
-    user: User = current_user
-    sent = db.session.scalars(
-        select(Donation)
-        .options(joinedload(Donation.post).joinedload(Post.user))
-        .where(Donation.donor_id == user.id)
-        .order_by(Donation.created_at.desc(), Donation.id.desc())
-        .limit(MY_GIFTS_LIMIT)
-    )
-    return render_template(
-        "gifts/index.html",
-        to_confirm=pending_for(user),
-        sent=list(sent),
-        sent_limit=MY_GIFTS_LIMIT,
-        disputing=request.args.get("dispute", type=int),
-    )
+def index() -> Response:
+    # Gifts live on your profile now (#132); old links and emails land there.
+    args: dict[str, Any] = {k: v for k, v in request.args.items() if k in ("dispute", "tab")}
+    return redirect(url_for("profile.show", username=current_user.username, **args))
 
 
 def locked_gift(donation_id: int, owner_id: int) -> Donation:
@@ -230,7 +231,7 @@ def count_confirmed(donation: Donation, already_heard: bool) -> tuple[Post, bool
 @login_required
 def resolve(donation_id: int, action: str) -> Response:
     flash(*settle(locked_gift(donation_id, current_user.id), action))
-    return redirect(url_for("gifts.index"))
+    return redirect(url_for("profile.show", username=current_user.username))
 
 
 def answer_link(donation: Donation) -> str:
