@@ -190,17 +190,17 @@ def test_verified_required_prompts_unverified_user() -> None:
         verified.email_verified_at = utcnow()
         db.session.add_all([unverified, verified])
         db.session.commit()
-        unverified_id, verified_id = unverified.id, verified.id
+        unverified_id, verified_id = unverified.get_id(), verified.get_id()
 
     client = app.test_client()
     assert "/login?next=" in client.get("/protected").location
     with client.session_transaction() as session:
-        session["_user_id"] = str(unverified_id)
+        session["_user_id"] = unverified_id
     resp = client.get("/protected")
     assert resp.status_code == 302
     assert resp.location.endswith("/verify/pending")
     with client.session_transaction() as session:
-        session["_user_id"] = str(verified_id)
+        session["_user_id"] = verified_id
     assert client.get("/protected").get_data(as_text=True) == "ok"
 
 

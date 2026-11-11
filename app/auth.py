@@ -22,12 +22,16 @@ VERIFY_EMAIL_WINDOW = timedelta(hours=1)
 
 
 def load_user(user_id: str) -> User | None:
+    id_, _, version = user_id.partition(":")
     try:
-        user = db.session.get(User, int(user_id))
+        user = db.session.get(User, int(id_))
     except ValueError:
         return None
-    # A deleted or banned account's sessions end on their next request.
-    return None if user is None or user.is_deleted or user.is_banned else user
+    # A deleted or banned account's sessions end on their next request, and so
+    # does any session from before the password was last reset.
+    if user is None or user.is_deleted or user.is_banned or version != str(user.session_version):
+        return None
+    return user
 
 
 def unauthorized() -> Response:

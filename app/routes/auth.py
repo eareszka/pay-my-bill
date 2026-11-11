@@ -97,6 +97,7 @@ def signup() -> str | Response:
                 db.session.rollback()
                 form.username.errors.append("That username or email is already in use.")
             else:
+                session.clear()
                 login_user(user)
                 # Verifying takes a trip to their email; afterwards, back to what they were doing.
                 if request.args.get("next"):
@@ -168,6 +169,7 @@ def login() -> str | Response | tuple[str, int, dict[str, str]]:
             return render_template("auth/login.html", form=form)
         if user is not None and ok:
             mark_login_succeeded(attempt)
+            session.clear()
             login_user(user)
             next_page = safe_next(request.args.get("next"))
             if not user.is_verified and request.args.get("next"):
@@ -223,6 +225,9 @@ def reset_password(token: str) -> str | Response:
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.password_hash = generate_password_hash(form.password.data or "")
+        # Logs out everyone, including whoever signed up with this email before
+        # its owner claimed it (#130).
+        user.end_sessions()
         # The link came through their inbox, which proves the email.
         if not user.is_verified:
             user.email_verified_at = utcnow()

@@ -162,6 +162,8 @@ class User(Base):
     banned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     stripe_account_id: Mapped[str | None] = mapped_column(String(64), unique=True)
     stripe_ready: Mapped[bool] = mapped_column(default=False, server_default="0")
+    # Part of the session's user id, so raising it ends every existing session (#130).
+    session_version: Mapped[int] = mapped_column(default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")
@@ -171,7 +173,10 @@ class User(Base):
     is_anonymous = False
 
     def get_id(self) -> str:
-        return str(self.id)
+        return f"{self.id}:{self.session_version}"
+
+    def end_sessions(self) -> None:
+        self.session_version += 1
 
     @property
     def is_verified(self) -> bool:
