@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - New look: the card stack (#118). The owner replaced the cork board through Impeccable with a full-screen feed: each person's ask fills the screen in its own color (red for a need, blue for a want, until categories arrive in #119), with a tall League Gothic title, who and where, the story, and the amount on the card. Back and Next sit on a rail at the right edge, and the one you drag toward lights up as the real next ask shows underneath. Swipes snap in 180ms. Chip in is a white button on every ask. The shell is void black with a bottom nav on phones (Feed, Post, Gifts, Leaders, you) that moves into the top bar on wide screens. The feed and post pages are always dark, and forms, Gifts, Leaders, and profiles follow the system light or dark setting in the same type. On screens 960px and wider, the feed card takes the post page's shape: the ask and the Chip in panel form one wide card, with big Back and Next buttons outside it and arrow keys, so nobody has to drag with a mouse. League Gothic replaces Bitter (both OFL).
 
 ### Security
+- The Stripe refresh link, where Stripe sends people when an onboarding link expires, only renews onboarding already started. It no longer creates a Stripe account, so a link from another site can't make one for a logged-in user (#167).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed
