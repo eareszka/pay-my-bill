@@ -104,19 +104,22 @@ def remove_photo(post_id: int) -> Response:
     return redirect(url_for("admin.queue"))
 
 
-def _ban(user: User) -> None:
+def _ban(user: User) -> list[str]:
+    """Ban the user. Returns photo keys to discard once the change commits."""
     user.banned_at = utcnow()
     photo_keys: list[str] = []
+    # Every post goes, closed and funded ones too, so gifts to them stop
+    # counting toward anyone's rewards (#147).
     for post in user.posts:
-        if post.status in (PostStatus.OPEN, PostStatus.PENDING_REVIEW):
-            post.status = PostStatus.REMOVED
-            if post.photo_key:
-                photo_keys.append(post.photo_key)
-                post.photo_key = None
+        post.status = PostStatus.REMOVED
+        if post.photo_key:
+            photo_keys.append(post.photo_key)
+            post.photo_key = None
     _resolve(
         or_(Report.user_id == user.id, Report.post_id.in_([p.id for p in user.posts])),
         resolution="banned",
     )
+    return photo_keys
 
 
 @bp.post("/users/<int:user_id>/ban")
@@ -125,11 +128,11 @@ def ban(user_id: int) -> Response:
     user = db.session.get(User, user_id)
     if user is None or user.is_admin:
         abort(404)
-    _ban(user)
+    photo_keys = _ban(user)
     db.session.commit()
     for key in photo_keys:
         photos.discard(key)
-    flash(f"Banned {user.username}. Their open posts are removed.", "success")
+    flash(f"Banned {user.username}. Their posts and profile are hidden.", "success")
     return redirect(url_for("admin.queue"))
 
 
@@ -144,9 +147,10 @@ def ban_cluster(user_id: int) -> Response:
     seen = {int(id_) for id_ in request.args.get("ids", "").split(",") if id_.isdigit()}
     cluster = [u for u in flag.cluster if u.id in seen]
     targets = [u for u in (flag.donor, *cluster) if not u.is_admin and not u.is_banned]
-    for user in targets:
-        _ban(user)
+    photo_keys = [key for user in targets for key in _ban(user)]
     db.session.commit()
+    for key in photo_keys:
+        photos.discard(key)
     flash(f"Banned {', '.join(u.username for u in targets)}.", "success")
     return redirect(url_for("admin.queue"))
 

@@ -62,7 +62,7 @@ def post(post_id: int) -> str | Response:
 @verified_required
 def user(username: str) -> str | Response:
     target = db.session.scalar(select(User).where(User.username == username.lower()))
-    if target is None or not target.is_verified or target.id == current_user.id:
+    if target is None or not target.is_verified or target.is_banned or target.id == current_user.id:
         abort(404)
     form = ReportForm()
     if form.validate_on_submit():

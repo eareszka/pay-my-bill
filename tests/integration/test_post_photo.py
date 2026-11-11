@@ -277,3 +277,37 @@ def test_a_ban_deletes_the_photos_of_removed_posts(
     client.post(f"/admin/users/{owner.id}/ban")
     assert post.photo_key is None
     assert not file.exists()
+
+
+def test_a_ban_deletes_photos_on_closed_posts_too(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    from app.models import PostStatus
+
+    owner = make_user("maria_g")
+    post = with_photo(app, owner)
+    post.status = PostStatus.CLOSED
+    db.session.commit()
+    file = stored(app, post)
+    login_as(client, make_user("boss", is_admin=True))
+    client.post(f"/admin/users/{owner.id}/ban")
+    assert post.status is PostStatus.REMOVED
+    assert not file.exists()
+
+
+def test_a_cluster_ban_deletes_the_puppets_photos(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    from tests.integration.test_farm_flags import puppets
+    from tests.integration.test_leaders import give, person
+
+    farmer = person(make_user, "farmer")
+    ring = puppets(make_user, 3)
+    for puppet in ring:
+        give(farmer, puppet, cents=1)
+    files = [stored(app, with_photo(app, puppet)) for puppet in ring]
+    login_as(client, make_user("boss", is_admin=True))
+    ids = ",".join(str(p.id) for p in ring)
+    client.post(f"/admin/users/{farmer.id}/ban-cluster?ids={ids}")
+    assert all(p.is_banned for p in ring)
+    assert not any(f.exists() for f in files)

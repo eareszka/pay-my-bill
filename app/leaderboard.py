@@ -64,6 +64,7 @@ def _gifts(period: Period, now: datetime) -> list[Donation]:
         .options(contains_eager(Donation.donor.of_type(donor)))
         .where(
             donor.email_verified_at.is_not(None),
+            donor.banned_at.is_(None),
             donor.created_at <= now - timedelta(days=MIN_ACCOUNT_AGE_DAYS),
         )
     )
