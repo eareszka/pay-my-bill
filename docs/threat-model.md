@@ -3,7 +3,7 @@
 | # | Abuse case | Actor | Mitigation | Sprint |
 |---|---|---|---|---|
 | T1 | Fake "I sent it" to farm XP or leaderboard rank | Donor | Confirmed-only scoring (ADR 0004) | 2 |
-| T2 | Sock-puppet ring confirming each other's donations | Colluding accounts | Verified email required; 3-day account-age gate for boards; per-pair weekly cap ($200) with admin flag; per-IP signup limit (#137); admin queue flags donors when 3+ of the people they helped got gifts only from them and joined within 24 hours (#140) | 1, 5 |
+| T2 | Sock-puppet ring confirming each other's donations | Colluding accounts | Verified email required; 3-day account-age gate for boards; per-pair weekly cap ($200) with admin flag; per-IP signup limit (#137); admin queue flags donors when 3+ of the people they helped got gifts from no one outside the donor's own recipients or banned accounts, and joined within 24 hours, with one-click ban of the group (#140) | 1, 5 |
 | T3 | Business, startup, or investment fundraising | Poster | $1,000 ask cap; at most 2 open posts; keyword flag → review queue; reports; bans | 1, 5 |
 | T4 | Scam posts (fake sob stories) | Poster | Reports; admin removal; repeat-dispute flags; visible poster history | 5 |
 | T5 | Harassment in posts or thank-yous | Any | Reports; admin removal; Community Rules | 5 |

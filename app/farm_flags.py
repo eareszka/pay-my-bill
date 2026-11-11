@@ -2,6 +2,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
 
+from sqlalchemy import select
+
 from app.extensions import db
 from app.models import User, as_utc
 from app.rewards import rewardable_gifts
@@ -18,6 +20,8 @@ class Flag:
     donor: User
     helped: int
     cluster: list[User]
+    # What the donor's confirmed gifts to each clustered account add up to.
+    cents: dict[int, int]
 
 
 def _largest_burst(people: list[User]) -> list[User]:
@@ -33,20 +37,32 @@ def _largest_burst(people: list[User]) -> list[User]:
 
 
 def suspected_farms() -> list[Flag]:
-    """Donors whose credit comes from a burst of recipients only they gave to."""
+    """Donors whose credit comes from a burst of recipients nobody else really gave to.
+
+    A giver doesn't count as someone else if they're banned or one of the
+    donor's own recipients, so puppets gifting each other and puppets reused
+    after a ban are still caught.
+    """
     helped: defaultdict[int, set[int]] = defaultdict(set)
     givers: defaultdict[int, set[int]] = defaultdict(set)
+    cents: defaultdict[tuple[int, int], int] = defaultdict(int)
     people: dict[int, User] = {}
     for gift in db.session.scalars(rewardable_gifts()):
-        helped[gift.donor_id].add(gift.post.user_id)
-        givers[gift.post.user_id].add(gift.donor_id)
-        people[gift.post.user_id] = gift.post.user
+        recipient = gift.post.user_id
+        helped[gift.donor_id].add(recipient)
+        givers[recipient].add(gift.donor_id)
+        cents[gift.donor_id, recipient] += gift.amount_cents
+        people[recipient] = gift.post.user
+    donors = {u.id: u for u in db.session.scalars(select(User).where(User.id.in_(helped)))}
+    banned = {id_ for id_, u in donors.items() if u.is_banned}
     flags: list[Flag] = []
     for donor_id, recipients in helped.items():
-        only_this_donor = [people[r] for r in recipients if givers[r] == {donor_id}]
-        cluster = _largest_burst(only_this_donor)
+        if donor_id in banned:
+            continue
+        insiders = recipients | banned | {donor_id}
+        alone = [people[r] for r in recipients if givers[r] <= insiders]
+        cluster = _largest_burst(alone)
         if len(cluster) >= CLUSTER_SIZE:
-            donor = db.session.get(User, donor_id)
-            if donor is not None and not donor.is_banned:
-                flags.append(Flag(donor, len(recipients), cluster))
+            gifts = {u.id: cents[donor_id, u.id] for u in cluster}
+            flags.append(Flag(donors[donor_id], len(recipients), cluster, gifts))
     return sorted(flags, key=lambda f: (-len(f.cluster), f.donor.username))

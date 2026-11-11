@@ -71,4 +71,48 @@ def test_queue_lists_flags_with_a_ban_button(client: FlaskClient, make_user: Mak
     page = client.get("/admin").get_data(as_text=True)
     assert "Possible fake helping (1)" in page
     assert "Helped 3 people. 3 joined together" in page
+    assert "got $5 from farmer" in page
     assert f"/admin/users/{farmer.id}/ban" in page
+    assert "Ban farmer and these 3" in page
+
+
+def test_puppets_gifting_each_other_are_still_flagged(make_user: MakeUser) -> None:
+    farmer = person(make_user, "farmer")
+    ring = puppets(make_user, 4)
+    for n, puppet in enumerate(ring):
+        give(farmer, puppet, cents=1)
+        give(puppet, ring[(n + 1) % len(ring)], cents=1)
+    assert flagged() == [("farmer", 4, ["p0", "p1", "p2", "p3"])]
+
+
+def test_puppets_reused_after_a_ban_are_still_flagged(make_user: MakeUser) -> None:
+    farmer = person(make_user, "farmer")
+    ring = puppets(make_user, 3)
+    for puppet in ring:
+        give(farmer, puppet, cents=1)
+    farmer.banned_at = utcnow()
+    db.session.commit()
+    again = person(make_user, "farmer2")
+    for puppet in ring:
+        give(again, puppet, cents=1)
+    assert flagged() == [("farmer2", 3, ["p0", "p1", "p2"])]
+
+
+def test_ban_cluster_bans_the_donor_and_the_flagged_accounts(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    login_as(client, make_user("boss", is_admin=True))
+    farmer = person(make_user, "farmer")
+    ring = puppets(make_user, 3)
+    for puppet in ring:
+        give(farmer, puppet, cents=1)
+    bystander = person(make_user, "bystander")
+    give(farmer, bystander)
+    give(person(make_user, "friend"), bystander)
+    resp = client.post(f"/admin/users/{farmer.id}/ban-cluster", follow_redirects=True)
+    assert "Banned farmer, p0, p1, p2." in resp.get_data(as_text=True)
+    assert farmer.is_banned and all(p.is_banned for p in ring)
+    assert not bystander.is_banned
+    assert flagged() == []
+    # No longer flagged, so a repeat bans nobody.
+    assert client.post(f"/admin/users/{farmer.id}/ban-cluster").status_code == 404
