@@ -4,7 +4,7 @@
 {% block content %}
   <div class="profile-head">
     <h1>{{ user.username }}</h1>
-    {% if is_owner %}<a class="btn btn-secondary btn-small" href="{{ url_for('profile.edit') }}">Settings</a>{% endif %}
+    {% if is_owner %}<a class="btn btn-secondary" href="{{ url_for('profile.edit') }}">Settings</a>{% endif %}
   </div>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
   <section class="rewards" aria-label="Giving">

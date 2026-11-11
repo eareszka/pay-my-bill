@@ -22,7 +22,7 @@
     <p class="hint">This is your post. Share it so people can chip in.</p>
   {% elif waiting_gift %}
     <p class="update-due" data-gift-recorded="{{ post.id }}">Your {{ waiting_gift.amount_cents | cents }} gift is waiting for {{ poster }} to confirm.</p>
-    <p class="hint">{% if card_ready %}You can still chip in instantly by card. {% elif post.is_open %}You can chip in again once it's confirmed or marked not received. {% endif %}<a href="{{ url_for('gifts.index') }}">See your gifts</a></p>
+    <p class="hint">{% if card_ready %}You can still chip in instantly by card. {% elif post.is_open %}You can chip in again once it's confirmed or marked not received. {% endif %}<a href="{{ url_for('profile.show', username=current_user.username, tab='chipped') }}">See your gifts</a></p>
     {% if card_ready %}{{ card_form() }}{% endif %}
     <script src="{{ url_for('static', filename='js/chip-in.js') }}" defer></script>
   {% elif pay_options or card_ready %}

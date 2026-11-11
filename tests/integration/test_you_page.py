@@ -137,3 +137,11 @@ def test_settings_links_back_to_your_profile(client: FlaskClient, poster: User) 
     assert "<h1>Settings</h1>" in page
     you = page.split('class="nav-user"')[1].split(">")[0]
     assert 'aria-current="page"' in you
+
+
+def test_see_your_gifts_opens_chipped_in(client: FlaskClient, poster: User, donor: User) -> None:
+    post = add_post(poster)
+    add_gift(post, donor)
+    login_as(client, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert 'href="/u/dev_tom?tab=chipped">See your gifts</a>' in page
