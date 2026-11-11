@@ -206,13 +206,16 @@ def test_delete_account_is_rate_limited(client: FlaskClient, poster: User) -> No
 
 
 def test_delete_account_clears_login_history(client: FlaskClient, poster: User) -> None:
-    db.session.add(LoginAttempt(identifier="maria_g", ip="1.2.3.4", succeeded=False))
-    db.session.add(LoginAttempt(identifier="maria_g@example.com", ip="1.2.3.4", succeeded=False))
+    # Reset and verify rows name the account too, so they go with it (#169).
+    named = {"maria_g", "maria_g@example.com", "reset:maria_g@example.com", f"verify:{poster.id}"}
+    for identifier in [*named, "someone_else"]:
+        db.session.add(LoginAttempt(identifier=identifier, ip="1.2.3.4", succeeded=False))
     db.session.commit()
     login_as(client, poster)
     client.post("/account/delete", data={"password": PASSWORD})
     identifiers = set(db.session.scalars(select(LoginAttempt.identifier)))
-    assert not identifiers & {"maria_g", "maria_g@example.com"}
+    assert not identifiers & named
+    assert "someone_else" in identifiers
 
 
 def test_reminders_skip_deleted_posters(

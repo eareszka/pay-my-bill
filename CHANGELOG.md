@@ -34,6 +34,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - A banned account's login gets the same "Wrong username, email, or password" reply as a wrong password, so the reply no longer confirms that a guessed password was right (#163).
 - With no mail provider set, emails are written in full to the log only in development, debug, or tests. Anywhere else the log shows just the recipient and subject, with a warning, so reset and verify links never end up in shared logs (#165).
 - The Stripe refresh link, where Stripe sends people when an onboarding link expires, only renews onboarding already started. It no longer creates a Stripe account, so a link from another site can't make one for a logged-in user (#167).
+- Deleting an account now also clears its password-reset and verification-email throttle rows, so a deleted user's email address doesn't stay in the database (#169).
 - Verification emails are limited to three an hour per account (signup plus two resends), so one account can't use up the daily email quota (#14).
 
 ### Changed
