@@ -1,5 +1,5 @@
 import click
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from sqlalchemy import or_, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
@@ -131,7 +131,10 @@ def ban_cluster(user_id: int) -> Response:
     flag = next((f for f in suspected_farms() if f.donor.id == user_id), None)
     if flag is None:
         abort(404)
-    targets = [u for u in (flag.donor, *flag.cluster) if not u.is_admin and not u.is_banned]
+    # Only the accounts the admin saw, never one that joined the cluster since.
+    seen = {int(id_) for id_ in request.args.get("ids", "").split(",") if id_.isdigit()}
+    cluster = [u for u in flag.cluster if u.id in seen]
+    targets = [u for u in (flag.donor, *cluster) if not u.is_admin and not u.is_banned]
     for user in targets:
         _ban(user)
     db.session.commit()

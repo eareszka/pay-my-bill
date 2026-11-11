@@ -109,10 +109,26 @@ def test_ban_cluster_bans_the_donor_and_the_flagged_accounts(
     bystander = person(make_user, "bystander")
     give(farmer, bystander)
     give(person(make_user, "friend"), bystander)
-    resp = client.post(f"/admin/users/{farmer.id}/ban-cluster", follow_redirects=True)
+    ids = ",".join(str(p.id) for p in ring)
+    assert f"ban-cluster?ids={ids}" in client.get("/admin").get_data(as_text=True)
+    resp = client.post(f"/admin/users/{farmer.id}/ban-cluster?ids={ids}", follow_redirects=True)
     assert "Banned farmer, p0, p1, p2." in resp.get_data(as_text=True)
     assert farmer.is_banned and all(p.is_banned for p in ring)
     assert not bystander.is_banned
     assert flagged() == []
     # No longer flagged, so a repeat bans nobody.
-    assert client.post(f"/admin/users/{farmer.id}/ban-cluster").status_code == 404
+    assert client.post(f"/admin/users/{farmer.id}/ban-cluster?ids={ids}").status_code == 404
+
+
+def test_ban_cluster_skips_accounts_the_admin_did_not_see(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    login_as(client, make_user("boss", is_admin=True))
+    farmer = person(make_user, "farmer")
+    ring = puppets(make_user, 4)
+    for puppet in ring:
+        give(farmer, puppet, cents=1)
+    seen = ",".join(str(p.id) for p in ring[:3])
+    client.post(f"/admin/users/{farmer.id}/ban-cluster?ids={seen},junk")
+    assert farmer.is_banned
+    assert [p.is_banned for p in ring] == [True, True, True, False]
