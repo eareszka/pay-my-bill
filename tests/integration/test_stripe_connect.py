@@ -211,3 +211,20 @@ def test_profile_rechecks_a_pending_account(
     fake_client.v1.accounts.retrieve.side_effect = stripe.APIConnectionError("down")
     assert client.get("/profile").status_code == 200
     assert "Stripe status check failed" in caplog.text
+
+
+@pytest.mark.usefixtures("stripe_on")
+def test_refresh_link_never_creates_an_account(
+    client: FlaskClient, make_user: MakeUser, fake_client: MagicMock
+) -> None:
+    # A plain GET, so another site could send someone here (#167).
+    login_as(client, make_user("alice"))
+    resp = client.get("/stripe/connect/refresh")
+    assert resp.location.endswith("/profile")
+    fake_client.v2.core.accounts.create.assert_not_called()
+    fake_client.v2.core.account_links.create.assert_not_called()
+
+
+def test_refresh_is_404_without_stripe(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("alice", stripe_account_id="acct_1"))
+    assert client.get("/stripe/connect/refresh").status_code == 404

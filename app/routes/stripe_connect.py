@@ -49,6 +49,12 @@ def connect() -> Response:
 @verified_required
 def refresh() -> Response:
     # Stripe sends people here when an onboarding link expires, so make a fresh one.
+    # It's a plain link, so it only renews onboarding already started; making an
+    # account takes the button's POST (#167).
+    if not stripe_pay.enabled():
+        abort(404)
+    if not current_user.stripe_account_id:
+        return _back()
     return _onboard()
 
 
