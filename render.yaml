@@ -5,7 +5,8 @@ services:
     plan: free
     branch: main
     autoDeploy: true
-    buildCommand: pip install .
+    # Exact, hash-checked versions from requirements.lock, then the app itself (#177).
+    buildCommand: pip install --require-hashes -r requirements.lock && pip install --no-deps .
     startCommand: flask --app app db upgrade && gunicorn --bind 0.0.0.0:$PORT "app:create_app()"
     healthCheckPath: /health
     envVars:
