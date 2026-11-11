@@ -1,3 +1,6 @@
+import hashlib
+import hmac
+
 from flask import current_app
 from itsdangerous import BadSignature, URLSafeTimedSerializer
 
@@ -10,6 +13,12 @@ GIFT_ANSWER = "gift-answer"
 
 def _serializer(purpose: str) -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt=purpose)
+
+
+def password_digest(password_hash: str) -> str:
+    """Stands in for the hash in reset links, which anyone can decode (#134)."""
+    key = str(current_app.config["SECRET_KEY"]).encode()
+    return hmac.new(key, password_hash.encode(), hashlib.sha256).hexdigest()
 
 
 def make_token(user_id: int, bound_to: str, purpose: str) -> str:

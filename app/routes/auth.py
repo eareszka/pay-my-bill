@@ -1,3 +1,4 @@
+import hmac
 from functools import cache
 from urllib.parse import urlsplit
 
@@ -33,6 +34,7 @@ from app.tokens import (
     VERIFY_EMAIL,
     VERIFY_MAX_AGE,
     make_token,
+    password_digest,
     read_token,
 )
 
@@ -198,8 +200,9 @@ def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
             )
         user = db.session.scalar(select(User).where(User.email == email))
         if user is not None and not user.is_deleted:
-            # Bound to the password hash, so the link stops working once it's used.
-            token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+            # Bound to a digest of the password hash, so the link stops working
+            # once it's used without carrying the hash itself.
+            token = make_token(user.id, password_digest(user.password_hash), RESET_PASSWORD)
             link = url_for("auth.reset_password", token=token, _external=True)
             send_later(
                 user.email,
@@ -217,7 +220,12 @@ def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
 def reset_password(token: str) -> str | Response:
     payload = read_token(token, RESET_PASSWORD, RESET_MAX_AGE)
     user = db.session.get(User, payload[0]) if payload else None
-    if user is None or payload is None or user.is_deleted or user.password_hash != payload[1]:
+    if (
+        user is None
+        or payload is None
+        or user.is_deleted
+        or not hmac.compare_digest(password_digest(user.password_hash), payload[1])
+    ):
         flash("That reset link is invalid, expired, or already used.", "error")
         return redirect(url_for("auth.reset_request"))
     form = ResetPasswordForm()
