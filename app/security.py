@@ -3,9 +3,10 @@ from urllib.parse import urlsplit
 from flask import Flask
 from werkzeug.wrappers import Response
 
-# Card gifts and Stripe onboarding post to us, then redirect to Stripe, which
-# form-action also governs.
-STRIPE_FORM_TARGETS = "https://checkout.stripe.com https://connect.stripe.com"
+# Card gifts, Connect onboarding, and the Express dashboard post to us, then
+# redirect to Stripe. Chrome checks form-action on every hop, and Stripe may
+# bounce between its own hosts, so any Stripe host is allowed.
+STRIPE_FORM_TARGETS = "https://*.stripe.com"
 HSTS = "max-age=31536000; includeSubDomains"
 
 

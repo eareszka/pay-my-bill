@@ -13,7 +13,7 @@ def test_every_response_sends_security_headers(client: FlaskClient) -> None:
         policy = headers["Content-Security-Policy"]
         assert "script-src 'self'" in policy
         assert "frame-ancestors 'none'" in policy
-        assert "form-action 'self' https://checkout.stripe.com https://connect.stripe.com" in policy
+        assert "form-action 'self' https://*.stripe.com;" in policy
         assert headers["X-Frame-Options"] == "DENY"
         assert headers["X-Content-Type-Options"] == "nosniff"
         assert headers["Referrer-Policy"] == "same-origin"
