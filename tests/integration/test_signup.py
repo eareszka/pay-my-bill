@@ -4,7 +4,7 @@ import smtplib
 from datetime import timedelta
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from flask.testing import FlaskClient
 from sqlalchemy import func, select
 from werkzeug.security import check_password_hash
@@ -286,3 +286,18 @@ def test_field_errors_are_linked_for_screen_readers(client: FlaskClient) -> None
     assert (
         '<small class="error" id="username-error">Usernames are 3 to 30 characters.</small>' in page
     )
+
+
+def test_logins_typed_as_the_marker_do_not_use_up_emails(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    from app.auth import MAX_VERIFY_EMAILS
+
+    user = make_user(verified=False)
+    # A logged-out visitor fails logins as this user's marker (#179).
+    stranger = app.test_client()
+    for _ in range(MAX_VERIFY_EMAILS + 1):
+        stranger.post("/login", data={"identifier": f"verify:{user.id}", "password": "x"})
+    g.pop("_login_user", None)
+    login_as(client, user)
+    assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data

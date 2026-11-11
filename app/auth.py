@@ -80,7 +80,10 @@ def allow_verification_email(user_id: int) -> bool:
     """
     identifier = f"verify:{user_id}"
     since = utcnow() - VERIFY_EMAIL_WINDOW
-    if _failures_since(since, LoginAttempt.identifier == identifier) >= MAX_VERIFY_EMAILS:
+    # Only rows written here, which have no IP: a login typed as "verify:<id>" stores
+    # the caller's IP, so it can't use up someone else's emails (#179).
+    mine = (LoginAttempt.identifier == identifier, LoginAttempt.ip.is_(None))
+    if _failures_since(since, *mine) >= MAX_VERIFY_EMAILS:
         return False
     db.session.add(LoginAttempt(identifier=identifier, ip=None, succeeded=False))
     db.session.commit()
