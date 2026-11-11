@@ -299,9 +299,9 @@ def test_grant_and_revoke_commands(app: Flask, make_user: MakeUser) -> None:
     runner = app.test_cli_runner()
     assert "is now an admin" in runner.invoke(args=["admin", "grant", "Helper@Example.com"]).output
     assert user.is_admin
-    assert (
-        "no longer an admin" in runner.invoke(args=["admin", "revoke", "helper@example.com"]).output
-    )
+    revoked = runner.invoke(args=["admin", "revoke", "helper@example.com"])
+    assert "no longer an admin" in revoked.output
+    assert "no admins are left" in revoked.output
     assert not user.is_admin
     assert "isn't an admin" in runner.invoke(args=["admin", "revoke", "helper@example.com"]).output
     assert "No account uses" in runner.invoke(args=["admin", "revoke", "nobody@example.com"]).output

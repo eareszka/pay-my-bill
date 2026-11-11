@@ -190,3 +190,5 @@ def revoke_command(email: str) -> None:
     _log("revoke admin", f"user {user.username}")
     db.session.commit()
     click.echo(f"{user.username} is no longer an admin.")
+    if not db.session.scalar(select(User.id).where(User.is_admin.is_(True))):
+        click.echo("Warning: no admins are left, so nobody can open /admin.", err=True)
