@@ -1,7 +1,7 @@
 """session version
 
 Revision ID: 0016
-Revises: 0014
+Revises: 0015
 Create Date: 2026-11-11 12:00:00.000000
 
 """
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "0016"
-down_revision = "0014"
+down_revision = "0015"
 branch_labels = None
 depends_on = None
 
