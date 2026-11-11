@@ -64,31 +64,41 @@ _LOOKALIKES = str.maketrans(
     "\u0430\u0435\u043e\u0440\u0441\u0443\u0445\u0456\u0458\u0455\u0501\u04cf\u043a\u043c\u0442\u043d\u0432\u03bf\u03b1\u03b5\u03b9\u03ba\u03bd\u03c1\u03c4\u03c5",
     "aeopcyxijsdlkmthboaeiknptu",
 )
+_DOTLESS_I = str.maketrans({0x131: "i"})
 _LEET = str.maketrans("013457@$", "oieastas")
-_WORD = re.compile(r"[a-z0-9@$]*[a-z][a-z0-9@$]*")
-_GAP = r"[ .,\-_*\u00b7|/]+"
-_SPACED = re.compile(r"(?<![a-z0-9])[a-z0-9@$](?:" + _GAP + r"[a-z0-9@$](?![a-z0-9])){2,}")
-# "bus!ness", "bus|ness": an i stand-in only when letters sit on both sides.
-_I_INSIDE = re.compile(r"(?<=[a-z])[!|](?=[a-z])")
+# Starts only where a token starts, so a long run with no letter is scanned once,
+# not once from every position (#158).
+_WORD = re.compile(r"(?<![a-z0-9@$])[0-9@$]*[a-z][a-z0-9@$]*")
+_GAP = "[ .,:;+~'_*" + chr(0xB7) + "|/-]+"
+_SPACED = re.compile(r"(?<![a-z0-9])[a-z0-9@$!](?:" + _GAP + r"[a-z0-9@$!](?![a-z0-9])){2,}")
+# "bus!ness", "bu5!ness": an i stand-in only with a letter or digit on both sides.
+_I_INSIDE = re.compile(r"(?<=[a-z0-9@$])[!|](?=[a-z0-9@$])")
+# Blank characters that aren't format characters: the combining grapheme joiner,
+# Hangul fillers, and the braille blank.
+_BLANKS = frozenset(map(chr, (0x34F, 0x115F, 0x1160, 0x3164, 0xFFA0, 0x2800)))
 
 
 def _visible(c: str) -> bool:
-    # Format characters (zero-width spaces, joiners, soft hyphens) and the combining
-    # grapheme joiner render as nothing, so they can hide inside a word.
-    return unicodedata.category(c) != "Cf" and c != "\u034f"
+    # Format characters (zero-width spaces, joiners, soft hyphens) and blanks render as
+    # nothing, so they can hide inside a word.
+    return unicodedata.category(c) != "Cf" and c not in _BLANKS
 
 
 def normalize(text: str) -> str:
     """Fold a post's text so disguised words read as the plain words."""
     text = "".join(c for c in unicodedata.normalize("NFKC", text) if _visible(c))
-    text = text.lower().translate(_LOOKALIKES)
-    text = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
+    # Drop every mark (accents, variation selectors) before reading look-alikes, so an
+    # accented look-alike folds too.
+    marks = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in marks if not unicodedata.category(c).startswith("M"))
+    text = text.lower().translate(_LOOKALIKES).translate(_DOTLESS_I)
+    # One letter per line or tab is spacing too.
+    text = re.sub(r"\s+", " ", text)
     # Join letters spaced out one at a time ("b.u.s.i.n.e.s.s"), then read digits and
     # symbols inside words as letters ("bus1ness"). Plain numbers like $500 stay as they are.
     text = _SPACED.sub(lambda m: re.sub(_GAP, "", m.group(0)), text)
     text = _I_INSIDE.sub("i", text)
     text = _WORD.sub(lambda m: m.group(0).translate(_LEET), text)
-    text = re.sub(r"\s+", " ", text)
     return _EVERYDAY.sub(" ", text)
 
 

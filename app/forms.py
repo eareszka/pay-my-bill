@@ -293,6 +293,10 @@ class ResultsUpdateForm(FlaskForm):
     )
 
     def validate_note(self, field: TextAreaField) -> None:
+        # Runs even when Length has already refused the note, so an oversized body
+        # is never scanned (#158).
+        if not field.data or len(field.data) > 2000:
+            return
         words = update_flagged_keywords(field.data)
         if words:
             raise ValidationError(

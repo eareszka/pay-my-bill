@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from app.moderation import flagged_keywords, is_flagged, normalize, update_flagged_keywords
@@ -104,3 +106,33 @@ def test_normalize_folds_disguises(text: str, plain: str) -> None:
 def test_updates_use_only_the_original_list() -> None:
     assert update_flagged_keywords("Went to the shop with Angel, my company paid the rest") == []
     assert update_flagged_keywords("Now b.u.s.i.n.e.s.s time") == ["business"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "b\nu\ns\ni\nn\ne\ns\ns",
+        "b\tu\ts\ti\tn\te\ts\ts",
+        "b:u:s:i:n:e:s:s",
+        "b+u+s+i+n+e+s+s",
+        "bu5!ness",
+        "b,u,s,!,n,e,s,s",
+        "busi\ufe0fness",
+        "busi\u3164ness",
+        "busi\u2800ness",
+        "bus\u0131ness",
+        "bus\u0457ness",
+    ],
+)
+def test_flags_the_re_test_misses(text: str) -> None:
+    # From the audit's second re-test (#158).
+    assert is_flagged(text)
+
+
+def test_long_runs_without_letters_stay_fast() -> None:
+    # A run with no letter used to be rescanned from every position (#158).
+    started = time.perf_counter()
+    for run in ("1" * 50_000, "$" * 50_000, "1@" * 25_000):
+        normalize(run)
+    # Quadratic took about 10 s for these; linear is well under, even with coverage on.
+    assert time.perf_counter() - started < 2

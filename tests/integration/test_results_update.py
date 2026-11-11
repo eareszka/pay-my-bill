@@ -441,3 +441,16 @@ def test_a_refused_update_names_the_word(client: FlaskClient, poster: User, dono
         f"/posts/{post.id}/update", data={"note": "Thanks! Next I'm raising money for my startup."}
     )
     assert "“startup” reads like fundraising" in response.get_data(as_text=True)
+
+
+def test_an_oversized_update_is_refused_without_scanning(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    from unittest.mock import patch
+
+    post = closed_post(poster, donor)
+    login_as(client, poster)
+    with patch("app.forms.update_flagged_keywords") as scan:
+        response = client.post(f"/posts/{post.id}/update", data={"note": "1" * 50_000})
+    assert "20 to 2,000 characters" in response.get_data(as_text=True)
+    scan.assert_not_called()
