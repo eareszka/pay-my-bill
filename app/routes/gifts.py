@@ -301,7 +301,7 @@ def send_reminders() -> int:
             f"These gifts are still waiting for you to confirm:\n{lines}\n\n"
             f"Check your payment app, then confirm or dispute them here:\n{link}\n\n"
             f"Gifts nobody confirms expire after {PENDING_GIFT_DAYS} days, "
-            "and the donor gets no credit."
+            "and whoever sent them gets no credit."
         )
         emails.append((poster.id, poster.email, body, [g.id for g in gifts]))
     # End the read transaction before slow SMTP sends; mark each poster as soon as

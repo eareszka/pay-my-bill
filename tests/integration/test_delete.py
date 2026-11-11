@@ -117,7 +117,7 @@ def test_delete_post_with_confirmed_gifts_keeps_credit(
     add_gift(post, donor, DonationStatus.CONFIRMED)
     login_as(client, poster)
     page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
-    assert "donors keep credit for their gifts" in page
+    assert "people who chipped in keep credit for their gifts" in page
     client.post(f"/posts/{post.id}/delete")
     assert (post.title, post.body, post.status) == (
         "Deleted post",
@@ -148,7 +148,7 @@ def test_account_delete_asks_for_password(client: FlaskClient, poster: User) -> 
     assert 'href="/profile?delete=1#delete">Delete my account</a>' in page
     assert "Your password" not in page
     page = client.get("/profile?delete=1").get_data(as_text=True)
-    assert "Donors keep credit for gifts you confirmed." in page
+    assert "People who chipped in keep credit for gifts you confirmed." in page
     assert 'action="/account/delete"' in page
 
 
