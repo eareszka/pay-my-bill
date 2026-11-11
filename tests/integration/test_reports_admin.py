@@ -409,3 +409,18 @@ def test_a_login_typed_as_the_marker_cannot_silence_report_emails(
     login_as(client, make_user("bob"))
     client.post(f"/report/post/{post.id}", data={"reason": "spam"})
     assert caplog.text.count("New report on Pay My Bill") == 1
+
+
+def test_dismissing_a_post_report_logs_the_post(
+    client: FlaskClient, make_user: MakeUser, admin: User
+) -> None:
+    from app.models import AdminAction
+
+    post = make_post(make_user("maria_g"))
+    report = Report(reporter=admin, post=post, reason=ReportReason.OTHER)
+    db.session.add(report)
+    db.session.commit()
+    login_as(client, admin)
+    client.post(f"/admin/reports/{report.id}/dismiss")
+    action = db.session.scalars(select(AdminAction)).one()
+    assert action.target == f"report {report.id} on post {post.id} by maria_g: {post.title}"

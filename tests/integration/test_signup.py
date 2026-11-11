@@ -368,18 +368,18 @@ def test_a_logged_out_verify_link_asks_to_log_in_first(
     page = client.get(resp.location).get_data(as_text=True)
     assert "Reset its password to claim it." in page
 
-    # The account's own login then finishes it and lands on the home page.
+    # The account's own login then finishes it and lands on the feed.
     resp = client.post(resp.location, data={"identifier": "squatter", "password": PASSWORD})
     resp = client.get(resp.location)
     assert user.is_verified
-    assert resp.location == "/"
+    assert resp.location == "/feed"
 
 
 def test_another_accounts_session_cannot_verify(client: FlaskClient, make_user: MakeUser) -> None:
     target = make_user("target", verified=False)
     login_as(client, make_user("someone"))
     resp = client.get(f"/verify/{make_token(target.id, target.email, VERIFY_EMAIL)}")
-    assert resp.location == "/"
+    assert resp.location == "/feed"
     assert not target.is_verified
 
 

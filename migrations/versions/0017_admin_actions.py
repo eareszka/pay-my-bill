@@ -1,7 +1,7 @@
 """admin actions
 
 Revision ID: 0017
-Revises: 0015
+Revises: 0016
 Create Date: 2026-11-11 18:00:00.000000
 
 """
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "0017"
-down_revision = "0015"
+down_revision = "0016"
 branch_labels = None
 depends_on = None
 
