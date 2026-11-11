@@ -1,6 +1,6 @@
 import pytest
 
-from app.moderation import flagged_keywords, is_flagged, normalize
+from app.moderation import flagged_keywords, is_flagged, normalize, update_flagged_keywords
 
 
 @pytest.mark.parametrize(
@@ -25,9 +25,9 @@ from app.moderation import flagged_keywords, is_flagged, normalize
         "bus1ness",
         "b.u.s.i.n.e.s.s",
         "B U S I N E S S plan",
-        "busi​ness",
-        "busіness",
-        "Вusiness",
+        "busi\u200bness",
+        "bus\u0456ness",
+        "\u0412usiness",
         "st0ck",
         "r0i",
         "c0mp@ny",
@@ -40,6 +40,10 @@ from app.moderation import flagged_keywords, is_flagged, normalize
         "Great return on your money",
         "Open my own shop",
         "Grow my brand",
+        "bus!ness",
+        "b,u,s,i,n,e,s,s",
+        "busi\u034fness",
+        "busi\u180eness",
     ],
 )
 def test_flags_fundraising(text: str) -> None:
@@ -60,9 +64,15 @@ def test_flags_fundraising(text: str) -> None:
         "Shopping for groceries",
         "My brand new baby needs a crib",
         "3 kids, 1 job, 2 cars",
-        "Café supplies for my mom",
+        "Caf\u00e9 supplies for my mom",
         "U.S. citizen",
         "Workshop fees for school",
+        "Moving to Los Angeles for a new job",
+        "Capital One froze my card",
+        "Stocking up on diapers",
+        "Rent at the non-profit shelter",
+        "My brand-new baby needs a crib",
+        "Thanks! I paid it off!",
     ],
 )
 def test_ignores_everyday_asks(text: str) -> None:
@@ -81,11 +91,16 @@ def test_checks_every_text_and_reports_matches() -> None:
     [
         ("bus1ness", "business"),
         ("B.U.S.I.N.E.S.S", "business"),
-        ("busi​ness", "business"),
-        ("ｂusiness", "business"),
-        ("café", "cafe"),
+        ("busi\u200bness", "business"),
+        ("\uff42usiness", "business"),
+        ("caf\u00e9", "cafe"),
         ("need   $500\nfor rent", "need $500 for rent"),
     ],
 )
 def test_normalize_folds_disguises(text: str, plain: str) -> None:
     assert normalize(text) == plain
+
+
+def test_updates_use_only_the_original_list() -> None:
+    assert update_flagged_keywords("Went to the shop with Angel, my company paid the rest") == []
+    assert update_flagged_keywords("Now b.u.s.i.n.e.s.s time") == ["business"]
