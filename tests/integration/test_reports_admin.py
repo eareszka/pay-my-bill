@@ -104,7 +104,7 @@ def test_admin_queue_is_hidden_from_others(client: FlaskClient, make_user: MakeU
     login_as(client, make_user("bob"))
     assert client.get("/admin").status_code == 404
     assert client.post("/admin/reports/1/dismiss").status_code == 404
-    assert b'href="/admin"' not in client.get("/").data
+    assert b'href="/admin"' not in client.get("/feed").data
 
 
 def test_admin_approves_a_flagged_post_and_its_clock_restarts(

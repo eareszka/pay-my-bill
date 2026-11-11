@@ -73,7 +73,7 @@ def test_closing_takes_the_post_off_the_feed(client: FlaskClient, poster: User) 
     assert "Close post" not in page
     assert post.status is PostStatus.CLOSED
     assert post.closed_at is not None
-    assert "Short on rent" not in client.get("/").get_data(as_text=True)
+    assert "Short on rent" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_only_the_owner_can_close(client: FlaskClient, poster: User, donor: User) -> None:
@@ -123,7 +123,7 @@ def test_post_closes_on_its_own_at_30_days(
 ) -> None:
     post = add_post(poster, age_days=age_days)
     assert post.is_open is is_open
-    assert ("Short on rent" in client.get("/").get_data(as_text=True)) is is_open
+    assert ("Short on rent" in client.get("/feed").get_data(as_text=True)) is is_open
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert ("Open until" in page) is is_open
     assert ("This post is closed" in page) is not is_open

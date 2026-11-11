@@ -108,7 +108,7 @@ def test_page_tabs_rows_and_empty_state(client: FlaskClient, make_user: MakeUser
     page = client.get("/leaders?period=all&scope=bogus").get_data(as_text=True)
     assert '<span class="leader-rank">1</span>' in page
     assert '<span class="leader-people">1 person</span>' in page
-    assert '<p class="leader-cta"><a href="/">Find someone to help</a></p>' in page
+    assert '<p class="leader-cta"><a href="/feed">Find someone to help</a></p>' in page
     assert 'href="/leaders?scope=global&amp;period=week"' in page
 
 
@@ -139,7 +139,9 @@ def test_viewer_outside_top_20_sees_their_rank(
 
 
 def test_logged_out_top_bar_links_leaders(client: FlaskClient) -> None:
-    assert '<span class="nav-label">Leaders</span></a>' in client.get("/").get_data(as_text=True)
+    assert '<span class="nav-label">Leaders</span></a>' in client.get("/feed").get_data(
+        as_text=True
+    )
     page = client.get("/leaders?scope=state").get_data(as_text=True)
     assert 'aria-label="Where"' not in page
 
@@ -149,7 +151,7 @@ def test_top_bar_links_leaders_and_profile_holds_logout(
 ) -> None:
     me = person(make_user, "me")
     login_as(client, me)
-    home = client.get("/").get_data(as_text=True)
+    home = client.get("/feed").get_data(as_text=True)
     assert 'href="/leaders"><svg' in home
     assert "Log out" not in home
     assert "Log out" in client.get("/profile").get_data(as_text=True)

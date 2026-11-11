@@ -1,11 +1,14 @@
 import re
+from typing import Any
 
-from flask import Blueprint, abort, render_template, request, send_from_directory
+from flask import Blueprint, abort, redirect, render_template, request, send_from_directory, url_for
+from flask_login import current_user
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
 from app.extensions import db
+from app.forms import SignupForm
 from app.models import Post, PostKind, open_posts
 from app.photos import LocalStore, store
 from app.routes.posts import chip_in_context
@@ -34,6 +37,16 @@ def ticket_at(position: int, kind: PostKind | None, top: Post | None) -> Post | 
 
 
 @bp.get("/")
+def home() -> str | Response:
+    # The how-it-works story is for new visitors (#120); everyone else, and old feed links, go on.
+    # Tracking tags on a shared link (?utm_source=, ?fbclid=) still show the story.
+    args: dict[str, Any] = {k: v for k, v in request.args.items() if k in ("kind", "n")}
+    if current_user.is_authenticated or args:
+        return redirect(url_for("main.index", **args))
+    return render_template("home.html", form=SignupForm())
+
+
+@bp.get("/feed")
 def index() -> str:
     kind = request.args.get("kind", type=PostKind)
     count = select(func.count()).select_from(Post).where(open_posts())

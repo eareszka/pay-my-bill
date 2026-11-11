@@ -80,7 +80,7 @@ def test_new_post_with_a_photo_shows_it(app: Flask, client: FlaskClient, poster:
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert f'src="/media/{post.photo_key}" alt="Photo from maria_g"' in page
     assert "Remove photo" in page
-    feed = client.get("/").get_data(as_text=True)
+    feed = client.get("/feed").get_data(as_text=True)
     assert f'<img class="ticket-photo" src="/media/{post.photo_key}"' in feed
     assert "has-photo" in feed
 
@@ -245,7 +245,7 @@ def test_flagged_post_shows_its_photo_to_admins(
 def test_feed_loads_the_visible_photo_first(app: Flask, client: FlaskClient, poster: User) -> None:
     shown = with_photo(app, poster, "Shown first")
     waiting = with_photo(app, poster, "Waiting underneath")
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     first = shown if f'src="/media/{shown.photo_key}" alt="" decoding="sync"' in page else waiting
     other = waiting if first is shown else shown
     assert f'<link rel="preload" as="image" href="/media/{first.photo_key}"' in page

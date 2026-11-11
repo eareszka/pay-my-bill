@@ -52,7 +52,7 @@ def test_you_opens_your_profile_with_the_badge(
 ) -> None:
     add_gift(add_post(poster), donor)
     login_as(client, poster)
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert 'class="nav-user" href="/u/maria_g"' in page
     you = page.split('class="nav-user"')[1].split("</a>")[0]
     assert '<span class="badge" aria-hidden="true">1</span>' in you

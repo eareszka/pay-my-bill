@@ -220,7 +220,7 @@ def test_csrf_token_required() -> None:
 
 
 def test_index_renders(app: Flask, client: FlaskClient) -> None:
-    assert client.get("/").status_code == 200
+    assert client.get("/feed").status_code == 200
 
 
 def test_verify_token_bound_to_email(client: FlaskClient, make_user: MakeUser) -> None:
@@ -251,7 +251,7 @@ def test_signup_survives_mail_failure(
 def test_malformed_session_user_id_is_anonymous(client: FlaskClient) -> None:
     with client.session_transaction() as session:
         session["_user_id"] = "not-a-number"
-    resp = client.get("/")
+    resp = client.get("/feed")
     assert resp.status_code == 200
     assert b"Sign up" in resp.data
 

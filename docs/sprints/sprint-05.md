@@ -17,7 +17,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-8 Swipe through the pile | #90 | 3 | Done |
 | S5-9 New look: the card stack | #118 | 8 | Done |
 | S5-10 Categories and show less | #119 | 5 | To do |
-| S5-11 How-it-works home page | #120 | 5 | To do |
+| S5-11 How-it-works home page | #120 | 5 | In review |
 | S5-12 Photo on a post | #122 | 5 | Done |
 | S5-13 You: my posts and chipped in | #132 | 3 | In review |
 
@@ -49,3 +49,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-09: The owner approved the simplified messages mockup made with Impeccable: one "How it's going" list per post, Chip in first, Follow as one quiet button, notes behind a link, the thank-you inside the gift, and a single "Updated" line on the feed card. PB-31 and PB-45 to PB-47 now say so. Blocked: none.
 - 2026-11-11: The owner set up Cloudflare R2 (bucket `pay-my-bill-staging`, public development URL, five `R2_*` settings on Render). A test post's photo loads from R2 as WebP with the one-year immutable cache header. Still to check: it survives the next deploy. Added PB-48 to move photos to a custom domain before launch. The owner confirmed the #119 category list as drafted. Next: #119. Blocked: none.
 - 2026-11-11: The owner asked for an easy way to see the posts they created and the ones they chipped in on, under a profile tab, with Impeccable deciding the design in the current look. #116 (PR #117) was brought into the new look (migration renumbered to 0015 after 0014) and merged with the owner's OK. Added S5-13 (#132): You opens your own profile with Posts and Chipped in tabs and a Settings button, Gifts folds into You with its badge, and old `/gifts` links redirect. Also fixed stray bullets on the confirm list left from the #118 rewrite. Waiting on the owner's review of screenshots. Blocked: none.
+- 2026-11-11: #120 built through Impeccable. The owner picked the Color Cut scroll structure (split doors, real app pieces labeled Example, a sideways cut per step, ending at sign-up). `/` is the home page for logged-out visitors, and the feed moved to `/feed` with old links redirecting. Next: the finish review and the owner's look at screenshots. Blocked: none.

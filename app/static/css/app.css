@@ -151,6 +151,9 @@ h3.section-title { font-size: 1rem; }
 .topbar a { color: inherit; text-decoration: none; }
 .topbar :focus-visible { outline-color: var(--on-void); }
 .brand { font: 400 1.75rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; }
+/* Logged out, the one filled action in the bar. */
+.topbar .topbar-signup { min-height: 36px; margin-left: auto; padding: 6px 14px; color: var(--void); background: var(--on-void); }
+.topbar .topbar-signup:hover { background: #d9dce2; }
 .topbar > nav {
   position: fixed;
   inset: auto 0 0;
@@ -577,6 +580,9 @@ h3.section-title { font-size: 1rem; }
   .topbar > nav a { flex: none; flex-direction: row; gap: 8px; padding: 8px 12px; font-size: 0.9375rem; border-radius: var(--radius); }
   .topbar > nav a[aria-current="page"] { background: var(--slate); }
   .topbar > nav .icon { width: 20px; height: 20px; }
+  .topbar > nav { margin-left: auto; }
+  .topbar > nav a[href="/signup"] { display: none; }
+  .topbar .topbar-signup { margin-left: 12px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
   .container { padding: 28px 16px; }
@@ -619,4 +625,98 @@ h3.section-title { font-size: 1rem; }
 }
 @media (max-width: 959px) {
   .deck-side { display: none; }
+}
+
+/* Home (#120): how it works, told the way the feed moves. Each step cuts in as its own field. */
+body.stage-page .container-wide:has(> .home) { max-width: none; padding: 0; }
+.home { --door-h: clamp(260px, calc((100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom) - 96px) / 2), 420px); color: var(--on-void); }
+.home-doors { display: grid; }
+.home-door {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: var(--door-h);
+  padding: 24px 18px 20px;
+  color: var(--on-void);
+  text-decoration: none;
+  background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
+}
+.home-door-help { --field: var(--want); }
+.home-door-ask { --field: var(--need); }
+.home-door-line { font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
+.home-door-text { max-width: 34ch; font-size: 1.0625rem; }
+.home-door-go { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 700; }
+.home-door-go .icon { width: 20px; height: 20px; transition: transform var(--fast) var(--ease-out); }
+.home-door:hover .home-door-go { text-decoration: underline; text-underline-offset: 0.18em; }
+.home-door:hover .home-door-go .icon { transform: translateX(4px); }
+.home-door:focus-visible { outline: 2px solid var(--on-void); outline-offset: -6px; }
+.home-promise { margin: 0; padding: 20px 18px; color: var(--on-void-muted); }
+.home-promise strong { color: var(--on-void); }
+
+.home-path { --field: var(--want); padding-bottom: 8px; }
+.home-path-ask { --field: var(--need); }
+.home-steps { margin: 0; padding: 0; list-style: none; }
+.home-step { padding-bottom: 32px; }
+.home-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: min(62svh, 520px);
+  padding: 64px 18px 20px;
+  background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
+}
+.home-field p { margin: 0; max-width: 40ch; font-size: 1.0625rem; }
+.home-line { margin: 0 0 12px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
+.home-field .home-count { margin-top: 18px; font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.home-piece { margin: 0; padding: 24px 16px 0; }
+.home-example { display: inline-block; margin-bottom: 10px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; color: var(--on-void); border: 1.5px solid var(--edge); border-radius: 6px; }
+.home-piece .group { margin: 0; }
+.home-piece .btn { cursor: default; }
+.home-piece .btn:active { transform: none; }
+.home-ask { --field: var(--need); max-width: 360px; padding: 22px 18px 18px; color: var(--on-void); background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field); border-radius: 14px; }
+.home-ask p { margin: 0; }
+.home-ask .home-ask-title { margin-bottom: 10px; font: 400 3rem/0.92 var(--display); text-transform: uppercase; }
+.home-ask-tab { display: block; margin-top: 16px; padding: 13px; text-align: center; font-weight: 700; color: var(--void); background: var(--on-void); border-radius: 12px; }
+.home-panel { max-width: 400px; }
+.home-panel p { margin: 0; }
+.home-label { font-weight: 700; }
+.home-input { display: flex; align-items: center; min-height: 48px; padding: 11px 13px; font-weight: 400; font-variant-numeric: tabular-nums; background: var(--bg); border: 1.5px solid var(--edge); border-radius: var(--radius); }
+.home-input::before { content: "$"; color: var(--muted); }
+.home-panel .gift { padding: 0; border: 0; }
+.home-panel .gift + .gift { margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--line); }
+.home-sent { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.home-thanks { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding: 12px 0; }
+.home-turn { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: 0; padding: 8px 16px 40px; }
+.home-turn a:not(.btn) { font-weight: 700; color: var(--on-void); }
+.home-join { max-width: 480px; margin: 0 auto; padding: 48px 16px 24px; }
+.home-join-lede { margin: 0 0 20px; color: var(--on-void-muted); }
+.home-join .form { color: var(--on-void); }
+
+/* The cut: with scroll-driven animation, each field wipes in from the right and its example follows. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-field { animation: home-cut linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
+    .home-piece { animation: home-follow linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
+  }
+}
+@keyframes home-cut { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0); } }
+@keyframes home-follow { from { opacity: 0.2; transform: translateX(56px); } to { opacity: 1; transform: none; } }
+
+@media (min-width: 960px) {
+  .home { --door-h: clamp(420px, calc(100svh - var(--bar-h) - 96px), 640px); }
+  .home-doors { grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1240px; margin: 0 auto; padding: 20px 24px 0; }
+  .home-door { min-height: var(--door-h); padding: 32px; border-radius: 18px; }
+  .home-promise { max-width: 1240px; margin: 0 auto; padding: 18px 24px; }
+  /* Each path is one band that bleeds off the right edge; the examples sit on void beside it. */
+  .home { --gutter: max(24px, calc((100vw - 1192px) / 2)); }
+  .home-path { padding-top: 48px; }
+  .home-step { display: grid; grid-template-columns: var(--gutter) 400px 56px minmax(0, 1fr); align-items: center; padding: 0; }
+  .home-piece { grid-column: 2; grid-row: 1; padding: 32px 0; }
+  .home-field { grid-column: 4; grid-row: 1; align-self: stretch; min-height: min(70vh, 620px); padding: 40px var(--gutter) 32px 48px; }
+  .home-step:first-child .home-field { border-top-left-radius: 18px; }
+  .home-step:last-child .home-field { border-bottom-left-radius: 18px; }
+  .home-line { font-size: 5rem; }
+  .home-turn { padding: 32px var(--gutter) 24px; }
+  .home-join { max-width: 520px; margin: 0 auto; padding: 64px 24px 24px; }
 }
