@@ -104,12 +104,13 @@ def ban(user_id: int) -> Response:
         abort(404)
     user.banned_at = utcnow()
     photo_keys: list[str] = []
+    # Every post goes, closed and funded ones too, so gifts to them stop
+    # counting toward anyone's rewards (#147).
     for post in user.posts:
-        if post.status in (PostStatus.OPEN, PostStatus.PENDING_REVIEW):
-            post.status = PostStatus.REMOVED
-            if post.photo_key:
-                photo_keys.append(post.photo_key)
-                post.photo_key = None
+        post.status = PostStatus.REMOVED
+        if post.photo_key:
+            photo_keys.append(post.photo_key)
+            post.photo_key = None
     _resolve(
         or_(Report.user_id == user.id, Report.post_id.in_([p.id for p in user.posts])),
         resolution="banned",
@@ -117,7 +118,7 @@ def ban(user_id: int) -> Response:
     db.session.commit()
     for key in photo_keys:
         photos.discard(key)
-    flash(f"Banned {user.username}. Their open posts are removed.", "success")
+    flash(f"Banned {user.username}. Their posts and profile are hidden.", "success")
     return redirect(url_for("admin.queue"))
 
 

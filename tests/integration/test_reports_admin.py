@@ -3,7 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from flask.testing import FlaskClient
 from sqlalchemy import select
 
@@ -165,7 +165,7 @@ def test_admin_bans_a_user(client: FlaskClient, make_user: MakeUser, admin: User
     assert [p.status for p in (open_post, flagged, closed)] == [
         PostStatus.REMOVED,
         PostStatus.REMOVED,
-        PostStatus.CLOSED,
+        PostStatus.REMOVED,
     ]
     assert open_reports() == []
     assert client.post(f"/admin/users/{admin.id}/ban").status_code == 404
@@ -251,3 +251,32 @@ def test_grant_command(app: Flask, make_user: MakeUser) -> None:
     missing = runner.invoke(args=["admin", "grant", "nobody@example.com"])
     assert missing.exit_code != 0
     assert "No account uses" in missing.output
+
+
+def test_a_ban_hides_the_user_everywhere(
+    client: FlaskClient, make_user: MakeUser, admin: User
+) -> None:
+    from app.leaderboard import Period, Scope, rank
+    from app.rewards import confirmed_gifts
+    from tests.integration.test_leaders import give, person
+
+    creep = person(make_user, "creep")
+    donor = person(make_user, "donor")
+    give(donor, creep)  # creep was helped
+    give(creep, person(make_user, "someone"))  # creep helped someone
+    assert {r.user.username for r in rank(Scope.GLOBAL, Period.ALL, None)} == {"donor", "creep"}
+    assert client.get("/u/creep").status_code == 200
+    # Requests in the fixture's app context share g, so forget the visitor.
+    g.pop("_login_user", None)
+
+    login_as(client, admin)
+    client.post(f"/admin/users/{creep.id}/ban")
+    # Off the boards as a donor, and gifts to them no longer count.
+    assert [r.user.username for r in rank(Scope.GLOBAL, Period.ALL, None)] == []
+    assert confirmed_gifts(donor) == []
+    assert all(p.status == PostStatus.REMOVED for p in creep.posts)
+    # Only admins can still open the profile.
+    assert client.get("/u/creep").status_code == 200
+    client.post("/logout")
+    g.pop("_login_user", None)
+    assert client.get("/u/creep").status_code == 404

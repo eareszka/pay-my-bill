@@ -123,6 +123,8 @@ def show(username: str) -> str:
     is_owner = user is not None and current_user.is_authenticated and current_user.id == user.id
     if user is None or not (user.is_verified or is_owner):
         abort(404)
+    if user.is_banned and not (current_user.is_authenticated and current_user.is_admin):
+        abort(404)
     gifts = confirmed_gifts(user)
     stats = progress(gifts)
     shown = [*PUBLIC_STATUSES, PostStatus.PENDING_REVIEW] if is_owner else PUBLIC_STATUSES
