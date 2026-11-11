@@ -39,6 +39,7 @@ def app(tmp_path: Path) -> Iterator[Flask]:
             "WTF_CSRF_ENABLED": False,
             "MAIL_ASYNC": False,
             "SERVER_NAME": "localhost",
+            "APP_URL": "http://localhost",
         }
     )
     with app.app_context():

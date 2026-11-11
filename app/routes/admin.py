@@ -10,13 +10,14 @@ from app.extensions import db
 from app.forms import EmptyForm
 from app.mail import send_later
 from app.models import Post, PostStatus, Report, ReportReason, User, utcnow
+from app.urls import site_url
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 def notify_admins(subject: str, body: str) -> None:
     admins = db.session.scalars(select(User).where(User.is_admin.is_(True))).all()
-    link = url_for("admin.queue", _external=True)
+    link = site_url("admin.queue")
     for admin in admins:
         send_later(admin.email, subject, f"{body}\n\nReview it: {link}")
 

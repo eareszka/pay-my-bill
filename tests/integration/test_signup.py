@@ -256,11 +256,17 @@ def test_malformed_session_user_id_is_anonymous(client: FlaskClient) -> None:
     assert b"Sign up" in resp.data
 
 
-def test_proxy_headers_make_https_links(
-    client: FlaskClient, caplog: pytest.LogCaptureFixture
+def test_emailed_links_come_from_app_url(
+    app: Flask, client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
 ) -> None:
-    client.post("/signup", data=FORM, headers={"X-Forwarded-Proto": "https"})
-    assert "https://localhost/verify/" in caplog.text
+    # A forged Host must not steer a reset link to someone else's site (#150).
+    app.config.update(SERVER_NAME=None, APP_URL="https://pay.example/")
+    make_user("alice")
+    client.post("/reset", data={"email": "alice@example.com"}, headers={"Host": "evil.example"})
+    client.post("/signup", data=FORM, headers={"Host": "evil.example", "X-Forwarded-Proto": "http"})
+    assert "https://pay.example/reset/" in caplog.text
+    assert "https://pay.example/verify/" in caplog.text
+    assert "evil.example" not in caplog.text
 
 
 def test_signup_requires_18_plus(client: FlaskClient) -> None:
