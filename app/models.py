@@ -222,6 +222,7 @@ class Post(Base):
     update_body: Mapped[str | None] = mapped_column(Text)
     update_posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     update_reminders_sent: Mapped[int] = mapped_column(default=0, server_default="0")
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     photo_key: Mapped[str | None] = mapped_column(String(80))
 
     user: Mapped[User] = relationship(back_populates="posts")
@@ -236,6 +237,29 @@ class Post(Base):
     @property
     def is_deleted(self) -> bool:
         return self.title == DELETED_POST_TITLE and self.body == DELETED_POST_BODY
+
+    @property
+    def can_edit(self) -> bool:
+        return not self.is_deleted and (self.is_open or self.status == PostStatus.PENDING_REVIEW)
+
+    @property
+    def story_only(self) -> bool:
+        # Once someone has chipped in, the ask they gave to stays put; only the story
+        # can change (#116). A gift still waiting may be money on its way, so it counts;
+        # a disputed or expired claim doesn't.
+        return any(
+            gift.status == DonationStatus.CONFIRMED
+            or (gift.status == DonationStatus.PENDING and not gift.is_expired)
+            for gift in self.donations
+        )
+
+    @property
+    def state_label(self) -> str:
+        if self.status == PostStatus.PENDING_REVIEW:
+            return "In review"
+        if self.status == PostStatus.FUNDED:
+            return "Funded"
+        return "Open" if self.is_open else "Closed"
 
     @property
     def closes_at(self) -> datetime:

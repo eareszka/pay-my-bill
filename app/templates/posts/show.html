@@ -18,6 +18,7 @@
       {% if post.photo_key %}<img class="hero-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo from {{ post.user.username }}">{% endif %}
       <h1>{{ post.title }}</h1>
       {% include "posts/_meta.html" %}
+      {% if post.edited_at %}<p class="post-edited">Edited {{ post.edited_at | date }}</p>{% endif %}
       <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
       {{ meter(post.progress_percent, "Progress toward goal") }}
     </header>
@@ -72,6 +73,7 @@
         </div>
       {% else %}
         <div class="actions">
+          {% if post.can_edit %}<a class="btn btn-secondary" href="{{ url_for('posts.edit', post_id=post.id) }}">Edit post</a>{% endif %}
           {% if post.is_open %}<a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, close=1) }}#delete">Close post</a>{% endif %}
           {% if post.photo_key %}
             <form method="post" action="{{ url_for('posts.delete_photo', post_id=post.id) }}">

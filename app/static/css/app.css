@@ -527,6 +527,11 @@ h3.section-title { font-size: 1rem; }
 .empty { color: var(--muted); }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }
+.profile-posts { margin-top: 32px; }
+.post-list-goal { font-weight: 400; color: var(--muted); }
+.post-list-actions { display: inline-flex; gap: 16px; margin-left: auto; }
+.post-list-actions a { display: inline-block; padding-block: 8px; margin-block: -8px; font-weight: 700; color: var(--ink); }
+.post-hero .post-edited { margin: 4px 0 0; font-size: 0.875rem; color: rgb(255 255 255 / 0.8); }
 .report-link { margin-top: 28px; font-size: 0.875rem; text-align: center; }
 .report-link a { color: var(--muted); }
 .admin-item { margin-bottom: 12px; }

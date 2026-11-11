@@ -20,7 +20,14 @@ from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
 from app.mail import send_later
-from app.models import User
+from app.models import (
+    DELETED_POST_BODY,
+    DELETED_POST_TITLE,
+    PUBLIC_STATUSES,
+    Post,
+    PostStatus,
+    User,
+)
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 
 bp = Blueprint("profile", __name__)
@@ -106,6 +113,9 @@ def delete_account() -> str | Response | tuple[str, int]:
     return page, 400
 
 
+PROFILE_POST_LIMIT = 20
+
+
 @bp.get("/u/<username>")
 def show(username: str) -> str:
     user = db.session.scalar(select(User).where(User.username == username.lower()))
@@ -113,6 +123,18 @@ def show(username: str) -> str:
         abort(404)
     gifts = confirmed_gifts(user)
     stats = progress(gifts)
+    is_owner = current_user.is_authenticated and current_user.id == user.id
+    shown = [*PUBLIC_STATUSES, PostStatus.PENDING_REVIEW] if is_owner else PUBLIC_STATUSES
+    posts = db.session.scalars(
+        select(Post)
+        .where(
+            Post.user_id == user.id,
+            Post.status.in_(shown),
+            ~((Post.title == DELETED_POST_TITLE) & (Post.body == DELETED_POST_BODY)),
+        )
+        .order_by(Post.created_at.desc(), Post.id.desc())
+        .limit(PROFILE_POST_LIMIT)
+    ).all()
     return render_template(
         "profile/show.html",
         user=user,
@@ -120,4 +142,7 @@ def show(username: str) -> str:
         streak=streak(gifts),
         badges=badges(user, gifts, stats.people_helped),
         follow_through=follow_through(user),
+        posts=posts,
+        is_owner=is_owner,
+        post_limit=PROFILE_POST_LIMIT,
     )

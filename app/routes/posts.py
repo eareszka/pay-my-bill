@@ -40,6 +40,7 @@ from app.models import (
     utcnow,
 )
 from app.moderation import is_flagged
+from app.money import format_cents
 from app.payment_links import pay_options
 from app.routes.admin import notify_admins
 
@@ -338,6 +339,53 @@ def delete(post_id: int) -> Response:
     photos.discard(photo_key)
     flash("Your post was deleted.", "success")
     return redirect(url_for("main.index"))
+
+
+@bp.route("/<int:post_id>/edit", methods=["GET", "POST"])
+@verified_required
+def edit(post_id: int) -> str | Response:
+    post = own_post_for_update(post_id)
+    if not post.can_edit:
+        db.session.rollback()
+        flash("Only open posts can be edited.", "info")
+        return redirect(url_for("posts.show", post_id=post_id))
+    form = PostForm(
+        data={
+            "kind": post.kind.value,
+            "title": post.title,
+            "body": post.body,
+            "goal": format_cents(post.goal_cents),
+        }
+    )
+    del form.accept_rules, form.photo
+    if post.story_only:
+        del form.kind, form.title, form.goal
+    if form.validate_on_submit():
+        before = (post.kind, post.title, post.body, post.goal_cents)
+        if not post.story_only:
+            post.kind = PostKind(form.kind.data)
+            post.title = form.title.data
+            post.goal_cents = form.goal_cents
+        post.body = form.body.data
+        if (post.kind, post.title, post.body, post.goal_cents) == before:
+            db.session.rollback()
+            return redirect(url_for("posts.show", post_id=post_id))
+        post.edited_at = utcnow()
+        flagged = post.status == PostStatus.OPEN and is_flagged(post.title, post.body)
+        if flagged:
+            post.status = PostStatus.PENDING_REVIEW
+        db.session.commit()
+        if flagged:
+            notify_admins(
+                "An edited post is waiting for review",
+                f"{post.user.username}'s post “{post.title}” matched the fundraising word list.",
+            )
+            flash("Thanks! Your changes will show after a quick review.", "info")
+        else:
+            flash("Your post was updated.", "success")
+        return redirect(url_for("posts.show", post_id=post_id))
+    db.session.rollback()
+    return render_template("posts/edit.html", form=form, post=post)
 
 
 REMINDER_DAYS = (3, 6)
