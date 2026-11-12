@@ -80,11 +80,18 @@ def signup() -> str | Response | tuple[str, int, dict[str, str]]:
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
     form = SignupForm()
+    # Arriving from a how-it-works story (#120), its color waits at the foot as the way back.
+    story = request.args.get("from")
+    story = story if story in ("help", "ask") else None
     if form.validate_on_submit():
         if not allow_signup(request.remote_addr):
             form.email.errors.append("Too many new accounts from your network. Try again later.")
             retry_after = str(int(SIGNUP_WINDOW.total_seconds()))
-            return render_template("auth/signup.html", form=form), 429, {"Retry-After": retry_after}
+            return (
+                render_template("auth/signup.html", form=form, story=story),
+                429,
+                {"Retry-After": retry_after},
+            )
         taken = db.session.scalars(
             select(User).where(
                 or_(User.username == form.username.data, User.email == form.email.data)
@@ -117,7 +124,7 @@ def signup() -> str | Response | tuple[str, int, dict[str, str]]:
                 send_verification(user)
                 flash("Account created. Check your email to verify it.", "success")
                 return redirect(url_for("auth.verify_pending"))
-    return render_template("auth/signup.html", form=form)
+    return render_template("auth/signup.html", form=form, story=story)
 
 
 @bp.get("/verify/pending")

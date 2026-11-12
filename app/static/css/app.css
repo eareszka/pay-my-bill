@@ -582,6 +582,7 @@ h3.section-title { font-size: 1rem; }
   .topbar > nav .icon { width: 20px; height: 20px; }
   .topbar > nav { margin-left: auto; }
   .topbar > nav a[href="/signup"] { display: none; }
+  .join-page .topbar > nav a[href^="/login"] { display: none; }
   .topbar .topbar-signup { margin-left: 12px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
@@ -627,8 +628,10 @@ h3.section-title { font-size: 1rem; }
   .deck-side { display: none; }
 }
 
-/* Home (#120): how it works, told the way the feed moves. Each step cuts in as its own field. */
-body.stage-page .container-wide:has(> .home) { max-width: none; padding: 0; }
+/* Home (#120): two doors. Each opens its own story, one step per page, and the door you take becomes the screen. */
+body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none; padding: 0; }
+.home-door-help, .how-story-help .how-field, .how-other-help { --field: var(--want); }
+.home-door-ask, .how-story-ask .how-field, .how-other-ask { --field: var(--need); }
 .home { --door-h: clamp(260px, calc((100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom) - 96px) / 2), 420px); color: var(--on-void); }
 .home-doors { display: grid; }
 .home-door {
@@ -642,81 +645,154 @@ body.stage-page .container-wide:has(> .home) { max-width: none; padding: 0; }
   text-decoration: none;
   background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
 }
-.home-door-help { --field: var(--want); }
-.home-door-ask { --field: var(--need); }
+/* Real photos from posts tile the top of a door, turned to the door's own color, and the field takes over under the words. */
+.home-door { position: relative; isolation: isolate; overflow: hidden; }
+.home-door > span:not(.home-mosaic) { position: relative; z-index: 2; }
+.home-mosaic { position: absolute; inset: 0 0 auto; z-index: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; height: 48%; isolation: isolate; }
+.home-mosaic img:nth-child(n + 4) { display: none; }
+.home-mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1); }
+.home-mosaic::after { content: ""; position: absolute; inset: 0; background: var(--field); mix-blend-mode: multiply; }
+.home-door:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 18%, var(--field) 50%); pointer-events: none; }
 .home-door-line { font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
 .home-door-text { max-width: 34ch; font-size: 1.0625rem; }
-.home-door-go { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 700; }
-.home-door-go .icon { width: 20px; height: 20px; transition: transform var(--fast) var(--ease-out); }
-.home-door:hover .home-door-go { text-decoration: underline; text-underline-offset: 0.18em; }
-.home-door:hover .home-door-go .icon { transform: translateX(4px); }
-.home-door:focus-visible { outline: 2px solid var(--on-void); outline-offset: -6px; }
+.home-door-go, .how-other-go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.home-door-go { margin-top: 6px; }
+.home-door-go .icon, .how-other-go .icon { width: 20px; height: 20px; transition: transform var(--fast) var(--ease-out); }
+.home-door:hover .home-door-go, .how-other:hover .how-other-go { text-decoration: underline; text-underline-offset: 0.18em; }
+.home-door:hover .home-door-go .icon, .how-other:hover .how-other-go .icon { transform: translateX(4px); }
+.home-door:focus-visible, .how-other:focus-visible { outline: 2px solid var(--on-void); outline-offset: -6px; }
 .home-promise { margin: 0; padding: 20px 18px; color: var(--on-void-muted); }
 .home-promise strong { color: var(--on-void); }
 
-.home-path { --field: var(--want); padding-bottom: 8px; }
-.home-path-ask { --field: var(--need); }
-.home-steps { margin: 0; padding: 0; list-style: none; }
-.home-step { padding-bottom: 32px; }
-.home-field {
+/* A story step: one field fills the screen, and the other door waits docked at its foot. */
+.how { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); color: var(--on-void); }
+.how-field {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: min(62svh, 520px);
-  padding: 64px 18px 20px;
+  gap: 20px;
+  padding: 16px 18px 8px;
+  background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
+  touch-action: pan-y;
+}
+/* The door's photos carry into its story: three across the top of the field, fading to solid behind the headline. */
+.how-field:has(.home-mosaic) { position: relative; isolation: isolate; overflow: hidden; }
+.how-field > :not(.home-mosaic, .sr-only) { position: relative; z-index: 2; }
+.how-field .home-mosaic { height: 44%; grid-template-rows: 1fr; }
+.how-field:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 8%, var(--field) 40%); pointer-events: none; }
+.how-progress { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.how-progress li { flex: 1; height: 3px; background: rgb(255 255 255 / 0.35); border-radius: 2px; }
+.how-progress li.on { background: var(--on-void); }
+.how-step { display: flex; flex: 1; flex-direction: column; gap: 20px; }
+.how-words p { margin: 0; max-width: 40ch; font-size: 1.0625rem; }
+.how-line { margin: 0 0 10px; font: 400 clamp(2.75rem, 12.5vw, 4.25rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; text-wrap: balance; }
+.how-piece { margin: 0; }
+.how-example { display: inline-block; margin-bottom: 10px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; border: 1.5px solid var(--on-void); border-radius: 6px; }
+.how-piece .group { max-width: 400px; margin: 0; }
+.how-piece .btn { cursor: default; }
+.how-piece .btn:active { transform: none; }
+.how-panel p { margin: 0; }
+/* The example ask card is a dark panel like every other example, never the other door's color. */
+.how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: 14px; }
+.how-ask p { margin: 0; }
+.how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
+.how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--void); background: var(--on-void); border-radius: 12px; }
+.how-label { font-weight: 700; }
+.how-input { display: flex; align-items: center; min-height: 48px; padding: 11px 13px; font-variant-numeric: tabular-nums; background: var(--bg); border: 1.5px solid var(--edge); border-radius: var(--radius); }
+.how-input::before { content: "$"; color: var(--muted); }
+.how-panel .gift { padding: 0; border: 0; }
+.how-panel .gift + .gift { margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--line); }
+.how-sent { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.how-thanks { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+.how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
+.how-nav a:not(.btn) { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; color: var(--on-void); text-decoration: none; }
+.how-nav a:not(.btn):hover { text-decoration: underline; text-underline-offset: 0.18em; }
+.how-nav .icon { width: 20px; height: 20px; }
+.how-count { font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.how-other {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  min-height: 72px;
+  padding: 12px 18px;
+  color: var(--on-void);
+  text-decoration: none;
   background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
 }
-.home-field p { margin: 0; max-width: 40ch; font-size: 1.0625rem; }
-.home-line { margin: 0 0 12px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
-.home-field .home-count { margin-top: 18px; font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.home-piece { margin: 0; padding: 24px 16px 0; }
-.home-example { display: inline-block; margin-bottom: 10px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; color: var(--on-void); border: 1.5px solid var(--edge); border-radius: 6px; }
-.home-piece .group { margin: 0; }
-.home-piece .btn { cursor: default; }
-.home-piece .btn:active { transform: none; }
-.home-ask { --field: var(--need); max-width: 360px; padding: 22px 18px 18px; color: var(--on-void); background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field); border-radius: 14px; }
-.home-ask p { margin: 0; }
-.home-ask .home-ask-title { margin-bottom: 10px; font: 400 3rem/0.92 var(--display); text-transform: uppercase; }
-.home-ask-tab { display: block; margin-top: 16px; padding: 13px; text-align: center; font-weight: 700; color: var(--void); background: var(--on-void); border-radius: 12px; }
-.home-panel { max-width: 400px; }
-.home-panel p { margin: 0; }
-.home-label { font-weight: 700; }
-.home-input { display: flex; align-items: center; min-height: 48px; padding: 11px 13px; font-weight: 400; font-variant-numeric: tabular-nums; background: var(--bg); border: 1.5px solid var(--edge); border-radius: var(--radius); }
-.home-input::before { content: "$"; color: var(--muted); }
-.home-panel .gift { padding: 0; border: 0; }
-.home-panel .gift + .gift { margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--line); }
-.home-sent { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-.home-thanks { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding: 12px 0; }
-.home-turn { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: 0; padding: 8px 16px 40px; }
-.home-turn a:not(.btn) { font-weight: 700; color: var(--on-void); }
-.home-join { max-width: 480px; margin: 0 auto; padding: 48px 16px 24px; }
-.home-join-lede { margin: 0 0 20px; color: var(--on-void-muted); }
-.home-join .form { color: var(--on-void); }
+.how-other-line { font: 400 1.75rem/1 var(--display); text-transform: uppercase; }
 
-/* The cut: with scroll-driven animation, each field wipes in from the right and its example follows. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .home-field { animation: home-cut linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
-    .home-piece { animation: home-follow linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
-  }
+/* Sign up (#120): the story's white Sign up grows into this card, and the story's field sinks into the strip at the foot. */
+.join { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); color: var(--on-void); }
+.join-step { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: 12px 18px 28px; }
+.join-line { margin: 0 0 8px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
+.join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--on-void-muted); }
+.join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--on-void); border-radius: 16px; }
+.join-card .form { color: var(--ink); }
+.join-login { margin: 20px 0 0; color: var(--on-void-muted); }
+.join-login a { color: var(--on-void); font-weight: 700; }
+.join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 3; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
+.join-back .icon { width: 20px; height: 20px; }
+
+/* The door you take grows into the story while the other shrinks into the strip; each step's words cut in from the right. */
+@media (prefers-reduced-motion: no-preference) {
+  .home-door-help, .how-story-help .how-field, .how-other-help { view-transition-name: field-help; }
+  .home-door-ask, .how-story-ask .how-field, .how-other-ask { view-transition-name: field-ask; }
+  .how-step, .join-step { view-transition-name: how-step; }
+  .how-end, .join-card { view-transition-name: join-card; }
+  /* The button grows into the form card in front of the field sinking to the foot; the step words ride on top too. */
+  ::view-transition-group(field-help), ::view-transition-group(field-ask) { z-index: 1; }
+  ::view-transition-group(how-step), ::view-transition-group(join-card) { z-index: 2; }
+  ::view-transition-group(join-card) { overflow: clip; border-radius: var(--radius); animation-duration: 460ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(join-card) { height: 100%; object-fit: none; object-position: center; animation: how-fade-out 120ms 100ms ease-in both; }
+  ::view-transition-new(join-card) { height: 100%; object-fit: none; object-position: left top; animation: how-fade-in 200ms ease-out both; }
+  ::view-transition-group(field-help), ::view-transition-group(field-ask) { overflow: clip; animation-duration: 460ms; animation-timing-function: var(--ease-out); }
+  /* When both pages carry a field, its group holds the field's own color so a growing door never shows a ghosted band.
+     A field with no partner just fades (how.js names the pairs). */
+  html:active-view-transition-type(keep-help)::view-transition-group(field-help) { background: var(--want); }
+  html:active-view-transition-type(keep-ask)::view-transition-group(field-ask) { background: var(--need); }
+  ::view-transition-old(field-help), ::view-transition-new(field-help),
+  ::view-transition-old(field-ask), ::view-transition-new(field-ask) { height: 100%; object-fit: none; object-position: left bottom; animation-duration: 460ms; }
+  ::view-transition-group(how-step) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-new(how-step) { animation: how-cut 420ms var(--ease-out) both; }
+  ::view-transition-old(how-step) { animation: how-leave 220ms ease-in both; }
+  html:active-view-transition-type(back)::view-transition-new(how-step) { animation-name: how-cut-back; }
+  html:active-view-transition-type(back)::view-transition-old(how-step) { animation-name: how-leave-back; }
+  html:active-view-transition-type(open)::view-transition-new(how-step) { animation-delay: 220ms; }
 }
-@keyframes home-cut { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0); } }
-@keyframes home-follow { from { opacity: 0.2; transform: translateX(56px); } to { opacity: 1; transform: none; } }
+@keyframes how-cut { from { clip-path: inset(0 0 0 100%); transform: translateX(32px); } to { clip-path: inset(0); transform: none; } }
+@keyframes how-cut-back { from { clip-path: inset(0 100% 0 0); transform: translateX(-32px); } to { clip-path: inset(0); transform: none; } }
+@keyframes how-leave { to { opacity: 0; transform: translateX(-32px); } }
+@keyframes how-fade-out { to { opacity: 0; } }
+@keyframes how-fade-in { from { opacity: 0; } }
+@keyframes how-leave-back { to { opacity: 0; transform: translateX(32px); } }
 
 @media (min-width: 960px) {
   .home { --door-h: clamp(420px, calc(100svh - var(--bar-h) - 96px), 640px); }
   .home-doors { grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1240px; margin: 0 auto; padding: 20px 24px 0; }
-  .home-door { min-height: var(--door-h); padding: 32px; border-radius: 18px; }
+  /* The two doors share rows, so their headlines sit on one line whatever the sentences below them do. */
+  .home-doors { grid-template-rows: minmax(0, 1fr) auto auto auto; min-height: calc(var(--door-h) + 20px); }
+  .home-door { display: grid; grid-row: span 4; grid-template-rows: subgrid; grid-template-columns: minmax(0, 1fr); row-gap: 8px; min-height: 0; }
+  .home-door-line { grid-area: 2 / 1; align-self: end; }
+  .home-door-text { grid-area: 3 / 1; }
+  .home-door-go { grid-area: 4 / 1; justify-self: start; }
+  .home-door { padding: 32px; border-radius: 18px; }
+  .home-mosaic { grid-template-rows: repeat(2, 1fr); height: 62%; }
+  .home-mosaic img:nth-child(n + 4) { display: block; }
+  /* The last seam falls in the gap left of the example column, never through the Example tag. */
+  .how-field .home-mosaic { height: 52%; grid-template-rows: 1fr; grid-template-columns: 1fr 1fr calc(400px + 40px + 28px); }
+  .how-field:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 22%, var(--field) 50%); }
+  .home-door:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 22%, var(--field) 62%); }
   .home-promise { max-width: 1240px; margin: 0 auto; padding: 18px 24px; }
-  /* Each path is one band that bleeds off the right edge; the examples sit on void beside it. */
-  .home { --gutter: max(24px, calc((100vw - 1192px) / 2)); }
-  .home-path { padding-top: 48px; }
-  .home-step { display: grid; grid-template-columns: var(--gutter) 400px 56px minmax(0, 1fr); align-items: center; padding: 0; }
-  .home-piece { grid-column: 2; grid-row: 1; padding: 32px 0; }
-  .home-field { grid-column: 4; grid-row: 1; align-self: stretch; min-height: min(70vh, 620px); padding: 40px var(--gutter) 32px 48px; }
-  .home-step:first-child .home-field { border-top-left-radius: 18px; }
-  .home-step:last-child .home-field { border-bottom-left-radius: 18px; }
-  .home-line { font-size: 5rem; }
-  .home-turn { padding: 32px var(--gutter) 24px; }
-  .home-join { max-width: 520px; margin: 0 auto; padding: 64px 24px 24px; }
+  .how { gap: 12px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 20px 24px 24px; }
+  .how-field { gap: 28px; padding: 28px 40px 20px; border-radius: 18px; }
+  .how-step { display: grid; grid-template-columns: minmax(0, 1fr) 400px; align-items: center; gap: 56px; }
+  .how-line { font-size: 5.5rem; }
+  .how-other { padding: 16px 40px; border-radius: 18px; }
+  .join { max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 0 24px 24px; }
+  .join-step { padding-top: 24px; }
+  .join-back { bottom: 24px; }
+  ::view-transition-group(field-help), ::view-transition-group(field-ask) { border-radius: 18px; }
 }

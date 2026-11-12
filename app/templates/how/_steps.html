@@ -1,0 +1,77 @@
+{% from "posts/_progress.html" import meter %}
+{% macro example() %}<figcaption class="how-example">Example</figcaption>{% endmacro %}
+{% macro ask_card(title, who, raised, goal, percent) %}
+  <div class="ticket how-ask">
+    <p class="how-ask-title">{{ title }}</p>
+    <p class="card-head">{{ who }}</p>
+    <p class="amounts"><strong>{{ raised }}</strong> of {{ goal }}</p>
+    {{ meter(percent) }}
+    <span class="how-ask-tab">Chip in</span>
+  </div>
+{% endmacro %}
+{% macro gift(amount, meta) %}
+  <div class="gift">
+    <p class="gift-amount">{{ amount }}</p>
+    <p class="gift-meta">{{ meta }}</p>
+    <div class="gift-actions"><span class="btn">Confirm</span><span class="btn btn-secondary">Didn't get it</span></div>
+  </div>
+{% endmacro %}
+{% macro words(line, text) %}
+  <div class="how-words">
+    <h2 class="how-line">{{ line }}</h2>
+    <p>{{ text }}</p>
+  </div>
+{% endmacro %}
+
+{% macro step_body(path, step) %}
+{% if path == "help" and step == 1 %}
+  {{ words("Pick one person", "Asks come one at a time, full screen. Swipe to the next, swipe back, and stop on someone you want to help.") }}
+  <figure class="how-piece">{{ example() }}{{ ask_card("Short on rent this month", "maria_g · Milwaukee, WI · Need", "$45", "$120", 38) }}</figure>
+{% elif path == "help" and step == 2 %}
+  {{ words("Pay them in your own app", "Pick an amount and your Venmo, Cash App, or PayPal opens to their page. The money goes straight to them.") }}
+  <figure class="how-piece">
+    {{ example() }}
+    <div class="group how-panel">
+      <div class="field"><span class="how-label">Amount</span><span class="how-input">20</span></div>
+      <div class="pay-buttons">
+        <span class="btn">Venmo <small>@maria-g</small></span>
+        <span class="btn">Cash App <small>$mariag</small></span>
+      </div>
+      <div class="how-sent"><span class="section-title">Sent it?</span><span class="btn btn-secondary">I sent it</span></div>
+    </div>
+  </figure>
+{% elif path == "help" and step == 3 %}
+  {{ words("They confirm it came through", "Tap \"I sent it\", and they see your gift waiting. They check their app. Only gifts they confirm count, so the credit is honest.") }}
+  <figure class="how-piece">{{ example() }}<div class="group how-panel"><p class="section-title">To confirm</p>{{ gift("$20", "via Venmo from sam_k") }}</div></figure>
+{% elif path == "help" %}
+  {{ words("You get credit and a thank-you", "Once they confirm, your gift earns XP, levels, and badges, and counts toward the leaderboard. It counts people helped, never dollars.") }}
+  <figure class="how-piece">
+    {{ example() }}
+    <div class="group how-panel">
+      <p class="rewards-level">Level 1</p>
+      {{ meter(35) }}
+      <p class="hint">1 person helped</p>
+      <div class="how-thanks"><p><span class="chip chip-confirmed">Confirmed</span></p><p>"Thank you, sam_k! That got me a lot closer on rent."</p><p class="hint">maria_g</p></div>
+    </div>
+  </figure>
+{% elif step == 1 %}
+  {{ words("Ask for up to $1,000", "Say what it's for in a few lines: a need or just a want. Never for a business, a startup, or an investment.") }}
+  <figure class="how-piece">{{ example() }}{{ ask_card("Concert tickets for my sister's birthday", "dev_tom · Madison, WI · Want", "$0", "$300", 0) }}</figure>
+{% elif step == 2 %}
+  {{ words("People chip in through your app", "Gifts land in your own Cash App, Venmo, or PayPal. You check, then confirm what arrived.") }}
+  <figure class="how-piece">
+    {{ example() }}
+    <div class="group how-panel">
+      <p class="section-title">To confirm</p>
+      {{ gift("$25", "via Cash App from kayla.r") }}
+      <div class="how-confirmed"><p><strong>$40</strong> via Venmo from lee_w</p><span class="chip chip-confirmed">Confirmed</span></div>
+    </div>
+  </figure>
+{% else %}
+  {{ words("Say how it went", "When your post closes, share a short update within 7 days. Posters who follow through get first shot at the top of the feed.") }}
+  <figure class="how-piece">
+    {{ example() }}
+    <div class="group how-panel"><p class="section-title">How it went</p><p>"Got the tickets, and it made her birthday. Thank you, everyone who chipped in."</p><p><span class="chip chip-confirmed">Funded</span></p></div>
+  </figure>
+{% endif %}
+{% endmacro %}

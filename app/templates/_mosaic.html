@@ -1,0 +1,2 @@
+{# Real post photos tinted into the field color (#120): the home doors and the story steps. #}
+{% macro mosaic(keys) %}{% if keys %}<span class="home-mosaic" aria-hidden="true">{% for key in keys %}<img src="{{ photo_url(key) }}" alt="" decoding="async"{% if loop.index > 3 %} loading="lazy"{% endif %}>{% endfor %}</span>{% endif %}{% endmacro %}

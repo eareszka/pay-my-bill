@@ -17,7 +17,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-8 Swipe through the pile | #90 | 3 | Done |
 | S5-9 New look: the card stack | #118 | 8 | Done |
 | S5-10 Categories and show less | #119 | 5 | To do |
-| S5-11 How-it-works home page | #120 | 5 | In review |
+| S5-11 How-it-works home page | #120 | 5 | Done |
 | S5-12 Photo on a post | #122 | 5 | Done |
 | S5-13 You: my posts and chipped in | #132 | 3 | Done |
 
@@ -67,3 +67,8 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-11: #120 built through Impeccable. The owner picked the Color Cut scroll structure (split doors, real app pieces labeled Example, a sideways cut per step, ending at sign-up). `/` is the home page for logged-out visitors, and the feed moved to `/feed` with old links redirecting. Next: the finish review and the owner's look at screenshots. Blocked: none.
 - 2026-11-11: The audit passed #155 (PR #156) after the upload limit moved to a hook that runs before CSRF. #158 passed with an owner question on results updates. Built #160, the verify-link hole found in the #133 re-test: verifying needs the account's own session, and the email says what to do if you didn't sign up. Blocked: #9, on staging data.
 - 2026-11-11: The audit passed #158 (PR #159, now linear in time) and #163 (PR #164). Built the small lows: #165 (no email bodies in production logs), #167 (the Stripe refresh link never creates an account), #169 (deleting an account clears its reset and verify throttle rows), and #171 (logout clears the session). Next: #16 (admin action log and revoke), #17 (report limits), #18 (CI chores). Blocked: #9, on staging data.
+- 2026-11-11: The owner looked at the live #120 page and asked for two doors on the first page, each opening its own story, with animation instead of one long scroll, and Impeccable making the design choices. Impeccable's round: the owner picked "The Door Opens" (the tapped door grows into the story, the other door docks at the bottom). Rebuilt on the same PR (#161): `/how/help` and `/how/ask` are one step per page with page transitions. Next: finish review, then the owner's look. Blocked: none.
+- 2026-11-11: The owner asked for real photos on the doors as a collage. Impeccable round: the owner picked "Tinted Mosaic". Built on #182: `app/door_photos.py` picks the six newest photo posts (open asks for help, funded for asking) from verified, unbanned, never-reported accounts; fewer than six leaves the door plain. Next: finish review and the owner's look. Blocked: none.
+- 2026-11-11: The owner asked for images on every story page. Impeccable round: the owner picked "Photo Band" (three of the door's tinted photos across the top of each step, fading behind the headline; neighboring steps alternate). Built on #182. Next: finish review and the owner's look. Blocked: none.
+- 2026-11-12: The owner asked for the move into Sign up at the end of each story to be smooth and seamless. Impeccable round: the owner picked "Button Becomes the Form". Built on #182: `/signup` uses the stage look with a white-edged form card; from a story (`?from=help|ask`) the Sign up button morphs into the card and the field sinks into a strip at the foot that leads back. Next: finish review and the owner's look. Blocked: none.
+- 2026-11-12: The owner approved #120 (doors, stories, door and step photos, sign-up handoff) and asked to merge; #182 merged. S5-11 Done. Next: #119 (categories and show less). Blocked: none.

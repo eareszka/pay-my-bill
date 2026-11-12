@@ -1,176 +1,26 @@
 {% extends "base.html" %}
-{% from "_field.html" import choice, field %}
-{% from "posts/_progress.html" import meter %}
+{% from "_mosaic.html" import mosaic %}
 {% block title %}Pay My Bill · Chip in on someone's bill{% endblock %}
 {% block body_class %}page stage-page home-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
-{% macro example() %}<figcaption class="home-example">Example</figcaption>{% endmacro %}
-{% macro ask_card(title, who, raised, goal, percent) %}
-  <div class="ticket home-ask">
-    <p class="home-ask-title">{{ title }}</p>
-    <p class="card-head">{{ who }}</p>
-    <p class="amounts"><strong>{{ raised }}</strong> of {{ goal }}</p>
-    {{ meter(percent) }}
-    <span class="home-ask-tab">Chip in</span>
-  </div>
-{% endmacro %}
+{% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
 {% block content %}
 <div class="home">
   <h1 class="sr-only">How Pay My Bill works</h1>
   <nav class="home-doors" aria-label="How it works">
-    <a class="home-door home-door-help" href="#help">
+    <a class="home-door home-door-help" href="{{ url_for('main.how', path='help') }}">
+      {{ mosaic(help_photos) }}
       <span class="home-door-line">I want to help</span>
       <span class="home-door-text">Chip in on someone's bill, straight from your own Venmo, Cash App, or PayPal.</span>
       <span class="home-door-go">See how it works<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></span>
     </a>
-    <a class="home-door home-door-ask" href="#ask">
+    <a class="home-door home-door-ask" href="{{ url_for('main.how', path='ask') }}">
+      {{ mosaic(ask_photos) }}
       <span class="home-door-line">I need a hand</span>
-      <span class="home-door-text">Ask for up to $1,000: rent coming up short, a bill that's due, or just a game you want.</span>
+      <span class="home-door-text">Ask for up to $1,000: rent coming up short, a bill that's due, or just a game you want.{% if ask_photos %} These asks got there.{% endif %}</span>
       <span class="home-door-go">See how it works<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></span>
     </a>
   </nav>
   <p class="home-promise"><strong>Pay My Bill never holds your money.</strong> Gifts go straight from one person's pay app to the other's.</p>
-
-  <section class="home-path home-path-help" id="help" aria-labelledby="help-title">
-    <h2 class="sr-only" id="help-title">How helping works</h2>
-    <ol class="home-steps">
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">Pick one person</h3>
-          <p>Asks come one at a time, full screen. Swipe to the next, swipe back, and stop on someone you want to help.</p>
-          <p class="home-count">1 of 4</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          {{ ask_card("Short on rent this month", "maria_g · Milwaukee, WI · Need", "$45", "$120", 38) }}
-        </figure>
-      </li>
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">Pay them in your own app</h3>
-          <p>Pick an amount and your Venmo, Cash App, or PayPal opens to their page. The money goes straight to them.</p>
-          <p class="home-count">2 of 4</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          <div class="group home-panel">
-            <p class="section-title">Chip in</p>
-            <div class="field"><span class="home-label">Amount</span><span class="home-input">20</span></div>
-            <div class="pay-buttons">
-              <span class="btn">Venmo <small>@maria-g</small></span>
-              <span class="btn">Cash App <small>$mariag</small></span>
-            </div>
-            <p class="hint">Opens maria_g's page in the app. Pay My Bill never holds money.</p>
-            <div class="home-sent"><span class="section-title">Sent it?</span><span class="btn btn-secondary">I sent it</span></div>
-          </div>
-        </figure>
-      </li>
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">They confirm it came through</h3>
-          <p>Tap "I sent it", and they see your gift waiting. They check their app. Only gifts they confirm count, so the credit is honest.</p>
-          <p class="home-count">3 of 4</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          <div class="group home-panel">
-            <p class="section-title">To confirm</p>
-            <div class="gift">
-              <p class="gift-amount">$20</p>
-              <p class="gift-meta">via Venmo from sam_k</p>
-              <div class="gift-actions"><span class="btn">Confirm</span><span class="btn btn-secondary">Didn't get it</span></div>
-            </div>
-          </div>
-        </figure>
-      </li>
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">You get credit and a thank-you</h3>
-          <p>Once they confirm, your gift earns XP, levels, and badges, and counts toward the leaderboard. It counts people helped, never dollars.</p>
-          <p class="home-count">4 of 4</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          <div class="group home-panel">
-            <p class="rewards-level">Level 1</p>
-            {{ meter(40) }}
-            <p class="hint">1 person helped</p>
-            <div class="gift-list home-thanks"><p><span class="chip chip-confirmed">Confirmed</span></p><p>"Thank you, sam_k! That got me a lot closer on rent."</p><p class="hint">maria_g</p></div>
-          </div>
-        </figure>
-      </li>
-    </ol>
-    <p class="home-turn"><a class="btn" href="#join">Sign up to chip in</a> <a href="#ask">How asking works</a></p>
-  </section>
-
-  <section class="home-path home-path-ask" id="ask" aria-labelledby="ask-title">
-    <h2 class="sr-only" id="ask-title">How asking works</h2>
-    <ol class="home-steps">
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">Ask for up to $1,000</h3>
-          <p>Say what it's for in a few lines: a need or just a want. Never for a business, a startup, or an investment.</p>
-          <p class="home-count">1 of 3</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          {{ ask_card("New tires before winter", "dev_tom · Madison, WI · Need", "$0", "$300", 0) }}
-        </figure>
-      </li>
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">People chip in through your app</h3>
-          <p>Gifts land in your own Cash App, Venmo, or PayPal. You check, then confirm what arrived.</p>
-          <p class="home-count">2 of 3</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          <div class="group home-panel">
-            <p class="section-title">To confirm <span class="count">2</span></p>
-            <div class="gift">
-              <p class="gift-amount">$25</p>
-              <p class="gift-meta">via Cash App from kayla.r</p>
-              <div class="gift-actions"><span class="btn">Confirm</span><span class="btn btn-secondary">Didn't get it</span></div>
-            </div>
-            <div class="gift">
-              <p class="gift-amount">$40</p>
-              <p class="gift-meta">via Venmo from lee_w</p>
-              <div class="gift-actions"><span class="btn">Confirm</span><span class="btn btn-secondary">Didn't get it</span></div>
-            </div>
-          </div>
-        </figure>
-      </li>
-      <li class="home-step">
-        <div class="home-field">
-          <h3 class="home-line">Say how it went</h3>
-          <p>When your post closes, share a short update within 7 days. Posters who follow through get first shot at the top of the feed.</p>
-          <p class="home-count">3 of 3</p>
-        </div>
-        <figure class="home-piece">
-          {{ example() }}
-          <div class="group home-panel">
-            <p class="section-title">How it went</p>
-            <p>"Got all four tires on Saturday. Thank you, everyone who chipped in."</p>
-            <p><span class="chip chip-confirmed">Funded</span></p>
-          </div>
-        </figure>
-      </li>
-    </ol>
-  </section>
-
-  <section class="home-join" id="join" aria-labelledby="join-title">
-    <h2 class="home-line" id="join-title">Join in</h2>
-    <p class="home-join-lede">One account to chip in and to ask. You must be 18 or older.</p>
-    <form method="post" action="{{ url_for('auth.signup') }}" class="form page-form" novalidate>
-      {{ form.hidden_tag() }}
-      {{ field(form.username, autocomplete="username") }}
-      {{ field(form.email, autocomplete="email") }}
-      {{ field(form.password, autocomplete="new-password") }}
-      {{ field(form.confirm, autocomplete="new-password") }}
-      {% call choice(form.adult) %}I'm 18 or older and agree to the <a href="{{ url_for('main.terms') }}" target="_blank">Terms</a> and <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a>{% endcall %}
-      <button type="submit" class="btn">Sign up</button>
-    </form>
-    <p>Not ready? <a href="{{ url_for('main.index') }}">Browse the feed first</a>. Have an account? <a href="{{ url_for('auth.login') }}">Log in</a>.</p>
-  </section>
 </div>
 {% endblock %}

@@ -7,8 +7,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
+from app.door_photos import door_photos
 from app.extensions import db
-from app.forms import SignupForm
 from app.models import Post, PostKind, open_posts
 from app.photos import LocalStore, store
 from app.routes.posts import chip_in_context
@@ -43,7 +43,33 @@ def home() -> str | Response:
     args: dict[str, Any] = {k: v for k, v in request.args.items() if k in ("kind", "n")}
     if current_user.is_authenticated or args:
         return redirect(url_for("main.index", **args))
-    return render_template("home.html", form=SignupForm())
+    return render_template(
+        "home.html", help_photos=door_photos(funded=False), ask_photos=door_photos(funded=True)
+    )
+
+
+# Each door opens its own story, one step per page, so Back and links work without JavaScript.
+STORY_STEPS = {"help": 4, "ask": 3}
+
+
+@bp.get("/how/<any(help, ask):path>", defaults={"step": 1})
+@bp.get("/how/<any(help, ask):path>/<int:step>")
+def how(path: str, step: int) -> str:
+    total = STORY_STEPS[path]
+    if not 1 <= step <= total:
+        abort(404)
+    other = "ask" if path == "help" else "help"
+    # Each step carries three of its door's photos, so neighboring steps never show the same ones.
+    pool = door_photos(funded=path == "ask")
+    start = (step - 1) % 2 * 3
+    return render_template(
+        "how/story.html",
+        path=path,
+        other=other,
+        step=step,
+        total=total,
+        photos=pool[start : start + 3],
+    )
 
 
 @bp.get("/feed")

@@ -579,6 +579,16 @@
         "name": "field-scrim-hero",
         "value": "linear-gradient(to bottom, transparent 40%, rgb(0 0 0 / 0.4))",
         "purpose": "Bottom scrim over the post-page hero."
+      },
+      {
+        "name": "door-photo-fade",
+        "value": "linear-gradient(to bottom, transparent 18%, var(--field) 50%); 960px and up: linear-gradient(to bottom, transparent 22%, var(--field) 62%)",
+        "purpose": "Home door photo mosaic fading to solid field under the bottom scrim; the Scrim Only Rule's one exception, always to the field's own color."
+      },
+      {
+        "name": "step-band-fade",
+        "value": "linear-gradient(to bottom, transparent 8%, var(--field) 40%); 960px and up: linear-gradient(to bottom, transparent 22%, var(--field) 50%)",
+        "purpose": "Story step photo band fading to solid field under the bottom scrim; shares the Scrim Only Rule's photo-fade exception, always to the field's own color."
       }
     ],
     "shadows": [
@@ -645,14 +655,34 @@
         "purpose": "Button active state."
       },
       {
-        "name": "home-cut",
-        "value": "clip-path inset(0 0 0 100%) to inset(0), linear, animation-timeline view(), range entry 0% to entry 100%",
-        "purpose": "Home page step fields wipe in from the right; only under @supports (animation-timeline: view()) and prefers-reduced-motion: no-preference."
+        "name": "how-field",
+        "value": "cross-document view transition, names field-help / field-ask, 460ms var(--ease-out); group overflow clip, z-index 1, 18px radius from 960px; group background in the field color only under types keep-help / keep-ask (both pages carry the field), otherwise the partnerless field just fades; snapshots object-fit none, object-position left bottom",
+        "purpose": "The tapped home door grows into its story field and the other door shrinks into the docked strip; on sign-up the story field sinks into the back strip; only under prefers-reduced-motion: no-preference."
       },
       {
-        "name": "home-follow",
-        "value": "opacity 0.2 and translateX(56px) to rest, linear, view() entry 0% to 80%",
-        "purpose": "A home step's example piece follows its field in."
+        "name": "how-cut",
+        "value": "clip-path inset(0 0 0 100%) + translateX(32px) to rest, 420ms var(--ease-out); old step fades and moves 32px left, 220ms ease-in",
+        "purpose": "Each story step's content (how-step) wipes in from the right."
+      },
+      {
+        "name": "how-back",
+        "value": "view transition type back: clip-path inset(0 100% 0 0) + translateX(-32px) in, old leaves 32px right",
+        "purpose": "Going back a step, to the doors (step 0), or from sign-up (step 99) to the story reverses the cut; set by how.js on pagereveal."
+      },
+      {
+        "name": "how-open",
+        "value": "view transition type open: incoming how-step delayed 220ms",
+        "purpose": "Opening a door or switching stories lets the field land before the words cut in."
+      },
+      {
+        "name": "join-handoff",
+        "value": "view transition name join-card on .how-end / .join-card, 460ms var(--ease-out), group overflow clip at var(--radius), z-index 2 with how-step; old snapshot centered, fades out 120ms after 100ms ease-in; new snapshot left top, fades in 200ms ease-out",
+        "purpose": "The last step's white Sign up grows into the sign-up form card while the step words cut and the field sinks into the strip; reduced motion is plain navigation."
+      },
+      {
+        "name": "how-swipe",
+        "value": "60px horizontal, pointer non-mouse, |dx| >= 1.5 * |dy|; ArrowLeft / ArrowRight",
+        "purpose": "Swipe or arrow keys follow the Back / Next links on story steps."
       }
     ],
     "breakpoints": [
@@ -761,7 +791,7 @@
   ],
   "narrative": {
     "northStar": "The Color Cut",
-    "overview": "The app is a black frame around one person. The shell (top bar, bottom nav, feed stage, post page) is void black, and inside it a single ask fills the screen as a saturated color field with its title set huge in condensed uppercase. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's color is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. White is the only interface ink on the stage. The one money action, Chip in, is a white filled tab that travels with the person.\n\nAway from the stage, the working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense. They follow the system color scheme: cool paper and white panels in light, near-black panels in dark. They share the same two typefaces, the same inverse filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no gradient except the scrim that keeps white text legible at the foot of a color field.\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar and the stage becomes a framed 470px column standing beside a 400px Chip in panel on void.",
+    "overview": "The app is a black frame around one person. The shell (top bar, bottom nav, feed stage, post page) is void black, and inside it a single ask fills the screen as a saturated color field with its title set huge in condensed uppercase. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's color is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. White is the only interface ink on the stage. The one money action, Chip in, is a white filled tab that travels with the person.\n\nAway from the stage, the working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense. They follow the system color scheme: cool paper and white panels in light, near-black panels in dark. They share the same two typefaces, the same inverse filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no gradient except the scrim that keeps white text legible at the foot of a color field (plus the fades from the photo mosaic into the field's own color on the home doors and the story steps).\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar and the stage becomes a framed 470px column standing beside a 400px Chip in panel on void.",
     "keyCharacteristics": [
       "Void-black shell that is always dark: top bar, bottom nav, feed stage, and post page.",
       "One full-bleed color field per ask (Need or Want) under a bottom scrim, with white type only.",
@@ -798,7 +828,7 @@
       },
       {
         "name": "The Scrim Only Rule",
-        "body": "The one gradient is the bottom scrim on a color field (transparent to 40% black over the lower half on cards, and over the lower 60% on the post hero). No other gradients, glass, glow, or box shadows.",
+        "body": "The one gradient is the bottom scrim on a color field (transparent to 40% black over the lower half on cards, and over the lower 60% on the post hero). Its one exception is the photo fade, on the home doors and on the story step band, which runs from the photos to solid field under the scrim and only ever fades to the field's own color, never to black or another hue. No other gradients, glass, glow, or box shadows.",
         "section": "elevation"
       }
     ],
@@ -815,7 +845,7 @@
     ],
     "donts": [
       "**Don't** use tomato for anything but errors, disputed gifts, and destructive actions.",
-      "**Don't** add box shadows, glass, glow, or gradients other than the field scrim.",
+      "**Don't** add box shadows, glass, glow, or gradients other than the field scrim and the photo fades on the home doors and story steps, each into the field's own color.",
       "**Don't** put colored text or colored controls on a color field. It's white or nothing.",
       "**Don't** turn state into pills or badges with fills. Use a shape and a word.",
       "**Don't** add a second progress style (rings, segmented bars, or percentages as hero numbers).",

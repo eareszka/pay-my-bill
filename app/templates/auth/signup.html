@@ -1,16 +1,29 @@
 {% extends "base.html" %}
 {% from "_field.html" import choice, field %}
 {% block title %}Sign up · Pay My Bill{% endblock %}
+{% block body_class %}page stage-page join-page{% endblock %}
+{% block main_class %} container-wide{% endblock %}
+{% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
 {% block content %}
-  <h1>Create your account</h1>
-  <form method="post" class="form page-form" novalidate>
-    {{ form.hidden_tag() }}
-    {{ field(form.username, autocomplete="username") }}
-    {{ field(form.email, autocomplete="email") }}
-    {{ field(form.password, autocomplete="new-password") }}
-    {{ field(form.confirm, autocomplete="new-password") }}
-    {% call choice(form.adult) %}I'm 18 or older and agree to the <a href="{{ url_for('main.terms') }}" target="_blank">Terms</a> and <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a>{% endcall %}
-    <button type="submit" class="btn">Sign up</button>
-  </form>
-  <p>Already have an account? <a href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a></p>
+<div class="join">
+  <div class="join-step">
+    <h1 class="join-line">Join in</h1>
+    <p class="join-lede">Create your account: one account to chip in and to ask. You must be 18 or older.</p>
+    <div class="join-card">
+      <form method="post" class="form" novalidate>
+        {{ form.hidden_tag() }}
+        {{ field(form.username, autocomplete="username") }}
+        {{ field(form.email, autocomplete="email") }}
+        {{ field(form.password, autocomplete="new-password") }}
+        {{ field(form.confirm, autocomplete="new-password") }}
+        {% call choice(form.adult) %}I'm 18 or older and agree to the <a href="{{ url_for('main.terms') }}" target="_blank">Terms</a> and <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a>{% endcall %}
+        <button type="submit" class="btn">Sign up</button>
+      </form>
+    </div>
+    <p class="join-login">Already have an account? <a href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a></p>
+  </div>
+  {% if story %}
+    <a class="how-other how-other-{{ story }} join-back" href="{{ url_for('main.how', path=story, step=4 if story == 'help' else 3) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to how {{ "helping" if story == "help" else "asking" }} works</a>
+  {% endif %}
+</div>
 {% endblock %}
