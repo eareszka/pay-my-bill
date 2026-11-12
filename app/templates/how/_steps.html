@@ -1,7 +1,7 @@
 {% from "posts/_progress.html" import meter %}
 {% macro example() %}<figcaption class="how-example">Example</figcaption>{% endmacro %}
-{% macro ask_card(title, who, raised, goal, percent, kind) %}
-  <div class="ticket how-ask how-ask-{{ kind }}">
+{% macro ask_card(title, who, raised, goal, percent) %}
+  <div class="ticket how-ask">
     <p class="how-ask-title">{{ title }}</p>
     <p class="card-head">{{ who }}</p>
     <p class="amounts"><strong>{{ raised }}</strong> of {{ goal }}</p>
@@ -26,7 +26,7 @@
 {% macro step_body(path, step) %}
 {% if path == "help" and step == 1 %}
   {{ words("Pick one person", "Asks come one at a time, full screen. Swipe to the next, swipe back, and stop on someone you want to help.") }}
-  <figure class="how-piece">{{ example() }}{{ ask_card("Short on rent this month", "maria_g · Milwaukee, WI · Need", "$45", "$120", 38, "need") }}</figure>
+  <figure class="how-piece">{{ example() }}{{ ask_card("Short on rent this month", "maria_g · Milwaukee, WI · Need", "$45", "$120", 38) }}</figure>
 {% elif path == "help" and step == 2 %}
   {{ words("Pay them in your own app", "Pick an amount and your Venmo, Cash App, or PayPal opens to their page. The money goes straight to them.") }}
   <figure class="how-piece">
@@ -56,7 +56,7 @@
   </figure>
 {% elif step == 1 %}
   {{ words("Ask for up to $1,000", "Say what it's for in a few lines: a need or just a want. Never for a business, a startup, or an investment.") }}
-  <figure class="how-piece">{{ example() }}{{ ask_card("Concert tickets for my sister's birthday", "dev_tom · Madison, WI · Want", "$0", "$300", 0, "want") }}</figure>
+  <figure class="how-piece">{{ example() }}{{ ask_card("Concert tickets for my sister's birthday", "dev_tom · Madison, WI · Want", "$0", "$300", 0) }}</figure>
 {% elif step == 2 %}
   {{ words("People chip in through your app", "Gifts land in your own Cash App, Venmo, or PayPal. You check, then confirm what arrived.") }}
   <figure class="how-piece">

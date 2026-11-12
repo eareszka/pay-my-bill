@@ -691,9 +691,8 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
 .how-piece .btn { cursor: default; }
 .how-piece .btn:active { transform: none; }
 .how-panel p { margin: 0; }
-.how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--on-void); background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field); border-radius: 14px; }
-.how-ask-need { --field: var(--need); }
-.how-ask-want { --field: var(--want); }
+/* The example ask card is a dark panel like every other example, never the other door's color. */
+.how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: 14px; }
 .how-ask p { margin: 0; }
 .how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
 .how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--void); background: var(--on-void); border-radius: 12px; }
