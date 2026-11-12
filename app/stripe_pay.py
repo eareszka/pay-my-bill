@@ -113,8 +113,19 @@ def _cents_up(value: Decimal) -> int:
     return int(value.to_integral_value(rounding=ROUND_CEILING))
 
 
+def parse_fee_rate(value: str) -> Decimal:
+    # Checked at startup, so a typo like "1%" or "1" can't break post pages or eat a gift.
+    try:
+        rate = Decimal(value)
+    except ArithmeticError:
+        raise ValueError(f"PLATFORM_FEE_RATE must be a fraction like 0.01, not {value!r}") from None
+    if not Decimal(0) <= rate <= Decimal("0.2"):
+        raise ValueError(f"PLATFORM_FEE_RATE must be between 0 and 0.2, not {value!r}")
+    return rate
+
+
 def platform_fee_rate() -> Decimal:
-    return Decimal(current_app.config["PLATFORM_FEE_RATE"])
+    return parse_fee_rate(str(current_app.config["PLATFORM_FEE_RATE"]))
 
 
 def fee_terms() -> dict[str, str]:
@@ -122,6 +133,7 @@ def fee_terms() -> dict[str, str]:
     rate = platform_fee_rate()
     return {
         "card_rate": str(CARD_FEE_RATE),
+        "card_pct": f"{float(CARD_FEE_RATE * 100):g}%",
         "card_fixed": str(CARD_FEE_FIXED_CENTS),
         "platform_rate": str(rate),
         "platform_pct": f"{float(rate * 100):g}%",

@@ -96,6 +96,9 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
 
     from app import models  # noqa: F401
+    from app.stripe_pay import parse_fee_rate
+
+    parse_fee_rate(str(app.config["PLATFORM_FEE_RATE"]))
     from app.extensions import csrf, db, login_manager, migrate
     from app.photos import MAX_UPLOAD_BYTES
 
@@ -154,7 +157,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         PostStatus=models.PostStatus,
         DonationStatus=models.DonationStatus,
         ReactionKind=models.ReactionKind,
-        LEGAL_UPDATED="November 9, 2026",
+        LEGAL_UPDATED="November 12, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
         stripe_enabled=stripe_pay.enabled,
     )

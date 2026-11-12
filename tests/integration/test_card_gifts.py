@@ -14,7 +14,7 @@ from flask import Flask
 from flask.testing import FlaskClient
 from sqlalchemy import select
 
-from app import stripe_pay
+from app import create_app, stripe_pay
 from app.extensions import db
 from app.models import Donation, DonationStatus, PaymentMethod, Post, PostKind, PostStatus, User
 from tests.conftest import MakeUser, login_as
@@ -70,18 +70,21 @@ def signed(client: FlaskClient, event: dict[str, Any], secret: str = SECRET) -> 
 
 
 def paid_event(
-    post: Post, donor: User, gift: int = 2_000, session_id: str = "cs_1", **extra: Any
+    post: Post, donor: User, paid: int = 2_000, session_id: str = "cs_1", **extra: Any
 ) -> dict[str, Any]:
+    stripe_fee, platform_fee, net = stripe_pay.split(paid)
     session = {
         "id": session_id,
         "object": "checkout.session",
         "payment_status": "paid",
         "payment_intent": "pi_1",
+        "amount_total": paid,
         "metadata": {
             "post_id": str(post.id),
             "donor_id": str(donor.id),
-            "gift_cents": str(gift),
-            "fee_cents": "108",
+            "gift_cents": str(net),
+            "fee_cents": str(stripe_fee + platform_fee),
+            "platform_fee_cents": str(platform_fee),
         },
         **extra,
     }
@@ -108,6 +111,21 @@ def test_fees_come_out_of_the_gift(paid: int, parts: tuple[int, int, int]) -> No
     assert stripe_fee + platform_fee + net == paid
     # The estimate never promises more than Stripe's 2.9% + 30¢ leaves.
     assert stripe_fee >= paid * 29 // 1000 + 30
+
+
+@pytest.mark.parametrize("rate", ["1%", "1", "-0.01", "abc"])
+def test_bad_platform_fee_rate_stops_startup(rate: str) -> None:
+    with pytest.raises(ValueError, match="PLATFORM_FEE_RATE"):
+        create_app({"TESTING": True, "PLATFORM_FEE_RATE": rate})
+
+
+def test_donor_email_falls_back_without_a_total(
+    client: FlaskClient, post: Post, donor: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    event = paid_event(post, donor)
+    del event["data"]["object"]["amount_total"]
+    signed(client, event)
+    assert "Your $20 gift to maria_g went through" in caplog.text
 
 
 def test_platform_fee_can_be_turned_off(app: Flask) -> None:
@@ -264,16 +282,16 @@ def test_paid_webhook_records_a_confirmed_gift_once(
     assert resp.status_code == 200
     [gift] = gifts()
     assert (gift.amount_cents, gift.fee_cents, gift.method, gift.status) == (
-        2_000,
+        1_892,
         108,
         PaymentMethod.CARD,
         DonationStatus.CONFIRMED,
     )
     assert (gift.stripe_session_id, gift.stripe_payment_intent) == ("cs_1", "pi_1")
-    assert post.raised_cents == 2_000
-    assert "dev_tom sent you $20" in caplog.text
-    assert "Your $21.08 gift to maria_g went through" in caplog.text
-    assert "maria_g gets about $20 after card and Pay My Bill fees" in caplog.text
+    assert post.raised_cents == 1_892
+    assert "dev_tom sent you $18.92" in caplog.text
+    assert "Your $20 gift to maria_g went through" in caplog.text
+    assert "maria_g gets about $18.92 after fees" in caplog.text
     assert signed(client, paid_event(post, donor)).status_code == 200
     assert len(gifts()) == 1
 
@@ -281,7 +299,7 @@ def test_paid_webhook_records_a_confirmed_gift_once(
 def test_paid_webhook_that_funds_the_post(
     client: FlaskClient, post: Post, donor: User, caplog: pytest.LogCaptureFixture
 ) -> None:
-    signed(client, paid_event(post, donor, gift=5_000))
+    signed(client, paid_event(post, donor, paid=5_300))
     db.session.refresh(post)
     assert post.status == PostStatus.FUNDED
     assert "fully funded" in caplog.text
@@ -401,7 +419,7 @@ def charge_event(event_type: str, **charge: Any) -> dict[str, Any]:
 
 
 def test_refund_reopens_a_post_it_had_funded(client: FlaskClient, post: Post, donor: User) -> None:
-    signed(client, paid_event(post, donor, gift=5_000))
+    signed(client, paid_event(post, donor, paid=5_300))
     db.session.refresh(post)
     assert post.status == PostStatus.FUNDED
     signed(client, charge_event("charge.refunded", refunded=True))
@@ -414,7 +432,7 @@ def test_refund_reopens_a_post_it_had_funded(client: FlaskClient, post: Post, do
 def test_refund_after_30_days_leaves_the_post_closed(
     client: FlaskClient, post: Post, donor: User
 ) -> None:
-    signed(client, paid_event(post, donor, gift=5_000))
+    signed(client, paid_event(post, donor, paid=5_300))
     post.created_at = post.created_at - timedelta(days=31)
     db.session.commit()
     signed(client, charge_event("charge.refunded", refunded=True))
@@ -455,7 +473,7 @@ def test_won_dispute_counts_the_gift_again(
     signed(client, charge_event("charge.dispute.closed", status="won"))
     [gift] = gifts()
     assert gift.status == DonationStatus.CONFIRMED
-    assert post.raised_cents == 2_000
+    assert post.raised_cents == 1_892
     assert "A card dispute was won" in caplog.text
     signed(client, charge_event("charge.dispute.closed", status="won"))
     assert "A card dispute was won" in caplog.text

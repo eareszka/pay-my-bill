@@ -7,12 +7,12 @@
         {% endif %}
         <div class="field">
           <label for="card-amount">Amount</label>
-          <input id="card-amount" name="amount" inputmode="decimal" autocomplete="off" required aria-describedby="card-amount-hint card-net"{% if card_error %} aria-invalid="true" autofocus{% endif %} value="{{ request.form.get('amount', '') if card_error else '' }}" data-card-rate="{{ card_fee.card_rate }}" data-card-fixed="{{ card_fee.card_fixed }}" data-platform-rate="{{ card_fee.platform_rate }}" data-min="{{ min_card_gift / 100 }}" data-max="{{ post.goal_cents / 100 }}">
+          <input id="card-amount" name="amount" inputmode="decimal" autocomplete="off" required aria-describedby="card-amount-hint card-net"{% if card_error %} aria-invalid="true" autofocus{% endif %} value="{{ request.form.get('amount', '') if card_error else '' }}" data-card-rate="{{ card_fee.card_rate }}" data-card-fixed="{{ card_fee.card_fixed }}" data-platform-rate="{{ card_fee.platform_rate }}" data-min-cents="{{ min_card_gift }}" data-max-cents="{{ post.goal_cents }}">
           <small id="card-amount-hint"{% if card_error %} class="error"{% endif %}>{{ card_error or ("From " ~ (min_card_gift | cents) ~ " up to " ~ (post.goal_cents | cents) ~ ".") }}</small>
           <small id="card-net" aria-live="polite" data-poster="{{ poster }}" hidden></small>
         </div>
         <button type="submit" class="btn">Chip in instantly</button>
-        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You pay exactly what you enter. The card fee (about 3% + 30¢) and a {{ card_fee.platform_pct }} Pay My Bill fee come out of it, {{ poster }} gets the rest, and it counts right away. A card from outside the US costs a little more.</p>
+        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You pay exactly what you enter. The card fee (about {{ card_fee.card_pct }} + {{ card_fee.card_fixed }}¢) and a {{ card_fee.platform_pct }} Pay My Bill fee come out of it, {{ poster }} gets the rest, and it counts right away. A card from outside the US costs a little more.</p>
         <script src="{{ url_for('static', filename='js/card-net.js') }}" defer></script>
       </form>
 {% endmacro %}

@@ -8,11 +8,13 @@ function cents(value) {
 }
 
 function update() {
-  const text = input.value.replace(/[$\s]/g, "");
-  const ok = /^(\d+|\d{1,3}(,\d{3})+)(\.\d{1,2})?$/.test(text);
-  const paid = ok ? Math.round(Number(text.replaceAll(",", "")) * 100) : NaN;
+  // The same pattern as the server's parse_dollars, so it never estimates a refused amount.
+  const match = /^\$?\s*(\d{1,3}(?:,\d{3})*|\d+)(?:\.(\d{1,2}))?$/.exec(input.value.trim());
+  const paid = match
+    ? Number(match[1].replaceAll(",", "")) * 100 + Number((match[2] || "0").padEnd(2, "0"))
+    : NaN;
   const d = input.dataset;
-  if (!(paid >= Number(d.min) * 100 && paid <= Number(d.max) * 100)) {
+  if (!(paid >= Number(d.minCents) && paid <= Number(d.maxCents))) {
     net.hidden = true;
     return;
   }
