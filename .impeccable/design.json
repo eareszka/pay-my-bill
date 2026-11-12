@@ -656,8 +656,8 @@
       },
       {
         "name": "how-field",
-        "value": "cross-document view transition, names field-help / field-ask, 460ms var(--ease-out); group overflow clip, background in the field color, 18px radius from 960px; snapshots object-fit none, object-position left bottom",
-        "purpose": "The tapped home door grows into its story field and the other door shrinks into the docked strip; only under prefers-reduced-motion: no-preference."
+        "value": "cross-document view transition, names field-help / field-ask, 460ms var(--ease-out); group overflow clip, z-index 1, 18px radius from 960px; group background in the field color only under types keep-help / keep-ask (both pages carry the field), otherwise the partnerless field just fades; snapshots object-fit none, object-position left bottom",
+        "purpose": "The tapped home door grows into its story field and the other door shrinks into the docked strip; on sign-up the story field sinks into the back strip; only under prefers-reduced-motion: no-preference."
       },
       {
         "name": "how-cut",
@@ -667,12 +667,17 @@
       {
         "name": "how-back",
         "value": "view transition type back: clip-path inset(0 100% 0 0) + translateX(-32px) in, old leaves 32px right",
-        "purpose": "Going back a step, or to the doors (step 0), reverses the cut; set by how.js on pagereveal."
+        "purpose": "Going back a step, to the doors (step 0), or from sign-up (step 99) to the story reverses the cut; set by how.js on pagereveal."
       },
       {
         "name": "how-open",
         "value": "view transition type open: incoming how-step delayed 220ms",
         "purpose": "Opening a door or switching stories lets the field land before the words cut in."
+      },
+      {
+        "name": "join-handoff",
+        "value": "view transition name join-card on .how-end / .join-card, 460ms var(--ease-out), group overflow clip at var(--radius), z-index 2 with how-step; old snapshot centered, fades out 120ms after 100ms ease-in; new snapshot left top, fades in 200ms ease-out",
+        "purpose": "The last step's white Sign up grows into the sign-up form card while the step words cut and the field sinks into the strip; reduced motion is plain navigation."
       },
       {
         "name": "how-swipe",

@@ -582,6 +582,7 @@ h3.section-title { font-size: 1rem; }
   .topbar > nav .icon { width: 20px; height: 20px; }
   .topbar > nav { margin-left: auto; }
   .topbar > nav a[href="/signup"] { display: none; }
+  .join-page .topbar > nav a[href^="/login"] { display: none; }
   .topbar .topbar-signup { margin-left: 12px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
@@ -628,7 +629,7 @@ h3.section-title { font-size: 1rem; }
 }
 
 /* Home (#120): two doors. Each opens its own story, one step per page, and the door you take becomes the screen. */
-body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding: 0; }
+body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none; padding: 0; }
 .home-door-help, .how-story-help .how-field, .how-other-help { --field: var(--want); }
 .home-door-ask, .how-story-ask .how-field, .how-other-ask { --field: var(--need); }
 .home { --door-h: clamp(260px, calc((100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom) - 96px) / 2), 420px); color: var(--on-void); }
@@ -723,15 +724,35 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
 }
 .how-other-line { font: 400 1.75rem/1 var(--display); text-transform: uppercase; }
 
+/* Sign up (#120): the story's white Sign up grows into this card, and the story's field sinks into the strip at the foot. */
+.join { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); color: var(--on-void); }
+.join-step { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: 12px 18px 28px; }
+.join-line { margin: 0 0 8px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
+.join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--on-void-muted); }
+.join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--on-void); border-radius: 16px; }
+.join-card .form { color: var(--ink); }
+.join-login { margin: 20px 0 0; color: var(--on-void-muted); }
+.join-login a { color: var(--on-void); font-weight: 700; }
+.join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 3; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
+.join-back .icon { width: 20px; height: 20px; }
+
 /* The door you take grows into the story while the other shrinks into the strip; each step's words cut in from the right. */
 @media (prefers-reduced-motion: no-preference) {
   .home-door-help, .how-story-help .how-field, .how-other-help { view-transition-name: field-help; }
   .home-door-ask, .how-story-ask .how-field, .how-other-ask { view-transition-name: field-ask; }
-  .how-step { view-transition-name: how-step; }
+  .how-step, .join-step { view-transition-name: how-step; }
+  .how-end, .join-card { view-transition-name: join-card; }
+  /* The button grows into the form card in front of the field sinking to the foot; the step words ride on top too. */
+  ::view-transition-group(field-help), ::view-transition-group(field-ask) { z-index: 1; }
+  ::view-transition-group(how-step), ::view-transition-group(join-card) { z-index: 2; }
+  ::view-transition-group(join-card) { overflow: clip; border-radius: var(--radius); animation-duration: 460ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(join-card) { height: 100%; object-fit: none; object-position: center; animation: how-fade-out 120ms 100ms ease-in both; }
+  ::view-transition-new(join-card) { height: 100%; object-fit: none; object-position: left top; animation: how-fade-in 200ms ease-out both; }
   ::view-transition-group(field-help), ::view-transition-group(field-ask) { overflow: clip; animation-duration: 460ms; animation-timing-function: var(--ease-out); }
-  /* The group carries the field's own color, so a growing door never shows a ghosted band. */
-  ::view-transition-group(field-help) { background: var(--want); }
-  ::view-transition-group(field-ask) { background: var(--need); }
+  /* When both pages carry a field, its group holds the field's own color so a growing door never shows a ghosted band.
+     A field with no partner just fades (how.js names the pairs). */
+  html:active-view-transition-type(keep-help)::view-transition-group(field-help) { background: var(--want); }
+  html:active-view-transition-type(keep-ask)::view-transition-group(field-ask) { background: var(--need); }
   ::view-transition-old(field-help), ::view-transition-new(field-help),
   ::view-transition-old(field-ask), ::view-transition-new(field-ask) { height: 100%; object-fit: none; object-position: left bottom; animation-duration: 460ms; }
   ::view-transition-group(how-step) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
@@ -744,6 +765,8 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
 @keyframes how-cut { from { clip-path: inset(0 0 0 100%); transform: translateX(32px); } to { clip-path: inset(0); transform: none; } }
 @keyframes how-cut-back { from { clip-path: inset(0 100% 0 0); transform: translateX(-32px); } to { clip-path: inset(0); transform: none; } }
 @keyframes how-leave { to { opacity: 0; transform: translateX(-32px); } }
+@keyframes how-fade-out { to { opacity: 0; } }
+@keyframes how-fade-in { from { opacity: 0; } }
 @keyframes how-leave-back { to { opacity: 0; transform: translateX(32px); } }
 
 @media (min-width: 960px) {
@@ -768,5 +791,8 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
   .how-step { display: grid; grid-template-columns: minmax(0, 1fr) 400px; align-items: center; gap: 56px; }
   .how-line { font-size: 5.5rem; }
   .how-other { padding: 16px 40px; border-radius: 18px; }
+  .join { max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 0 24px 24px; }
+  .join-step { padding-top: 24px; }
+  .join-back { bottom: 24px; }
   ::view-transition-group(field-help), ::view-transition-group(field-ask) { border-radius: 18px; }
 }

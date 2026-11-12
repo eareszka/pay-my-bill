@@ -33,6 +33,10 @@ def test_signup_page_renders(client: FlaskClient) -> None:
     resp = client.get("/signup")
     assert resp.status_code == 200
     assert b"Create your account" in resp.data
+    assert b"Join in" in resp.data
+    assert b"join-back" not in resp.data
+    # The top bar offers the other way in, not a second Sign up.
+    assert b'<a class="btn topbar-signup" href="/login">Log in</a>' in resp.data
 
 
 def test_signup_creates_hashed_user_and_sends_verification(
@@ -314,6 +318,14 @@ def test_signups_are_limited_per_address(app: Flask) -> None:
     assert resp.headers["Retry-After"] == str(int(SIGNUP_WINDOW.total_seconds()))
     assert b"Too many new accounts from your network" in resp.data
     assert user_count() == MAX_SIGNUPS_PER_IP
+    # Arriving from a how-it-works story, the way back survives the limit (#120).
+    from_story = app.test_client().post(
+        "/signup?from=ask",
+        data={**FORM, "username": "one_more", "email": "more@example.com"},
+        environ_base={"REMOTE_ADDR": "203.0.113.7"},
+    )
+    assert from_story.status_code == 429
+    assert b'class="how-other how-other-ask join-back"' in from_story.data
     # Another address is unaffected, and the window passing lifts the limit.
     assert signup_as(app.test_client(), 100, ip="198.51.100.9") == 302
     db.session.execute(

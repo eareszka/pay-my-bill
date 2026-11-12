@@ -51,7 +51,7 @@ def test_each_story_ends_on_sign_up_or_the_other_story(
     client: FlaskClient, path: str, total: int, other: str
 ) -> None:
     page = page_at(client, f"/how/{path}/{total}")
-    assert '<a class="btn how-end" href="/signup">Sign up</a>' in page
+    assert f'<a class="btn how-end" href="/signup?from={path}">Sign up</a>' in page
     assert f'href="{other}">' in page
     assert "Or see how" in page
     assert "Next<svg" not in page
@@ -102,3 +102,16 @@ def test_feed_is_open_to_everyone(client: FlaskClient) -> None:
 
 def test_brand_goes_home(client: FlaskClient) -> None:
     assert '<a class="brand" href="/">Pay My Bill</a>' in page_at(client, "/feed")
+
+
+@pytest.mark.parametrize(("path", "total", "other"), STORIES)
+def test_sign_up_from_a_story_keeps_the_way_back(
+    client: FlaskClient, path: str, total: int, other: str
+) -> None:
+    page = page_at(client, f"/signup?from={path}")
+    assert f'<a class="how-other how-other-{path} join-back" href="/how/{path}/{total}">' in page
+    assert other not in page.split("join-back")[1].split("</a>")[0]
+
+
+def test_sign_up_ignores_an_unknown_story(client: FlaskClient) -> None:
+    assert "join-back" not in page_at(client, "/signup?from=elsewhere")
