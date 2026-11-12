@@ -32,7 +32,7 @@
         {{ nav_link("auth.signup", "you", "Sign up") }}
       {% endif %}
     </nav>
-    {% if not current_user.is_authenticated %}<a class="btn topbar-signup" href="{{ '#join' if request.endpoint == 'main.home' else url_for('auth.signup') }}">Sign up</a>{% endif %}
+    {% if not current_user.is_authenticated %}<a class="btn topbar-signup" href="{{ url_for('auth.signup') }}">Sign up</a>{% endif %}
   </header>
   <main class="container{% block main_class %}{% endblock %}" id="main" tabindex="-1">
     {% for category, message in get_flashed_messages(with_categories=true) %}

@@ -645,14 +645,29 @@
         "purpose": "Button active state."
       },
       {
-        "name": "home-cut",
-        "value": "clip-path inset(0 0 0 100%) to inset(0), linear, animation-timeline view(), range entry 0% to entry 100%",
-        "purpose": "Home page step fields wipe in from the right; only under @supports (animation-timeline: view()) and prefers-reduced-motion: no-preference."
+        "name": "how-field",
+        "value": "cross-document view transition, names field-help / field-ask, 460ms var(--ease-out); group overflow clip, background in the field color, 18px radius from 960px; snapshots object-fit none, object-position left bottom",
+        "purpose": "The tapped home door grows into its story field and the other door shrinks into the docked strip; only under prefers-reduced-motion: no-preference."
       },
       {
-        "name": "home-follow",
-        "value": "opacity 0.2 and translateX(56px) to rest, linear, view() entry 0% to 80%",
-        "purpose": "A home step's example piece follows its field in."
+        "name": "how-cut",
+        "value": "clip-path inset(0 0 0 100%) + translateX(32px) to rest, 420ms var(--ease-out); old step fades and moves 32px left, 220ms ease-in",
+        "purpose": "Each story step's content (how-step) wipes in from the right."
+      },
+      {
+        "name": "how-back",
+        "value": "view transition type back: clip-path inset(0 100% 0 0) + translateX(-32px) in, old leaves 32px right",
+        "purpose": "Going back a step, or to the doors (step 0), reverses the cut; set by how.js on pagereveal."
+      },
+      {
+        "name": "how-open",
+        "value": "view transition type open: incoming how-step delayed 220ms",
+        "purpose": "Opening a door or switching stories lets the field land before the words cut in."
+      },
+      {
+        "name": "how-swipe",
+        "value": "60px horizontal, pointer non-mouse, |dx| >= 1.5 * |dy|; ArrowLeft / ArrowRight",
+        "purpose": "Swipe or arrow keys follow the Back / Next links on story steps."
       }
     ],
     "breakpoints": [
