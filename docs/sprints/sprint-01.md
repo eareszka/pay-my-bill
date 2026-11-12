@@ -28,6 +28,7 @@ Sprint Planning is Monday. #1 was pulled forward on 2026-10-27 because Sprint 0 
 - 2026-10-28: #7 merged (#20). All 23 committed points are done before the official sprint start (2026-11-02), so planning on Monday can pull Sprint 2 forward or take on the backlog follow-ups from the reviews: #14 resend cooldown, #15 async mail and `login_attempts` pruning, #21 keep a handle while a post is open. Review and Retro are left for the owner on Sunday. Blocked: none.
 - 2026-10-28: The post-merge staging check found every Render deploy since #12 failing. SQLAlchemy 2.1 defaults to psycopg 3, but only psycopg2 was installed (#23, P0). Fixed in #24: switched to `psycopg[binary]`, pinned the driver in the URL and SQLAlchemy to 2.1.x, and amended ADR 0005. Next: confirm staging serves `/signup`. Blocked: none.
 - 2026-10-28: #25: documented the owner's results-update idea (ADR 0008) and people-helped leaderboards (ADR 0009), added T11–T15 and new PRD risks, and filed the product backlog as #26–#36. Next: owner approves the PR, then the repo goes public with branch protection. Blocked: none.
+- 2026-10-28: #37 merged. A gitleaks scan of all 38 commits found no leaks, so the repo was made public and `main` is now protected (PR + `checks` CI required, no force-push). #38 updates AGENTS.md to match. Next: Sprint 2 planning. Blocked: none.
 
 ## Review
 _(Sunday)_

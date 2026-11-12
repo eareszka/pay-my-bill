@@ -124,9 +124,14 @@ def test_card_form_hidden_without_stripe_or_when_not_ready(
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Chip in instantly" not in page
     assert "Cash App" in page
+    # With no card option, the app buttons are the main action and stay filled.
+    assert '<a class="btn" href="https://cash.app/' in page
     recipient.stripe_ready = True
     db.session.commit()
-    assert "Or pay in an app" in client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Or pay in an app" in page
+    # Next to "Chip in instantly", they're outlined so the card stays the one fill.
+    assert '<a class="btn btn-secondary" href="https://cash.app/' in page
     app.config["STRIPE_SECRET_KEY"] = ""
     assert "Chip in instantly" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
 

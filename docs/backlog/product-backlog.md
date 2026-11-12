@@ -153,8 +153,8 @@ As the **community**, we want **a way to report and act on bad posts** (App Stor
 - [ ] Admins see reports and flagged posts in one queue, and can approve, remove, or ban.
 - [ ] A banned user can't log in, and their open posts leave the feed.
 
-### PB-34 Production settings and security headers · #TBD · 2 pts · P0 · chore · v0.2-beta
-- [ ] Secure session cookies, security headers, and an upload limit are on in production.
+### PB-34 Production settings and security headers · #142 · 2 pts · P0 · chore · v0.2-beta
+- [x] Secure session cookies, security headers, and an upload limit are on in production.
 - [ ] The app refuses to start in production without `SECRET_KEY`.
 
 ### PB-35 Scheduled jobs for reminders · #TBD · 1 pt · P1 · chore · v0.2-beta
@@ -245,3 +245,6 @@ As a **visitor**, I want to **ask the poster a question before I give** so that 
 - [ ] A question that's never answered is never shown publicly.
 - [ ] At most 3 open questions per asker per post.
 
+### PB-49 Catch farms that use a helper account · #146 · 3 pts · P2 · security
+From the audit's re-test of #140. A farmer plus one extra account that both give 1 cent to the same puppets avoids the flag, and both get credit.
+- [ ] Flag a group of recipients that share the same small set of givers when every confirmed gift in the group is tiny.

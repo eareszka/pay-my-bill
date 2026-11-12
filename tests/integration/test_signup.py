@@ -4,17 +4,17 @@ import smtplib
 from datetime import timedelta
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from flask.testing import FlaskClient
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from werkzeug.security import check_password_hash
 
 from app import create_app
-from app.auth import verified_required
+from app.auth import MAX_SIGNUPS_PER_IP, SIGNUP_WINDOW, verified_required
 from app.extensions import db
 from app.models import LoginAttempt, User, as_utc, utcnow
 from app.tokens import VERIFY_EMAIL, make_token
-from tests.conftest import MakeUser, login_as
+from tests.conftest import PASSWORD, MakeUser, login_as
 
 FORM = {
     "username": "New_User",
@@ -190,17 +190,17 @@ def test_verified_required_prompts_unverified_user() -> None:
         verified.email_verified_at = utcnow()
         db.session.add_all([unverified, verified])
         db.session.commit()
-        unverified_id, verified_id = unverified.id, verified.id
+        unverified_id, verified_id = unverified.get_id(), verified.get_id()
 
     client = app.test_client()
     assert "/login?next=" in client.get("/protected").location
     with client.session_transaction() as session:
-        session["_user_id"] = str(unverified_id)
+        session["_user_id"] = unverified_id
     resp = client.get("/protected")
     assert resp.status_code == 302
     assert resp.location.endswith("/verify/pending")
     with client.session_transaction() as session:
-        session["_user_id"] = str(verified_id)
+        session["_user_id"] = verified_id
     assert client.get("/protected").get_data(as_text=True) == "ok"
 
 
@@ -220,7 +220,7 @@ def test_csrf_token_required() -> None:
 
 
 def test_index_renders(app: Flask, client: FlaskClient) -> None:
-    assert client.get("/").status_code == 200
+    assert client.get("/feed").status_code == 200
 
 
 def test_verify_token_bound_to_email(client: FlaskClient, make_user: MakeUser) -> None:
@@ -251,16 +251,22 @@ def test_signup_survives_mail_failure(
 def test_malformed_session_user_id_is_anonymous(client: FlaskClient) -> None:
     with client.session_transaction() as session:
         session["_user_id"] = "not-a-number"
-    resp = client.get("/")
+    resp = client.get("/feed")
     assert resp.status_code == 200
     assert b"Sign up" in resp.data
 
 
-def test_proxy_headers_make_https_links(
-    client: FlaskClient, caplog: pytest.LogCaptureFixture
+def test_emailed_links_come_from_app_url(
+    app: Flask, client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
 ) -> None:
-    client.post("/signup", data=FORM, headers={"X-Forwarded-Proto": "https"})
-    assert "https://localhost/verify/" in caplog.text
+    # A forged Host must not steer a reset link to someone else's site (#150).
+    app.config.update(SERVER_NAME=None, APP_URL="https://pay.example/")
+    make_user("alice")
+    client.post("/reset", data={"email": "alice@example.com"}, headers={"Host": "evil.example"})
+    client.post("/signup", data=FORM, headers={"Host": "evil.example", "X-Forwarded-Proto": "http"})
+    assert "https://pay.example/reset/" in caplog.text
+    assert "https://pay.example/verify/" in caplog.text
+    assert "evil.example" not in caplog.text
 
 
 def test_signup_requires_18_plus(client: FlaskClient) -> None:
@@ -286,3 +292,115 @@ def test_field_errors_are_linked_for_screen_readers(client: FlaskClient) -> None
     assert (
         '<small class="error" id="username-error">Usernames are 3 to 30 characters.</small>' in page
     )
+
+
+def signup_as(client: FlaskClient, n: int, ip: str = "203.0.113.7") -> int:
+    form = {**FORM, "username": f"user{n}", "email": f"user{n}@example.com"}
+    status = client.post("/signup", data=form, environ_base={"REMOTE_ADDR": ip}).status_code
+    # Requests in the fixture's app context share g, so forget who signed up.
+    g.pop("_login_user", None)
+    return status
+
+
+def test_signups_are_limited_per_address(app: Flask) -> None:
+    for n in range(MAX_SIGNUPS_PER_IP):
+        assert signup_as(app.test_client(), n) == 302
+    resp = app.test_client().post(
+        "/signup",
+        data={**FORM, "username": "one_more", "email": "more@example.com"},
+        environ_base={"REMOTE_ADDR": "203.0.113.7"},
+    )
+    assert resp.status_code == 429
+    assert resp.headers["Retry-After"] == str(int(SIGNUP_WINDOW.total_seconds()))
+    assert b"Too many new accounts from your network" in resp.data
+    assert user_count() == MAX_SIGNUPS_PER_IP
+    # Another address is unaffected, and the window passing lifts the limit.
+    assert signup_as(app.test_client(), 100, ip="198.51.100.9") == 302
+    db.session.execute(
+        update(LoginAttempt).values(created_at=utcnow() - SIGNUP_WINDOW - timedelta(minutes=1))
+    )
+    db.session.commit()
+    assert signup_as(app.test_client(), 101) == 302
+
+
+def test_signups_do_not_count_toward_the_login_lockout(app: Flask, make_user: MakeUser) -> None:
+    make_user("alice")
+    for n in range(MAX_SIGNUPS_PER_IP):
+        signup_as(app.test_client(), n, ip="127.0.0.1")
+    resp = app.test_client().post("/login", data={"identifier": "alice", "password": PASSWORD})
+    assert resp.status_code == 302
+
+
+def test_an_account_named_signup_gets_no_lockout_relief(app: Flask, make_user: MakeUser) -> None:
+    make_user("signup")
+    client = app.test_client()
+    for n in range(7):
+        # A signup between guesses must not reset the guess count.
+        signup_as(app.test_client(), n, ip="127.0.0.1")
+        client.post("/login", data={"identifier": "signup", "password": "wrong-guess"})
+    resp = client.post("/login", data={"identifier": "signup", "password": "wrong-guess"})
+    assert resp.status_code == 429
+
+
+def test_deleting_an_account_named_signup_keeps_the_limit(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    for n in range(MAX_SIGNUPS_PER_IP):
+        signup_as(app.test_client(), n)
+    named_signup = make_user("signup")
+    login_as(client, named_signup)
+    client.post("/account/delete", data={"password": PASSWORD})
+    g.pop("_login_user", None)
+    db.session.refresh(named_signup)
+    assert named_signup.is_deleted
+    assert signup_as(app.test_client(), 99) == 429
+
+
+def test_a_logged_out_verify_link_asks_to_log_in_first(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    # Someone signed up with this inbox's address; its owner clicks the link (#160).
+    user = make_user("squatter", verified=False)
+    token = make_token(user.id, user.email, VERIFY_EMAIL)
+    resp = client.get(f"/verify/{token}")
+    assert "/login?next=/verify/" in resp.location
+    assert not user.is_verified
+    page = client.get(resp.location).get_data(as_text=True)
+    assert "Reset its password to claim it." in page
+
+    # The account's own login then finishes it and lands on the feed.
+    resp = client.post(resp.location, data={"identifier": "squatter", "password": PASSWORD})
+    resp = client.get(resp.location)
+    assert user.is_verified
+    assert resp.location == "/feed"
+
+
+def test_another_accounts_session_cannot_verify(client: FlaskClient, make_user: MakeUser) -> None:
+    target = make_user("target", verified=False)
+    login_as(client, make_user("someone"))
+    resp = client.get(f"/verify/{make_token(target.id, target.email, VERIFY_EMAIL)}")
+    assert resp.location == "/feed"
+    assert not target.is_verified
+
+
+def test_verify_email_says_what_to_do_if_you_did_not_sign_up(
+    client: FlaskClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    client.post("/signup", data=FORM)
+    assert "Didn't sign up for Pay My Bill?" in caplog.text
+    assert "/reset" in caplog.text
+
+
+def test_logins_typed_as_the_marker_do_not_use_up_emails(
+    app: Flask, client: FlaskClient, make_user: MakeUser
+) -> None:
+    from app.auth import MAX_VERIFY_EMAILS
+
+    user = make_user(verified=False)
+    # A logged-out visitor fails logins as this user's marker (#179).
+    stranger = app.test_client()
+    for _ in range(MAX_VERIFY_EMAILS + 1):
+        stranger.post("/login", data={"identifier": f"verify:{user.id}", "password": "x"})
+    g.pop("_login_user", None)
+    login_as(client, user)
+    assert b"new verification link" in client.post("/verify/resend", follow_redirects=True).data

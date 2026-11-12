@@ -25,9 +25,10 @@ MAX_FEEDBACK_PER_UPDATE = 3  # T16: a pile of kudos can't outweigh real follow-t
 
 def established(user: User, at: datetime) -> bool:
     # Verified, and old enough when they acted, so an account made for the purpose never
-    # counts, even once it ages (T2, T16). A real donor who later left keeps counting (T14).
+    # counts, even once it ages (T2, T16). A real donor who later left keeps counting (T14);
+    # a banned one doesn't (#147).
     old_enough = as_utc(user.created_at) + timedelta(days=MIN_ACCOUNT_AGE_DAYS) <= as_utc(at)
-    return old_enough and (user.is_verified or user.is_deleted)
+    return old_enough and not user.is_banned and (user.is_verified or user.is_deleted)
 
 
 def real_gifts(post: Post) -> list[Donation]:

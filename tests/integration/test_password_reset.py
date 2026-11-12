@@ -4,12 +4,14 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
+from flask import Flask
 from flask.testing import FlaskClient
+from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import check_password_hash
 
 from app.extensions import db
-from app.models import LoginAttempt, utcnow
-from app.tokens import RESET_PASSWORD, make_token
+from app.models import LoginAttempt, User, utcnow
+from app.tokens import RESET_PASSWORD, make_token, password_digest
 from tests.conftest import PASSWORD, MakeUser
 
 NEW = "brand-new-pass"
@@ -82,7 +84,7 @@ def test_mismatched_passwords_are_refused(
 
 def test_expired_link_is_refused(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user("alice")
-    token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+    token = make_token(user.id, password_digest(user.password_hash), RESET_PASSWORD)
     later = utcnow() + timedelta(hours=2)
     with patch("itsdangerous.timed.time.time", return_value=later.timestamp()):
         resp = client.get(f"/reset/{token}", follow_redirects=True)
@@ -94,7 +96,7 @@ def test_garbage_and_deleted_accounts_are_refused(client: FlaskClient, make_user
     user = make_user("gone")
     user.email = "x@deleted.invalid"
     db.session.commit()
-    token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+    token = make_token(user.id, password_digest(user.password_hash), RESET_PASSWORD)
     assert client.get(f"/reset/{token}").location.endswith("/reset")
     client.post("/reset", data={"email": "x@deleted.invalid"})
 
@@ -127,3 +129,116 @@ def test_mail_failure_keeps_the_same_reply(client: FlaskClient, make_user: MakeU
     with patch("app.mail.send_email", side_effect=smtplib.SMTPException("down")):
         resp = client.post("/reset", data={"email": "alice@example.com"}, follow_redirects=True)
     assert b"If an account uses that email" in resp.data
+
+
+def test_reset_ends_sessions_from_before_it(
+    app: Flask, client: FlaskClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Someone signs up with alice's email and stays logged in (#130).
+    squatter = app.test_client()
+    squatter.post(
+        "/signup",
+        data={
+            "username": "squatter",
+            "email": "alice@example.com",
+            "password": PASSWORD,
+            "confirm": PASSWORD,
+            "adult": "y",
+            "rules": "y",
+        },
+    )
+    user = db.session.query(User).filter_by(email="alice@example.com").one()
+    assert squatter.get("/profile").status_code == 200
+
+    # Alice claims the account through her inbox.
+    client.post("/reset", data={"email": "alice@example.com"})
+    client.post(reset_link(caplog), data={"password": NEW, "confirm": NEW})
+    db.session.refresh(user)
+    assert user.is_verified
+
+    resp = squatter.get("/profile")
+    assert resp.status_code == 302
+    assert "/login" in resp.location
+    assert (
+        client.post("/login", data={"identifier": "alice@example.com", "password": NEW}).status_code
+        == 302
+    )
+    assert client.get("/profile").status_code == 200
+
+
+def test_session_without_current_version_is_anonymous(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    user = make_user("alice")
+    for stale in (str(user.id), f"{user.id}:{user.session_version + 1}", f"{user.id}:"):
+        with client.session_transaction() as session:
+            session["_user_id"] = stale
+        assert client.get("/profile").status_code == 302
+
+
+def test_link_does_not_carry_the_password_hash(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    user = make_user("alice")
+    client.post("/reset", data={"email": "alice@example.com"})
+    token = reset_link(caplog).removeprefix("/reset/")
+    # Signed, not encrypted: anyone can read the payload without the key (#134).
+    valid, payload = URLSafeTimedSerializer("not-the-key").loads_unsafe(token)
+    assert not valid
+    assert payload == [user.id, password_digest(user.password_hash)]
+    assert "scrypt" not in str(payload)
+
+
+def test_link_bound_to_the_raw_hash_is_refused(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user("alice")
+    token = make_token(user.id, user.password_hash, RESET_PASSWORD)
+    assert client.get(f"/reset/{token}").location.endswith("/reset")
+
+
+def test_claiming_an_unverified_account_clears_its_handles(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Set up by someone else before the email's owner claimed it (#133).
+    user = make_user(
+        "alice",
+        verified=False,
+        venmo_handle="squatter",
+        cashapp_handle="squatter",
+        paypal_handle="squatter",
+        city="Madison",
+        state="WI",
+    )
+    client.post("/reset", data={"email": "alice@example.com"})
+    resp = client.post(
+        reset_link(caplog), data={"password": NEW, "confirm": NEW}, follow_redirects=True
+    )
+    assert b"we cleared its payment handles and city" in resp.data
+    db.session.refresh(user)
+    assert user.is_verified
+    assert (user.cashapp_handle, user.venmo_handle, user.paypal_handle) == (None, None, None)
+    assert (user.city, user.state) == (None, None)
+
+
+def test_claiming_a_bare_unverified_account_says_nothing_extra(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    make_user("alice", verified=False)
+    client.post("/reset", data={"email": "alice@example.com"})
+    resp = client.post(
+        reset_link(caplog), data={"password": NEW, "confirm": NEW}, follow_redirects=True
+    )
+    assert b"Your password is changed" in resp.data
+    assert b"we cleared" not in resp.data
+
+
+def test_reset_keeps_a_verified_accounts_handles(
+    client: FlaskClient, make_user: MakeUser, caplog: pytest.LogCaptureFixture
+) -> None:
+    user = make_user("alice", venmo_handle="alice-v", city="Madison", state="WI")
+    client.post("/reset", data={"email": "alice@example.com"})
+    resp = client.post(
+        reset_link(caplog), data={"password": NEW, "confirm": NEW}, follow_redirects=True
+    )
+    assert b"we cleared" not in resp.data
+    db.session.refresh(user)
+    assert (user.venmo_handle, user.city, user.state) == ("alice-v", "Madison", "WI")

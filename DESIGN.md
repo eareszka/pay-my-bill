@@ -271,7 +271,7 @@ Corners are gentle and scale with the size of the object: 2px on the meter, 6px 
 Plain and confident. There is one inverse fill, and everything else is drawn in outline.
 - **Shape:** gently rounded (8px), at least 46px tall, padding 10px 18px, Public Sans 700.
 - **Primary:** ink fill with white text on light pages, and white fill with void text on dark pages and the stage. Hover shifts the fill one step (action-hover). Pressing scales it to 0.98.
-- **Secondary:** transparent with a 1.5px edge stroke and ink text. Hover darkens the stroke to ink.
+- **Secondary:** transparent with a 1.5px edge stroke and ink text. Hover darkens the stroke to ink. The Cash App, Venmo, and PayPal buttons are secondary when "Chip in instantly" sits above them, and primary when they're the only way to pay.
 - **Danger:** a tomato fill used only for confirmed destructive acts such as deleting a post. Its text is white on light pages and void on dark.
 - **Disabled:** 50% opacity with a not-allowed cursor.
 - **Focus:** a 2px ink outline offset by 2px everywhere (white on void).
@@ -297,6 +297,7 @@ State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes 
 ### Navigation
 - **Phone:** a fixed void bar at the bottom with Lucide 24px icons over 0.75rem 700 labels in fog gray. The current page turns white and its icon stroke thickens to 2.5. A white count badge on You marks gifts waiting to be confirmed. You opens your own profile, where Gifts now lives.
 - **Desktop (960px and wider):** the same items, inline in the top bar with 20px icons and 0.9375rem labels. The current page gets a slate fill with 8px corners.
+- **Logged out:** the top bar carries one white filled Sign up (void text, 36px tall, 6px 14px padding, hover #d9dce2) after the nav. On the home page it jumps to the sign-up form, and elsewhere it opens `/signup`. At 960px and wider the nav hides its duplicate Sign up text link, and phones keep the Sign up tab in the bottom nav. The wordmark links to the home page.
 - **Tabs:** text tabs with a 2px underline on the current tab (white on the stage, ink elsewhere) and muted inactive tabs over a hairline.
 
 ### Lists
@@ -314,6 +315,17 @@ One ask per screen, with a real link for each move. Dragging past 8px picks up t
 ### Photo State
 A post may carry one poster photo (ADR 0015). On the feed card it fills the field edge to edge (`object-fit: cover`) under a deeper scrim: 45% black at the top for the tabs, clear through the middle, and 82% black at the foot for the words. The title drops to sit just above the foot, so the photo's middle stays clear. On the post page the color-field header grows to `min(72vh, 600px)` (520px on desktop), with the photo behind it and a scrim to 82% at the foot. The ask's color stays underneath while the photo loads. A post with no photo is complete and never shows an empty frame.
 
+### The Home Page
+The logged-out front door at `/` (#120) explains the app the way the feed moves: each step cuts in sideways as its own color field. The page is always void, and the feed itself lives at `/feed`.
+- **Doors:** two full-bleed linked fields, Want Cobalt "I want to help" and Need Ember "I need a hand", each with the bottom scrim. A door carries one League Gothic line at Display Hero size, a 1.0625rem sentence (34ch max), and a bold "See how it works" with a 20px arrow that slides 4px on hover. There is deliberately no small label above the line: the craft floor bans eyebrows, so the line itself names the door. Phones stack them, each about half the viewport tall (260 to 420px). At 960px they sit side by side as 18px-cornered fields with a 16px gap, as tall as the viewport less the bar (420 to 640px). Focus is a white 2px outline inset 6px.
+- **Promise strip:** a plain void strip under the doors, with the money promise in bold white and the rest in fog gray.
+- **Paths:** two ordered lists of steps, cobalt for helping (four steps) and ember for asking (three). Each step is a field with a League Gothic line (5rem at 960px and wider), a 1.0625rem sentence (40ch max), and a tabular "1 of 4" count beneath, followed by its example piece on void.
+- **Example pieces:** the real app components (the mini ask card, the Chip in panel, the To confirm row, the rewards meter, state marks) under an "Example" tag: 0.75rem 700 white text in a 1.5px edge outline with 6px corners. Each piece mirrors the real app in its real state, so step 2 shows filled pay-app buttons with an outlined "I sent it", which is what a post without card gifts shows. Example buttons are inert (default cursor, no press). The mini ask card is a 14px-cornered field (360px max) with a 3rem League Gothic title, the meter on the field, and a white 12px Chip in tab.
+- **Phones:** each step field bleeds full width (at least `min(62svh, 520px)` tall), with its example below on void with 16px sides and 32px before the next step.
+- **960px and wider:** each path is one continuous band bleeding off the right edge, with only its first and last fields rounded (18px) on the left. The examples sit on void in a 400px column on the left, centered against their field, inside a gutter that aligns with the 1240px frame.
+- **The cut:** under `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference` only, each field wipes in from the right with a linear `clip-path: inset(0 0 0 100%)` to `inset(0)` tied to its view() entry, and its example follows (from 20% opacity and 56px to the right, done by 80% of entry). Without support, or with reduced motion, the plain stacked page is the default and is complete.
+- **End:** the helping path closes with a filled "Sign up to chip in" and a link to the asking path. Both paths end at the working sign-up form on void (480px column, 520px at 960px and wider) with a fog-gray lede, plus links to the feed and Log in.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -325,6 +337,7 @@ A post may carry one poster photo (ADR 0015). On the feed card it fills the fiel
 - **Do** use Lucide line icons at a 2px stroke from the `_icons.html` sprite, always with a visible text label.
 - **Do** back every gesture with a labeled button and a real link, so the feed works without JavaScript and at 360px with no horizontal scroll.
 - **Do** say "gift" and "chip in" in interface copy.
+- **Do** label every demo piece of the app "Example" with the outlined tag, and make it mirror the real component and its real state exactly.
 
 ### Don't:
 - **Don't** use tomato for anything but errors, disputed gifts, and destructive actions.
@@ -334,3 +347,4 @@ A post may carry one poster photo (ADR 0015). On the feed card it fills the fiel
 - **Don't** add a second progress style (rings, segmented bars, or percentages as hero numbers).
 - **Don't** nest cards in panels or lay asks out as a card grid or vertical-scroll feed.
 - **Don't** say "donation" or "charity" anywhere in the interface.
+- **Don't** invent stats, counts, testimonials, or quotes on marketing surfaces. The proof is the real app pieces, labeled Example.

@@ -24,6 +24,8 @@ for _key in (
     "R2_SECRET_ACCESS_KEY",
 ):
     os.environ[_key] = ""
+# Tests run as local development; the production checks have their own tests.
+os.environ["FLASK_ENV"] = "development"
 
 PASSWORD = "correct-horse"  # noqa: S105 - test fixture
 
@@ -39,6 +41,7 @@ def app(tmp_path: Path) -> Iterator[Flask]:
             "WTF_CSRF_ENABLED": False,
             "MAIL_ASYNC": False,
             "SERVER_NAME": "localhost",
+            "APP_URL": "http://localhost",
         }
     )
     with app.app_context():
@@ -75,5 +78,5 @@ def make_user(app: Flask) -> MakeUser:
 
 def login_as(client: FlaskClient, user: User) -> None:
     with client.session_transaction() as session:
-        session["_user_id"] = str(user.id)
+        session["_user_id"] = user.get_id()
         session["_fresh"] = True

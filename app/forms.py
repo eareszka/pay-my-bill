@@ -25,7 +25,7 @@ from wtforms.validators import (
 )
 
 from app.models import MAX_GOAL_CENTS, Post, PostKind, ReportReason
-from app.moderation import is_flagged
+from app.moderation import update_flagged_keywords
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
 from app.photos import PhotoError, process
@@ -293,9 +293,14 @@ class ResultsUpdateForm(FlaskForm):
     )
 
     def validate_note(self, field: TextAreaField) -> None:
-        if is_flagged(field.data):
+        # Runs even when Length has already refused the note, so an oversized body
+        # is never scanned (#158).
+        if not field.data or len(field.data) > 2000:
+            return
+        words = update_flagged_keywords(field.data)
+        if words:
             raise ValidationError(
-                "That reads like fundraising, which isn't allowed here. "
+                f"“{words[0]}” reads like fundraising, which isn't allowed here. "
                 "Tell people how the help was used."
             )
 

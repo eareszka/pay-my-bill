@@ -34,8 +34,8 @@ def test_login_success_lands_on_feed(
     user = make_user("alice")
     resp = client.post("/login", data={"identifier": identifier, "password": PASSWORD})
     assert resp.status_code == 302
-    assert resp.location == "/"
-    assert logged_in_as(client) == str(user.id)
+    assert resp.location == "/feed"
+    assert logged_in_as(client) == user.get_id()
     attempt = db.session.scalars(select(LoginAttempt)).one()
     assert (attempt.identifier, attempt.succeeded) == ("alice", True)
 
@@ -81,9 +81,9 @@ def test_rate_limit_window_expires(client: FlaskClient, make_user: MakeUser) -> 
     ("next_", "expected"),
     [
         ("/verify/pending", "/verify/pending"),
-        ("https://evil.example.com/", "/"),
-        ("//evil.example.com/", "/"),
-        (r"/\evil.example.com", "/"),
+        ("https://evil.example.com/", "/feed"),
+        ("//evil.example.com/", "/feed"),
+        (r"/\evil.example.com", "/feed"),
     ],
 )
 def test_login_next_must_be_local(
@@ -149,3 +149,22 @@ def test_locked_attempts_are_recorded(client: FlaskClient, make_user: MakeUser) 
 def test_unauthorized_get_keeps_next_post_drops_it(client: FlaskClient) -> None:
     assert client.get("/verify/pending").location == "/login?next=/verify/pending"
     assert client.post("/verify/resend").location == "/login"
+
+
+def test_login_starts_a_fresh_session(client: FlaskClient, make_user: MakeUser) -> None:
+    make_user("alice")
+    with client.session_transaction() as session:
+        session["planted"] = "from before login"
+    client.post("/login", data={"identifier": "alice", "password": PASSWORD})
+    with client.session_transaction() as session:
+        assert "planted" not in session
+
+
+def test_logout_clears_the_whole_session(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("alice"))
+    with client.session_transaction() as session:
+        session["after_verify"] = "/posts/7"
+        session["csrf_token"] = "old-token"  # noqa: S105 - a test value
+    client.post("/logout")
+    with client.session_transaction() as session:
+        assert set(session) <= {"_flashes"}

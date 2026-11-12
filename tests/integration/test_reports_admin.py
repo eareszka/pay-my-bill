@@ -3,7 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from flask.testing import FlaskClient
 from sqlalchemy import select
 
@@ -104,7 +104,7 @@ def test_admin_queue_is_hidden_from_others(client: FlaskClient, make_user: MakeU
     login_as(client, make_user("bob"))
     assert client.get("/admin").status_code == 404
     assert client.post("/admin/reports/1/dismiss").status_code == 404
-    assert b'href="/admin"' not in client.get("/").data
+    assert b'href="/admin"' not in client.get("/feed").data
 
 
 def test_admin_approves_a_flagged_post_and_its_clock_restarts(
@@ -165,7 +165,7 @@ def test_admin_bans_a_user(client: FlaskClient, make_user: MakeUser, admin: User
     assert [p.status for p in (open_post, flagged, closed)] == [
         PostStatus.REMOVED,
         PostStatus.REMOVED,
-        PostStatus.CLOSED,
+        PostStatus.REMOVED,
     ]
     assert open_reports() == []
     assert client.post(f"/admin/users/{admin.id}/ban").status_code == 404
@@ -180,9 +180,14 @@ def test_banned_user_is_logged_out_and_cant_log_in(
     creep.banned_at = utcnow()
     db.session.commit()
     assert client.get("/profile").status_code == 302
-    resp = client.post("/login", data={"identifier": "creep", "password": PASSWORD})
-    assert resp.status_code == 200
-    assert b"This account has been suspended." in resp.data
+    right = client.post("/login", data={"identifier": "creep", "password": PASSWORD})
+    wrong = client.post("/login", data={"identifier": "creep", "password": "not-it"})
+    # Same reply either way, so it never confirms a guessed password.
+    assert right.status_code == wrong.status_code == 200
+    for resp in (right, wrong):
+        assert b"Wrong username, email, or password." in resp.data
+        assert b"suspended" not in resp.data
+    assert client.get("/profile").status_code == 302
 
 
 def test_admin_dismisses_a_report(client: FlaskClient, make_user: MakeUser, admin: User) -> None:
@@ -251,3 +256,171 @@ def test_grant_command(app: Flask, make_user: MakeUser) -> None:
     missing = runner.invoke(args=["admin", "grant", "nobody@example.com"])
     assert missing.exit_code != 0
     assert "No account uses" in missing.output
+
+
+def test_a_ban_hides_the_user_everywhere(
+    client: FlaskClient, make_user: MakeUser, admin: User
+) -> None:
+    from app.leaderboard import Period, Scope, rank
+    from app.rewards import confirmed_gifts
+    from tests.integration.test_leaders import give, person
+
+    creep = person(make_user, "creep")
+    donor = person(make_user, "donor")
+    give(donor, creep)  # creep was helped
+    give(creep, person(make_user, "someone"))  # creep helped someone
+    assert {r.user.username for r in rank(Scope.GLOBAL, Period.ALL, None)} == {"donor", "creep"}
+    assert client.get("/u/creep").status_code == 200
+    # Requests in the fixture's app context share g, so forget the visitor.
+    g.pop("_login_user", None)
+
+    login_as(client, admin)
+    client.post(f"/admin/users/{creep.id}/ban")
+    # Off the boards as a donor, and gifts to them no longer count.
+    assert [r.user.username for r in rank(Scope.GLOBAL, Period.ALL, None)] == []
+    assert confirmed_gifts(donor) == []
+    assert all(p.status == PostStatus.REMOVED for p in creep.posts)
+    # Only admins can still open the profile.
+    assert client.get("/u/creep").status_code == 200
+    client.post("/logout")
+    g.pop("_login_user", None)
+    assert client.get("/u/creep").status_code == 404
+
+
+def test_a_banned_user_cannot_be_reported(client: FlaskClient, make_user: MakeUser) -> None:
+    creep = make_user("creep", banned_at=utcnow())
+    login_as(client, make_user("alice"))
+    assert client.get(f"/report/user/{creep.username}").status_code == 404
+
+
+def test_admin_actions_are_logged_and_shown(
+    client: FlaskClient, make_user: MakeUser, admin: User
+) -> None:
+    from app.models import AdminAction
+
+    creep = make_user("creep")
+    flagged = make_post(creep, PostStatus.PENDING_REVIEW)
+    flagged.title = "Seed money"
+    spam = make_post(make_user("spammer"))
+    report = Report(reporter=admin, user=make_user("odd_one"), reason=ReportReason.OTHER)
+    db.session.add(report)
+    db.session.commit()
+    login_as(client, admin)
+    assert b"No admin actions yet." in client.get("/admin").data
+    client.post(f"/admin/posts/{flagged.id}/approve")
+    client.post(f"/admin/posts/{spam.id}/remove")
+    client.post(f"/admin/reports/{report.id}/dismiss")
+    client.post(f"/admin/users/{creep.id}/ban")
+    logged = [(a.admin_id, a.action) for a in db.session.scalars(select(AdminAction))]
+    assert logged == [
+        (admin.id, "approve"),
+        (admin.id, "remove post"),
+        (admin.id, "dismiss report"),
+        (admin.id, "ban"),
+    ]
+    page = client.get("/admin").get_data(as_text=True)
+    assert f"boss · approve · post {flagged.id} by creep: Seed money" in page
+    assert f"boss · dismiss report · report {report.id} on user odd_one" in page
+    assert "boss · ban · user creep" in page
+
+
+def test_huge_ids_are_404(client: FlaskClient, admin: User) -> None:
+    login_as(client, admin)
+    for path in ("/admin/posts/99999999999/remove", "/admin/users/99999999999/ban"):
+        assert client.post(path).status_code == 404
+    assert client.post("/admin/reports/99999999999/dismiss").status_code == 404
+    assert client.post("/admin/reports/1/dismiss").status_code == 404
+
+
+def test_grant_and_revoke_commands(app: Flask, make_user: MakeUser) -> None:
+    from app.models import AdminAction
+
+    user = make_user("helper")
+    runner = app.test_cli_runner()
+    assert "is now an admin" in runner.invoke(args=["admin", "grant", "Helper@Example.com"]).output
+    assert user.is_admin
+    revoked = runner.invoke(args=["admin", "revoke", "helper@example.com"])
+    assert "no longer an admin" in revoked.output
+    assert "no admins are left" in revoked.output
+    assert not user.is_admin
+    assert "isn't an admin" in runner.invoke(args=["admin", "revoke", "helper@example.com"]).output
+    assert "No account uses" in runner.invoke(args=["admin", "revoke", "nobody@example.com"]).output
+    logged = [(a.admin_id, a.action, a.target) for a in db.session.scalars(select(AdminAction))]
+    assert logged == [(None, "grant admin", "user helper"), (None, "revoke admin", "user helper")]
+
+
+def test_reports_are_limited_per_day(client: FlaskClient, make_user: MakeUser, admin: User) -> None:
+    from app.routes.reports import MAX_REPORTS_PER_DAY, REPORT_WINDOW
+
+    posts = [make_post(make_user(f"poster{n}")) for n in range(MAX_REPORTS_PER_DAY + 1)]
+    login_as(client, make_user("bob"))
+    for post in posts[:-1]:
+        client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+    resp = client.post(
+        f"/report/post/{posts[-1].id}", data={"reason": "spam"}, follow_redirects=True
+    )
+    assert f"sent {MAX_REPORTS_PER_DAY} reports today. Try again tomorrow." in resp.get_data(
+        as_text=True
+    )
+    assert len(open_reports()) == MAX_REPORTS_PER_DAY
+    # A day later there's room again.
+    for report in open_reports():
+        report.created_at = utcnow() - REPORT_WINDOW - timedelta(minutes=1)
+    db.session.commit()
+    client.post(f"/report/post/{posts[-1].id}", data={"reason": "spam"})
+    assert len(open_reports()) == MAX_REPORTS_PER_DAY + 1
+
+
+def test_admins_get_one_report_email_an_hour(
+    client: FlaskClient, make_user: MakeUser, admin: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    from app.models import LoginAttempt
+
+    # Eight reports from eight accounts, 50 minutes apart: a steady trickle must not
+    # silence the emails, so they go out on the 1st, 3rd, 5th and 7th.
+    sent = []
+    for n in range(8):
+        post = make_post(make_user(f"poster{n}"))
+        login_as(client, make_user(f"reporter{n}"))
+        before = caplog.text.count("New report on Pay My Bill")
+        client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+        sent.append(caplog.text.count("New report on Pay My Bill") - before)
+        for row in [*open_reports(), *db.session.scalars(select(LoginAttempt))]:
+            row.created_at -= timedelta(minutes=50)
+        db.session.commit()
+    assert sent == [1, 0, 1, 0, 1, 0, 1, 0]
+    assert "wait in the queue" in caplog.text
+
+
+def test_a_login_typed_as_the_marker_cannot_silence_report_emails(
+    app: Flask,
+    client: FlaskClient,
+    make_user: MakeUser,
+    admin: User,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from app.routes.reports import REPORT_EMAIL_IDENTIFIER
+
+    # Logged out, someone fails a login as the marker before each report (#175).
+    app.test_client().post("/login", data={"identifier": REPORT_EMAIL_IDENTIFIER, "password": "x"})
+    # Requests in the fixture's app context share g, so forget that visitor.
+    g.pop("_login_user", None)
+    post = make_post(make_user("poster"))
+    login_as(client, make_user("bob"))
+    client.post(f"/report/post/{post.id}", data={"reason": "spam"})
+    assert caplog.text.count("New report on Pay My Bill") == 1
+
+
+def test_dismissing_a_post_report_logs_the_post(
+    client: FlaskClient, make_user: MakeUser, admin: User
+) -> None:
+    from app.models import AdminAction
+
+    post = make_post(make_user("maria_g"))
+    report = Report(reporter=admin, post=post, reason=ReportReason.OTHER)
+    db.session.add(report)
+    db.session.commit()
+    login_as(client, admin)
+    client.post(f"/admin/reports/{report.id}/dismiss")
+    action = db.session.scalars(select(AdminAction)).one()
+    assert action.target == f"report {report.id} on post {post.id} by maria_g: {post.title}"

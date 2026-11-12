@@ -135,7 +135,7 @@ def test_confirm_reaching_goal_funds_post(client: FlaskClient, poster: User, don
     assert "&#34;Rent&#34; is fully funded!" in client.get(
         "/gifts", follow_redirects=True
     ).get_data(as_text=True)
-    assert "Rent" not in client.get("/").get_data(as_text=True)
+    assert "Rent" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_confirm_on_closed_post_keeps_status(
@@ -189,21 +189,21 @@ def test_nav_badge_counts_gifts_waiting(client: FlaskClient, poster: User, donor
         '<span class="badge" aria-hidden="true">{n}</span>'
         '<span class="sr-only">, {n} to confirm</span>'
     )
-    assert badge.format(n=2) in client.get("/").get_data(as_text=True)
+    assert badge.format(n=2) in client.get("/feed").get_data(as_text=True)
     resolve(client, first)
-    assert badge.format(n=1) in client.get("/").get_data(as_text=True)
+    assert badge.format(n=1) in client.get("/feed").get_data(as_text=True)
 
 
 def test_no_badge_for_the_donor(client: FlaskClient, poster: User, donor: User) -> None:
     add_gift(add_post(poster), donor)
     login_as(client, donor)
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert '<span class="nav-label">Gifts</span>' not in page
     assert 'class="badge"' not in page
 
 
 def test_no_gifts_link_when_logged_out(client: FlaskClient) -> None:
-    assert 'href="/gifts"' not in client.get("/").get_data(as_text=True)
+    assert 'href="/gifts"' not in client.get("/feed").get_data(as_text=True)
 
 
 def test_removed_posts_drop_out(client: FlaskClient, poster: User, donor: User) -> None:

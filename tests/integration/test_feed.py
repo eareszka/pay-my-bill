@@ -45,15 +45,15 @@ def test_one_ticket_shows_at_a_time_newest_after_the_top(
     add_post(user, "The top ticket", hours_ago=9)
     add_post(user, "Older need", hours_ago=5)
     add_post(user, "Newest want", kind=PostKind.WANT, hours_ago=1)
-    first = client.get("/").get_data(as_text=True)
+    first = client.get("/feed").get_data(as_text=True)
     assert "The top ticket" in first
     assert "Newest want" not in first.split("<template")[0]
     assert "1 of 3" in first
-    second = client.get("/?n=2").get_data(as_text=True)
+    second = client.get("/feed?n=2").get_data(as_text=True)
     assert "Newest want" in second
     assert "ticket-want" in second
     assert '<span class="sr-only">Want: </span>' in second
-    third = client.get("/?n=3").get_data(as_text=True)
+    third = client.get("/feed?n=3").get_data(as_text=True)
     assert "Older need" in third
     assert "ticket-need" in third
     assert "$0</strong> of $120.50" in third
@@ -66,7 +66,7 @@ def test_feed_hides_non_open_posts(
     client: FlaskClient, make_user: MakeUser, status: PostStatus
 ) -> None:
     add_post(make_user(), "Hidden post", status=status)
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert "Hidden post" not in page
     assert "No open posts here yet." in page
 
@@ -81,29 +81,29 @@ def test_feed_filters_by_kind(
     user = make_user()
     add_post(user, "A want", kind=PostKind.WANT)
     add_post(user, "A need", kind=PostKind.NEED)
-    page = client.get(f"/?kind={kind}").get_data(as_text=True)
+    page = client.get(f"/feed?kind={kind}").get_data(as_text=True)
     assert shown in page
     assert hidden not in page
-    assert f'href="/?kind={kind}" aria-current="page"' in page
+    assert f'href="/feed?kind={kind}" aria-current="page"' in page
 
 
 def test_unknown_kind_shows_all(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user()
     add_post(user, "A want", kind=PostKind.WANT)
     add_post(user, "A need")
-    assert "1 of 2" in client.get("/?kind=loan").get_data(as_text=True)
+    assert "1 of 2" in client.get("/feed?kind=loan").get_data(as_text=True)
 
 
 def test_next_and_back_walk_the_stack_and_wrap(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user()
     for i in range(3):
         add_post(user, f"Post number {i}", kind=PostKind.WANT)
-    first = client.get("/?kind=want").get_data(as_text=True)
-    assert 'class="rail-btn deck-next" href="/?kind=want&amp;n=2"' in first
+    first = client.get("/feed?kind=want").get_data(as_text=True)
+    assert 'class="rail-btn deck-next" href="/feed?kind=want&amp;n=2"' in first
     assert "deck-back" not in first
-    last = client.get("/?kind=want&n=3").get_data(as_text=True)
-    assert 'class="rail-btn deck-back" href="/?kind=want&amp;n=2"' in last
-    assert 'class="rail-btn deck-next" href="/?kind=want"' in last
+    last = client.get("/feed?kind=want&n=3").get_data(as_text=True)
+    assert 'class="rail-btn deck-back" href="/feed?kind=want&amp;n=2"' in last
+    assert 'class="rail-btn deck-next" href="/feed?kind=want"' in last
 
 
 @pytest.mark.parametrize("bad", ["0", "-3", "abc", "99999999999999999999", "4"])
@@ -113,12 +113,12 @@ def test_position_off_the_stack_shows_the_first_ticket(
     user = make_user()
     for i in range(3):
         add_post(user, f"Post number {i}")
-    assert "1 of 3" in client.get(f"/?n={bad}").get_data(as_text=True)
+    assert "1 of 3" in client.get(f"/feed?n={bad}").get_data(as_text=True)
 
 
 def test_only_ticket_has_no_next_or_stack(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert "deck-next" not in page
     assert "deck-stacked" not in page
     assert "1 of 1" in page
@@ -126,7 +126,7 @@ def test_only_ticket_has_no_next_or_stack(client: FlaskClient, make_user: MakeUs
 
 def test_ticket_says_who_where_and_kind(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(city="Tampa", state="FL"), "Only post")
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     ticket = page[page.index('class="ticket deck-ticket') :]
     assert "Need · " in ticket
     assert ticket.index("Tampa, FL") < ticket.index('class="meter"')
@@ -136,7 +136,7 @@ def test_ticket_says_who_where_and_kind(client: FlaskClient, make_user: MakeUser
 def test_chip_in_panel_sits_beside_the_ticket(client: FlaskClient, make_user: MakeUser) -> None:
     post = add_post(make_user(venmo_handle="@maria-g"), "Only post")
     login_as(client, make_user("dev_tom"))
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert 'class="deck-side"' in page
     assert f'action="/posts/{post.id}/gifts"' in page
     assert "side-amount" in page
@@ -146,41 +146,41 @@ def test_own_post_has_no_form_beside_the_ticket(client: FlaskClient, make_user: 
     owner = make_user(venmo_handle="@maria-g")
     add_post(owner, "Only post")
     login_as(client, owner)
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert "This is your post." in page
     assert 'class="chip-in"' not in page
 
 
 def test_empty_board_has_no_panel(client: FlaskClient) -> None:
-    assert "deck-side" not in client.get("/").get_data(as_text=True)
+    assert "deck-side" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_ticket_body_is_shortened(client: FlaskClient, make_user: MakeUser) -> None:
     post = add_post(make_user(), "Only post")
     post.body = "word " * 100
     db.session.commit()
-    assert "word " * 40 not in client.get("/").get_data(as_text=True)
+    assert "word " * 40 not in client.get("/feed").get_data(as_text=True)
 
 
 def test_ticket_opens_the_post(client: FlaskClient, make_user: MakeUser) -> None:
     post = add_post(make_user(), "Only post")
-    assert f'href="/posts/{post.id}"' in client.get("/").get_data(as_text=True)
+    assert f'href="/posts/{post.id}"' in client.get("/feed").get_data(as_text=True)
 
 
 def test_no_chip_in_tab_without_a_way_to_pay(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
-    assert "tear-tab" not in client.get("/").get_data(as_text=True)
+    assert "tear-tab" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert "No open posts here yet." in page
     assert "to post one" in page
 
 
 def test_layout_has_mobile_viewport(client: FlaskClient) -> None:
     viewport = b'name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"'
-    assert viewport in client.get("/").data
+    assert viewport in client.get("/feed").data
 
 
 @pytest.mark.parametrize(
@@ -207,39 +207,39 @@ def test_progress_bar_only_looks_full_when_funded(
 
 
 def test_heading_is_for_screen_readers_only(client: FlaskClient) -> None:
-    assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/").get_data(as_text=True)
+    assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/feed").get_data(as_text=True)
 
 
 def test_heading_steps_back_for_members(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user())
-    assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/").get_data(as_text=True)
+    assert '<h1 class="sr-only">Help someone out</h1>' in client.get("/feed").get_data(as_text=True)
 
 
 def test_logging_in_from_the_panel_returns_to_that_post(
     client: FlaskClient, make_user: MakeUser
 ) -> None:
     post = add_post(make_user(venmo_handle="@maria-g"), "Only post")
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert f'href="/login?next=/posts/{post.id}">Log in first' in page
 
 
 def test_lone_ticket_does_not_use_the_stack(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
-    assert "deck-stacked" not in client.get("/").get_data(as_text=True)
+    assert "deck-stacked" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_swipe_script_loads_only_with_a_ticket(client: FlaskClient, make_user: MakeUser) -> None:
-    assert "js/swipe.js" not in client.get("/").get_data(as_text=True)
+    assert "js/swipe.js" not in client.get("/feed").get_data(as_text=True)
     add_post(make_user(), "Only post")
-    assert "js/swipe.js" in client.get("/").get_data(as_text=True)
+    assert "js/swipe.js" in client.get("/feed").get_data(as_text=True)
 
 
 def test_back_link_is_there_to_swipe_to(client: FlaskClient, make_user: MakeUser) -> None:
     user = make_user()
     add_post(user, "First post")
     add_post(user, "Second post")
-    assert "deck-back" not in client.get("/").get_data(as_text=True)
-    assert "deck-back" in client.get("/?n=2").get_data(as_text=True)
+    assert "deck-back" not in client.get("/feed").get_data(as_text=True)
+    assert "deck-back" in client.get("/feed?n=2").get_data(as_text=True)
 
 
 def under_card(page: str, side: str) -> str:
@@ -254,7 +254,7 @@ def three_posts(user: User) -> None:
 
 def test_neighbors_wait_under_a_middle_ticket(client: FlaskClient, make_user: MakeUser) -> None:
     three_posts(make_user(venmo_handle="@maria-g"))
-    page = client.get("/?n=2").get_data(as_text=True)
+    page = client.get("/feed?n=2").get_data(as_text=True)
     shown = page[: page.index("<template")]
     titles = ("Oldest post", "Middle post", "Newest post")
     current = next(title for title in titles if title in shown)
@@ -265,7 +265,7 @@ def test_neighbors_wait_under_a_middle_ticket(client: FlaskClient, make_user: Ma
 
 def test_first_ticket_has_nothing_to_go_back_to(client: FlaskClient, make_user: MakeUser) -> None:
     three_posts(make_user())
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert under_card(page, "next")
     assert not under_card(page, "back")
 
@@ -274,9 +274,9 @@ def test_last_ticket_wraps_to_the_first_underneath(
     client: FlaskClient, make_user: MakeUser
 ) -> None:
     three_posts(make_user())
-    first = client.get("/").get_data(as_text=True)
+    first = client.get("/feed").get_data(as_text=True)
     first_title = first[: first.index("<template")]
-    last = client.get("/?n=3").get_data(as_text=True)
+    last = client.get("/feed?n=3").get_data(as_text=True)
     wrapped = under_card(last, "next")
     title = next(t for t in ("Oldest post", "Middle post", "Newest post") if t in first_title)
     assert title in wrapped
@@ -284,7 +284,7 @@ def test_last_ticket_wraps_to_the_first_underneath(
 
 def test_lone_ticket_has_nothing_underneath(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
-    assert "<template" not in client.get("/").get_data(as_text=True)
+    assert "<template" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_neighbor_checks_its_own_owner(client: FlaskClient, make_user: MakeUser) -> None:
@@ -294,7 +294,7 @@ def test_neighbor_checks_its_own_owner(client: FlaskClient, make_user: MakeUser)
     add_post(theirs, "Their post")
     login_as(client, mine)
     for position in (1, 2):
-        page = client.get(f"/?n={position}").get_data(as_text=True)
+        page = client.get(f"/feed?n={position}").get_data(as_text=True)
         under = under_card(page, "next") or under_card(page, "back")
         assert ("tear-tab" in under) == ("Their post" in under)
 
@@ -303,7 +303,7 @@ def test_tabs_and_rail_sit_around_the_stage(client: FlaskClient, make_user: Make
     user = make_user()
     for i in range(2):
         add_post(user, f"Post number {i}")
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     stage = page.index('<div class="stage">')
     assert page.index('<nav class="tabs"') < stage < page.index('<nav class="rail"')
     assert page.index('<nav class="rail"') < page.index('<aside class="deck-side">')

@@ -73,7 +73,7 @@ def test_others_see_no_delete(client: FlaskClient, poster: User, donor: User) ->
 def test_delete_post_without_gifts(client: FlaskClient, poster: User) -> None:
     post_id = add_post(poster).id
     login_as(client, poster)
-    assert client.post(f"/posts/{post_id}/delete").location == "/"
+    assert client.post(f"/posts/{post_id}/delete").location == "/feed"
     assert count(Post) == 0
     assert client.get(f"/posts/{post_id}").status_code == 404
 
@@ -117,7 +117,7 @@ def test_delete_post_with_confirmed_gifts_keeps_credit(
     add_gift(post, donor, DonationStatus.CONFIRMED)
     login_as(client, poster)
     page = client.get(f"/posts/{post.id}?delete=1").get_data(as_text=True)
-    assert "donors keep credit for their gifts" in page
+    assert "people who chipped in keep credit for their gifts" in page
     client.post(f"/posts/{post.id}/delete")
     assert (post.title, post.body, post.status) == (
         "Deleted post",
@@ -148,7 +148,7 @@ def test_account_delete_asks_for_password(client: FlaskClient, poster: User) -> 
     assert 'href="/profile?delete=1#delete">Delete my account</a>' in page
     assert "Your password" not in page
     page = client.get("/profile?delete=1").get_data(as_text=True)
-    assert "Donors keep credit for gifts you confirmed." in page
+    assert "People who chipped in keep credit for gifts you confirmed." in page
     assert 'action="/account/delete"' in page
 
 
@@ -169,7 +169,7 @@ def test_delete_account_anonymizes_and_logs_out(
     plain_id, poster_id = plain.id, poster.id
     login_as(client, poster)
     resp = client.post("/account/delete", data={"password": PASSWORD})
-    assert resp.location == "/"
+    assert resp.location == "/feed"
     user = db.session.get(User, poster_id)
     assert user is not None
     assert user.username == f"deleted-{poster_id}"
@@ -206,13 +206,16 @@ def test_delete_account_is_rate_limited(client: FlaskClient, poster: User) -> No
 
 
 def test_delete_account_clears_login_history(client: FlaskClient, poster: User) -> None:
-    db.session.add(LoginAttempt(identifier="maria_g", ip="1.2.3.4", succeeded=False))
-    db.session.add(LoginAttempt(identifier="maria_g@example.com", ip="1.2.3.4", succeeded=False))
+    # Reset and verify rows name the account too, so they go with it (#169).
+    named = {"maria_g", "maria_g@example.com", "reset:maria_g@example.com", f"verify:{poster.id}"}
+    for identifier in [*named, "someone_else"]:
+        db.session.add(LoginAttempt(identifier=identifier, ip="1.2.3.4", succeeded=False))
     db.session.commit()
     login_as(client, poster)
     client.post("/account/delete", data={"password": PASSWORD})
     identifiers = set(db.session.scalars(select(LoginAttempt.identifier)))
-    assert not identifiers & {"maria_g", "maria_g@example.com"}
+    assert not identifiers & named
+    assert "someone_else" in identifiers
 
 
 def test_reminders_skip_deleted_posters(

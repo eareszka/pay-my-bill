@@ -104,7 +104,7 @@ def test_stale_form_only_goes_back_to_a_real_page(referrer: str) -> None:
     with client.session_transaction() as session:
         session["seen"] = True
     response = client.post("/login", data={}, headers={"Referer": referrer})
-    assert response.location.endswith("/")
+    assert response.location.endswith("/feed")
     assert "evil.example" not in response.location
 
 
@@ -149,7 +149,7 @@ def test_server_error_page_survives_a_broken_database(
 
 
 def test_skip_link_and_named_nav(client: FlaskClient) -> None:
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/feed").get_data(as_text=True)
     assert 'href="#main">Skip to content' in page
     assert '<nav aria-label="Main">' in page
     assert 'id="main"' in page

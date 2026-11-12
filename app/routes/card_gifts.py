@@ -13,6 +13,7 @@ from app.extensions import csrf, db
 from app.forms import GiftForm
 from app.mail import send_later
 from app.models import (
+    MAX_DB_INT,
     MIN_CARD_GIFT_CENTS,
     Donation,
     DonationStatus,
@@ -27,7 +28,8 @@ from app.models import (
 from app.money import format_cents, parse_dollars
 from app.routes.admin import notify_admins
 from app.routes.gifts import count_confirmed
-from app.routes.posts import MAX_DB_INT, can_view, render_post
+from app.routes.posts import can_view, render_post
+from app.urls import site_url
 
 bp = Blueprint("card", __name__)
 
@@ -57,7 +59,7 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
         return _card_error(post, f"{limits}, like 20 or 12.50.")
     if not MIN_CARD_GIFT_CENTS <= gift_cents <= post.goal_cents:
         return _card_error(post, f"{limits}.")
-    back = url_for("posts.show", post_id=post.id, _external=True)
+    back = site_url("posts.show", post_id=post.id)
     try:
         url = stripe_pay.checkout_url(
             post_id=post.id,
@@ -67,7 +69,7 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
             recipient=recipient.username,
             destination=recipient.stripe_account_id,
             gift_cents=gift_cents,
-            success_url=url_for("posts.show", post_id=post.id, paid=1, _external=True),
+            success_url=site_url("posts.show", post_id=post.id, paid=1),
             cancel_url=back,
         )
     except stripe.StripeError:
@@ -140,7 +142,7 @@ def record_card_gift(session: dict[str, Any], account: str | None) -> None:
     # nothing saved and Stripe's retry records it from scratch.
     post, funded = count_confirmed(donation, already_heard)
     amount = format_cents(donation.amount_cents)
-    link = url_for("posts.show", post_id=post.id, _external=True)
+    link = site_url("posts.show", post_id=post.id)
     send_later(
         post.user.email,
         f"{donor.username} sent you {amount}",

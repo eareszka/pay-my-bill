@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import secrets
+import threading
 from pathlib import Path
 from typing import IO, Any, Protocol
 
@@ -11,11 +12,18 @@ from flask import Flask, current_app, url_for
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 MAX_PHOTO_BYTES = 8 * 1024 * 1024
+# An 8 MB photo plus the rest of the new-post form.
+MAX_UPLOAD_BYTES = 9 * 1024 * 1024
 MAX_SOURCE_PIXELS = 40_000_000  # about 7,300 x 5,500; anything bigger is refused, not decoded
 MAX_EDGE = 1600
 WEBP_QUALITY = 80
 ACCEPTED_FORMATS = {"JPEG", "PNG", "WEBP"}
 PHOTO_ACCEPT = "image/jpeg,image/png,image/webp"
+
+
+# A full-size decode can take a few hundred MB, so a gunicorn worker's threads
+# take turns rather than decode several at once on a 512 MB server (#155).
+_decoding = threading.BoundedSemaphore(1)
 
 
 class PhotoError(ValueError):
@@ -36,7 +44,9 @@ def process(stream: IO[bytes]) -> bytes:
             if probe.width * probe.height > MAX_SOURCE_PIXELS:
                 raise PhotoError("That photo is too large. Try one under 40 megapixels.")
             probe.verify()
-        with Image.open(io.BytesIO(raw)) as image:
+        with _decoding, Image.open(io.BytesIO(raw)) as image:
+            # JPEGs can decode straight to near the final size, using far less memory.
+            image.draft("RGB", (MAX_EDGE, MAX_EDGE))
             image.load()
             upright = ImageOps.exif_transpose(image)
             rgb = upright.convert("RGB")
