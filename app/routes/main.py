@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
+from app.door_photos import door_photos
 from app.extensions import db
 from app.models import Post, PostKind, open_posts
 from app.photos import LocalStore, store
@@ -42,7 +43,9 @@ def home() -> str | Response:
     args: dict[str, Any] = {k: v for k, v in request.args.items() if k in ("kind", "n")}
     if current_user.is_authenticated or args:
         return redirect(url_for("main.index", **args))
-    return render_template("home.html")
+    return render_template(
+        "home.html", help_photos=door_photos(funded=False), ask_photos=door_photos(funded=True)
+    )
 
 
 # Each door opens its own story, one step per page, so Back and links work without JavaScript.

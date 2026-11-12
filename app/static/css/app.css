@@ -644,6 +644,14 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
   text-decoration: none;
   background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
 }
+/* Real photos from posts tile the top of a door, turned to the door's own color, and the field takes over under the words. */
+.home-door { position: relative; isolation: isolate; overflow: hidden; }
+.home-door > span:not(.home-mosaic) { position: relative; z-index: 2; }
+.home-mosaic { position: absolute; inset: 0 0 auto; z-index: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; height: 48%; isolation: isolate; }
+.home-mosaic img:nth-child(n + 4) { display: none; }
+.home-mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1); }
+.home-mosaic::after { content: ""; position: absolute; inset: 0; background: var(--field); mix-blend-mode: multiply; }
+.home-door:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 18%, var(--field) 50%); pointer-events: none; }
 .home-door-line { font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
 .home-door-text { max-width: 34ch; font-size: 1.0625rem; }
 .home-door-go, .how-other-go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
@@ -737,7 +745,16 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
 @media (min-width: 960px) {
   .home { --door-h: clamp(420px, calc(100svh - var(--bar-h) - 96px), 640px); }
   .home-doors { grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1240px; margin: 0 auto; padding: 20px 24px 0; }
+  /* The two doors share rows, so their headlines sit on one line whatever the sentences below them do. */
+  .home-doors { grid-template-rows: minmax(0, 1fr) auto auto auto; min-height: calc(var(--door-h) + 20px); }
+  .home-door { display: grid; grid-row: span 4; grid-template-rows: subgrid; grid-template-columns: minmax(0, 1fr); row-gap: 8px; min-height: 0; }
+  .home-door-line { grid-area: 2 / 1; align-self: end; }
+  .home-door-text { grid-area: 3 / 1; }
+  .home-door-go { grid-area: 4 / 1; justify-self: start; }
   .home-door { padding: 32px; border-radius: 18px; }
+  .home-mosaic { grid-template-rows: repeat(2, 1fr); height: 62%; }
+  .home-mosaic img:nth-child(n + 4) { display: block; }
+  .home-door:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 22%, var(--field) 62%); }
   .home-promise { max-width: 1240px; margin: 0 auto; padding: 18px 24px; }
   .how { gap: 12px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 20px 24px 24px; }
   .how-field { gap: 28px; padding: 28px 40px 20px; border-radius: 18px; }

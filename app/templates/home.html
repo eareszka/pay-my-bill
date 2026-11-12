@@ -3,18 +3,21 @@
 {% block body_class %}page stage-page home-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
+{% macro mosaic(keys) %}{% if keys %}<span class="home-mosaic" aria-hidden="true">{% for key in keys %}<img src="{{ photo_url(key) }}" alt="" decoding="async"{% if loop.index > 3 %} loading="lazy"{% endif %}>{% endfor %}</span>{% endif %}{% endmacro %}
 {% block content %}
 <div class="home">
   <h1 class="sr-only">How Pay My Bill works</h1>
   <nav class="home-doors" aria-label="How it works">
     <a class="home-door home-door-help" href="{{ url_for('main.how', path='help') }}">
+      {{ mosaic(help_photos) }}
       <span class="home-door-line">I want to help</span>
       <span class="home-door-text">Chip in on someone's bill, straight from your own Venmo, Cash App, or PayPal.</span>
       <span class="home-door-go">See how it works<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></span>
     </a>
     <a class="home-door home-door-ask" href="{{ url_for('main.how', path='ask') }}">
+      {{ mosaic(ask_photos) }}
       <span class="home-door-line">I need a hand</span>
-      <span class="home-door-text">Ask for up to $1,000: rent coming up short, a bill that's due, or just a game you want.</span>
+      <span class="home-door-text">Ask for up to $1,000: rent coming up short, a bill that's due, or just a game you want.{% if ask_photos %} These asks got there.{% endif %}</span>
       <span class="home-door-go">See how it works<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></span>
     </a>
   </nav>
