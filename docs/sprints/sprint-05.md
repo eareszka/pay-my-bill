@@ -17,7 +17,7 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 | S5-8 Swipe through the pile | #90 | 3 | Done |
 | S5-9 New look: the card stack | #118 | 8 | Done |
 | S5-10 Categories and show less | #119 | 5 | To do |
-| S5-11 How-it-works home page | #120 | 5 | In review |
+| S5-11 How-it-works home page | #120 | 5 | Done |
 | S5-12 Photo on a post | #122 | 5 | Done |
 | S5-13 You: my posts and chipped in | #132 | 3 | Done |
 
@@ -71,3 +71,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-11: The owner asked for real photos on the doors as a collage. Impeccable round: the owner picked "Tinted Mosaic". Built on #182: `app/door_photos.py` picks the six newest photo posts (open asks for help, funded for asking) from verified, unbanned, never-reported accounts; fewer than six leaves the door plain. Next: finish review and the owner's look. Blocked: none.
 - 2026-11-11: The owner asked for images on every story page. Impeccable round: the owner picked "Photo Band" (three of the door's tinted photos across the top of each step, fading behind the headline; neighboring steps alternate). Built on #182. Next: finish review and the owner's look. Blocked: none.
 - 2026-11-12: The owner asked for the move into Sign up at the end of each story to be smooth and seamless. Impeccable round: the owner picked "Button Becomes the Form". Built on #182: `/signup` uses the stage look with a white-edged form card; from a story (`?from=help|ask`) the Sign up button morphs into the card and the field sinks into a strip at the foot that leads back. Next: finish review and the owner's look. Blocked: none.
+- 2026-11-12: The owner approved #120 (doors, stories, door and step photos, sign-up handoff) and asked to merge; #182 merged. S5-11 Done. Next: #119 (categories and show less). Blocked: none.
