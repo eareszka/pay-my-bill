@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
+from app import stripe_pay
 from app.door_photos import door_photos
 from app.extensions import db
 from app.models import Post, PostKind, open_posts
@@ -107,7 +108,7 @@ def rules() -> str:
 
 @bp.get("/terms")
 def terms() -> str:
-    return render_template("legal/terms.html")
+    return render_template("legal/terms.html", card_fee=stripe_pay.fee_terms())
 
 
 @bp.get("/privacy")

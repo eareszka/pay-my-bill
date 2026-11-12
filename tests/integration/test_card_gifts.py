@@ -81,7 +81,7 @@ def paid_event(
             "post_id": str(post.id),
             "donor_id": str(donor.id),
             "gift_cents": str(gift),
-            "fee_cents": str(stripe_pay.charge_for(gift) - gift),
+            "fee_cents": "108",
         },
         **extra,
     }
@@ -98,18 +98,32 @@ def gifts() -> list[Donation]:
     return list(db.session.scalars(select(Donation)))
 
 
-@pytest.mark.parametrize(("gift", "charge"), [(500, 546), (2_000, 2_091), (100_000, 103_018)])
-def test_donor_covers_the_fee(gift: int, charge: int) -> None:
-    assert stripe_pay.charge_for(gift) == charge
-    # What Stripe keeps (2.9% + 30¢ of the charge) never eats into the gift.
-    assert charge - (charge * 29 // 1000 + 30) >= gift
+@pytest.mark.parametrize(
+    ("paid", "parts"),
+    [(500, (45, 5, 450)), (2_000, (88, 20, 1_892)), (100_000, (2_930, 1_000, 96_070))],
+)
+def test_fees_come_out_of_the_gift(paid: int, parts: tuple[int, int, int]) -> None:
+    assert stripe_pay.split(paid) == parts
+    stripe_fee, platform_fee, net = parts
+    assert stripe_fee + platform_fee + net == paid
+    # The estimate never promises more than Stripe's 2.9% + 30¢ leaves.
+    assert stripe_fee >= paid * 29 // 1000 + 30
+
+
+def test_platform_fee_can_be_turned_off(app: Flask) -> None:
+    app.config["PLATFORM_FEE_RATE"] = "0"
+    assert stripe_pay.split(500) == (45, 0, 455)
+    assert stripe_pay.fee_terms()["platform_pct"] == "0%"
 
 
 def test_post_page_offers_instant_card_gift(client: FlaskClient, post: Post, donor: User) -> None:
     login_as(client, donor)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Chip in instantly" in page
-    assert "You cover the card fee" in page
+    assert "You pay exactly what you enter" in page
+    assert "a 1% Pay My Bill fee come out of it" in page
+    assert 'data-platform-rate="0.01"' in page
+    assert "js/card-net.js" in page
     assert "A card from outside the US costs a little more" in page
     assert "Or pay in an app" not in page
 
@@ -150,7 +164,12 @@ def test_checkout_redirects_to_stripe_with_direct_charge(
     assert resp.status_code == 303
     assert resp.location == "https://checkout.stripe.com/c/pay/cs_1"
     params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
-    assert params["line_items"][0]["price_data"]["unit_amount"] == 2_091
+    assert params["line_items"][0]["price_data"]["unit_amount"] == 2_000
+    assert (
+        "maria_g gets about $18.92"
+        in params["line_items"][0]["price_data"]["product_data"]["description"]
+    )
+    assert params["payment_intent_data"]["application_fee_amount"] == 20
     assert params["allowed_payment_method_types"] == ["card"]
     assert "transfer_data" not in params["payment_intent_data"]
     options = fake_client.v1.checkout.sessions.create.call_args.kwargs["options"]
@@ -158,12 +177,29 @@ def test_checkout_redirects_to_stripe_with_direct_charge(
     assert params["metadata"] == {
         "post_id": str(post.id),
         "donor_id": str(donor.id),
-        "gift_cents": "2000",
-        "fee_cents": "91",
+        "gift_cents": "1892",
+        "fee_cents": "108",
+        "platform_fee_cents": "20",
     }
     assert params["customer_email"] == "dev_tom@example.com"
     assert params["success_url"] == f"http://localhost/posts/{post.id}?paid=1"
     assert gifts() == []
+
+
+def test_checkout_without_platform_fee(
+    app: Flask, client: FlaskClient, post: Post, donor: User, fake_client: MagicMock
+) -> None:
+    app.config["PLATFORM_FEE_RATE"] = "0"
+    login_as(client, donor)
+    assert client.post(f"/posts/{post.id}/card", data={"amount": "20"}).status_code == 303
+    params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
+    assert "application_fee_amount" not in params["payment_intent_data"]
+    assert params["metadata"]["gift_cents"] == "1912"
+
+
+def test_terms_disclose_the_fees(client: FlaskClient) -> None:
+    page = client.get("/terms").get_data(as_text=True)
+    assert "a 1% Pay My Bill platform fee come out of each card gift" in page
 
 
 @pytest.mark.parametrize(
@@ -229,14 +265,15 @@ def test_paid_webhook_records_a_confirmed_gift_once(
     [gift] = gifts()
     assert (gift.amount_cents, gift.fee_cents, gift.method, gift.status) == (
         2_000,
-        91,
+        108,
         PaymentMethod.CARD,
         DonationStatus.CONFIRMED,
     )
     assert (gift.stripe_session_id, gift.stripe_payment_intent) == ("cs_1", "pi_1")
     assert post.raised_cents == 2_000
     assert "dev_tom sent you $20" in caplog.text
-    assert "Your $20 gift to maria_g went through" in caplog.text
+    assert "Your $21.08 gift to maria_g went through" in caplog.text
+    assert "maria_g gets about $20 after card and Pay My Bill fees" in caplog.text
     assert signed(client, paid_event(post, donor)).status_code == 200
     assert len(gifts()) == 1
 

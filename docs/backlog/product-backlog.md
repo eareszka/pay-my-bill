@@ -199,6 +199,12 @@ ADR 0014. The owner applies. Nothing about real payments ships until this is don
 - [ ] Refunds and disputes from Stripe un-count the gift and flag it in the admin queue.
 - [ ] Terms and Privacy are updated for card gifts.
 
+### PB-50 Flat card gifts with a platform fee · #183 · 2 pts · P0 · epic:donations
+Owner request (2026-11-12), ADR 0016.
+- [x] The donor pays exactly the typed amount. Stripe's fee and a 1% application fee come out of it.
+- [x] Progress counts the recipient's estimated net. The donor email shows what they paid.
+- [x] The card form shows a live net estimate. The Terms disclose the fees.
+
 ### PB-44 Share an ask · #TBD · 2 pts · P2 · epic:posts
 From the #118 finish review: the full-screen feed's rail has room for Share.
 - [ ] A Share button on the rail and post page opens the phone's share sheet, or copies the post link where that isn't available.
