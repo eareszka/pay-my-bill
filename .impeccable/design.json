@@ -584,6 +584,11 @@
         "name": "door-photo-fade",
         "value": "linear-gradient(to bottom, transparent 18%, var(--field) 50%); 960px and up: linear-gradient(to bottom, transparent 22%, var(--field) 62%)",
         "purpose": "Home door photo mosaic fading to solid field under the bottom scrim; the Scrim Only Rule's one exception, always to the field's own color."
+      },
+      {
+        "name": "step-band-fade",
+        "value": "linear-gradient(to bottom, transparent 8%, var(--field) 40%); 960px and up: linear-gradient(to bottom, transparent 22%, var(--field) 50%)",
+        "purpose": "Story step photo band fading to solid field under the bottom scrim; shares the Scrim Only Rule's photo-fade exception, always to the field's own color."
       }
     ],
     "shadows": [
@@ -781,7 +786,7 @@
   ],
   "narrative": {
     "northStar": "The Color Cut",
-    "overview": "The app is a black frame around one person. The shell (top bar, bottom nav, feed stage, post page) is void black, and inside it a single ask fills the screen as a saturated color field with its title set huge in condensed uppercase. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's color is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. White is the only interface ink on the stage. The one money action, Chip in, is a white filled tab that travels with the person.\n\nAway from the stage, the working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense. They follow the system color scheme: cool paper and white panels in light, near-black panels in dark. They share the same two typefaces, the same inverse filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no gradient except the scrim that keeps white text legible at the foot of a color field.\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar and the stage becomes a framed 470px column standing beside a 400px Chip in panel on void.",
+    "overview": "The app is a black frame around one person. The shell (top bar, bottom nav, feed stage, post page) is void black, and inside it a single ask fills the screen as a saturated color field with its title set huge in condensed uppercase. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's color is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. White is the only interface ink on the stage. The one money action, Chip in, is a white filled tab that travels with the person.\n\nAway from the stage, the working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense. They follow the system color scheme: cool paper and white panels in light, near-black panels in dark. They share the same two typefaces, the same inverse filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no gradient except the scrim that keeps white text legible at the foot of a color field (plus the fades from the photo mosaic into the field's own color on the home doors and the story steps).\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar and the stage becomes a framed 470px column standing beside a 400px Chip in panel on void.",
     "keyCharacteristics": [
       "Void-black shell that is always dark: top bar, bottom nav, feed stage, and post page.",
       "One full-bleed color field per ask (Need or Want) under a bottom scrim, with white type only.",
@@ -818,7 +823,7 @@
       },
       {
         "name": "The Scrim Only Rule",
-        "body": "The one gradient is the bottom scrim on a color field (transparent to 40% black over the lower half on cards, and over the lower 60% on the post hero). Its one exception is the home door photo fade, which runs from the photo mosaic to solid field under the scrim and only ever fades to the field's own color, never to black or another hue. No other gradients, glass, glow, or box shadows.",
+        "body": "The one gradient is the bottom scrim on a color field (transparent to 40% black over the lower half on cards, and over the lower 60% on the post hero). Its one exception is the photo fade, on the home doors and on the story step band, which runs from the photos to solid field under the scrim and only ever fades to the field's own color, never to black or another hue. No other gradients, glass, glow, or box shadows.",
         "section": "elevation"
       }
     ],
@@ -835,7 +840,7 @@
     ],
     "donts": [
       "**Don't** use tomato for anything but errors, disputed gifts, and destructive actions.",
-      "**Don't** add box shadows, glass, glow, or gradients other than the field scrim.",
+      "**Don't** add box shadows, glass, glow, or gradients other than the field scrim and the photo fades on the home doors and story steps, each into the field's own color.",
       "**Don't** put colored text or colored controls on a color field. It's white or nothing.",
       "**Don't** turn state into pills or badges with fills. Use a shape and a word.",
       "**Don't** add a second progress style (rings, segmented bars, or percentages as hero numbers).",

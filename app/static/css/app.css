@@ -674,6 +674,11 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
   background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)) var(--field);
   touch-action: pan-y;
 }
+/* The door's photos carry into its story: three across the top of the field, fading to solid behind the headline. */
+.how-field:has(.home-mosaic) { position: relative; isolation: isolate; overflow: hidden; }
+.how-field > :not(.home-mosaic, .sr-only) { position: relative; z-index: 2; }
+.how-field .home-mosaic { height: 44%; grid-template-rows: 1fr; }
+.how-field:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 8%, var(--field) 40%); pointer-events: none; }
 .how-progress { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .how-progress li { flex: 1; height: 3px; background: rgb(255 255 255 / 0.35); border-radius: 2px; }
 .how-progress li.on { background: var(--on-void); }
@@ -754,6 +759,9 @@ body.stage-page .container-wide:has(> .home, > .how) { max-width: none; padding:
   .home-door { padding: 32px; border-radius: 18px; }
   .home-mosaic { grid-template-rows: repeat(2, 1fr); height: 62%; }
   .home-mosaic img:nth-child(n + 4) { display: block; }
+  /* The last seam falls in the gap left of the example column, never through the Example tag. */
+  .how-field .home-mosaic { height: 52%; grid-template-rows: 1fr; grid-template-columns: 1fr 1fr calc(400px + 40px + 28px); }
+  .how-field:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 22%, var(--field) 50%); }
   .home-door:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 50%, rgb(0 0 0 / 0.4)), linear-gradient(to bottom, transparent 22%, var(--field) 62%); }
   .home-promise { max-width: 1240px; margin: 0 auto; padding: 18px 24px; }
   .how { gap: 12px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 20px 24px 24px; }

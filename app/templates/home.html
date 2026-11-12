@@ -1,9 +1,9 @@
 {% extends "base.html" %}
+{% from "_mosaic.html" import mosaic %}
 {% block title %}Pay My Bill · Chip in on someone's bill{% endblock %}
 {% block body_class %}page stage-page home-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
-{% macro mosaic(keys) %}{% if keys %}<span class="home-mosaic" aria-hidden="true">{% for key in keys %}<img src="{{ photo_url(key) }}" alt="" decoding="async"{% if loop.index > 3 %} loading="lazy"{% endif %}>{% endfor %}</span>{% endif %}{% endmacro %}
 {% block content %}
 <div class="home">
   <h1 class="sr-only">How Pay My Bill works</h1>

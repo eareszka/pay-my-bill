@@ -59,7 +59,17 @@ def how(path: str, step: int) -> str:
     if not 1 <= step <= total:
         abort(404)
     other = "ask" if path == "help" else "help"
-    return render_template("how/story.html", path=path, other=other, step=step, total=total)
+    # Each step carries three of its door's photos, so neighboring steps never show the same ones.
+    pool = door_photos(funded=path == "ask")
+    start = (step - 1) % 2 * 3
+    return render_template(
+        "how/story.html",
+        path=path,
+        other=other,
+        step=step,
+        total=total,
+        photos=pool[start : start + 3],
+    )
 
 
 @bp.get("/feed")

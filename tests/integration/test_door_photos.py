@@ -94,3 +94,21 @@ def test_a_report_on_another_post_keeps_the_account_off(app: Flask, make_user: M
     db.session.add(Report(reporter=reporter, post=old, reason=ReportReason.SCAM))
     db.session.commit()
     assert door_photos(funded=False) == []
+
+
+def test_story_steps_carry_their_doors_photos(client: FlaskClient, make_user: MakeUser) -> None:
+    assert "home-mosaic" not in client.get("/how/help").get_data(as_text=True)
+    user = make_user("maria_g")
+    add_posts(user, DOOR_PHOTOS)
+    keys = door_photos(funded=False)
+    first = client.get("/how/help").get_data(as_text=True)
+    second = client.get("/how/help/2").get_data(as_text=True)
+    third = client.get("/how/help/3").get_data(as_text=True)
+    for page in (first, second, third):
+        assert page.count('alt="" decoding="async"') == 3
+    assert all(key in first for key in keys[:3]) and keys[3] not in first
+    assert all(key in second for key in keys[3:]) and keys[0] not in second
+    assert all(key in third for key in keys[:3])
+    assert "home-mosaic" not in client.get("/how/ask").get_data(as_text=True)
+    add_posts(user, DOOR_PHOTOS, PostStatus.FUNDED, tag="f")
+    assert client.get("/how/ask/3").get_data(as_text=True).count('alt="" decoding="async"') == 3
