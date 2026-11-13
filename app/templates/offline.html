@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>You're offline · Pay My Bill</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="page">
+  {# Cached by the service worker, so nothing here may depend on who is logged in. #}
+  <header class="topbar"><span class="brand">Pay My Bill</span></header>
+  <main class="container" id="main">
+    <h1>You're offline</h1>
+    <p>Asks and gifts need a connection. Check your Wi-Fi or data, then try again.</p>
+    <p><a class="btn" href="">Try again</a></p>
+  </main>
+</body>
+</html>

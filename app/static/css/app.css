@@ -144,7 +144,8 @@ h3.section-title { font-size: 1rem; }
   display: flex;
   align-items: center;
   height: var(--bar-h);
-  padding: 0 16px;
+  /* Clear the notch when an installed app is turned sideways (#185). */
+  padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
   color: var(--on-void);
   background: var(--void);
 }
