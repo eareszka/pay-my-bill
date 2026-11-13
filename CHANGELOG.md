@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Install to the Home Screen like an app (#185). The site has a web app manifest, so "Add to Home Screen" on iPhone or Android opens it full-screen with its own icon and a void status bar, and no browser bar. The icon is the deck: a Need-red ticket over a Want-blue one, with the wordmark in League Gothic. It's a placeholder until the name is final (#35). A small service worker shows a "You're offline" page when there's no connection. Pages and data always come from the network, never from a cache. In landscape, the top bar clears the notch.
+
 ### Changed
 - When a post offers "Chip in instantly" by card, the Cash App, Venmo, and PayPal buttons below it are outlined, so the card stays the one filled button. With no card option they stay filled (owner, 2026-11-11).
 

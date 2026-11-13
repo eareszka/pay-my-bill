@@ -1,7 +1,16 @@
 import re
 from typing import Any
 
-from flask import Blueprint, abort, redirect, render_template, request, send_from_directory, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
 from flask_login import current_user
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
@@ -99,6 +108,32 @@ def index() -> str:
         total=total,
         **(chip_in_context(post) if post else {}),
     )
+
+
+def static_dir() -> str:
+    return str(current_app.static_folder)
+
+
+@bp.get("/manifest.webmanifest")
+def manifest() -> Response:
+    response = send_from_directory(
+        static_dir(), "manifest.webmanifest", mimetype="application/manifest+json"
+    )
+    response.cache_control.no_cache = True
+    return response
+
+
+@bp.get("/sw.js")
+def service_worker() -> Response:
+    # Served from the root so it can catch every page; always rechecked so updates land.
+    response = send_from_directory(static_dir(), "js/sw.js", mimetype="text/javascript")
+    response.cache_control.no_cache = True
+    return response
+
+
+@bp.get("/offline")
+def offline() -> str:
+    return render_template("offline.html")
 
 
 @bp.get("/rules")
