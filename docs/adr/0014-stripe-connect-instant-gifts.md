@@ -10,7 +10,7 @@ Use **Stripe Connect with Express accounts**, after Stripe approves the use case
 - Recipients onboard once through Stripe-hosted onboarding, which handles identity, bank details, and payouts. Pay My Bill never stores bank or card data.
 - Donors pay by card, Apple Pay, or Google Pay through Stripe Checkout. Each charge is a destination charge to the recipient's connected account.
 - A signed `checkout.session.completed` webhook records the gift as confirmed. A processor-verified payment replaces recipient confirmation for these gifts, and ADR 0004 is amended to say so.
-- Pay My Bill takes no platform fee. Recipients get the whole gift less Stripe's processing fee, and the page says so before paying (Apple Guideline 3.2.1(vii), to be checked in PB-9).
+- *(Superseded by ADR 0016: donors pay a flat amount, fees come out of the gift, and Pay My Bill takes 1%.)* Pay My Bill takes no platform fee. Recipients get the whole gift less Stripe's processing fee, and the page says so before paying (Apple Guideline 3.2.1(vii), to be checked in PB-9).
 - Link-out handles stay as a fallback until Stripe is live, then are reviewed.
 
 ## Consequences

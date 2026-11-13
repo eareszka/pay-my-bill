@@ -73,6 +73,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
         STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
         STRIPE_CONNECT_WEBHOOK_SECRET=os.environ.get("STRIPE_CONNECT_WEBHOOK_SECRET", ""),
+        # Pay My Bill's cut of each card gift (ADR 0016); 0 turns it off.
+        PLATFORM_FEE_RATE=os.environ.get("PLATFORM_FEE_RATE") or "0.01",
         # Post photos go to Cloudflare R2 when a bucket is set, else to PHOTO_DIR (ADR 0015).
         R2_ACCOUNT_ID=os.environ.get("R2_ACCOUNT_ID", ""),
         R2_ACCESS_KEY_ID=os.environ.get("R2_ACCESS_KEY_ID", ""),
@@ -94,6 +96,9 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
 
     from app import models  # noqa: F401
+    from app.stripe_pay import parse_fee_rate
+
+    parse_fee_rate(str(app.config["PLATFORM_FEE_RATE"]))
     from app.extensions import csrf, db, login_manager, migrate
     from app.photos import MAX_UPLOAD_BYTES
 
@@ -152,7 +157,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         PostStatus=models.PostStatus,
         DonationStatus=models.DonationStatus,
         ReactionKind=models.ReactionKind,
-        LEGAL_UPDATED="November 9, 2026",
+        LEGAL_UPDATED="November 12, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],
         stripe_enabled=stripe_pay.enabled,
     )

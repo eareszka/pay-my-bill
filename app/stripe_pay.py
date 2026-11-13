@@ -4,8 +4,10 @@ from decimal import ROUND_CEILING, Decimal
 
 import stripe
 from flask import current_app
+from stripe.params.checkout import SessionCreateParamsPaymentIntentData
 
 from app.models import User
+from app.money import format_cents
 
 
 def enabled() -> bool:
@@ -107,10 +109,42 @@ CARD_FEE_RATE = Decimal("0.029")
 CARD_FEE_FIXED_CENTS = 30
 
 
-def charge_for(gift_cents: int) -> int:
-    """What the donor pays so the recipient still gets the whole gift after Stripe's fee."""
-    total = (gift_cents + CARD_FEE_FIXED_CENTS) / (1 - CARD_FEE_RATE)
-    return int(total.to_integral_value(rounding=ROUND_CEILING))
+def _cents_up(value: Decimal) -> int:
+    return int(value.to_integral_value(rounding=ROUND_CEILING))
+
+
+def parse_fee_rate(value: str) -> Decimal:
+    # Checked at startup, so a typo like "1%" or "1" can't break post pages or eat a gift.
+    try:
+        rate = Decimal(value)
+    except ArithmeticError:
+        raise ValueError(f"PLATFORM_FEE_RATE must be a fraction like 0.01, not {value!r}") from None
+    if not Decimal(0) <= rate <= Decimal("0.2"):
+        raise ValueError(f"PLATFORM_FEE_RATE must be between 0 and 0.2, not {value!r}")
+    return rate
+
+
+def platform_fee_rate() -> Decimal:
+    return parse_fee_rate(str(current_app.config["PLATFORM_FEE_RATE"]))
+
+
+def fee_terms() -> dict[str, str]:
+    # The card form shows these and estimates what the recipient gets with them.
+    rate = platform_fee_rate()
+    return {
+        "card_rate": str(CARD_FEE_RATE),
+        "card_pct": f"{float(CARD_FEE_RATE * 100):g}%",
+        "card_fixed": str(CARD_FEE_FIXED_CENTS),
+        "platform_rate": str(rate),
+        "platform_pct": f"{float(rate * 100):g}%",
+    }
+
+
+def split(paid_cents: int) -> tuple[int, int, int]:
+    """Stripe's fee (US cards), Pay My Bill's fee, and what the recipient keeps (ADR 0016)."""
+    stripe_fee = _cents_up(paid_cents * CARD_FEE_RATE) + CARD_FEE_FIXED_CENTS
+    platform_fee = _cents_up(paid_cents * platform_fee_rate())
+    return stripe_fee, platform_fee, paid_cents - stripe_fee - platform_fee
 
 
 def checkout_url(
@@ -121,21 +155,25 @@ def checkout_url(
     donor_email: str,
     recipient: str,
     destination: str,
-    gift_cents: int,
+    paid_cents: int,
     success_url: str,
     cancel_url: str,
 ) -> str:
-    total = charge_for(gift_cents)
+    stripe_fee, platform_fee, net = split(paid_cents)
     metadata = {
         "post_id": str(post_id),
         "donor_id": str(donor_id),
-        "gift_cents": str(gift_cents),
-        "fee_cents": str(total - gift_cents),
+        "gift_cents": str(net),
+        "fee_cents": str(stripe_fee + platform_fee),
+        "platform_fee_cents": str(platform_fee),
     }
+    payment_intent: SessionCreateParamsPaymentIntentData = {"metadata": metadata}
+    if platform_fee:
+        payment_intent["application_fee_amount"] = platform_fee
     session = client().v1.checkout.sessions.create(
         params={
             "mode": "payment",
-            # The fee gross-up assumes card pricing, so no Klarna, bank, or crypto.
+            # The fee estimate assumes card pricing, so no Klarna, bank, or crypto.
             # Apple Pay and Google Pay are card wallets and still show.
             "allowed_payment_method_types": ["card"],
             "customer_email": donor_email,
@@ -144,19 +182,19 @@ def checkout_url(
                     "quantity": 1,
                     "price_data": {
                         "currency": "usd",
-                        "unit_amount": total,
+                        "unit_amount": paid_cents,
                         "product_data": {
                             "name": f"Gift to {recipient}",
-                            "description": f"For “{title}”. Includes the card fee, so "
-                            f"{recipient} gets the full gift.",
+                            "description": f"For “{title}”. Card and Pay My Bill fees come "
+                            f"out of it, so {recipient} gets about {format_cents(net)}.",
                         },
                     },
                 }
             ],
             # A direct charge on the recipient's account (Managed Risk, ADR 0014): Stripe
-            # takes its fee from the charge, which the donor's extra covers, so the
-            # recipient keeps the whole gift.
-            "payment_intent_data": {"metadata": metadata},
+            # takes its fee from the charge and Pay My Bill's application fee goes to the
+            # platform, so the recipient keeps the rest (ADR 0016).
+            "payment_intent_data": payment_intent,
             "metadata": metadata,
             "success_url": success_url,
             "cancel_url": cancel_url,

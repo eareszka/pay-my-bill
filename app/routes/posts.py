@@ -209,6 +209,7 @@ def chip_in_context(post: Post, form: GiftForm | None = None) -> dict[str, objec
         "late_gift_hours": LATE_GIFT_HOURS,
         "card_ready": stripe_pay.enabled() and post.user.stripe_ready and post.is_open,
         "min_card_gift": MIN_CARD_GIFT_CENTS,
+        "card_fee": stripe_pay.fee_terms(),
     }
 
 

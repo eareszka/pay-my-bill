@@ -68,7 +68,7 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
             donor_email=current_user.email,
             recipient=recipient.username,
             destination=recipient.stripe_account_id,
-            gift_cents=gift_cents,
+            paid_cents=gift_cents,
             success_url=site_url("posts.show", post_id=post.id, paid=1),
             cancel_url=back,
         )
@@ -151,11 +151,15 @@ def record_card_gift(session: dict[str, Any], account: str | None) -> None:
         + ("\n\nYour post is fully funded!" if funded else "")
         + f"\n\n{link}",
     )
+    # Stripe's own total is what the donor paid; fees came out of it (ADR 0016).
+    paid_cents = _meta_int(session, "amount_total") or donation.amount_cents + donation.fee_cents
+    paid = format_cents(paid_cents)
     send_later(
         donor.email,
-        f"Your {amount} gift to {post.user.username} went through",
-        f'Hi {donor.username},\n\nYour {amount} gift for "{post.title}" went through '
-        "and already counts toward your rewards. Thank you!\n\n" + link,
+        f"Your {paid} gift to {post.user.username} went through",
+        f'Hi {donor.username},\n\nYour {paid} gift for "{post.title}" went through, and '
+        f"{post.user.username} gets about {amount} after fees. "
+        "It already counts toward your rewards. Thank you!\n\n" + link,
     )
 
 
