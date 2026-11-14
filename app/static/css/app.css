@@ -29,7 +29,8 @@
   --info-tint: #e6e8ee;
   --mark-empty: #dfe2e8;
   --radius: 8px;
-  --bar-h: 52px;
+  /* The iOS app draws under the status bar, so the bar grows by the top inset (#193); it's 0 in a browser. */
+  --bar-h: calc(52px + env(safe-area-inset-top));
   --nav-h: 64px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --fast: 140ms;
@@ -145,7 +146,7 @@ h3.section-title { font-size: 1rem; }
   align-items: center;
   height: var(--bar-h);
   /* Clear the notch when an installed app is turned sideways (#185). */
-  padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
   color: var(--on-void);
   background: var(--void);
 }
