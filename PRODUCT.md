@@ -29,10 +29,10 @@ Crowdfunding sites are built for big campaigns and businesses. Pay My Bill is fo
 - Hard rules: goals are capped at $1,000, a user can have at most 2 open posts, business, startup, product, or investment fundraising is prohibited, users must be 18+, region is self-reported city and state only (no GPS), and the app never holds or processes money.
 - Wording: gifts are "gifts" or "chipping in", never "charitable donations". App Store rules reserve charity collection for registered nonprofits.
 - Stack: Flask, Jinja templates, and vanilla CSS/JS, with no SPA framework (ADR 0003). Every page must work at 360px width without horizontal scroll.
-- Undecided: the final product name and domain (backlog #35).
+- Name: Yearnly (ADR 0017), on yearnly.app.
 
 ## Brand Commitments
-- "Pay My Bill" is a working name; the final name is still open (#35). No logo or brand assets exist yet.
+- The product is named **Yearnly** (ADR 0017, yearnly.app). The UI still says "Pay My Bill" until the rename story ships. "Chip in" stays the verb for giving. The only brand asset is the placeholder deck icon (#185).
 
 ## Evidence on Hand
 - None yet. The product is pre-beta with no real users, so there are no testimonials, stats, or press. Future work must not invent any.

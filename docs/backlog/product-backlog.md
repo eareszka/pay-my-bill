@@ -18,8 +18,8 @@ Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning.
 - [ ] Any required changes become backlog items or a new ADR.
 
 ### PB-10 Spike: product name and domain · #35 · 2 pts · P2 · spike
-- [ ] Three or more candidate names, each checked against USPTO search, domain availability, and app-store conflicts.
-- [ ] The owner picks one; an ADR records it.
+- [x] Three or more candidate names, each checked against USPTO search, domain availability, and app-store conflicts.
+- [x] The owner picks one; an ADR records it (ADR 0017: Yearnly).
 
 ### PB-11 Spike: cold start and beta recruitment · #36 · 2 pts · P2 · spike
 - [ ] A plan for getting the first 20–50 beta users, including where donors come from, and how the PRD success metrics will be measured.
