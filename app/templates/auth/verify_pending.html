@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Verify your email · Pay My Bill{% endblock %}
+{% block title %}Verify your email · Yearnly{% endblock %}
 {% block content %}
   <h1>Verify your email</h1>
   <p>You need to verify your email before you can post or chip in. We sent a link to
     <strong>{{ current_user.email }}</strong>.</p>
   <p class="muted">Not there after a minute? Check your spam or junk folder for an
-    email from Pay My Bill. If it's there, mark it "Not spam" so our next emails reach your
+    email from Yearnly. If it's there, mark it "Not spam" so our next emails reach your
     inbox.</p>
   <form method="post" action="{{ url_for('auth.verify_resend') }}">
     {{ form.hidden_tag() }}

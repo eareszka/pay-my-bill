@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Pay My Bill",
-  "short_name": "Pay My Bill",
+  "name": "Yearnly",
+  "short_name": "Yearnly",
   "description": "Post an everyday want or need, or chip in on someone else's.",
   "start_url": "/",
   "scope": "/",

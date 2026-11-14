@@ -50,7 +50,7 @@ def test_signup_creates_hashed_user_and_sends_verification(
     assert user.password_hash != FORM["password"]
     assert check_password_hash(user.password_hash, FORM["password"])
     assert not user.is_verified
-    assert "Verify your Pay My Bill email" in caplog.text
+    assert "Verify your Yearnly email" in caplog.text
     link = re.search(r"http://localhost/verify/\S+", caplog.text)
     assert link is not None
 
@@ -247,7 +247,7 @@ def test_signup_survives_mail_failure(
     assert b"Check your email to verify it" in resp.data
     assert b"Verify your email" in resp.data
     assert user_count() == 1
-    assert "Could not send 'Verify your Pay My Bill email'" in caplog.text
+    assert "Could not send 'Verify your Yearnly email'" in caplog.text
     resp = client.post("/verify/resend", follow_redirects=True)
     assert b"new verification link" in resp.data
 
@@ -399,7 +399,7 @@ def test_verify_email_says_what_to_do_if_you_did_not_sign_up(
     client: FlaskClient, caplog: pytest.LogCaptureFixture
 ) -> None:
     client.post("/signup", data=FORM)
-    assert "Didn't sign up for Pay My Bill?" in caplog.text
+    assert "Didn't sign up for Yearnly?" in caplog.text
     assert "/reset" in caplog.text
 
 

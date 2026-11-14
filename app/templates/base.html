@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% block title %}Pay My Bill{% endblock %}</title>
+  <title>{% block title %}Yearnly{% endblock %}</title>
   <meta name="theme-color" content="#0a0a0a">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32.png') }}">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
-  <meta name="apple-mobile-web-app-title" content="Pay My Bill">
+  <meta name="apple-mobile-web-app-title" content="Yearnly">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script src="{{ url_for('static', filename='js/pwa.js') }}" defer></script>
@@ -24,7 +24,7 @@
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="topbar">
-    <a class="brand" href="{{ url_for('main.home') }}">Pay My Bill</a>
+    <a class="brand" href="{{ url_for('main.home') }}">Yearnly</a>
     <nav aria-label="Main">
       {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
