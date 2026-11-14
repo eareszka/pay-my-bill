@@ -591,7 +591,6 @@ h3.section-title { font-size: 1rem; }
   .topbar > nav a[href="/signup"] { display: none; }
   .join-page .topbar > nav a[href^="/login"] { display: none; }
   .topbar .topbar-signup { margin-left: 12px; }
-  .topbar .topbar-login + .topbar-signup { margin-left: 4px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
   .container { padding: 28px 16px; }
