@@ -75,11 +75,11 @@ def test_profile_shows_level_and_people_helped(client: FlaskClient, make_user: M
     assert 'aria-valuenow="20"' in page
 
 
-def test_new_profile_starts_at_level_1(client: FlaskClient, make_user: MakeUser) -> None:
+def test_new_profile_hides_rewards_at_zero_xp(client: FlaskClient, make_user: MakeUser) -> None:
     make_user("sam_helps")
     page = client.get("/u/sam_helps").get_data(as_text=True)
-    assert '<p class="rewards-level">Level 1</p>' in page
-    assert "0 / 100 XP · 0 people helped" in page
+    assert 'class="rewards"' not in page
+    assert "XP" not in page
 
 
 def test_profile_shows_streak_only_when_active(client: FlaskClient, make_user: MakeUser) -> None:

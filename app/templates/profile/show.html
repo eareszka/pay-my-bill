@@ -7,17 +7,6 @@
     {% if is_owner %}<a class="btn btn-secondary" href="{{ url_for('profile.edit') }}">Settings</a>{% endif %}
   </div>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
-  <section class="rewards" aria-label="Giving">
-    <p class="rewards-level">Level {{ progress.level }}</p>
-    {{ meter(progress.percent, "XP toward level " ~ (progress.level + 1)) }}
-    <p class="hint rewards-stats">{{ "{:,}".format(progress.xp) }} / {{ "{:,}".format(progress.next_level_at) }} XP · {{ progress.people_helped }} {{ "person" if progress.people_helped == 1 else "people" }} helped</p>
-    {% if streak %}<p class="rewards-streak">{{ streak }}-week streak</p>{% endif %}
-    {% if badges %}
-      <ul class="badge-list" aria-label="Badges">
-        {% for badge in badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
-      </ul>
-    {% endif %}
-  </section>
   {% if follow_through.due %}
     <p class="follow-through">Updated {{ follow_through.updated }} of {{ follow_through.due }} {{ "post" if follow_through.due == 1 else "posts" }}</p>
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
@@ -36,6 +25,19 @@
     {% endif %}
   {% else %}
     {% include "profile/_posts.html" %}
+  {% endif %}
+  {% if progress.xp %}
+    <section class="rewards" aria-label="Giving">
+      <p class="rewards-level">Level {{ progress.level }}</p>
+      {{ meter(progress.percent, "XP toward level " ~ (progress.level + 1)) }}
+      <p class="hint rewards-stats">{{ "{:,}".format(progress.xp) }} / {{ "{:,}".format(progress.next_level_at) }} XP · {{ progress.people_helped }} {{ "person" if progress.people_helped == 1 else "people" }} helped</p>
+      {% if streak %}<p class="rewards-streak">{{ streak }}-week streak</p>{% endif %}
+      {% if badges %}
+        <ul class="badge-list" aria-label="Badges">
+          {% for badge in badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
+        </ul>
+      {% endif %}
+    </section>
   {% endif %}
   {% if not current_user.is_authenticated or current_user.id != user.id %}
     <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>

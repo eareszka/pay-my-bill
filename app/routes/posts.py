@@ -43,6 +43,7 @@ from app.models import (
 from app.moderation import is_flagged
 from app.money import format_cents
 from app.payment_links import pay_options
+from app.rewards import follow_through
 from app.routes.admin import notify_admins
 from app.urls import site_url
 
@@ -224,6 +225,7 @@ def render_post(
         post=post,
         card_error=card_error,
         reactions=reaction_view(post) if post.update_body else None,
+        follow_through=follow_through(post.user),
         update_form=update_form or ResultsUpdateForm(formdata=None),
         **chip_in_context(post, form),
     )

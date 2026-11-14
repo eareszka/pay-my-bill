@@ -9,11 +9,11 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 |---|---|---|---|
 | S5-1 Harden errors, accessibility, and small screens | #77 | 5 | Done |
 | S5-2 Safer chip-in flow | #78 | 5 | Done |
-| S5-3 Trust information | #79 | 3 | To do |
+| S5-3 Trust information | #79 | 3 | Done |
 | S5-4 Visible rewards | #80 | 5 | To do |
 | S5-5 Clear disputes | #81 | 3 | To do |
 | S5-7 Bulletin board and the top spot | #85 | 5 | Done |
-| S5-6 Password reset | #82 | 3 | To do |
+| S5-6 Password reset | #82 | 3 | Done (Sprint 5b, #94) |
 | S5-8 Swipe through the pile | #90 | 3 | Done |
 | S5-9 New look: the card stack | #118 | 8 | Done |
 | S5-10 Categories and show less | #119 | 5 | To do |
@@ -73,3 +73,4 @@ The owner chose this sprint after Impeccable's audit and critique, ahead of phot
 - 2026-11-12: The owner asked for the move into Sign up at the end of each story to be smooth and seamless. Impeccable round: the owner picked "Button Becomes the Form". Built on #182: `/signup` uses the stage look with a white-edged form card; from a story (`?from=help|ask`) the Sign up button morphs into the card and the field sinks into a strip at the foot that leads back. Next: finish review and the owner's look. Blocked: none.
 - 2026-11-12: The owner approved #120 (doors, stories, door and step photos, sign-up handoff) and asked to merge; #182 merged. S5-11 Done. Next: #119 (categories and show less). Blocked: none.
 - 2026-11-12: The owner asked for flat card gifts: the donor pays exactly what they type, fees come out of the gift, and Pay My Bill takes a cut. The owner chose 1% and counting what the recipient gets (ADR 0016, #183, PB-50). Built on `feat/183-flat-card-gifts`. Next: review and merge, then the owner updates the Stripe platform profile. Blocked: none.
+- 2026-11-13: The owner chose to finish Sprint 5 next, then Phase 2; the iPhone shell waits on the local branch `chore/ios-testflight`. Did #79: the post page shows the follow-through stat and "On Pay My Bill since", and profiles put follow-through and posts before rewards, which hide at 0 XP. Profile post lists were already done in #116 and #132. 905 tests pass at 100%. Next: #80 visible rewards. Blocked: none.

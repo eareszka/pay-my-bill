@@ -24,9 +24,9 @@ As a **donor**, I want to **be sure my gift will count before and after I pay** 
 
 ### S5-3 Trust information · #79 · 3 pts · P1
 As a **donor**, I want to **see who I'm sending money to** so that **I can decide with confidence**.
-- [ ] The post page shows the follow-through stat, when there is one, and "On Pay My Bill since" a month and year.
-- [ ] Profiles list the person's past posts, as the Community Rules promise. Deleted and removed posts aren't listed.
-- [ ] Follow-through and posts come before the rewards panel, which is hidden at 0 XP.
+- [x] The post page shows the follow-through stat, when there is one, and "On Pay My Bill since" a month and year.
+- [x] Profiles list the person's past posts, as the Community Rules promise. Deleted and removed posts aren't listed.
+- [x] Follow-through and posts come before the rewards panel, which is hidden at 0 XP.
 
 ### S5-4 Visible rewards · #80 · 5 pts · P1
 As a **donor**, I want to **see my progress and know when a gift counts** so that **giving feels rewarding**.
