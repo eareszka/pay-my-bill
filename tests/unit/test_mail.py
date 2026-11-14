@@ -51,14 +51,14 @@ def test_brevo_backend_posts_json(app: Flask, monkeypatch: pytest.MonkeyPatch) -
     urlopen = MagicMock()
     monkeypatch.setattr("app.mail.urllib.request.urlopen", urlopen)
     app.config.update(
-        BREVO_API_KEY="key-123", MAIL_FROM="Pay My Bill <hi@example.com>", MAIL_SERVER="smtp.x"
+        BREVO_API_KEY="key-123", MAIL_FROM="Yearnly <hi@example.com>", MAIL_SERVER="smtp.x"
     )
     send_email("a@example.com", "Hello", "Body")
     request = urlopen.call_args.args[0]
     assert request.full_url == "https://api.brevo.com/v3/smtp/email"
     assert request.get_header("Api-key") == "key-123"
     payload = json.loads(request.data)
-    assert payload["sender"] == {"name": "Pay My Bill", "email": "hi@example.com"}
+    assert payload["sender"] == {"name": "Yearnly", "email": "hi@example.com"}
     assert payload["to"] == [{"email": "a@example.com"}]
     assert (payload["subject"], payload["textContent"]) == ("Hello", "Body")
 

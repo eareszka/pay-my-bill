@@ -1,4 +1,4 @@
-"""Pay My Bill application factory."""
+"""Yearnly application factory."""
 
 import logging
 import os
@@ -63,7 +63,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         BREVO_API_KEY=os.environ.get("BREVO_API_KEY", ""),
         # Request-path email goes to a background thread; tests send inline.
         MAIL_ASYNC=os.environ.get("MAIL_ASYNC", "1") != "0",
-        MAIL_FROM=os.environ.get("MAIL_FROM", "Pay My Bill <no-reply@example.com>"),
+        MAIL_FROM=os.environ.get("MAIL_FROM", "Yearnly <no-reply@example.com>"),
         # The site address every absolute link is built from (app/urls.py), never the Host header.
         APP_URL=app_url,
         # Secure wherever the site is served over HTTPS; local http dev still works.
@@ -73,7 +73,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
         STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
         STRIPE_CONNECT_WEBHOOK_SECRET=os.environ.get("STRIPE_CONNECT_WEBHOOK_SECRET", ""),
-        # Pay My Bill's cut of each card gift (ADR 0016); 0 turns it off.
+        # Yearnly's cut of each card gift (ADR 0016); 0 turns it off.
         PLATFORM_FEE_RATE=os.environ.get("PLATFORM_FEE_RATE") or "0.01",
         # Post photos go to Cloudflare R2 when a bucket is set, else to PHOTO_DIR (ADR 0015).
         R2_ACCOUNT_ID=os.environ.get("R2_ACCOUNT_ID", ""),

@@ -24,7 +24,7 @@ def test_new_visitors_get_just_the_two_doors(client: FlaskClient) -> None:
     page = page_at(client, "/")
     assert '<a class="home-door home-door-help" href="/how/help">' in page
     assert '<a class="home-door home-door-ask" href="/how/ask">' in page
-    assert "Pay My Bill never holds your money." in page
+    assert "Yearnly never holds your money." in page
     assert "how-step" not in page
     assert 'aria-current="page"' not in page.split('aria-label="Main"')[1].split("</nav>")[0]
 
@@ -101,7 +101,7 @@ def test_feed_is_open_to_everyone(client: FlaskClient) -> None:
 
 
 def test_brand_goes_home(client: FlaskClient) -> None:
-    assert '<a class="brand" href="/">Pay My Bill</a>' in page_at(client, "/feed")
+    assert '<a class="brand" href="/">Yearnly</a>' in page_at(client, "/feed")
 
 
 @pytest.mark.parametrize(("path", "total", "other"), STORIES)

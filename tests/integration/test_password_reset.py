@@ -38,7 +38,7 @@ def test_same_reply_whether_or_not_the_account_exists(
     assert b"If an account uses that email" in known.data
     assert b"If an account uses that email" in unknown.data
     assert b"Check your spam or junk folder" in known.data
-    assert caplog.text.count("Reset your Pay My Bill password") == 1
+    assert caplog.text.count("Reset your Yearnly password") == 1
 
 
 def test_invalid_email_shows_form_error(client: FlaskClient) -> None:
@@ -62,7 +62,7 @@ def test_link_sets_new_password_once_and_notifies(
     assert check_password_hash(user.password_hash, NEW)
     assert not check_password_hash(user.password_hash, PASSWORD)
     assert user.is_verified
-    assert "Your Pay My Bill password changed" in caplog.text
+    assert "Your Yearnly password changed" in caplog.text
 
     reused = client.get(link)
     assert reused.status_code == 302

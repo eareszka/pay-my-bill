@@ -1,5 +1,5 @@
 ---
-name: Pay My Bill
+name: Yearnly
 description: One person's ask owns the screen. Flick sideways through people, flick back, and chip in with one tap.
 colors:
   void: "#0a0a0a"
@@ -169,7 +169,7 @@ components:
     height: "4px"
 ---
 
-# Design System: Pay My Bill
+# Design System: Yearnly
 
 ## Overview
 
@@ -232,7 +232,7 @@ These two are provisional category colors. Story #119 replaces them with per-cat
 ### Hierarchy
 - **Display Hero** (League Gothic 400, clamp 3.25 to 4.75rem, line-height 0.92, uppercase): the ask's title on the feed card. On the post-page hero it runs clamp 3 to 4.5rem, and 5rem at 960px and wider.
 - **Display** (League Gothic 400, clamp 2.5 to 3.25rem, line-height 0.95, uppercase): page titles (Gifts, Leaders, Ask for a hand), the empty-stage title, and the level on the profile.
-- **Brand** (League Gothic 400, 1.75rem, uppercase): the "Pay My Bill" wordmark in the top bar.
+- **Brand** (League Gothic 400, 1.75rem, uppercase): the "Yearnly" wordmark in the top bar.
 - **Title** (Public Sans 700, 1.125rem, line-height 1.3): section titles such as Chip in, My gifts, and Results update.
 - **Figure** (Public Sans 700, 1.75rem, tabular numerals): raised amounts and gift amounts. It grows to 2rem in the post hero and the side panel.
 - **Body** (Public Sans 400, 1rem, line-height 1.5): everything else. Post stories run at 1.0625rem and max 68ch.
@@ -316,7 +316,7 @@ One ask per screen, with a real link for each move. Dragging past 8px picks up t
 A post may carry one poster photo (ADR 0015). On the feed card it fills the field edge to edge (`object-fit: cover`) under a deeper scrim: 45% black at the top for the tabs, clear through the middle, and 82% black at the foot for the words. The title drops to sit just above the foot, so the photo's middle stays clear. On the post page the color-field header grows to `min(72vh, 600px)` (520px on desktop), with the photo behind it and a scrim to 82% at the foot. The ask's color stays underneath while the photo loads. A post with no photo is complete and never shows an empty frame.
 
 ### App Icon
-The Home Screen icon (#185) is the deck in miniature, on void: a Need-red (#b8300f) ticket tilted -4° over a Want-blue (#2445c8) ticket tilted 9°, both with 56/1024 corners, and "PAY / MY / BILL" stacked in white League Gothic at 238/1024 with 0.86 leading, set mid-left like a ticket title. The maskable version scales the same art to 78% so it survives circular masks. It's rendered from HTML in the real font and exported with Pillow to `app/static/icons/` (180, 192, 512, maskable 512, and a 32 favicon). It's a placeholder: re-render it when the name changes (#35).
+The Home Screen icon (#185, #191) is the deck in miniature, on void: a Need-red (#b8300f) ticket tilted -4° over a Want-blue (#2445c8) ticket tilted 9°, both with 56/1024 corners, and a white League Gothic **Y** at 560/1024, centered on the front ticket. The monogram replaced the stacked wordmark because "YEARNLY" on one line is too small to read at 60px, and iOS prints the name under the icon anyway. The maskable version scales the same art to 78%. It's rendered from HTML in the real font and exported with Pillow to `app/static/icons/` (180, 192, 512, maskable 512, and a 32 favicon), and the 1024 master goes into the iOS app.
 
 ### The Home Page
 The logged-out front door at `/` (#120) is just two doors, and each opens its own story, one step per server-rendered page. The pages are always void, and the feed itself lives at `/feed`.
