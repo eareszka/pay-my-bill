@@ -18,7 +18,7 @@ pytest
 ```
 
 ## Deploy (staging)
-Staging: https://pay-my-bill-staging.onrender.com ([`/health`](https://pay-my-bill-staging.onrender.com/health))
+Staging: https://yearnly.app ([`/health`](https://yearnly.app/health)), also reachable at https://pay-my-bill-staging.onrender.com
 
 Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yaml) Blueprint (see [ADR 0005](docs/adr/0005-render-staging.md)):
 
@@ -41,7 +41,7 @@ The current database expires around 2026-11-26. Staging data is disposable, so r
 1. In the Render dashboard, delete `pay-my-bill-staging-db`.
 2. Open the Blueprint and click **Manual Sync**. Render creates a fresh database from `render.yaml` and reconnects `DATABASE_URL` to the web service.
 3. Redeploy the web service. `flask db upgrade` builds the schema on start.
-4. Check that [`/health`](https://pay-my-bill-staging.onrender.com/health) returns 200.
+4. Check that [`/health`](https://yearnly.app/health) returns 200.
 
 To keep the data instead, upgrade the database to a paid plan before it expires.
 
