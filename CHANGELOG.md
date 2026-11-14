@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Documentation
+- The product's final name is Yearnly, on yearnly.app (ADR 0017, #35). The rename in the app comes in its own story.
+
 ### Added
 - Install to the Home Screen like an app (#185). The site has a web app manifest, so "Add to Home Screen" on iPhone or Android opens it full-screen with its own icon and a void status bar, and no browser bar. The icon is the deck: a Need-red ticket over a Want-blue one, with the wordmark in League Gothic. It's a placeholder until the name is final (#35). A small service worker shows a "You're offline" page when there's no connection. Pages and data always come from the network, never from a cache. In landscape, the top bar clears the notch.
 
