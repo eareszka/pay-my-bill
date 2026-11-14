@@ -26,7 +26,7 @@ def test_new_visitors_get_just_the_two_doors(client: FlaskClient) -> None:
     assert '<a class="home-door home-door-ask" href="/how/ask">' in page
     assert "Yearnly never holds your money." in page
     assert "how-step" not in page
-    assert 'aria-current="page"' not in page.split('aria-label="Main"')[1].split("</nav>")[0]
+    assert 'aria-label="Main"' not in page
 
 
 @pytest.mark.parametrize(("path", "total", "other"), STORIES)
@@ -94,6 +94,28 @@ def test_tracking_tags_still_show_the_doors(client: FlaskClient) -> None:
 def test_logged_out_top_bar_has_a_filled_sign_up(client: FlaskClient) -> None:
     for url in ("/", "/feed", "/how/help"):
         assert '<a class="btn topbar-signup" href="/signup">Sign up</a>' in page_at(client, url)
+
+
+@pytest.mark.parametrize("url", ["/", "/how/help", "/how/ask/3"])
+def test_front_door_shows_only_the_way_in(client: FlaskClient, url: str) -> None:
+    page = page_at(client, url)
+    assert '<body class="page stage-page' in page and "front-door" in page
+    assert '<a class="topbar-login" href="/login">Log in</a>' in page
+    assert 'aria-label="Main"' not in page
+    assert "site-footer" not in page
+
+
+@pytest.mark.parametrize("url", ["/feed", "/signup", "/rules"])
+def test_other_logged_out_pages_keep_the_nav(client: FlaskClient, url: str) -> None:
+    page = page_at(client, url)
+    assert 'aria-label="Main"' in page and "site-footer" in page
+    assert "front-door" not in page
+
+
+def test_logged_in_stories_keep_the_nav(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("maria_g"))
+    page = page_at(client, "/how/help")
+    assert 'aria-label="Main"' in page and "front-door" not in page
 
 
 def test_feed_is_open_to_everyone(client: FlaskClient) -> None:

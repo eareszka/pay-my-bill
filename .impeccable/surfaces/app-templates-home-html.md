@@ -13,7 +13,7 @@ The logged-out home page at `/` and the two how-it-works stories at `/how/help` 
 
 - New visitors on a phone, arriving from a shared post link or word of mouth, deciding whether this is real and safe.
 - Two kinds of visitor (owner, 2026-11-11: "both, split"): people who want to help, and people who need a hand.
-- The action: create an account. Each story ends on Sign up (to `/signup`) or the other story. The feed is always one link away in the nav.
+- The action: create an account. Each story ends on Sign up (to `/signup`) or the other story. Owner, 2026-11-14 (#196): logged out, these pages show nothing but the way in. There is no bottom nav and no footer, and the top bar holds only the wordmark, a quiet Log in link, and Sign up.
 - Proof: the real app pieces, each labeled Example. No invented stats, testimonials, or counts (PRODUCT.md, Evidence on Hand).
 
 ## Constraints
