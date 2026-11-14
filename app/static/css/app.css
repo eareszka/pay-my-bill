@@ -691,8 +691,7 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-progress li { flex: 1; height: 3px; background: rgb(255 255 255 / 0.35); border-radius: 2px; }
 .how-progress li.on { background: var(--on-void); }
 .how-step { display: flex; flex: 1; flex-direction: column; gap: 20px; }
-.how-words p { margin: 0; max-width: 40ch; font-size: 1.0625rem; }
-.how-line { margin: 0 0 10px; font: 400 clamp(2.75rem, 12.5vw, 4.25rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; text-wrap: balance; }
+.how-line { margin: 0; font: 400 clamp(2.75rem, 12.5vw, 4.25rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; text-wrap: balance; }
 .how-piece { margin: 0; }
 .how-example { display: inline-block; margin-bottom: 10px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; border: 1.5px solid var(--on-void); border-radius: 6px; }
 .how-piece .group { max-width: 400px; margin: 0; }
@@ -704,14 +703,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-ask p { margin: 0; }
 .how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
 .how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--void); background: var(--on-void); border-radius: 12px; }
-.how-label { font-weight: 700; }
-.how-input { display: flex; align-items: center; min-height: 48px; padding: 11px 13px; font-variant-numeric: tabular-nums; background: var(--bg); border: 1.5px solid var(--edge); border-radius: var(--radius); }
-.how-input::before { content: "$"; color: var(--muted); }
-.how-panel .gift { padding: 0; border: 0; }
-.how-panel .gift + .gift { margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--line); }
-.how-sent { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-.how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-.how-thanks { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+.how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.how-thanks { display: flex; flex-direction: column; gap: 6px; }
 .how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
 .how-nav a:not(.btn) { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; color: var(--on-void); text-decoration: none; }
 .how-nav a:not(.btn):hover { text-decoration: underline; text-underline-offset: 0.18em; }
