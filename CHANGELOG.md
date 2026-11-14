@@ -5,8 +5,6 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Changed
 - The app is called Yearnly everywhere people see it (#191, ADR 0017): the wordmark, page titles, Home Screen name, emails, the card statement descriptor, Terms, Privacy, and Rules. The Home Screen icon's front ticket now carries a Y monogram.
-
-### Changed
 - The site is served at https://yearnly.app (#35). Links in emails and the return links sent to Stripe use it (`APP_URL`), and email goes out as `Yearnly <no-reply@yearnly.app>` with DKIM, SPF, and DMARC set on the domain, so Outlook stops dropping verification emails. The onrender.com address still works.
 
 ### Documentation
