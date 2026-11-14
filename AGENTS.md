@@ -83,6 +83,8 @@ flask --app app run
 
 - **Sprint 5b, "Launch"** (2026-11-08): Terms and Privacy (#93), password reset (#94), reports and the admin queue at `/admin` (#95, migration 0010, `app/routes/admin.py` and `app/routes/reports.py`), and Brevo email (#96). Mail goes through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks SMTP. Make an admin with `flask --app app admin grant <email>` and remove one with `admin revoke <email>`; /admin lists recent admin actions. Sprint 5's #79, #80, and #81 are paused.
 
+- **iOS shell (#193):** `mobile/` is a Capacitor 8 project (`app.yearnly.ios`) that loads https://yearnly.app. Ship with Actions → **iOS TestFlight** (secrets `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `APPLE_TEAM_ID`). After changing `capacitor.config.json`, run `npx cap sync ios` in `mobile/` and commit `ios/`.
+
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:
 - Before starting work, pull `main` and check the open PRs and branches.

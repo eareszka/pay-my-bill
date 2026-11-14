@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- An iOS app shell for TestFlight (#193). `mobile/` holds a Capacitor 8 project (`app.yearnly.ios`) that opens https://yearnly.app full-screen, with the deck icon, a void launch screen, light status bar text, iPhone only, in portrait. A manual GitHub Actions workflow (`iOS TestFlight`) builds it on a macOS runner, signs it automatically with an App Store Connect API key, and uploads it, so no Mac is needed. The top bar now grows by the top safe-area inset, which is 0 in a browser, so the shell's content clears the status bar.
+
 ### Changed
 - The app is called Yearnly everywhere people see it (#191, ADR 0017): the wordmark, page titles, Home Screen name, emails, the card statement descriptor, Terms, Privacy, and Rules. The Home Screen icon's front ticket now carries a Y monogram.
 - The site is served at https://yearnly.app (#35). Links in emails and the return links sent to Stripe use it (`APP_URL`), and email goes out as `Yearnly <no-reply@yearnly.app>` with DKIM, SPF, and DMARC set on the domain, so Outlook stops dropping verification emails. The onrender.com address still works.
