@@ -20,11 +20,15 @@
 {% macro nav_link(endpoint, icon, label, extra="") %}
   <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
-<body class="{% block body_class %}page{% endblock %}">
+{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how") %}
+<body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="topbar">
     <a class="brand" href="{{ url_for('main.home') }}">Yearnly</a>
+    {% if front_door %}
+    <a class="topbar-login" href="{{ url_for('auth.login') }}">Log in</a>
+    {% else %}
     <nav aria-label="Main">
       {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
@@ -39,6 +43,7 @@
         {{ nav_link("auth.signup", "you", "Sign up") }}
       {% endif %}
     </nav>
+    {% endif %}
     {% if current_user.is_authenticated %}{% elif request.endpoint == 'auth.signup' %}<a class="btn topbar-signup" href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a>{% else %}<a class="btn topbar-signup" href="{{ url_for('auth.signup') }}">Sign up</a>{% endif %}
   </header>
   <main class="container{% block main_class %}{% endblock %}" id="main" tabindex="-1">
@@ -47,10 +52,12 @@
     {% endfor %}
     {% block content %}{% endblock %}
   </main>
+  {% if not front_door %}
   <footer class="site-footer">
     <a href="{{ url_for('main.rules') }}">Rules</a>
     <a href="{{ url_for('main.terms') }}">Terms</a>
     <a href="{{ url_for('main.privacy') }}">Privacy</a>
   </footer>
+  {% endif %}
 </body>
 </html>

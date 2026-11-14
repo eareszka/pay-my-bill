@@ -156,6 +156,11 @@ h3.section-title { font-size: 1rem; }
 /* Logged out, the one filled action in the bar. */
 .topbar .topbar-signup { min-height: 36px; margin-left: auto; padding: 6px 14px; color: var(--void); background: var(--on-void); }
 .topbar .topbar-signup:hover { background: #d9dce2; }
+/* The front door (home and the How stories, logged out) keeps only the way in (#196). */
+.front-door { --nav-h: 0px; }
+.topbar .topbar-login { display: inline-flex; align-items: center; min-height: 44px; margin-left: auto; padding: 0 14px; font-weight: 700; color: var(--on-void-muted); transition: color var(--fast) ease-out; }
+.topbar .topbar-login:hover { color: var(--on-void); }
+.topbar .topbar-login + .topbar-signup { margin-left: 4px; }
 .topbar > nav {
   position: fixed;
   inset: auto 0 0;
@@ -586,6 +591,7 @@ h3.section-title { font-size: 1rem; }
   .topbar > nav a[href="/signup"] { display: none; }
   .join-page .topbar > nav a[href^="/login"] { display: none; }
   .topbar .topbar-signup { margin-left: 12px; }
+  .topbar .topbar-login + .topbar-signup { margin-left: 4px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
   .container { padding: 28px 16px; }
