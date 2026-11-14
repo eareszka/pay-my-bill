@@ -239,7 +239,7 @@ class PostForm(FlaskForm):
             raise ValidationError("The goal has to be more than $0.")
         if cents > MAX_GOAL_CENTS:
             raise ValidationError(
-                f"Goals are capped at {format_cents(MAX_GOAL_CENTS)}. Pay My Bill is for "
+                f"Goals are capped at {format_cents(MAX_GOAL_CENTS)}. Yearnly is for "
                 "everyday wants and needs."
             )
         self.goal_cents = cents

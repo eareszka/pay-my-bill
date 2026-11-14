@@ -48,5 +48,5 @@ def test_pages_link_the_manifest_and_home_screen_icon(client: FlaskClient) -> No
     page = client.get("/rules").get_data(as_text=True)
     assert '<link rel="manifest" href="/manifest.webmanifest">' in page
     assert 'rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png"' in page
-    assert 'name="apple-mobile-web-app-title" content="Pay My Bill"' in page
+    assert 'name="apple-mobile-web-app-title" content="Yearnly"' in page
     assert "/static/js/pwa.js" in page

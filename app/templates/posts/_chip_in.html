@@ -12,7 +12,7 @@
           <small id="card-net" aria-live="polite" data-poster="{{ poster }}" hidden></small>
         </div>
         <button type="submit" class="btn">Chip in instantly</button>
-        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You pay exactly what you enter. The card fee (about {{ card_fee.card_pct }} + {{ card_fee.card_fixed }}¢) and a {{ card_fee.platform_pct }} Pay My Bill fee come out of it, {{ poster }} gets the rest, and it counts right away. A card from outside the US costs a little more.</p>
+        <p class="hint">Card, Apple Pay, or Google Pay through Stripe. You pay exactly what you enter. The card fee (about {{ card_fee.card_pct }} + {{ card_fee.card_fixed }}¢) and a {{ card_fee.platform_pct }} Yearnly fee come out of it, {{ poster }} gets the rest, and it counts right away. A card from outside the US costs a little more.</p>
         <script src="{{ url_for('static', filename='js/card-net.js') }}" defer></script>
       </form>
 {% endmacro %}
@@ -60,7 +60,7 @@
               <a class="btn{% if card_ready %} btn-secondary{% endif %}" href="{{ option.url }}" data-amount-sep="{{ option.amount_sep }}" data-method="{{ option.method.value }}" data-label="{{ option.label }}" data-handle="{{ option.handle }}" target="_blank" rel="noopener noreferrer">{{ option.label }} <small>{{ option.handle }}</small></a>
             {% endfor %}
           </div>
-          <p class="hint">Opens {{ poster }}'s page in the app. Pay My Bill never holds money.</p>
+          <p class="hint">Opens {{ poster }}'s page in the app. Yearnly never holds money.</p>
         {% endif %}
       </div>
       {% if current_user.is_authenticated %}

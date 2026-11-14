@@ -49,7 +49,7 @@ def test_report_a_post_notifies_admins(
     assert resp.status_code == 302
     (report,) = open_reports()
     assert (report.post_id, report.reason, report.details) == (post.id, ReportReason.SCAM, "Fake")
-    assert "New report on Pay My Bill" in caplog.text
+    assert "New report on Yearnly" in caplog.text
     assert "boss@example.com" in caplog.text
 
     client.post(f"/report/post/{post.id}", data={"reason": "spam"})
@@ -382,9 +382,9 @@ def test_admins_get_one_report_email_an_hour(
     for n in range(8):
         post = make_post(make_user(f"poster{n}"))
         login_as(client, make_user(f"reporter{n}"))
-        before = caplog.text.count("New report on Pay My Bill")
+        before = caplog.text.count("New report on Yearnly")
         client.post(f"/report/post/{post.id}", data={"reason": "spam"})
-        sent.append(caplog.text.count("New report on Pay My Bill") - before)
+        sent.append(caplog.text.count("New report on Yearnly") - before)
         for row in [*open_reports(), *db.session.scalars(select(LoginAttempt))]:
             row.created_at -= timedelta(minutes=50)
         db.session.commit()
@@ -408,7 +408,7 @@ def test_a_login_typed_as_the_marker_cannot_silence_report_emails(
     post = make_post(make_user("poster"))
     login_as(client, make_user("bob"))
     client.post(f"/report/post/{post.id}", data={"reason": "spam"})
-    assert caplog.text.count("New report on Pay My Bill") == 1
+    assert caplog.text.count("New report on Yearnly") == 1
 
 
 def test_dismissing_a_post_report_logs_the_post(

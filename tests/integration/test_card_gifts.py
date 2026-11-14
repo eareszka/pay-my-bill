@@ -139,7 +139,7 @@ def test_post_page_offers_instant_card_gift(client: FlaskClient, post: Post, don
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Chip in instantly" in page
     assert "You pay exactly what you enter" in page
-    assert "a 1% Pay My Bill fee come out of it" in page
+    assert "a 1% Yearnly fee come out of it" in page
     assert 'data-platform-rate="0.01"' in page
     assert "js/card-net.js" in page
     assert "A card from outside the US costs a little more" in page
@@ -217,7 +217,7 @@ def test_checkout_without_platform_fee(
 
 def test_terms_disclose_the_fees(client: FlaskClient) -> None:
     page = client.get("/terms").get_data(as_text=True)
-    assert "a 1% Pay My Bill platform fee come out of each card gift" in page
+    assert "a 1% Yearnly platform fee come out of each card gift" in page
 
 
 @pytest.mark.parametrize(

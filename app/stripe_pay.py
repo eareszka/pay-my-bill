@@ -34,9 +34,9 @@ def account_ready(account: stripe.Account) -> bool:
 # Recipients are people taking gifts, not businesses, so we answer Stripe's business
 # questions for them and onboarding only asks about the person and their bank (#98).
 GIFT_MCC = "7299"  # Miscellaneous personal services
-STATEMENT_DESCRIPTOR = "PAY MY BILL"
+STATEMENT_DESCRIPTOR = "YEARNLY"
 PRODUCT_DESCRIPTION = (
-    "Personal gifts from friends and community members through Pay My Bill, where people "
+    "Personal gifts from friends and community members through Yearnly, where people "
     "post everyday wants and needs and others chip in by card. Nothing is sold."
 )
 
@@ -141,7 +141,7 @@ def fee_terms() -> dict[str, str]:
 
 
 def split(paid_cents: int) -> tuple[int, int, int]:
-    """Stripe's fee (US cards), Pay My Bill's fee, and what the recipient keeps (ADR 0016)."""
+    """Stripe's fee (US cards), Yearnly's fee, and what the recipient keeps (ADR 0016)."""
     stripe_fee = _cents_up(paid_cents * CARD_FEE_RATE) + CARD_FEE_FIXED_CENTS
     platform_fee = _cents_up(paid_cents * platform_fee_rate())
     return stripe_fee, platform_fee, paid_cents - stripe_fee - platform_fee
@@ -185,14 +185,14 @@ def checkout_url(
                         "unit_amount": paid_cents,
                         "product_data": {
                             "name": f"Gift to {recipient}",
-                            "description": f"For “{title}”. Card and Pay My Bill fees come "
+                            "description": f"For “{title}”. Card and Yearnly fees come "
                             f"out of it, so {recipient} gets about {format_cents(net)}.",
                         },
                     },
                 }
             ],
             # A direct charge on the recipient's account (Managed Risk, ADR 0014): Stripe
-            # takes its fee from the charge and Pay My Bill's application fee goes to the
+            # takes its fee from the charge and Yearnly's application fee goes to the
             # platform, so the recipient keeps the rest (ADR 0016).
             "payment_intent_data": payment_intent,
             "metadata": metadata,

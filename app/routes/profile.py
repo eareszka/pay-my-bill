@@ -53,7 +53,7 @@ def send_handle_change_notice(
         for label, (old, new) in changes.items()
     ]
     body = (
-        f"Hi {user.username},\n\nThe payment handles on your Pay My Bill account just changed:\n"
+        f"Hi {user.username},\n\nThe payment handles on your Yearnly account just changed:\n"
         + "\n".join(lines)
         + "\n\nIf this wasn't you, change your password right away and contact us."
     )
