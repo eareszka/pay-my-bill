@@ -16,7 +16,7 @@ def test_manifest_describes_the_installed_app(client: FlaskClient) -> None:
         "/",
         "/",
     )
-    assert manifest["background_color"] == manifest["theme_color"] == "#0a0a0a"
+    assert manifest["background_color"] == manifest["theme_color"] == "#3a7558"
     for icon in manifest["icons"]:
         assert client.get(icon["src"]).status_code == 200
     assert any(icon.get("purpose") == "maskable" for icon in manifest["icons"])
