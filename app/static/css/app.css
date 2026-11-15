@@ -16,7 +16,9 @@
   --deep: #16261d;
   /* Chip in and other filled marks on a field: a deep green, never black (#200 finish review). */
   --press: #2f6249;
-  --press-hover: #26523c;
+  /* Chip in is the masking-tape marigold, the one warm note, so giving never blends into the green chrome (owner, 2026-11-14). */
+  --chip: #ffd166;
+  --chip-hover: #f5c04a;
   --on-field: #16261d;
   --on-field-muted: #2f4a3a;
   --field-track: rgb(22 38 29 / 0.2);
@@ -230,7 +232,7 @@ h3.section-title { font-size: 1rem; }
 .has-photo { background: var(--field); }
 .ticket-photo { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
 /* The photo itself fades out into the field, so the words and Chip in always sit on solid field. */
-.ticket-photo { -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 58%); mask-image: linear-gradient(to bottom, #000 30%, transparent 58%); }
+.ticket-photo { -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 18%, #000 30%, transparent 58%); mask-image: linear-gradient(to bottom, transparent 4%, #000 18%, #000 30%, transparent 58%); }
 .has-photo .card-body { background: linear-gradient(to bottom, color-mix(in srgb, var(--field) 85%, transparent), transparent 22%); }
 .has-photo .card-title { margin-block: auto 0; }
 .card-title { margin-block: auto; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; overflow-wrap: break-word; }
@@ -258,13 +260,13 @@ h3.section-title { font-size: 1rem; }
   font-weight: 700;
   text-align: center;
   text-decoration: none;
-  color: #ffffff;
-  background: var(--press);
+  color: var(--deep);
+  background: var(--chip);
   border-radius: 12px;
   transition: background-color var(--fast) ease-out;
 }
-.tear-tab:hover { background: var(--press-hover); }
-.tear-tab:focus-visible { outline-color: var(--press); outline-offset: 3px; }
+.tear-tab:hover { background: var(--chip-hover); }
+.tear-tab:focus-visible { outline-color: var(--deep); outline-offset: 3px; }
 
 /* The rail: Back and Next as glyphs on the right edge. The one you're dragging toward lights up. */
 .rail {
@@ -656,6 +658,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-field:has(.home-mosaic) { position: relative; isolation: isolate; overflow: hidden; }
 .how-field > :not(.home-mosaic, .sr-only) { position: relative; z-index: 2; }
 .how-field .home-mosaic { height: 44%; grid-template-rows: 1fr; }
+/* The headline sits on the band on phones, so its photos stay pale enough for dark ink. */
+.how-field .home-mosaic img { filter: grayscale(1) contrast(0.7) brightness(1.25); }
 .how-field:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 6%, var(--field) 30%); pointer-events: none; }
 .how-progress { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .how-progress li { flex: 1; height: 3px; background: var(--field-track); border-radius: 2px; }
@@ -672,7 +676,7 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: 14px; }
 .how-ask p { margin: 0; }
 .how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
-.how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: #ffffff; background: var(--press); border-radius: 12px; }
+.how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--deep); background: var(--chip); border-radius: 12px; }
 .how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .how-thanks { display: flex; flex-direction: column; gap: 6px; }
 .how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
