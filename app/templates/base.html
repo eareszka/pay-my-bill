@@ -24,11 +24,10 @@
 <body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
+  {# The front door (home and the How stories, logged out) has no bar at all (#205): the way in lives on the page. #}
+  {% if not front_door %}
   <header class="topbar">
     <a class="brand" href="{{ url_for('main.home') }}">Yearnly</a>
-    {% if front_door %}
-    <a class="topbar-login" href="{{ url_for('auth.login') }}">Log in</a>
-    {% else %}
     <nav aria-label="Main">
       {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
@@ -43,9 +42,9 @@
         {{ nav_link("auth.signup", "you", "Sign up") }}
       {% endif %}
     </nav>
-    {% endif %}
     {% if current_user.is_authenticated %}{% elif request.endpoint == 'auth.signup' %}<a class="btn topbar-signup" href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a>{% else %}<a class="btn topbar-signup" href="{{ url_for('auth.signup') }}">Sign up</a>{% endif %}
   </header>
+  {% endif %}
   <main class="container{% block main_class %}{% endblock %}" id="main" tabindex="-1">
     {% for category, message in get_flashed_messages(with_categories=true) %}
       <p class="flash flash-{{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>

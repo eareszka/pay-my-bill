@@ -38,7 +38,13 @@
   --bad-tint: #fbe3e1;
   --info-tint: #e5ece4;
   --mark-empty: #dbe2d8;
-  --radius: 8px;
+  /* Two Speech Bubbles (#205): big soft bubbles with one tight "tail" corner. Asks speak from the right
+     (tail bottom-right); helpers answer from the left (tail bottom-left). Every button is a pill. */
+  --radius: 14px;
+  --r-bubble: 28px;
+  --r-panel: 22px;
+  --r-tail: 6px;
+  --pill: 999px;
   /* The iOS app draws under the status bar, so the bar grows by the top inset (#193); it's 0 in a browser. */
   --bar-h: calc(52px + env(safe-area-inset-top));
   --nav-h: 64px;
@@ -124,11 +130,8 @@ h3.section-title { font-size: 1rem; }
 /* Logged out, the one filled action in the bar. */
 .topbar .topbar-signup { min-height: 36px; margin-left: auto; padding: 6px 14px; color: var(--deep); background: var(--on-shell); }
 .topbar .topbar-signup:hover { background: #e2eee6; }
-/* The front door (home and the How stories, logged out) keeps only the way in (#196). */
+/* The front door (home and the How stories, logged out) has no bar and no nav (#196, #205). */
 .front-door { --nav-h: 0px; }
-.topbar .topbar-login { display: inline-flex; align-items: center; min-height: 44px; margin-left: auto; padding: 0 14px; font-weight: 700; color: var(--on-shell-muted); transition: color var(--fast) ease-out; }
-.topbar .topbar-login:hover { color: var(--on-shell); }
-.topbar .topbar-login + .topbar-signup { margin-left: 4px; }
 .topbar > nav {
   position: fixed;
   inset: auto 0 0;
@@ -156,8 +159,8 @@ h3.section-title { font-size: 1rem; }
 .topbar > nav a:hover, .topbar > nav a[aria-current="page"] { color: var(--on-shell); }
 .topbar > nav a[aria-current="page"] .icon { stroke-width: 2.5; }
 /* On phones the current tab sits in a deeper green cell with a white rule along its top. */
-.topbar > nav a[aria-current="page"] { background: var(--shell-deep); }
-.topbar > nav a[aria-current="page"]::before { content: ""; position: absolute; inset: 0 22% auto; height: 3px; background: var(--on-shell); border-radius: 0 0 2px 2px; }
+.topbar > nav a > * { position: relative; }
+.topbar > nav a[aria-current="page"]::before { content: ""; position: absolute; top: 7px; left: 50%; width: 58px; height: 32px; translate: -50% 0; background: var(--shell-deep); border-radius: var(--pill); }
 .nav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-inline: 4px; }
 .badge {
   position: absolute;
@@ -170,7 +173,7 @@ h3.section-title { font-size: 1rem; }
   text-align: center;
   color: var(--deep);
   background: var(--on-shell);
-  border-radius: 9px;
+  border-radius: var(--pill);
   font-variant-numeric: tabular-nums;
 }
 .container { max-width: 640px; margin: 0 auto; padding: 16px; }
@@ -193,25 +196,26 @@ h3.section-title { font-size: 1rem; }
   z-index: 3;
   display: flex;
   justify-content: center;
-  gap: 22px;
+  gap: 6px;
   margin: 0;
   padding: 12px 16px;
   border: 0;
   pointer-events: none;
 }
 .deck-layout > .tabs a {
-  padding: 6px 0;
+  padding: 6px 14px;
   font-weight: 700;
   color: var(--on-field-muted);
   text-decoration: none;
-  border-bottom: 2px solid transparent;
+  border-radius: var(--pill);
   pointer-events: auto;
 }
 .deck-layout > .tabs a:hover, .deck-layout > .tabs a[aria-current="page"] { color: var(--on-field); }
-.deck-layout > .tabs a[aria-current="page"] { border-bottom-color: var(--on-field); }
+.deck-layout > .tabs a[aria-current="page"] { color: #ffffff; background: var(--press); }
 .deck-layout > .tabs :focus-visible { outline-color: var(--on-field); }
 
 .deck { position: absolute; inset: 0; }
+.deck .deck-ticket { inset: 8px 10px 12px; overflow: hidden; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
 .ticket { --field: var(--need); }
 .ticket-want { --field: var(--want); }
 .deck-ticket {
@@ -240,7 +244,7 @@ h3.section-title { font-size: 1rem; }
 .card-title a::after { content: ""; position: absolute; inset: 0; }
 .deck-ticket:hover .card-title a { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.08em; }
 .card-title a:focus-visible { outline: none; }
-.card-title a:focus-visible::after { outline: 2px solid var(--on-field); outline-offset: -6px; }
+.card-title a:focus-visible::after { outline: 2px solid var(--on-field); outline-offset: -6px; border-radius: calc(var(--r-bubble) - 6px) calc(var(--r-bubble) - 6px) 0 calc(var(--r-bubble) - 6px); }
 .ticket-foot { flex: none; margin-top: 14px; }
 .ticket-foot p { margin: 0; }
 .ticket .card-head { font-size: 0.9375rem; color: var(--on-field-muted); }
@@ -262,7 +266,7 @@ h3.section-title { font-size: 1rem; }
   text-decoration: none;
   color: var(--deep);
   background: var(--chip);
-  border-radius: 12px;
+  border-radius: var(--pill);
   transition: background-color var(--fast) ease-out;
 }
 .tear-tab:hover { background: var(--chip-hover); }
@@ -271,8 +275,8 @@ h3.section-title { font-size: 1rem; }
 /* The rail: Back and Next as glyphs on the right edge. The one you're dragging toward lights up. */
 .rail {
   position: absolute;
-  right: 10px;
-  bottom: 96px;
+  right: 18px;
+  bottom: 100px;
   z-index: 3;
   display: flex;
   flex-direction: column;
@@ -302,8 +306,8 @@ h3.section-title { font-size: 1rem; }
 .stage-empty a { color: var(--ink); font-weight: 700; }
 
 /* Ten marks toward the goal, filled once on the post page. */
-.meter { height: 4px; background: var(--mark-empty); border-radius: 2px; }
-.meter i { display: block; width: var(--p); max-width: 100%; height: 100%; background: var(--ink); border-radius: 2px; }
+.meter { height: 4px; background: var(--mark-empty); border-radius: var(--pill); }
+.meter i { display: block; width: var(--p); max-width: 100%; height: 100%; background: var(--ink); border-radius: var(--pill); }
 .ticket .meter, .post-hero .meter { background: var(--field-track); }
 .ticket .meter i, .post-hero .meter i { background: var(--deep); }
 
@@ -313,7 +317,7 @@ h3.section-title { font-size: 1rem; }
 /* The post page: the same color field as a header, then the story on the page. */
 .post { --field: var(--need); margin-bottom: 16px; }
 .post-want { --field: var(--want); }
-.post-hero { margin: -16px -16px 0; padding: 28px 16px 22px; color: var(--on-field); background: var(--field); }
+.post-hero { margin: -6px -6px 0; padding: 28px 18px 22px; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); color: var(--on-field); background: var(--field); }
 .post-hero h1 { margin: 0 0 14px; font-size: clamp(3rem, 14vw, 4.5rem); line-height: 0.92; }
 .post-hero .card-head { margin: 0; font-size: 0.9375rem; color: var(--on-field-muted); }
 .post-hero .amounts { margin: 18px 0 10px; font-size: 1rem; }
@@ -339,7 +343,7 @@ h3.section-title { font-size: 1rem; }
   color: var(--ink);
   background: var(--surface);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail);
 }
 .group legend { float: left; width: 100%; padding: 0; font-weight: 700; font-size: 1.125rem; }
 .group legend + * { clear: both; }
@@ -367,14 +371,33 @@ h3.section-title { font-size: 1rem; }
 .field [aria-invalid="true"], .field [aria-invalid="true"]:focus-visible { border-color: var(--bad); border-width: 2px; }
 .field textarea { min-height: 128px; }
 .field input[type="file"] { min-height: 0; padding: 10px; font-size: 0.9375rem; color: var(--muted); }
-.field input[type="file"]::file-selector-button { margin-right: 12px; padding: 8px 14px; font: inherit; font-weight: 700; color: var(--ink); background: transparent; border: 1.5px solid var(--edge); border-radius: var(--radius); cursor: pointer; }
+.field input[type="file"]::file-selector-button { margin-right: 12px; padding: 8px 14px; font: inherit; font-weight: 700; color: var(--ink); background: transparent; border: 1.5px solid var(--edge); border-radius: var(--pill); cursor: pointer; }
 .field input[type="file"]::file-selector-button:hover { border-color: var(--ink); }
 .error, .field small.error { color: var(--bad-text); font-weight: 700; }
 .muted, .hint, .field small:not(.error) { color: var(--muted); }
 .hint { margin: 0; font-size: 0.9375rem; }
 .choices { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .choice { display: flex; align-items: center; gap: 10px; min-height: 36px; font-weight: 400; }
-.choice input { width: 20px; height: 20px; margin: 0; }
+/* Checkboxes and radios in the bubble grammar: a rounded box or a round dot, filled shell green when chosen. */
+.choice input {
+  display: grid;
+  place-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  appearance: none;
+  background: var(--surface);
+  border: 1.5px solid var(--edge);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color var(--fast) ease-out, border-color var(--fast) ease-out;
+}
+.choice input[type="radio"] { border-radius: 50%; }
+.choice input:hover { border-color: var(--ink); }
+.choice input:checked { background: var(--shell); border-color: var(--shell); }
+.choice input[type="checkbox"]:checked::after { content: ""; width: 10px; height: 6px; margin-top: -3px; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; rotate: -45deg; }
+.choice input[type="radio"]:checked::after { content: ""; width: 8px; height: 8px; background: #ffffff; border-radius: 50%; }
 
 .flash, .notice { margin: 0 0 14px; padding: 12px 14px; color: var(--ink); background: var(--info-tint); border-radius: var(--radius); }
 .flash-success { background: var(--good-tint); }
@@ -398,7 +421,7 @@ h3.section-title { font-size: 1rem; }
   color: var(--action-fg);
   background: var(--action-bg);
   border: 1.5px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--pill);
   cursor: pointer;
   transition: background-color var(--fast) ease-out, border-color var(--fast) ease-out, transform var(--fast) var(--ease-out);
 }
@@ -478,26 +501,26 @@ h3.section-title { font-size: 1rem; }
 .gift-list-note { margin-top: 8px; }
 
 /* Leaders */
-.tabs { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
-.tabs + .tabs { margin-top: -6px; }
-.tabs a { padding: 10px 0; margin-bottom: -1px; font-weight: 700; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; }
-.tabs a:hover { color: var(--ink); }
-.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tabs + .tabs { margin-top: -4px; }
+.tabs a { padding: 8px 16px; font-weight: 700; color: var(--muted); text-decoration: none; border-radius: var(--pill); transition: background-color var(--fast) ease-out, color var(--fast) ease-out; }
+.tabs a:hover { color: var(--ink); background: var(--info-tint); }
+.tabs a[aria-current="page"] { color: #ffffff; background: var(--shell); }
 .leaders-hint { margin: -6px 0 16px; }
-.leader-list .is-you { font-weight: 700; background: var(--good-tint); }
+.leader-list .is-you { font-weight: 700; background: var(--good-tint); border-radius: var(--radius); }
 .leader-rank { justify-self: end; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
 .leader-people { justify-self: end; font-variant-numeric: tabular-nums; }
 .leader-you { margin: 12px 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
 .leader-cta { margin: 18px 0 0; }
 
 /* Profile */
-.rewards { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; padding: 18px 16px; background: var(--surface); border-radius: 14px; }
+.rewards { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; padding: 18px 16px; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
 .rewards p { margin: 0; }
 .rewards-level { font: 400 2.25rem/1 var(--display); text-transform: uppercase; }
 .rewards-stats { font-variant-numeric: tabular-nums; }
 .rewards-streak { font-weight: 700; }
 .badge-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; padding: 0; list-style: none; }
-.badge-list li { padding: 3px 10px; font-size: 0.875rem; font-weight: 700; background: var(--good-tint); border-radius: 6px; }
+.badge-list li { padding: 3px 10px; font-size: 0.875rem; font-weight: 700; background: var(--good-tint); border-radius: var(--pill); }
 .follow-through { margin: 16px 0 0; font-weight: 700; }
 .follow-through-hint { margin-top: 2px; }
 .handles { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0; }
@@ -544,7 +567,7 @@ h3.section-title { font-size: 1rem; }
 
 @media (max-width: 380px) {
   .card-body { padding-right: 76px; }
-  .tabs { gap: 16px; }
+  .tabs { gap: 4px; }
 }
 
 /* Website: the nav moves up into the bar, and the stage stands beside the Chip in panel. */
@@ -553,9 +576,10 @@ h3.section-title { font-size: 1rem; }
   body { padding-bottom: 0; }
   .topbar { justify-content: space-between; padding: 0 max(24px, calc((100% - 1120px) / 2)); }
   .topbar > nav { position: static; height: auto; padding: 0; gap: 4px; background: none; border: 0; }
-  .topbar > nav a { flex: none; flex-direction: row; gap: 8px; padding: 8px 12px; font-size: 0.9375rem; border-radius: var(--radius); }
+  .topbar > nav a { flex: none; flex-direction: row; gap: 8px; padding: 8px 12px; font-size: 0.9375rem; border-radius: var(--pill); }
   .topbar > nav a[aria-current="page"] { background: var(--shell-deep); }
   .topbar > nav a[aria-current="page"]::before { display: none; }
+  .topbar > nav a > * { position: static; }
   .topbar > nav .icon { width: 20px; height: 20px; }
   .topbar > nav { margin-left: auto; }
   .topbar > nav a[href="/signup"] { display: none; }
@@ -575,9 +599,12 @@ h3.section-title { font-size: 1rem; }
     row-gap: 16px;
   }
   .deck-layout > .tabs { position: static; grid-area: tabs; padding: 0; }
-  .stage { grid-area: stage; height: min(620px, calc(100dvh - var(--bar-h) - 170px)); min-height: 460px; border-radius: 18px 0 0 18px; }
-  .deck-layout:not(:has(.deck-side)) .stage { grid-column: stage / side; border-radius: 18px; }
-  .deck-side { grid-area: side; align-self: stretch; display: flex; flex-direction: column; overflow-y: auto; padding: 28px; background: var(--surface); border-radius: 0 18px 18px 0; }
+  .stage { grid-area: stage; height: min(620px, calc(100dvh - var(--bar-h) - 170px)); min-height: 460px; border-radius: var(--r-bubble) 0 0 var(--r-bubble); }
+  .deck-layout:not(:has(.deck-side)) .stage { grid-column: stage / side; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
+  .deck-side { grid-area: side; align-self: stretch; display: flex; flex-direction: column; overflow-y: auto; padding: 28px; background: var(--surface); border-radius: 0 var(--r-bubble) var(--r-tail) 0; }
+  .deck .deck-ticket { inset: 0; border-radius: 0; }
+  .deck .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) 0 0 calc(var(--r-bubble) - 6px); }
+  .deck-layout:not(:has(.deck-side)) .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) calc(var(--r-bubble) - 6px) 0 calc(var(--r-bubble) - 6px); }
   .deck-side .group, .post .post-side > .group { padding: 0; background: none; border-radius: 0; }
   .deck-side .group { margin: 0; }
   .deck .tear-tab { display: none; }
@@ -593,7 +620,7 @@ h3.section-title { font-size: 1rem; }
   .deck-count { grid-area: count; justify-self: center; font-size: 0.8125rem; color: var(--muted); }
   .deck-hint { display: inline; font-weight: 400; }
   .stage-page .container-wide:not(:has(> .feed)) { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
-  .post-hero { margin: 0; padding: 36px 32px 28px; border-radius: 18px; }
+  .post-hero { margin: 0; padding: 36px 32px 28px; }
   .post-hero h1 { font-size: 5rem; }
   .post-hero.has-photo { min-height: 520px; }
   .post:has(> .post-side > .group) { display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 28px; align-items: start; }
@@ -610,73 +637,98 @@ h3.section-title { font-size: 1rem; }
 body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none; padding: 0; }
 .home-door-help, .how-story-help .how-field, .how-other-help { --field: var(--want); }
 .home-door-ask, .how-story-ask .how-field, .how-other-ask { --field: var(--need); }
-.home { --door-h: clamp(260px, calc((100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom) - 96px) / 2), 420px); color: var(--ink); }
-.home-doors { display: grid; }
+/* The front door's two bubbles share one green (owner, #205); each story keeps its own. */
+.home-door.home-door-ask { --field: var(--want); }
+.front-door { --bar-h: env(safe-area-inset-top); }
+.home {
+  --door-h: clamp(220px, calc((100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 250px) / 2), 360px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100svh;
+  padding: calc(env(safe-area-inset-top) + 22px) 18px calc(env(safe-area-inset-bottom) + 20px);
+  color: var(--ink);
+}
+.home-mark { margin: 0; font: 400 1.875rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; color: var(--shell); }
+.home-doors { display: grid; gap: 24px; }
 .home-door {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   gap: 8px;
   min-height: var(--door-h);
-  padding: 24px 18px 20px;
+  padding: 22px 20px 20px;
   color: var(--on-field);
   text-decoration: none;
   background: var(--field);
+  border-radius: var(--r-bubble);
 }
+/* Helping speaks from the left, asking from the right, each with a small pointed tail. */
+.home-door-help { margin-right: 34px; border-bottom-left-radius: var(--r-tail); }
+.home-door-ask { margin-left: 34px; border-bottom-right-radius: var(--r-tail); }
+.home-door:not(:has(.home-mosaic)) { min-height: 0; padding-top: 26px; }
+.home-door::before, .how-field::before, .how-other::before { content: ""; position: absolute; bottom: -12px; width: 22px; height: 14px; background: var(--field); }
+.home-door-help::before, .how-story-help .how-field::before, .how-other-help::before { left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.home-door-ask::before, .how-story-ask .how-field::before, .how-other-ask::before { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
 /* Real photos from posts tile the top of a door, turned to the door's own color, and the field takes over under the words. */
-.home-door { position: relative; isolation: isolate; overflow: hidden; }
+.home-door { position: relative; isolation: isolate; }
 .home-door > span:not(.home-mosaic) { position: relative; z-index: 2; }
-.home-mosaic { position: absolute; inset: 0 0 auto; z-index: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; height: 48%; isolation: isolate; }
+.home-mosaic { position: absolute; inset: 0 0 auto; z-index: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; height: 48%; isolation: isolate; overflow: hidden; border-radius: var(--r-bubble) var(--r-bubble) 0 0; }
 .home-mosaic img:nth-child(n + 4) { display: none; }
-.home-mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1); }
+/* Headlines can sit on the band in a bubble, so the photos stay pale enough for dark ink. */
+.home-mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(0.7) brightness(1.25); }
 .home-mosaic::after { content: ""; position: absolute; inset: 0; background: var(--field); mix-blend-mode: multiply; }
-.home-door:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 18%, var(--field) 50%); pointer-events: none; }
-.home-door-line { font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
-.home-door-text { max-width: 34ch; font-size: 1.0625rem; }
+.home-door:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; background: linear-gradient(to bottom, transparent 18%, var(--field) 50%); pointer-events: none; }
+.home-door-line { font: 400 clamp(2.75rem, 13vw, 4.25rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
+.home-door-text { max-width: 34ch; font-size: 1rem; }
 .home-door-go, .how-other-go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
 .home-door-go { margin-top: 6px; }
 .home-door-go .icon, .how-other-go .icon { width: 20px; height: 20px; transition: transform var(--fast) var(--ease-out); }
 .home-door:hover .home-door-go, .how-other:hover .how-other-go { text-decoration: underline; text-underline-offset: 0.18em; }
 .home-door:hover .home-door-go .icon, .how-other:hover .how-other-go .icon { transform: translateX(4px); }
 .home-door:focus-visible, .how-other:focus-visible { outline: 2px solid var(--on-field); outline-offset: -6px; }
-.home-promise { margin: 0; padding: 20px 18px; color: var(--muted); }
-.home-promise strong { color: var(--ink); }
+.home-way-in { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 8px; }
+.home-signup { width: 100%; min-height: 52px; font-size: 1.0625rem; }
+.home-login { margin: 0; text-align: center; color: var(--muted); }
+.home-login a { color: var(--ink); font-weight: 700; }
 
 /* A story step: one field fills the screen, and the other door waits docked at its foot. */
-.how { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); color: var(--ink); }
+.how { display: flex; flex-direction: column; gap: 22px; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 20px); color: var(--ink); }
 .how-field {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 20px;
-  padding: 16px 18px 8px;
+  position: relative;
+  padding: 18px 18px 8px;
   color: var(--on-field);
   background: var(--field);
+  border-radius: var(--r-bubble);
   touch-action: pan-y;
 }
 /* The door's photos carry into its story: three across the top of the field, fading to solid behind the headline. */
-.how-field:has(.home-mosaic) { position: relative; isolation: isolate; overflow: hidden; }
+.how-field:has(.home-mosaic) { isolation: isolate; }
+.how-story-help .how-field, .how-other.how-other-help { border-bottom-left-radius: var(--r-tail); }
+.how-story-ask .how-field, .how-other.how-other-ask { border-bottom-right-radius: var(--r-tail); }
 .how-field > :not(.home-mosaic, .sr-only) { position: relative; z-index: 2; }
 .how-field .home-mosaic { height: 44%; grid-template-rows: 1fr; }
-/* The headline sits on the band on phones, so its photos stay pale enough for dark ink. */
-.how-field .home-mosaic img { filter: grayscale(1) contrast(0.7) brightness(1.25); }
-.how-field:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 6%, var(--field) 30%); pointer-events: none; }
+.how-field:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; background: linear-gradient(to bottom, transparent 6%, var(--field) 30%); pointer-events: none; }
 .how-progress { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.how-progress li { flex: 1; height: 3px; background: var(--field-track); border-radius: 2px; }
+.how-progress li { flex: 1; height: 3px; background: var(--field-track); border-radius: var(--pill); }
 .how-progress li.on { background: var(--deep); }
 .how-step { display: flex; flex: 1; flex-direction: column; gap: 20px; }
 .how-line { margin: 0; font: 400 clamp(2.75rem, 12.5vw, 4.25rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; text-wrap: balance; }
 .how-piece { margin: 0; }
-.how-example { display: inline-block; margin-bottom: 10px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; border: 1.5px solid var(--on-field); border-radius: 6px; }
+.how-example { display: inline-block; margin-bottom: 10px; padding: 3px 8px; font-size: 0.75rem; font-weight: 700; border: 1.5px solid var(--on-field); border-radius: var(--pill); }
 .how-piece .group { max-width: 400px; margin: 0; }
 .how-piece .btn { cursor: default; }
 .how-piece .btn:active { transform: none; }
 .how-panel p { margin: 0; }
 /* The example ask card is a plain panel like every other example, never the other door's color. */
-.how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: 14px; }
+.how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
 .how-ask p { margin: 0; }
 .how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
-.how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--deep); background: var(--chip); border-radius: 12px; }
+.how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--deep); background: var(--chip); border-radius: var(--pill); }
 .how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .how-thanks { display: flex; flex-direction: column; gap: 6px; }
 .how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
@@ -691,23 +743,25 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   justify-content: space-between;
   gap: 4px 12px;
   min-height: 72px;
+  position: relative;
   padding: 12px 18px;
   color: var(--on-field);
   text-decoration: none;
   background: var(--field);
+  border-radius: var(--r-bubble);
 }
 .how-other-line { font: 400 1.75rem/1 var(--display); text-transform: uppercase; }
 
 /* Sign up (#120): the story's white Sign up grows into this card, and the story's field sinks into the strip at the foot. */
 .join { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); color: var(--ink); }
-.join-step { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: 12px 18px 28px; }
+.join-step { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: 12px 18px 48px; }
 .join-line { margin: 0 0 8px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
 .join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--muted); }
-.join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; }
+.join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
 .join-card .form { color: var(--ink); }
 .join-login { margin: 20px 0 0; color: var(--muted); }
 .join-login a { color: var(--ink); font-weight: 700; }
-.join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 3; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
+.join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; margin: 0 16px; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
 .join-back .icon { width: 20px; height: 20px; }
 
 /* The door you take grows into the story while the other shrinks into the strip; each step's words cut in from the right. */
@@ -719,10 +773,10 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   /* The button grows into the form card in front of the field sinking to the foot; the step words ride on top too. */
   ::view-transition-group(field-help), ::view-transition-group(field-ask) { z-index: 1; }
   ::view-transition-group(how-step), ::view-transition-group(join-card) { z-index: 2; }
-  ::view-transition-group(join-card) { overflow: clip; border-radius: var(--radius); animation-duration: 460ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-group(join-card) { overflow: clip; border-radius: var(--pill); animation-duration: 460ms; animation-timing-function: var(--ease-out); }
   ::view-transition-old(join-card) { height: 100%; object-fit: none; object-position: center; animation: how-fade-out 120ms 100ms ease-in both; }
   ::view-transition-new(join-card) { height: 100%; object-fit: none; object-position: left top; animation: how-fade-in 200ms ease-out both; }
-  ::view-transition-group(field-help), ::view-transition-group(field-ask) { overflow: clip; animation-duration: 460ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-group(field-help), ::view-transition-group(field-ask) { overflow: clip; border-radius: var(--r-bubble); animation-duration: 460ms; animation-timing-function: var(--ease-out); }
   /* When both pages carry a field, its group holds the field's own color so a growing door never shows a ghosted band.
      A field with no partner just fades (how.js names the pairs). */
   html:active-view-transition-type(keep-help)::view-transition-group(field-help) { background: var(--want); }
@@ -737,18 +791,18 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   html:active-view-transition-type(open)::view-transition-new(how-step) { animation-delay: 220ms; }
 }
 /* The doors arrive (#203): on a fresh open each door's color fills up from its foot like a tip jar,
-   help then ask, the words rise in as their field lands, and the money line comes last. */
+   help then ask, the words rise in as their field lands, and the way in comes last. */
 @media (prefers-reduced-motion: no-preference) {
   .arrive .home-door { animation: door-fill 520ms var(--ease-out) both; }
   .arrive .home-door-ask { animation-delay: 110ms; }
   .arrive .home-door > span:not(.home-mosaic) { animation: door-words 420ms var(--ease-out) 300ms both; }
   .arrive .home-door-ask > span:not(.home-mosaic) { animation-delay: 410ms; }
-  .arrive .home-promise { animation: how-fade-in 360ms ease-out 560ms both; }
+  .arrive .home-way-in { animation: how-fade-in 360ms ease-out 560ms both; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .arrive .home-door, .arrive .home-promise { animation: how-fade-in 200ms ease-out both; }
+  .arrive .home-door, .arrive .home-way-in { animation: how-fade-in 200ms ease-out both; }
 }
-@keyframes door-fill { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0); } }
+@keyframes door-fill { from { clip-path: inset(100% -24px -24px -24px); } to { clip-path: inset(-24px); } }
 @keyframes door-words { from { opacity: 0; transform: translateY(12px); } }
 @keyframes how-cut { from { clip-path: inset(0 0 0 100%); transform: translateX(32px); } to { clip-path: inset(0); transform: none; } }
 @keyframes how-cut-back { from { clip-path: inset(0 100% 0 0); transform: translateX(-32px); } to { clip-path: inset(0); transform: none; } }
@@ -758,29 +812,32 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 @keyframes how-leave-back { to { opacity: 0; transform: translateX(32px); } }
 
 @media (min-width: 960px) {
-  .home { --door-h: clamp(420px, calc(100svh - var(--bar-h) - 96px), 640px); }
-  .home-doors { grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1240px; margin: 0 auto; padding: 20px 24px 0; }
+  .home { --door-h: clamp(380px, calc(100svh - 300px), 580px); width: 100%; max-width: 1240px; margin: 0 auto; padding: 36px 24px 36px; gap: 24px; }
+  .home-doors { grid-template-columns: 1fr 1fr; column-gap: 28px; }
+  .home-door-help, .home-door-ask { margin: 0; }
+  .home-door:not(:has(.home-mosaic)) { display: flex; align-self: end; }
+  .home-door:not(:has(.home-mosaic)) .home-door-line { align-self: auto; }
+  .home-door::before, .how-field::before, .how-other::before { bottom: -22px; width: 40px; height: 26px; }
+  .home-way-in { width: 100%; max-width: 420px; margin: auto auto 0; }
   /* The two doors share rows, so their headlines sit on one line whatever the sentences below them do. */
   .home-doors { grid-template-rows: minmax(0, 1fr) auto auto auto; min-height: calc(var(--door-h) + 20px); }
   .home-door { display: grid; grid-row: span 4; grid-template-rows: subgrid; grid-template-columns: minmax(0, 1fr); row-gap: 8px; min-height: 0; }
   .home-door-line { grid-area: 2 / 1; align-self: end; }
   .home-door-text { grid-area: 3 / 1; }
   .home-door-go { grid-area: 4 / 1; justify-self: start; }
-  .home-door { padding: 32px; border-radius: 18px; }
+  .home-door { padding: 32px; }
   .home-mosaic { grid-template-rows: repeat(2, 1fr); height: 62%; }
   .home-mosaic img:nth-child(n + 4) { display: block; }
   /* The last seam falls in the gap left of the example column, never through the Example tag. */
   .how-field .home-mosaic { height: 52%; grid-template-rows: 1fr; grid-template-columns: 1fr 1fr calc(400px + 40px + 28px); }
   .how-field:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 22%, var(--field) 50%); }
   .home-door:has(.home-mosaic)::after { background: linear-gradient(to bottom, transparent 22%, var(--field) 62%); }
-  .home-promise { max-width: 1240px; margin: 0 auto; padding: 18px 24px; }
-  .how { gap: 12px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 20px 24px 24px; }
-  .how-field { gap: 28px; padding: 28px 40px 20px; border-radius: 18px; }
+  .how { gap: 26px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 24px 24px 32px; }
+  .how-field { gap: 28px; padding: 28px 40px 20px; }
   .how-step { display: grid; grid-template-columns: minmax(0, 1fr) 400px; align-items: center; gap: 56px; }
   .how-line { font-size: 5.5rem; }
-  .how-other { padding: 16px 40px; border-radius: 18px; }
+  .how-other { padding: 16px 40px; }
   .join { max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 0 24px 24px; }
   .join-step { padding-top: 24px; }
-  .join-back { bottom: 24px; }
-  ::view-transition-group(field-help), ::view-transition-group(field-ask) { border-radius: 18px; }
+  .join-back { bottom: 32px; margin: 0; }
 }

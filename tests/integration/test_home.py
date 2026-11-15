@@ -24,7 +24,8 @@ def test_new_visitors_get_just_the_two_doors(client: FlaskClient) -> None:
     page = page_at(client, "/")
     assert '<a class="home-door home-door-help" href="/how/help">' in page
     assert '<a class="home-door home-door-ask" href="/how/ask">' in page
-    assert "Yearnly never holds your money." in page
+    assert '<a class="btn home-signup" href="/signup">Sign up</a>' in page
+    assert 'Already have an account? <a href="/login">Log in</a>' in page
     assert "how-step" not in page
     assert 'aria-label="Main"' not in page
 
@@ -92,7 +93,7 @@ def test_tracking_tags_still_show_the_doors(client: FlaskClient) -> None:
 
 
 def test_logged_out_top_bar_has_a_filled_sign_up(client: FlaskClient) -> None:
-    for url in ("/", "/feed", "/how/help"):
+    for url in ("/feed", "/leaders", "/rules"):
         assert '<a class="btn topbar-signup" href="/signup">Sign up</a>' in page_at(client, url)
 
 
@@ -100,7 +101,7 @@ def test_logged_out_top_bar_has_a_filled_sign_up(client: FlaskClient) -> None:
 def test_front_door_shows_only_the_way_in(client: FlaskClient, url: str) -> None:
     page = page_at(client, url)
     assert '<body class="page stage-page' in page and "front-door" in page
-    assert '<a class="topbar-login" href="/login">Log in</a>' in page
+    assert '<header class="topbar">' not in page
     assert 'aria-label="Main"' not in page
     assert "site-footer" not in page
 
