@@ -23,7 +23,7 @@
     <p class="join-login">Already have an account? <a href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a></p>
   </div>
   {% if story %}
-    <a class="how-other how-other-{{ story }} join-back" href="{{ url_for('main.how', path=story, step=4 if story == 'help' else 3) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to how {{ "helping" if story == "help" else "asking" }} works</a>
+    <a class="how-other how-other-{{ story }} join-back" href="{{ url_for('main.how', path=story, step=3) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to how {{ "helping" if story == "help" else "asking" }} works</a>
   {% endif %}
 </div>
 {% endblock %}

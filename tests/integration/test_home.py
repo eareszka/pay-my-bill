@@ -5,7 +5,7 @@ from flask.testing import FlaskClient
 
 from tests.conftest import MakeUser, login_as
 
-STORIES = [("help", 4, "/how/ask"), ("ask", 3, "/how/help")]
+STORIES = [("help", 3, "/how/ask"), ("ask", 3, "/how/help")]
 
 
 def visible_text(page: str) -> str:
@@ -137,3 +137,20 @@ def test_sign_up_from_a_story_keeps_the_way_back(
 
 def test_sign_up_ignores_an_unknown_story(client: FlaskClient) -> None:
     assert "join-back" not in page_at(client, "/signup?from=elsewhere")
+
+
+def test_the_cut_help_step_goes_to_the_last_one(client: FlaskClient) -> None:
+    resp = client.get("/how/help/4")
+    assert resp.status_code == 301
+    assert resp.location == "/how/help/3"
+
+
+@pytest.mark.parametrize(("path", "total", "other"), STORIES)
+def test_steps_are_a_headline_and_one_example(
+    client: FlaskClient, path: str, total: int, other: str
+) -> None:
+    for step in range(1, total + 1):
+        page = page_at(client, step_url(path, step))
+        words = page.split('<div class="how-words">')[1].split("</div>")[0]
+        assert "<p>" not in words
+        assert page.count('class="how-example"') == 1
