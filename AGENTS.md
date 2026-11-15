@@ -27,7 +27,7 @@ Read this file fully before making any change. The project is run as a professio
 - Models live in `app/models.py` and subclass `Base` from `app/extensions.py` (not `db.Model`, which mypy can't type). Migrations live in `migrations/` (`flask --app app db migrate -m "..."`). Money is integer cents (ADR 0006).
 - `app/rewards.py` computes XP, levels, streaks, and badges from confirmed gifts (ADR 0010). Planned: `app/leaderboard.py` (`app/moderation.py` and `app/payment_links.py` exist now)
 - Deploys install exact, hash-checked versions from `requirements.lock` (#177). After changing dependencies in `pyproject.toml`, regenerate it with `uv pip compile pyproject.toml --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-header -o requirements.lock`, run the tests, and commit both.
-- Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, from Sprint 4)
+- Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, #207). The e2e tests are skipped by default. Run them with `python -m playwright install chromium` once, then `pytest -m e2e --no-cov` and `python -m tests.e2e.report`. Screenshots and `findings.md` land in `tests/e2e/artifacts/` (gitignored). Design findings go to Impeccable for the fix.
 
 ```powershell
 python -m venv .venv; .\.venv\Scripts\activate
