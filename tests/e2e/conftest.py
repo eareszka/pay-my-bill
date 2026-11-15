@@ -184,7 +184,9 @@ def make_ui(
         ui = Ui(page, device, live_server.url, name)
 
         def on_console(msg: ConsoleMessage) -> None:
-            if msg.type == "error":
+            # Chromium logs this when the harness navigates mid view-transition; slow clicks
+            # through the same pages never log it, so it's the test, not the app.
+            if msg.type == "error" and not msg.text.startswith("Transition was aborted"):
                 ui.console_errors.append(msg.text)
 
         def on_failed(req: Request) -> None:
