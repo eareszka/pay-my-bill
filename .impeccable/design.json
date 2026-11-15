@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-14T00:00:00Z",
+  "generatedAt": "2026-11-15T00:00:00Z",
   "title": "Design System: Yearnly",
   "extensions": {
     "colorMeta": {
@@ -574,7 +574,7 @@
       },
       {
         "name": "how-field",
-        "value": "cross-document view transition, names field-help / field-ask, 460ms var(--ease-out); group overflow clip, z-index 1, 18px radius from 960px; group background in the field color only under types keep-help / keep-ask (both pages carry the field), otherwise the partnerless field just fades; snapshots object-fit none, object-position left bottom",
+        "value": "cross-document view transition, names field-help / field-ask, 460ms var(--ease-out); group overflow clip, z-index 1, 28px (var(--r-bubble)) radius from 960px; group background in the field color only under types keep-help / keep-ask (both pages carry the field), otherwise the partnerless field just fades; snapshots object-fit none, object-position left bottom",
         "purpose": "The tapped home door grows into its story field and the other door shrinks into the docked strip; on sign-up the story field sinks into the back strip; only under prefers-reduced-motion: no-preference."
       },
       {
@@ -594,13 +594,18 @@
       },
       {
         "name": "join-handoff",
-        "value": "view transition name join-card on .how-end / .join-card, 460ms var(--ease-out), group overflow clip at var(--radius), z-index 2 with how-step; old snapshot centered, fades out 120ms after 100ms ease-in; new snapshot left top, fades in 200ms ease-out",
+        "value": "view transition name join-card on .how-end / .join-card, 460ms var(--ease-out), group overflow clip at var(--pill), z-index 2 with how-step; old snapshot centered, fades out 120ms after 100ms ease-in; new snapshot left top, fades in 200ms ease-out",
         "purpose": "The last step's green Sign up grows into the sign-up form card while the step words cut and the field sinks into the strip; reduced motion is plain navigation."
       },
       {
         "name": "how-swipe",
         "value": "60px horizontal, pointer non-mouse, |dx| >= 1.5 * |dy|; ArrowLeft / ArrowRight",
         "purpose": "Swipe or arrow keys follow the Back / Next links on story steps."
+      },
+      {
+        "name": "door-arrive",
+        "value": "html.arrive: .home-door clip-path inset(100% -24px -24px -24px) to inset(-24px), 520ms var(--ease-out), ask +110ms; words rise 12px and fade 420ms from 300ms (ask 410ms); .home-way-in fades 360ms from 560ms; reduced motion: 200ms fade",
+        "purpose": "On a fresh open of / the doors fill from the foot like a tip jar (#203); the -24px inset keeps the pointed tails unclipped."
       }
     ],
     "breakpoints": [
@@ -620,15 +625,16 @@
       "desktopMax": "1120px",
       "barHeight": {
         "phone": "52px",
-        "desktop": "60px"
+        "desktop": "60px",
+        "frontDoor": "env(safe-area-inset-top) (no top bar on the logged-out home and How stories, #205)"
       },
       "navHeight": {
         "phone": "64px",
         "desktop": "0px"
       },
       "stage": {
-        "phone": "full bleed between the bars, min-height 520px",
-        "desktop": "up to 660px wide, min(620px, 100dvh - 230px) tall (460px min), joined to the 400px side panel, 18px outer corners"
+        "phone": "full bleed between the bars, min-height 520px; the ticket is an inset ask bubble at 8px 10px 12px",
+        "desktop": "up to 660px wide, min(620px, 100dvh - 230px) tall (460px min), joined to the 400px side panel; stage 28/0/0/28, side 0/28/6/0; alone, 28/28/6/28"
       },
       "sidePanel": "400px",
       "desktopFeedMax": "1240px"
@@ -658,7 +664,7 @@
       {
         "name": "door-photo-fade",
         "value": "linear-gradient(to bottom, transparent 18%, var(--field) 50%); 960px and up: linear-gradient(to bottom, transparent 22%, var(--field) 62%)",
-        "purpose": "Home door mosaic (grayscale(1) contrast(1.1), multiplied into the field) fading to solid field before the words."
+        "purpose": "Home door mosaic (grayscale(1) contrast(0.7) brightness(1.25), multiplied into the field, clipped to the bubble's top corners) fading to solid field before the words."
       },
       {
         "name": "step-band-fade",
@@ -707,32 +713,109 @@
         "pair": "ink on bg",
         "ratio": "14.51:1"
       }
-    ]
+    ],
+    "shapes": {
+      "source": "owner, 2026-11-15, #205, Impeccable surface round 'Two Speech Bubbles', seed:4d569de5a9870911",
+      "idea": "Asking and helping are a conversation.",
+      "tokens": [
+        {
+          "name": "--r-bubble",
+          "value": "28px",
+          "purpose": "Big color fields and asks."
+        },
+        {
+          "name": "--r-panel",
+          "value": "22px",
+          "purpose": "Helper panels."
+        },
+        {
+          "name": "--r-tail",
+          "value": "6px",
+          "purpose": "The one tight tail corner of a bubble."
+        },
+        {
+          "name": "--pill",
+          "value": "999px",
+          "purpose": "Every button, tab, badge, meter, step bar, and the Example tag."
+        },
+        {
+          "name": "--radius",
+          "value": "14px",
+          "purpose": "Inputs, flashes and notices, the file field, the skip link, the admin photo, the Leaders 'you' row."
+        }
+      ],
+      "corners": [
+        {
+          "name": "ask",
+          "value": "28px 28px 6px 28px",
+          "appliesTo": "feed ticket (phones: inset 8px 10px 12px), post hero, example ask card",
+          "purpose": "Asks speak from the right."
+        },
+        {
+          "name": "helper",
+          "value": "22px 22px 22px 6px",
+          "appliesTo": ".group panels, .rewards, the sign-up .join-card",
+          "purpose": "Helpers answer from the left."
+        },
+        {
+          "name": "desktop-stage",
+          "value": "28px 0 0 28px",
+          "appliesTo": "feed stage beside the side panel (960px+)"
+        },
+        {
+          "name": "desktop-side",
+          "value": "0 28px 6px 0",
+          "appliesTo": "feed side panel (960px+)"
+        },
+        {
+          "name": "field-help",
+          "value": "28px 28px 28px 6px",
+          "appliesTo": "help door, help story field, help strip"
+        },
+        {
+          "name": "field-ask",
+          "value": "28px 28px 6px 28px",
+          "appliesTo": "ask door, ask story field, ask strip"
+        },
+        {
+          "name": "check",
+          "value": "7px",
+          "appliesTo": "drawn checkboxes (radios are 50%)"
+        }
+      ],
+      "pointedTail": {
+        "phone": "22x14px clip-path triangle in var(--field), bottom: -12px",
+        "desktop": "40x26px, bottom: -22px (min-width: 960px)",
+        "help": "left: 0; clip-path: polygon(0 0, 100% 0, 0 100%)",
+        "ask": "right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%)",
+        "only": "home doors, story fields, docked other-door strips (including the sign-up back strip)"
+      }
+    }
   },
   "components": [
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one filled action: Dollar Green with white text, on the ground and on a field.",
+      "description": "The one filled action: Dollar Green with white text, on the ground and on a field. A pill.",
       "html": "<button class=\"ds-btn\">Post update</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 8px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #ffffff; background: #3a7558; } .ds-btn:hover { background: #2f6249; } .ds-btn:active { transform: scale(0.98); } .ds-btn:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 999px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #ffffff; background: #3a7558; } .ds-btn:hover { background: #2f6249; } .ds-btn:active { transform: scale(0.98); } .ds-btn:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Outlined; every action that isn't the main one.",
+      "description": "Outlined; every action that isn't the main one. A pill.",
       "html": "<button class=\"ds-btn-o\">Cancel</button>",
-      "css": ".ds-btn-o { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 8px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #16261d; background: transparent; border-color: #86958a; } .ds-btn-o:hover { border-color: #16261d; } .ds-btn-o:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+      "css": ".ds-btn-o { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 999px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #16261d; background: transparent; border-color: #86958a; } .ds-btn-o:hover { border-color: #16261d; } .ds-btn-o:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
     },
     {
       "name": "Danger Button",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "Tomato fill for confirmed destructive acts only.",
+      "description": "Tomato fill for confirmed destructive acts only. A pill.",
       "html": "<button class=\"ds-btn-d\">Yes, delete</button>",
-      "css": ".ds-btn-d { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 8px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #ffffff; background: #c4302b; } .ds-btn-d:hover { background: #b0261f; } .ds-btn-d:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+      "css": ".ds-btn-d { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 999px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #ffffff; background: #c4302b; } .ds-btn-d:hover { background: #b0261f; } .ds-btn-d:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
     },
     {
       "name": "Text Field",
@@ -740,37 +823,37 @@
       "refersTo": "input",
       "description": "Bold label, 1.5px edge stroke, hint below; tomato stroke on error.",
       "html": "<label class=\"ds-field\">Goal amount<input class=\"ds-input\" value=\"$120\"><small>Up to $1,000.</small></label>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font: 700 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-field small { font-size: 0.875rem; font-weight: 400; color: #4d5c52; } .ds-input { min-height: 48px; padding: 11px 13px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; background: #ffffff; border: 1.5px solid #86958a; border-radius: 8px; transition: border-color 140ms ease-out; } .ds-input:hover { border-color: #16261d; } .ds-input:focus-visible { outline: 2px solid #16261d; outline-offset: 1px; border-color: #16261d; }"
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font: 700 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-field small { font-size: 0.875rem; font-weight: 400; color: #4d5c52; } .ds-input { min-height: 48px; padding: 11px 13px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; background: #ffffff; border: 1.5px solid #86958a; border-radius: 14px; transition: border-color 140ms ease-out; } .ds-input:hover { border-color: #16261d; } .ds-input:focus-visible { outline: 2px solid #16261d; outline-offset: 1px; border-color: #16261d; }"
     },
     {
       "name": "Ask Ticket",
       "kind": "card",
       "refersTo": "ticket-need",
-      "description": "Signature: one ask as a full-bleed Need Seafoam field in dark ink, League Gothic title, field meter, Press Green rail, and the Marigold Chip in tab.",
+      "description": "Signature: one ask as a Need Seafoam ask bubble (28px, 6px tail corner bottom-right) in dark ink, League Gothic title, pill field meter, Press Green rail, and the Marigold pill Chip in tab.",
       "html": "<article class=\"ds-ticket\"><div class=\"ds-body\"><h2 class=\"ds-title\">Phone bill past due</h2><p class=\"ds-head\">Need · <b>priya_k</b> · Madison, WI</p><p class=\"ds-amt\"><strong>$45</strong> of $180</p><div class=\"ds-meter\"><i style=\"width:25%\"></i></div></div><nav class=\"ds-rail\"><a href=\"#\" class=\"ds-rail-btn\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7\"/><path d=\"M19 12H5\"/></svg><span>Back</span></a><a href=\"#\" class=\"ds-rail-btn ds-lit\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg><span>Next</span></a></nav><a class=\"ds-tab\" href=\"#\">Chip in</a></article>",
-      "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-ticket { position: relative; display: flex; flex-direction: column; width: 320px; height: 520px; color: #16261d; background: #8fcfc0; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-body { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; padding: 64px 84px 18px 18px; } .ds-title { margin: auto 0; font: 400 3.5rem/0.92 'League Gothic', 'Arial Narrow', sans-serif; text-transform: uppercase; } .ds-head, .ds-amt { margin: 0; font-size: 0.9375rem; } .ds-head { color: #2f4a3a; } .ds-amt { margin-top: 14px; font-variant-numeric: tabular-nums; } .ds-amt strong { font-size: 1.75rem; } .ds-meter { height: 3px; margin-top: 10px; background: rgb(22 38 29 / 0.2); border-radius: 2px; } .ds-meter i { display: block; height: 100%; background: #16261d; border-radius: 2px; } .ds-rail { position: absolute; right: 10px; bottom: 96px; display: flex; flex-direction: column; gap: 14px; } .ds-rail-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 700 0.75rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; text-decoration: none; } .ds-rail-btn .ds-icon { width: 52px; height: 52px; padding: 12px; border-radius: 50%; transition: background-color 140ms ease-out, color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-rail-btn:hover .ds-icon, .ds-lit .ds-icon { color: #ffffff; background: #2f6249; } .ds-lit .ds-icon { transform: scale(1.08); } .ds-rail-btn:focus-visible { outline: none; } .ds-rail-btn:focus-visible .ds-icon { color: #ffffff; background: #2f6249; outline: 2px solid #2f6249; outline-offset: 2px; } .ds-tab { display: block; margin: 0 18px 18px; padding: 15px; font: 700 1.0625rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; text-align: center; text-decoration: none; color: #16261d; background: #ffd166; border-radius: 12px; transition: background-color 140ms ease-out; } .ds-tab:hover { background: #f5c04a; } .ds-tab:focus-visible { outline: 2px solid #16261d; outline-offset: 3px; }"
+      "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-ticket { position: relative; display: flex; flex-direction: column; width: 320px; height: 520px; color: #16261d; background: #8fcfc0; border-radius: 28px 28px 6px 28px; overflow: hidden; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-body { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; padding: 64px 84px 18px 18px; } .ds-title { margin: auto 0; font: 400 3.5rem/0.92 'League Gothic', 'Arial Narrow', sans-serif; text-transform: uppercase; } .ds-head, .ds-amt { margin: 0; font-size: 0.9375rem; } .ds-head { color: #2f4a3a; } .ds-amt { margin-top: 14px; font-variant-numeric: tabular-nums; } .ds-amt strong { font-size: 1.75rem; } .ds-meter { height: 3px; margin-top: 10px; background: rgb(22 38 29 / 0.2); border-radius: 999px; } .ds-meter i { display: block; height: 100%; background: #16261d; border-radius: 999px; } .ds-rail { position: absolute; right: 10px; bottom: 96px; display: flex; flex-direction: column; gap: 14px; } .ds-rail-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 700 0.75rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; text-decoration: none; } .ds-rail-btn .ds-icon { width: 52px; height: 52px; padding: 12px; border-radius: 50%; transition: background-color 140ms ease-out, color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-rail-btn:hover .ds-icon, .ds-lit .ds-icon { color: #ffffff; background: #2f6249; } .ds-lit .ds-icon { transform: scale(1.08); } .ds-rail-btn:focus-visible { outline: none; } .ds-rail-btn:focus-visible .ds-icon { color: #ffffff; background: #2f6249; outline: 2px solid #2f6249; outline-offset: 2px; } .ds-tab { display: block; margin: 0 18px 18px; padding: 15px; font: 700 1.0625rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; text-align: center; text-decoration: none; color: #16261d; background: #ffd166; border-radius: 999px; transition: background-color 140ms ease-out; } .ds-tab:hover { background: #f5c04a; } .ds-tab:focus-visible { outline: 2px solid #16261d; outline-offset: 3px; }"
     },
     {
       "name": "Bottom Nav",
       "kind": "nav",
       "refersTo": "nav-bar",
-      "description": "Phone nav on Dollar Green: Lucide icon over a Pale Mint label; the current item is white in a Deep Dollar cell with a 3px white top rule. Moves into the top bar at 960px as a Deep Dollar pill.",
+      "description": "Phone nav on Dollar Green: Lucide icon over a Pale Mint label; the current item is white with a 58x32px Deep Dollar pill behind its icon. Moves into the top bar at 960px, where the current item is a Deep Dollar pill.",
       "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg><span>Feed</span></a><a href=\"#\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M8 12h8\"/><path d=\"M12 8v8\"/></svg><span>Post</span></a><a href=\"#\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></svg><span>chris_p</span></a></nav>",
-      "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-nav { display: flex; width: 360px; height: 64px; background: #3a7558; border-top: 1px solid #2f6249; } .ds-nav a { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #e8f2eb; font: 700 0.75rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; text-decoration: none; transition: color 140ms ease-out; } .ds-nav a:hover, .ds-nav a[aria-current=page] { color: #ffffff; } .ds-nav a[aria-current=page] { background: #2f6249; } .ds-nav a[aria-current=page]::before { content: ''; position: absolute; inset: 0 22% auto; height: 3px; background: #ffffff; border-radius: 0 0 2px 2px; } .ds-nav a[aria-current=page] .ds-icon { stroke-width: 2.5; } .ds-nav a:focus-visible { outline: 2px solid #ffffff; outline-offset: -4px; }"
+      "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-nav { display: flex; width: 360px; height: 64px; background: #3a7558; border-top: 1px solid #2f6249; } .ds-nav a { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #e8f2eb; font: 700 0.75rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; text-decoration: none; transition: color 140ms ease-out; } .ds-nav a:hover, .ds-nav a[aria-current=page] { color: #ffffff; } .ds-nav a > * { position: relative; } .ds-nav a[aria-current=page]::before { content: ''; position: absolute; top: 7px; left: 50%; width: 58px; height: 32px; translate: -50% 0; background: #2f6249; border-radius: 999px; } .ds-nav a[aria-current=page] .ds-icon { stroke-width: 2.5; } .ds-nav a:focus-visible { outline: 2px solid #ffffff; outline-offset: -4px; }"
     },
     {
       "name": "Home Door",
       "kind": "custom",
-      "refersTo": "ticket-want",
-      "description": "A home door: a Want Sage field in dark ink with a League Gothic line and a sliding-arrow link. No scrim.",
+      "refersTo": "home-door",
+      "description": "A home door: a Want Sage speech bubble (28px, 6px tail corner bottom-left) with a pointed tail hanging 12px below, a League Gothic line, and a sliding-arrow link. No scrim.",
       "html": "<a class=\"ds-door\" href=\"#\"><span class=\"ds-door-line\">I want to help</span><span class=\"ds-door-text\">Pick one person and chip in through your own app.</span><span class=\"ds-door-go\">See how it works <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></span></a>",
-      "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-door { display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; width: 340px; min-height: 300px; padding: 24px 18px 20px; color: #16261d; background: #b9dcc3; text-decoration: none; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-door-line { font: 400 3.5rem/0.92 'League Gothic', 'Arial Narrow', sans-serif; text-transform: uppercase; } .ds-door-text { max-width: 34ch; font-size: 1.0625rem; } .ds-door-go { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 700; } .ds-door-go .ds-icon { width: 20px; height: 20px; transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-door:hover .ds-door-go { text-decoration: underline; text-underline-offset: 0.18em; } .ds-door:hover .ds-door-go .ds-icon { transform: translateX(4px); } .ds-door:focus-visible { outline: 2px solid #16261d; outline-offset: -6px; }"
+      "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-door { display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; position: relative; width: 306px; min-height: 0; margin: 0 34px 14px 0; padding: 26px 20px 20px; border-radius: 28px 28px 28px 6px; color: #16261d; background: #b9dcc3; text-decoration: none; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-door-line { font: 400 3rem/0.92 'League Gothic', 'Arial Narrow', sans-serif; text-transform: uppercase; } .ds-door-text { max-width: 34ch; font-size: 1rem; } .ds-door-go { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 700; } .ds-door-go .ds-icon { width: 20px; height: 20px; transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-door:hover .ds-door-go { text-decoration: underline; text-underline-offset: 0.18em; } .ds-door:hover .ds-door-go .ds-icon { transform: translateX(4px); } .ds-door:focus-visible { outline: 2px solid #16261d; outline-offset: -6px; } .ds-door::before { content: ''; position: absolute; left: 0; bottom: -12px; width: 22px; height: 14px; background: #b9dcc3; clip-path: polygon(0 0, 100% 0, 0 100%); }"
     },
     {
       "name": "State Mark",
       "kind": "chip",
       "refersTo": "",
-      "description": "A shape and a word, never a pill.",
+      "description": "A shape and a word, never a pill (a gift's state is never filled).",
       "html": "<span class=\"ds-mark\">Waiting</span> <span class=\"ds-mark ds-ok\">Confirmed</span> <span class=\"ds-mark ds-bad\">Not received</span>",
       "css": ".ds-mark { display: inline-flex; align-items: center; gap: 6px; margin-right: 14px; font: 700 0.875rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-mark::before { content: ''; width: 10px; height: 10px; border: 2px solid #4d5c52; border-radius: 50%; box-sizing: border-box; } .ds-ok::before { background: #12784a; border-color: #12784a; } .ds-bad { color: #b0261f; } .ds-bad::before { background: #c4302b; border-color: #c4302b; border-radius: 2px; }"
     },
@@ -781,23 +864,48 @@
       "description": "Dense rows between 1px hairlines; bold title, tabular amount right.",
       "html": "<ul class=\"ds-list\"><li><a href=\"#\">Vet visit for my dog</a><b>$10</b><span>to ana.b · Waiting</span></li><li><a href=\"#\">Electric bill help</a><b>$25</b><span>to kayla.r · Confirmed</span></li></ul>",
       "css": ".ds-list { width: 340px; margin: 0; padding: 0; list-style: none; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; border-top: 1px solid #dbe2d8; border-bottom: 1px solid #dbe2d8; } .ds-list li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; } .ds-list li + li { border-top: 1px solid #dbe2d8; } .ds-list a { font-weight: 700; color: inherit; text-decoration: none; } .ds-list a:hover { text-decoration: underline; } .ds-list b { font-variant-numeric: tabular-nums; } .ds-list span { grid-column: 1 / -1; font-size: 0.9375rem; color: #4d5c52; }"
+    },
+    {
+      "name": "Tabs",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Pill tabs (real links): muted labels, an Info Tint pill on hover, a Dollar Green pill with white text on the current tab.",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">This week</a><a href=\"#\">All time</a><a href=\"#\">My state</a></nav>",
+      "css": ".ds-tabs { display: flex; flex-wrap: wrap; gap: 6px; font: 700 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-tabs a { padding: 8px 16px; color: #4d5c52; text-decoration: none; border-radius: 999px; transition: background-color 140ms ease-out, color 140ms ease-out; } .ds-tabs a:hover { color: #16261d; background: #e5ece4; } .ds-tabs a[aria-current=page] { color: #ffffff; background: #3a7558; } .ds-tabs a:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+    },
+    {
+      "name": "Checkbox and Radio",
+      "kind": "input",
+      "refersTo": "checkbox",
+      "description": "Drawn controls: 22px, 1.5px edge stroke on surface, a 7px box or a round radio; checked fills Dollar Green with a white check or dot.",
+      "html": "<label class=\"ds-choice\"><input type=\"checkbox\" checked> I'm 18 or older</label> <label class=\"ds-choice\"><input type=\"radio\" name=\"k\" checked> Need</label> <label class=\"ds-choice\"><input type=\"radio\" name=\"k\"> Want</label>",
+      "css": ".ds-choice { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; margin-right: 18px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-choice input { display: grid; place-content: center; flex: none; width: 22px; height: 22px; margin: 0; appearance: none; background: #ffffff; border: 1.5px solid #86958a; border-radius: 7px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out; } .ds-choice input[type=radio] { border-radius: 50%; } .ds-choice input:hover { border-color: #16261d; } .ds-choice input:checked { background: #3a7558; border-color: #3a7558; } .ds-choice input[type=checkbox]:checked::after { content: ''; width: 10px; height: 6px; margin-top: -3px; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; rotate: -45deg; } .ds-choice input[type=radio]:checked::after { content: ''; width: 8px; height: 8px; background: #ffffff; border-radius: 50%; } .ds-choice input:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+    },
+    {
+      "name": "Helper Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "A helper answers from the left: white surface, 22px corners with the 6px tail bottom-left, 18px 16px padding, no shadow.",
+      "html": "<section class=\"ds-panel\"><h3>Chip in</h3><p>Send it in your own app, then tell them it's on the way.</p><button class=\"ds-pbtn\">Cash App</button></section>",
+      "css": ".ds-panel { display: flex; flex-direction: column; gap: 12px; width: 320px; padding: 18px 16px; color: #16261d; background: #ffffff; border-radius: 22px 22px 22px 6px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-panel h3 { margin: 0; font-size: 1.125rem; font-weight: 700; } .ds-panel p { margin: 0; } .ds-pbtn { min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #ffffff; background: #3a7558; border: 0; border-radius: 999px; cursor: pointer; transition: background-color 140ms ease-out; } .ds-pbtn:hover { background: #2f6249; } .ds-pbtn:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
     }
   ],
   "narrative": {
     "northStar": "The Tip Jar",
-    "overview": "The app is a tip jar on a counter: small gifts from passersby, dropped in one at a time. The ground is pale jar glass (bg), the shell (top bar, phone nav, theme color, app icon) is a soft dollar green with white type, and inside it a single ask fills the screen as a light green field, Want Sage for helping and Need Seafoam for asking, with its title set huge in condensed uppercase in dark green ink. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's field is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. The one money action, Chip in, is a marigold tab, the jar's masking-tape label and the one warm note in the world, so giving never blends into the green chrome. There is no black anywhere: the darkest value is a green-black ink (#16261d).\n\nThe world is always light. There is no dark mode, and `prefers-color-scheme` is ignored (`color-scheme: light`). The working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense on the same ground with white panels, the same two typefaces, the same green filled button, and the same hairline language. Lists are hairline rows, progress is a single hairline meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no dark scrim. The only gradients are fades into the field's own color: photos dissolve into the solid field so the words always sit on field.\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. At 960px and wider, the nav moves up into the bar, and the feed card takes the post page's shape: a wide landscape ask joined to a 400px Chip in panel, with big Back and Next buttons outside it. On a monitor nobody has to drag.",
+    "overview": "The app is a tip jar on a counter: small gifts from passersby, dropped in one at a time. The ground is pale jar glass (bg), the shell (top bar, phone nav, theme color, app icon) is a soft dollar green with white type, and inside it a single ask fills the screen as a light green speech bubble, Want Sage for helping and Need Seafoam for asking, with its title set huge in condensed uppercase in dark green ink. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's field is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. The one money action, Chip in, is a marigold tab, the jar's masking-tape label and the one warm note in the world, so giving never blends into the green chrome. There is no black anywhere: the darkest value is a green-black ink (#16261d).\n\nThe world is always light. There is no dark mode, and `prefers-color-scheme` is ignored (`color-scheme: light`). The working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense on the same ground with white panels, the same two typefaces, the same green filled button, and the same shapes. Asking and helping are a conversation (#205): an ask speaks from the right as a big soft bubble with one tight bottom-right corner, a helper's panel answers from the left with its tight corner bottom-left, and every button, tab, badge, and meter is a pill. Lists are hairline rows, progress is a single thin meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no dark scrim. The only gradients are fades into the field's own color: photos dissolve into the solid field so the words always sit on field.\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. Logged out, the front door (the home page and the How stories) has no bar at all: the way in lives on the page. At 960px and wider, the nav moves up into the bar, and the feed card takes the post page's shape: a wide landscape ask joined to a 400px Chip in panel, with big Back and Next buttons outside it. On a monitor nobody has to drag.",
     "keyCharacteristics": [
       "A pale jar-glass ground and a soft dollar-green shell with white type. Always light, no black anywhere.",
-      "One full-bleed light green field per ask (Want Sage or Need Seafoam) with dark green ink and no scrim.",
+      "One light green field per ask (Want Sage or Need Seafoam) with dark green ink and no scrim.",
       "League Gothic uppercase for titles, set huge and tall. Public Sans for everything else.",
-      "A green filled primary, outlined secondary, a marigold Chip in as the one warm note, and tomato only for errors and destructive acts.",
-      "Hairline meter, hairline rows, and Lucide 2px line icons.",
+      "Two speech bubbles: asks speak from the right (a 6px bottom-right corner), helpers answer from the left (a 6px bottom-left corner), and only the big color fields grow a pointed tail.",
+      "A green filled primary, outlined secondary, a marigold Chip in as the one warm note, and tomato only for errors and destructive acts. Every button is a pill.",
+      "A thin pill meter, hairline rows, and Lucide 2px line icons.",
       "Sideways gestures with a way back: left = next, right = back, each mirrored by a labeled rail button."
     ],
     "rules": [
       {
         "name": "The Dark Ink On Field Rule",
-        "body": "On a Sage or Seafoam field, every word and glyph is green-black ink (on-field, or on-field-muted for secondary lines), never white and never under a scrim. Filled controls on a field are only Marigold (Chip in), Dollar Green (the primary, such as the last step's Sign up), Press Green (a lit rail glyph), or a white example panel.",
+        "body": "On a Sage or Seafoam field, every word and glyph set on the field itself is green-black ink (on-field, or on-field-muted for secondary lines), never white and never under a scrim. Filled controls on a field are only Marigold (Chip in, deep text), Dollar Green (the primary, such as the last step's Sign up, white text), Press Green (a lit rail glyph or the current feed tab, white), or a white example panel.",
         "section": "colors"
       },
       {
@@ -834,28 +942,47 @@
         "name": "The Field Fade Only Rule",
         "body": "The only gradients are fades into the field's own color. The feed card photo is masked transparent at 4%, solid from 18 to 30%, and transparent by 58%, and a photo card washes the field (85% field to transparent by 22%) behind the tabs. The post-hero photo is masked solid to 30% and transparent by 62%. The door and step mosaics fade to solid field before the words. Never a dark scrim, a fade to another hue, glass, glow, or a box or drop shadow.",
         "section": "elevation"
+      },
+      {
+        "name": "The Conversation Rule",
+        "body": "An ask's tight corner is bottom-right and a helper's is bottom-left, always 6px, and a bubble has only one tight corner. If you can't say whether a new container is asking or answering, it's a helper panel.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Tails On Fields Only Rule",
+        "body": "A pointed tail is a 22 by 14px clip-path triangle in the field's own color, hanging 12px below the tight corner (bottom-left on the help side, bottom-right on the ask side); from 960px it grows to 40 by 26px and hangs 22px below. Only the big color fields carry one: the home doors, the story fields, and the docked strips. Tickets, the post hero, panels, and cards keep just the tight corner.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Pill Rule",
+        "body": "Whatever you press is a pill: buttons, tabs, and the Chip in tab. Badges and meters are pills too. A gift's state is never a pill (see State Marks).",
+        "section": "shapes"
       }
     ],
     "dos": [
       "**Do** keep the top bar and phone nav Dollar Green (#3a7558) with white type, the pages on the jar-glass ground, and the whole app light whatever the system setting.",
-      "**Do** give each ask a full-bleed Sage or Seafoam field with field-ink type and no scrim, and check that any new category color holds dark ink at 4.5:1 or better.",
+      "**Do** give each ask a Sage or Seafoam field with field-ink type and no scrim, and check that any new category color holds dark ink at 4.5:1 or better.",
+      "**Do** shape asks as 28px bubbles with the 6px tail corner bottom-right, and helper panels as 22px bubbles with the 6px tail corner bottom-left.",
+      "**Do** make every button, tab, and Chip in tab a pill, and keep inputs, flashes, and notices at 14px.",
       "**Do** fade every photo into the field's own color so the words, tabs, and Chip in sit on solid field.",
       "**Do** set titles in League Gothic uppercase and everything else in Public Sans, with tabular numerals for money and counts.",
       "**Do** use the green filled button for the screen's main action, Marigold only for Chip in, and outline everything else.",
-      "**Do** show progress only with the hairline meter, and lists only as hairline rows.",
+      "**Do** show progress only with the thin pill meter, and lists only as hairline rows.",
       "**Do** use Lucide line icons at a 2px stroke from the `_icons.html` sprite, always with a visible text label.",
       "**Do** back every gesture with a labeled button and a real link, so the feed works without JavaScript and at 360px with no horizontal scroll.",
       "**Do** say \"gift\" and \"chip in\" in interface copy.",
-      "**Do** label every demo piece of the app \"Example\" with the outlined tag, and make it mirror the real component and its real state exactly."
+      "**Do** label every demo piece of the app \"Example\" with the outlined pill tag, and make it mirror the real component, its shape, and its real state exactly."
     ],
     "donts": [
       "**Don't** use black or a neutral gray-black anywhere, or add a dark mode.",
       "**Don't** put white text or a dark scrim on a Sage or Seafoam field.",
       "**Don't** use Marigold for anything but Chip in, or tomato for anything but errors, disputed gifts, and destructive actions.",
       "**Don't** add box or drop shadows, glass, glow, or gradients other than the fades into the field's own color.",
-      "**Don't** turn state into pills or badges with fills. Use a shape and a word.",
+      "**Don't** give a bubble more than one tight corner, point an ask's tail left or a helper's right, or hang a pointed tail on anything but the home doors, the story fields, and the docked strips.",
+      "**Don't** turn a gift's state into a pill or a filled badge. Use a shape and a word.",
       "**Don't** add a second progress style for money or goals (rings, segmented bars, or percentages as hero numbers). The segmented step bars on the How stories mark place in a story, never progress toward a goal.",
       "**Don't** nest cards in panels or lay asks out as a card grid or vertical-scroll feed.",
+      "**Don't** put a top bar back on the logged-out front door.",
       "**Don't** say \"donation\" or \"charity\" anywhere in the interface.",
       "**Don't** invent stats, counts, testimonials, or quotes on marketing surfaces. The proof is the real app pieces, labeled Example."
     ]
