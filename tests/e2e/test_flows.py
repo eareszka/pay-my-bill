@@ -72,6 +72,15 @@ def test_sign_up(ui: Ui, device: str) -> None:
     assert_clean(ui)
 
 
+def test_sign_up_from_each_story(ui: Ui) -> None:
+    # Arriving from a How story, sign-up wears that story's color (#208).
+    for story in ("help", "ask"):
+        ui.goto(f"/signup?from={story}")
+        expect(ui.page.locator("form button[type=submit]")).to_be_visible()
+        ui.check(f"from-{story}")
+    assert_clean(ui)
+
+
 def test_sign_up_errors(ui: Ui) -> None:
     ui.goto("/signup")
     ui.page.click("form button[type=submit]")
