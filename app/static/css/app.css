@@ -736,6 +736,20 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   html:active-view-transition-type(back)::view-transition-old(how-step) { animation-name: how-leave-back; }
   html:active-view-transition-type(open)::view-transition-new(how-step) { animation-delay: 220ms; }
 }
+/* The doors arrive (#203): on a fresh open each door's color fills up from its foot like a tip jar,
+   help then ask, the words rise in as their field lands, and the money line comes last. */
+@media (prefers-reduced-motion: no-preference) {
+  .arrive .home-door { animation: door-fill 520ms var(--ease-out) both; }
+  .arrive .home-door-ask { animation-delay: 110ms; }
+  .arrive .home-door > span:not(.home-mosaic) { animation: door-words 420ms var(--ease-out) 300ms both; }
+  .arrive .home-door-ask > span:not(.home-mosaic) { animation-delay: 410ms; }
+  .arrive .home-promise { animation: how-fade-in 360ms ease-out 560ms both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arrive .home-door, .arrive .home-promise { animation: how-fade-in 200ms ease-out both; }
+}
+@keyframes door-fill { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0); } }
+@keyframes door-words { from { opacity: 0; transform: translateY(12px); } }
 @keyframes how-cut { from { clip-path: inset(0 0 0 100%); transform: translateX(32px); } to { clip-path: inset(0); transform: none; } }
 @keyframes how-cut-back { from { clip-path: inset(0 100% 0 0); transform: translateX(-32px); } to { clip-path: inset(0); transform: none; } }
 @keyframes how-leave { to { opacity: 0; transform: translateX(-32px); } }

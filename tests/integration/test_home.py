@@ -154,3 +154,14 @@ def test_steps_are_a_headline_and_one_example(
         words = page.split('<div class="how-words">')[1].split("</div>")[0]
         assert "<p>" not in words
         assert page.count('class="how-example"') == 1
+
+
+def test_the_doors_arrive_from_a_blocking_head_script(client: FlaskClient) -> None:
+    page = page_at(client, "/")
+    head = page.split("</head>")[0]
+    assert re.search(r'<script src="/static/js/how\.js(\?[^"]*)?"></script>', head)
+    script = client.get("/static/js/how.js").get_data(as_text=True)
+    assert 'classList.add("arrive")' in script
+    css = client.get("/static/css/app.css").get_data(as_text=True)
+    assert ".arrive .home-door { animation: door-fill" in css
+    assert "@media (prefers-reduced-motion: reduce) {\n  .arrive .home-door" in css
