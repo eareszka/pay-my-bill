@@ -558,7 +558,7 @@ h3.section-title { font-size: 1rem; }
 .report-link { margin-top: 28px; font-size: 0.875rem; text-align: center; }
 .report-link a { color: var(--muted); }
 /* Standalone text links keep their look; padding on an inline link grows its tap area to 44px without moving a line (#208). */
-.site-footer a, .report-link a, .leader-cta a, .join-login a, .form ~ p > a:only-child, .card-head a { padding-block: 14px; }
+.report-link a, .leader-cta a, .join-login a, .form ~ p > a:only-child, .card-head a { padding-block: 14px; }
 /* Where a link is laid out as a box, a matching negative margin keeps the row its old height. */
 .site-footer a, .settings-back { padding-block: 14px; margin-block: -14px; }
 .settings-back { margin-top: -6px; }
