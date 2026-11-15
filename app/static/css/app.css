@@ -126,12 +126,13 @@ h3.section-title { font-size: 1rem; }
 }
 .topbar a { color: inherit; text-decoration: none; }
 .topbar :focus-visible { outline-color: var(--on-shell); }
-.brand { font: 400 1.75rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; }
+.brand { padding-block: 8px; font: 400 1.75rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; }
 /* Logged out, the one filled action in the bar. */
-.topbar .topbar-signup { min-height: 36px; margin-left: auto; padding: 6px 14px; color: var(--deep); background: var(--on-shell); }
+.topbar .topbar-signup { min-height: 44px; margin-left: auto; padding: 6px 14px; color: var(--deep); background: var(--on-shell); }
 .topbar .topbar-signup:hover { background: #e2eee6; }
 /* The front door (home and the How stories, logged out) has no bar and no nav (#196, #205). */
 .front-door { --nav-h: 0px; }
+.auth-door { --nav-h: 0px; }
 .topbar > nav {
   position: fixed;
   inset: auto 0 0;
@@ -198,12 +199,15 @@ h3.section-title { font-size: 1rem; }
   justify-content: center;
   gap: 6px;
   margin: 0;
-  padding: 12px 16px;
+  padding: 8px 16px;
   border: 0;
   pointer-events: none;
 }
 .deck-layout > .tabs a {
-  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
   font-weight: 700;
   color: var(--on-field-muted);
   text-decoration: none;
@@ -239,6 +243,8 @@ h3.section-title { font-size: 1rem; }
 .ticket-photo { -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 18%, #000 30%, transparent 58%); mask-image: linear-gradient(to bottom, transparent 4%, #000 18%, #000 30%, transparent 58%); }
 .has-photo .card-body { background: linear-gradient(to bottom, color-mix(in srgb, var(--field) 85%, transparent), transparent 22%); }
 .has-photo .card-title { margin-block: auto 0; }
+/* With no photo, the title leads from the top and the who, story and amount hold the bottom (#208). */
+.deck-ticket:not(.has-photo) .card-title { margin-block: 0 auto; }
 .card-title { margin-block: auto; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; overflow-wrap: break-word; }
 .card-title a { color: inherit; text-decoration: none; }
 .card-title a::after { content: ""; position: absolute; inset: 0; }
@@ -300,6 +306,11 @@ h3.section-title { font-size: 1rem; }
 .deck-next { order: 2; }
 .deck-hint { display: none; }
 .deck-count { order: 3; font-size: 0.75rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--on-field); }
+/* Next is the one filled glyph on the phone: the circle, its label and the count read as a single control (#208). */
+.deck-next { gap: 0; }
+.deck-next .icon { color: #ffffff; background: var(--press); }
+.deck-next:hover .icon, .deck-next:focus-visible .icon { background: var(--deep); }
+.deck-next + .deck-count { margin-top: -12px; font-weight: 400; color: var(--on-field-muted); }
 .stage-empty { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 64px 24px; }
 .stage-empty p { margin: 0; color: var(--muted); }
 .stage-empty-title { font: 400 3rem/0.95 var(--display); text-transform: uppercase; color: var(--ink) !important; margin-bottom: 12px !important; }
@@ -377,7 +388,7 @@ h3.section-title { font-size: 1rem; }
 .muted, .hint, .field small:not(.error) { color: var(--muted); }
 .hint { margin: 0; font-size: 0.9375rem; }
 .choices { display: flex; flex-wrap: wrap; gap: 8px 20px; }
-.choice { display: flex; align-items: center; gap: 10px; min-height: 36px; font-weight: 400; }
+.choice { display: flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 400; }
 /* Checkboxes and radios in the bubble grammar: a rounded box or a round dot, filled shell green when chosen. */
 .choice input {
   display: grid;
@@ -503,7 +514,7 @@ h3.section-title { font-size: 1rem; }
 /* Leaders */
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .tabs + .tabs { margin-top: -4px; }
-.tabs a { padding: 8px 16px; font-weight: 700; color: var(--muted); text-decoration: none; border-radius: var(--pill); transition: background-color var(--fast) ease-out, color var(--fast) ease-out; }
+.tabs a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; font-weight: 700; color: var(--muted); text-decoration: none; border-radius: var(--pill); transition: background-color var(--fast) ease-out, color var(--fast) ease-out; }
 .tabs a:hover { color: var(--ink); background: var(--info-tint); }
 .tabs a[aria-current="page"] { color: #ffffff; background: var(--shell); }
 .leaders-hint { margin: -6px 0 16px; }
@@ -546,6 +557,12 @@ h3.section-title { font-size: 1rem; }
 .post-hero .post-edited { margin: 4px 0 0; font-size: 0.875rem; color: var(--on-field-muted); }
 .report-link { margin-top: 28px; font-size: 0.875rem; text-align: center; }
 .report-link a { color: var(--muted); }
+/* Standalone text links keep their look; padding on an inline link grows its tap area to 44px without moving a line (#208). */
+.site-footer a, .report-link a, .leader-cta a, .join-login a, .form ~ p > a:only-child, .card-head a { padding-block: 14px; }
+/* Where a link is laid out as a box, a matching negative margin keeps the row its old height. */
+.site-footer a, .settings-back { padding-block: 14px; margin-block: -14px; }
+.settings-back { margin-top: -6px; }
+.leader-list a { padding-block: 10px; margin-block: -10px; }
 .admin-item { margin-bottom: 12px; }
 .admin-item h3 { margin: 0 0 4px; font-size: 1rem; }
 .admin-item .actions { margin-top: 10px; }
@@ -576,7 +593,7 @@ h3.section-title { font-size: 1rem; }
   body { padding-bottom: 0; }
   .topbar { justify-content: space-between; padding: 0 max(24px, calc((100% - 1120px) / 2)); }
   .topbar > nav { position: static; height: auto; padding: 0; gap: 4px; background: none; border: 0; }
-  .topbar > nav a { flex: none; flex-direction: row; gap: 8px; padding: 8px 12px; font-size: 0.9375rem; border-radius: var(--pill); }
+  .topbar > nav a { flex: none; flex-direction: row; gap: 8px; min-height: 44px; padding: 8px 14px; font-size: 0.9375rem; border-radius: var(--pill); }
   .topbar > nav a[aria-current="page"] { background: var(--shell-deep); }
   .topbar > nav a[aria-current="page"]::before { display: none; }
   .topbar > nav a > * { position: static; }
@@ -618,6 +635,9 @@ h3.section-title { font-size: 1rem; }
   .rail-btn .icon { width: 60px; height: 60px; padding: 17px; color: var(--ink); border: 1.5px solid var(--edge); }
   .rail-btn:hover .icon { color: var(--bg); background: var(--ink); }
   .deck-count { grid-area: count; justify-self: center; font-size: 0.8125rem; color: var(--muted); }
+  .deck-next { gap: 4px; }
+  .deck-next .icon { color: var(--ink); background: none; }
+  .deck-next + .deck-count { margin-top: 0; font-weight: 700; color: var(--muted); }
   .deck-hint { display: inline; font-weight: 400; }
   .stage-page .container-wide:not(:has(> .feed)) { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
   .post-hero { margin: 0; padding: 36px 32px 28px; }

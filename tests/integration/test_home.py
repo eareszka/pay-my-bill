@@ -106,7 +106,15 @@ def test_front_door_shows_only_the_way_in(client: FlaskClient, url: str) -> None
     assert "site-footer" not in page
 
 
-@pytest.mark.parametrize("url", ["/feed", "/signup", "/rules"])
+@pytest.mark.parametrize("url", ["/signup", "/login"])
+def test_sign_up_and_log_in_are_focused_forms(client: FlaskClient, url: str) -> None:
+    page = page_at(client, url)
+    assert '<header class="topbar">' in page and "auth-door" in page
+    assert 'aria-label="Main"' not in page and "topbar-signup" not in page
+    assert "site-footer" in page
+
+
+@pytest.mark.parametrize("url", ["/feed", "/leaders", "/rules"])
 def test_other_logged_out_pages_keep_the_nav(client: FlaskClient, url: str) -> None:
     page = page_at(client, url)
     assert 'aria-label="Main"' in page and "site-footer" in page
@@ -165,4 +173,6 @@ def test_the_doors_arrive_from_a_blocking_head_script(client: FlaskClient) -> No
     assert 'classList.add("arrive")' in script
     css = client.get("/static/css/app.css").get_data(as_text=True)
     assert ".arrive .home-door { animation: door-fill" in css
-    assert "@media (prefers-reduced-motion: reduce) {\n  .arrive .home-door" in css
+    # A Windows checkout writes CRLF, so match either line ending.
+    reduced = r"@media \(prefers-reduced-motion: reduce\) \{\r?\n  \.arrive \.home-door"
+    assert re.search(reduced, css)
