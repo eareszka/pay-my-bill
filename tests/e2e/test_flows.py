@@ -121,7 +121,9 @@ def test_chip_in_with_an_app(ui: Ui, live_server: LiveServer) -> None:
     expect(page.locator("form.chip-in")).to_be_visible()
     ui.check("chip-in")
     page.fill("#chip-amount", "15")
-    page.select_option("#method", index=0)
+    # The first option is the "Choose app" placeholder; pick the first real app.
+    first_app = page.locator("#method option:not([value=''])").first.get_attribute("value")
+    page.select_option("#method", first_app)
     page.click("form.chip-in .sent-row button[type=submit]")
     ui.settle()
     expect(page.locator("[data-gift-recorded]")).to_be_visible()
