@@ -687,9 +687,10 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .home-door-help { margin-right: 34px; border-bottom-left-radius: var(--r-tail); }
 .home-door-ask { margin-left: 34px; border-bottom-right-radius: var(--r-tail); }
 .home-door:not(:has(.home-mosaic)) { min-height: 0; padding-top: 26px; }
-.home-door::before, .how-field::before, .how-other::before { content: ""; position: absolute; bottom: -12px; width: 22px; height: 14px; background: var(--field); }
-.home-door-help::before, .how-story-help .how-field::before, .how-other-help::before { left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
-.home-door-ask::before, .how-story-ask .how-field::before, .how-other-ask::before { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+/* Each tail reaches 6px up into its bubble, so the rounded tail corner never leaves a seam beside it. */
+.home-door::before, .how-field::before, .how-other::before { content: ""; position: absolute; bottom: -12px; width: 22px; height: 20px; background: var(--field); }
+.home-door-help::before, .how-story-help .how-field::before, .how-other-help::before { left: 0; clip-path: polygon(0 0, 100% 0, 100% 6px, 0 100%); }
+.home-door-ask::before, .how-story-ask .how-field::before, .how-other-ask::before { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 6px); }
 /* Real photos from posts tile the top of a door, turned to the door's own color, and the field takes over under the words. */
 .home-door { position: relative; isolation: isolate; }
 .home-door > span:not(.home-mosaic) { position: relative; z-index: 2; }
@@ -777,8 +778,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 /* Sign-up is the story's last step (#208): the form waits inside a speech bubble in that story's color, with its tail. Plain /signup speaks in the front door's sage. */
 .join-step { --field: var(--want); position: relative; width: 100%; max-width: 480px; margin: 0 auto; padding: 18px 18px 22px; color: var(--on-field); background: var(--field); border-radius: var(--r-bubble) var(--r-bubble) var(--r-bubble) var(--r-tail); }
 .join-step-ask { --field: var(--need); border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
-.join-step::before { content: ""; position: absolute; bottom: -12px; left: 0; width: 22px; height: 14px; background: var(--field); clip-path: polygon(0 0, 100% 0, 0 100%); }
-.join-step-ask::before { right: 0; left: auto; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.join-step::before { content: ""; position: absolute; bottom: -12px; left: 0; width: 22px; height: 20px; background: var(--field); clip-path: polygon(0 0, 100% 0, 100% 6px, 0 100%); }
+.join-step-ask::before { right: 0; left: auto; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 6px); }
 .join-line { margin: 0 0 8px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
 .join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--on-field-muted); }
 .join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
@@ -841,7 +842,7 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .home-door-help, .home-door-ask { margin: 0; }
   .home-door:not(:has(.home-mosaic)) { display: flex; align-self: end; }
   .home-door:not(:has(.home-mosaic)) .home-door-line { align-self: auto; }
-  .home-door::before, .how-field::before, .how-other::before { bottom: -22px; width: 40px; height: 26px; }
+  .home-door::before, .how-field::before, .how-other::before { bottom: -22px; width: 40px; height: 32px; }
   .home-way-in { width: 100%; max-width: 420px; margin: auto auto 0; }
   /* The two doors share rows, so their headlines sit on one line whatever the sentences below them do. */
   .home-doors { grid-template-rows: minmax(0, 1fr) auto auto auto; min-height: calc(var(--door-h) + 20px); }
@@ -863,6 +864,6 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .how-other { padding: 16px 40px; }
   .join { gap: 26px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 24px 24px 32px; }
   .join-step { padding: 28px 32px 32px; }
-  .join-step::before { bottom: -22px; width: 40px; height: 26px; }
+  .join-step::before { bottom: -22px; width: 40px; height: 32px; }
   .join-back { position: relative; bottom: auto; }
 }
