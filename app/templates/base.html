@@ -20,9 +20,10 @@
 {% macro nav_link(endpoint, icon, label, extra="") %}
   <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
-{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how") %}
-{# Sign up and Log in are focused forms: the bar keeps only the brand, and the line under the form is the one way across (#208). #}
-{% set auth_door = not current_user.is_authenticated and request.endpoint in ("auth.signup", "auth.login") %}
+{# Sign-up is the story's last step, so it joins the front door: no bar, no nav, no footer (#208). #}
+{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how", "auth.signup") %}
+{# Log in is a focused form: the bar keeps only the brand, and the line under the form is the way across (#208). #}
+{% set auth_door = not current_user.is_authenticated and request.endpoint == "auth.login" %}
 <body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}{% if auth_door %} auth-door{% endif %}">
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>

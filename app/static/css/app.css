@@ -601,7 +601,6 @@ h3.section-title { font-size: 1rem; }
   .topbar > nav .icon { width: 20px; height: 20px; }
   .topbar > nav { margin-left: auto; }
   .topbar > nav a[href="/signup"] { display: none; }
-  .join-page .topbar > nav a[href^="/login"] { display: none; }
   .topbar .topbar-signup { margin-left: 12px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
@@ -774,15 +773,19 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-other-line { font: 400 1.75rem/1 var(--display); text-transform: uppercase; }
 
 /* Sign up (#120): the story's white Sign up grows into this card, and the story's field sinks into the strip at the foot. */
-.join { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); color: var(--ink); }
-.join-step { flex: 1; width: 100%; max-width: 480px; margin: 0 auto; padding: 12px 18px 48px; }
+.join { display: flex; flex-direction: column; gap: 22px; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 20px); color: var(--ink); }
+/* Sign-up is the story's last step (#208): the form waits inside a speech bubble in that story's color, with its tail. Plain /signup speaks in the front door's sage. */
+.join-step { --field: var(--want); position: relative; width: 100%; max-width: 480px; margin: 0 auto; padding: 18px 18px 22px; color: var(--on-field); background: var(--field); border-radius: var(--r-bubble) var(--r-bubble) var(--r-bubble) var(--r-tail); }
+.join-step-ask { --field: var(--need); border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
+.join-step::before { content: ""; position: absolute; bottom: -12px; left: 0; width: 22px; height: 14px; background: var(--field); clip-path: polygon(0 0, 100% 0, 0 100%); }
+.join-step-ask::before { right: 0; left: auto; clip-path: polygon(0 0, 100% 0, 100% 100%); }
 .join-line { margin: 0 0 8px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
-.join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--muted); }
+.join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--on-field-muted); }
 .join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
 .join-card .form { color: var(--ink); }
-.join-login { margin: 20px 0 0; color: var(--muted); }
-.join-login a { color: var(--ink); font-weight: 700; }
-.join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; margin: 0 16px; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
+.join-login { margin: 20px 0 0; color: var(--on-field-muted); }
+.join-login a { color: var(--on-field); font-weight: 700; }
+.join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; width: 100%; max-width: 480px; margin: auto auto 0; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
 .join-back .icon { width: 20px; height: 20px; }
 
 /* The door you take grows into the story while the other shrinks into the strip; each step's words cut in from the right. */
@@ -858,7 +861,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .how-step { display: grid; grid-template-columns: minmax(0, 1fr) 400px; align-items: center; gap: 56px; }
   .how-line { font-size: 5.5rem; }
   .how-other { padding: 16px 40px; }
-  .join { max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 0 24px 24px; }
-  .join-step { padding-top: 24px; }
-  .join-back { bottom: 32px; margin: 0; }
+  .join { gap: 26px; max-width: 1240px; min-height: calc(100svh - var(--bar-h)); margin: 0 auto; padding: 24px 24px 32px; }
+  .join-step { padding: 28px 32px 32px; }
+  .join-step::before { bottom: -22px; width: 40px; height: 26px; }
+  .join-back { position: relative; bottom: auto; }
 }
