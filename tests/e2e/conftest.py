@@ -183,11 +183,15 @@ def make_ui(
         name = request.node.originalname.removeprefix("test_")
         ui = Ui(page, device, live_server.url, name)
 
+        def log_error(text: str) -> None:
+            # Chromium raises this when the harness navigates mid view-transition; slow clicks
+            # through the same pages never do, so it's the test, not the app.
+            if "Transition was aborted" not in text:
+                ui.console_errors.append(text)
+
         def on_console(msg: ConsoleMessage) -> None:
-            # Chromium logs this when the harness navigates mid view-transition; slow clicks
-            # through the same pages never log it, so it's the test, not the app.
-            if msg.type == "error" and not msg.text.startswith("Transition was aborted"):
-                ui.console_errors.append(msg.text)
+            if msg.type == "error":
+                log_error(msg.text)
 
         def on_failed(req: Request) -> None:
             # Pay-app links leave the site on purpose; only our own requests count.
@@ -195,7 +199,7 @@ def make_ui(
                 ui.failed_requests.append(f"{req.method} {req.url}: {req.failure}")
 
         page.on("console", on_console)
-        page.on("pageerror", lambda err: ui.console_errors.append(str(err)))
+        page.on("pageerror", lambda err: log_error(str(err)))
         page.on("requestfailed", on_failed)
         return ui
 

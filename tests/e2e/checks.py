@@ -14,8 +14,7 @@ Finding = dict[str, Any]
 MIN_TAP = 44
 # How many Tab presses the focus check walks through.
 FOCUS_STOPS = 15
-# How far outside a control its focus ring may be drawn, and how long it may take to appear.
-FOCUS_PAD = 12
+# How long a focus ring may take to appear or fade.
 FOCUS_SETTLE_MS = 250
 
 OVERFLOW_JS = """
@@ -64,17 +63,11 @@ TAP_JS = """
 """
 
 FOCUS_JS = r"""
-(pad) => {
+() => {
   const el = document.activeElement;
   if (!el || el === document.body) return null;
-  const r = el.getBoundingClientRect();
   const name = (el.getAttribute('aria-label') || el.textContent || el.name || el.id || '').trim().replace(/\s+/g, ' ').slice(0, 40);
-  // The area a ring could show in: the element plus a margin, kept inside the viewport.
-  const x = Math.max(0, r.left - pad), y = Math.max(0, r.top - pad);
-  const clip = {x, y,
-    width: Math.min(innerWidth, r.right + pad) - x,
-    height: Math.min(innerHeight, r.bottom + pad) - y};
-  return {name: `<${el.tagName.toLowerCase()}> "${name}"`, clip};
+  return `<${el.tagName.toLowerCase()}> "${name}"`;
 }
 """
 
@@ -152,30 +145,27 @@ def focus_visible(page: Page) -> list[Finding]:
     """Tab through the first controls and report any whose focus changes nothing on screen.
 
     Rings can be drawn on the element, a pseudo-element, or a child (#205's card ring is a
-    ::after overlay; the deck's Next ring is on its icon), so compare pixels, not styles.
+    ::after overlay around the whole card; the deck's Next ring is on its icon), so compare
+    the whole viewport's pixels, not styles.
     """
     missing: list[str] = []
     page.evaluate("() => document.activeElement && document.activeElement.blur()")
     for _ in range(FOCUS_STOPS):
         page.keyboard.press("Tab")
         page.wait_for_timeout(FOCUS_SETTLE_MS)
-        state = page.evaluate(FOCUS_JS, FOCUS_PAD)
-        if (
-            not state
-            or state["name"] in missing
-            or min(state["clip"]["width"], state["clip"]["height"]) <= 0
-        ):
+        name = page.evaluate(FOCUS_JS)
+        if not name or name in missing:
             continue
-        focused = page.screenshot(clip=state["clip"])
+        focused = page.screenshot()
         page.evaluate(
             "() => { window.__e2eFocus = document.activeElement; window.__e2eFocus.blur(); }"
         )
         page.wait_for_timeout(FOCUS_SETTLE_MS)
-        blurred = page.screenshot(clip=state["clip"])
+        blurred = page.screenshot()
         # Put focus back so the next Tab carries on from here.
         page.evaluate("() => window.__e2eFocus.focus()")
         if focused == blurred:
-            missing.append(state["name"])
+            missing.append(name)
     return finding("focus-visible", [f"{name} has no visible focus ring" for name in missing])
 
 
