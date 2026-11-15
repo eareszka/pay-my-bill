@@ -543,7 +543,7 @@ h3.section-title { font-size: 1rem; }
 .rules li { margin-bottom: 10px; }
 .profile-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .profile-head h1 { min-width: 0; overflow-wrap: anywhere; }
-.profile-head .btn { flex: none; min-height: 40px; padding: 6px 14px; }
+.profile-head .btn { flex: none; min-height: 44px; padding: 6px 14px; }
 .profile-tabs { margin-top: 32px; }
 .profile-tabs + .gift-section, .profile-tabs + .profile-posts { margin-top: 0; }
 .profile-posts { margin-top: 32px; }
@@ -561,6 +561,7 @@ h3.section-title { font-size: 1rem; }
 .report-link a, .leader-cta a, .join-login a, .form ~ p > a:only-child, .card-head a { padding-block: 14px; }
 /* Where a link is laid out as a box, a matching negative margin keeps the row its old height. */
 .site-footer a, .settings-back { padding-block: 14px; margin-block: -14px; }
+.site-footer a { padding-inline: 4px; margin-inline: -4px; }
 .settings-back { margin-top: -6px; }
 .leader-list a { padding-block: 10px; margin-block: -10px; }
 .admin-item { margin-bottom: 12px; }
