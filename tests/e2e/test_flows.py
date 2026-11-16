@@ -103,6 +103,15 @@ def test_log_in_to_the_feed(ui: Ui, live_server: LiveServer) -> None:
     assert_clean(ui)
 
 
+def test_log_in_with_a_wrong_password(ui: Ui, live_server: LiveServer) -> None:
+    user = live_server.make_user("typo")
+    ui.login(user, password="not-the-password")  # noqa: S106 - a deliberately wrong one
+    assert "/login" in ui.page.url, ui.page.url
+    expect(ui.page.locator(".flash, .error").first).to_be_visible()
+    ui.check("error")
+    assert_clean(ui)
+
+
 def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     user = live_server.make_user("poster")
     ui.login(user)
