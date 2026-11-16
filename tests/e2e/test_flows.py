@@ -122,7 +122,7 @@ def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     page.fill("#title", "Help with the power bill")
     page.fill("#body", "The power bill came in higher than usual this month.")
     page.fill("#goal", "80")
-    page.click("form.page-form button[type=submit]")
+    page.click("form:has(#title) button[type=submit]")
     ui.settle()
     expect(page.locator("h1")).to_contain_text("Help with the power bill")
     ui.check("detail")

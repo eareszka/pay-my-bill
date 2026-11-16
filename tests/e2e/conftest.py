@@ -120,7 +120,7 @@ class Ui:
         self.goto("/login")
         self.page.fill("#identifier", username)
         self.page.fill("#password", password)
-        self.page.click("form.page-form button[type=submit]")
+        self.page.click("form:has(#identifier) button[type=submit]")
         self.settle()
 
     def check(
