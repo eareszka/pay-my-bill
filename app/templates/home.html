@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% from "_mosaic.html" import mosaic %}
-{% block title %}Pay My Bill · Chip in on someone's bill{% endblock %}
+{% block title %}Yearnly · Chip in on someone's bill{% endblock %}
 {% block body_class %}page stage-page home-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
 {% block content %}
 <div class="home">
-  <h1 class="sr-only">How Pay My Bill works</h1>
+  <h1 class="home-mark"><span class="sr-only">Yearnly: how it works</span><span aria-hidden="true">Yearnly</span></h1>
   <nav class="home-doors" aria-label="How it works">
     <a class="home-door home-door-help" href="{{ url_for('main.how', path='help') }}">
       {{ mosaic(help_photos) }}
@@ -21,6 +21,9 @@
       <span class="home-door-go">See how it works<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></span>
     </a>
   </nav>
-  <p class="home-promise"><strong>Pay My Bill never holds your money.</strong> Gifts go straight from one person's pay app to the other's.</p>
+  <div class="home-way-in">
+    <a class="btn home-signup" href="{{ url_for('auth.signup') }}">Sign up</a>
+    <p class="home-login">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+  </div>
 </div>
 {% endblock %}

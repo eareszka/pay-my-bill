@@ -27,7 +27,7 @@ Read this file fully before making any change. The project is run as a professio
 - Models live in `app/models.py` and subclass `Base` from `app/extensions.py` (not `db.Model`, which mypy can't type). Migrations live in `migrations/` (`flask --app app db migrate -m "..."`). Money is integer cents (ADR 0006).
 - `app/rewards.py` computes XP, levels, streaks, and badges from confirmed gifts (ADR 0010). Planned: `app/leaderboard.py` (`app/moderation.py` and `app/payment_links.py` exist now)
 - Deploys install exact, hash-checked versions from `requirements.lock` (#177). After changing dependencies in `pyproject.toml`, regenerate it with `uv pip compile pyproject.toml --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-header -o requirements.lock`, run the tests, and commit both.
-- Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, from Sprint 4)
+- Tests live in `tests/unit/`, `tests/integration/` (Flask test client), and `tests/e2e/` (Playwright, #207). The e2e tests are skipped by default. Run them with `python -m playwright install chromium` once, then `pytest -m e2e --no-cov` and `python -m tests.e2e.report`. Screenshots and `findings.md` land in `tests/e2e/artifacts/` (gitignored). Design findings go to Impeccable for the fix.
 
 ```powershell
 python -m venv .venv; .\.venv\Scripts\activate
@@ -70,7 +70,7 @@ flask --app app run
 - The public GitHub repo `eareszka/pay-my-bill` is pushed, CI is green, and the labels and milestones (v0.1-alpha, v0.2-beta, v1.0) exist.
 - **Projects board:** https://github.com/users/eareszka/projects/4, with columns Backlog → Ready → In Progress → In Review → Done. Move cards as work progresses.
 - **`main` is protected:** changes only land through a PR, the `checks` CI job must pass with the branch up to date, and force-pushes and deletion are blocked, admins included. The repo is public, so never commit secrets (gitleaks runs in pre-commit).
-- **Staging is live** on Render at https://pay-my-bill-staging.onrender.com (ADR 0005, `render.yaml`). It auto-deploys from `main`. The database is Neon's free Postgres (it doesn't expire), with `DATABASE_URL` set in the Render dashboard (ADR 0005 amendment, #33).
+- **Staging is live** on Render at https://yearnly.app (ADR 0005 and 0017, `render.yaml`; the onrender.com address still works). DNS lives in Cloudflare: an A record for `@` and a `www` CNAME to Render, grey-clouded, plus Email Routing (`support@` forwards to the owner) and Brevo's DKIM, DMARC, and `em.` tracking records. Mail goes out as `Yearnly <no-reply@yearnly.app>`. It auto-deploys from `main`. The database is Neon's free Postgres (it doesn't expire), with `DATABASE_URL` set in the Render dashboard (ADR 0005 amendment, #33).
 - The Sprint 0 Review and Retro are left for the owner to write on Sunday.
 - **Sprint 1, "Users can sign up and post"** is done: issues #1–#7 (23 points) merged through PRs #12, #13, #16–#20. The app has sign-up with email verification, log in and out with a DB-backed lockout (migration 0002, ADR 0007), a profile with region and payment handles, post creation with the $1,000 cap, 2 open posts, Community Rules, and the fundraising keyword flag, a feed, and post detail pages. Tests: 199, 100% coverage.
 - Key modules: `app/auth.py` (typed `login_required`, `verified_required`, login throttle), `app/mail.py` (console unless `MAIL_SERVER` is set), `app/tokens.py`, `app/moderation.py`, `app/money.py` (dollars ↔ cents), `app/payment_links.py` (handle normalization; Sprint 2 adds deep links), and `app/regions.py`. Templates live in `app/templates/` and use `_field.html` and `posts/_meta.html`/`_progress.html` partials.
@@ -82,6 +82,8 @@ flask --app app run
 - **Sprint 4, "Follow-through"** is done: issues #65, #26, #27, #64, and #28 (16 points) merged through PRs #66, #70, #71, #72, and #74. Posts close by hand or on their own at 30 days (`Post.is_open`, `open_posts()`), and results updates, the overdue block, and the follow-through stat all come from dates when read. Reminders run through `flask --app app posts remind`. Migrations 0006–0009. Rules are in the ADR 0008 amendments.
 
 - **Sprint 5b, "Launch"** (2026-11-08): Terms and Privacy (#93), password reset (#94), reports and the admin queue at `/admin` (#95, migration 0010, `app/routes/admin.py` and `app/routes/reports.py`), and Brevo email (#96). Mail goes through Brevo's HTTPS API when `BREVO_API_KEY` is set, because Render's free tier blocks SMTP. Make an admin with `flask --app app admin grant <email>` and remove one with `admin revoke <email>`; /admin lists recent admin actions. Sprint 5's #79, #80, and #81 are paused.
+
+- **iOS shell (#193):** `mobile/` is a Capacitor 8 project (`app.yearnly.ios`) that loads https://yearnly.app. Ship with Actions → **iOS TestFlight** (secrets `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `APPLE_TEAM_ID`). After changing `capacitor.config.json`, run `npx cap sync ios` in `mobile/` and commit `ios/`.
 
 ## Coordination
 Other agents (Claude Code) may also work in this repo. To avoid conflicts:

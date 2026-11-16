@@ -15,7 +15,7 @@ services:
       - key: FLASK_ENV
         value: production
       - key: APP_URL
-        value: https://pay-my-bill-staging.onrender.com
+        value: https://yearnly.app
       - key: SECRET_KEY
         generateValue: true
       - key: BREVO_API_KEY

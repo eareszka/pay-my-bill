@@ -16,7 +16,7 @@ def test_manifest_describes_the_installed_app(client: FlaskClient) -> None:
         "/",
         "/",
     )
-    assert manifest["background_color"] == manifest["theme_color"] == "#0a0a0a"
+    assert manifest["background_color"] == manifest["theme_color"] == "#3a7558"
     for icon in manifest["icons"]:
         assert client.get(icon["src"]).status_code == 200
     assert any(icon.get("purpose") == "maskable" for icon in manifest["icons"])
@@ -48,5 +48,5 @@ def test_pages_link_the_manifest_and_home_screen_icon(client: FlaskClient) -> No
     page = client.get("/rules").get_data(as_text=True)
     assert '<link rel="manifest" href="/manifest.webmanifest">' in page
     assert 'rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png"' in page
-    assert 'name="apple-mobile-web-app-title" content="Pay My Bill"' in page
+    assert 'name="apple-mobile-web-app-title" content="Yearnly"' in page
     assert "/static/js/pwa.js" in page

@@ -72,7 +72,7 @@ def test_connect_creates_account_and_redirects_to_stripe(
     # The business questions are answered for the recipient (#98).
     merchant = created["params"]["configuration"]["merchant"]
     assert merchant["mcc"] == "7299"
-    assert merchant["statement_descriptor"] == {"descriptor": "PAY MY BILL"}
+    assert merchant["statement_descriptor"] == {"descriptor": "YEARNLY"}
     assert merchant["support"] == {"url": "http://localhost/u/alice"}
     profile = created["params"]["defaults"]["profile"]
     assert profile["business_url"] == "http://localhost/u/alice"

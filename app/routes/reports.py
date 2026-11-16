@@ -84,7 +84,7 @@ def _file(
     db.session.commit()
     if email_admins:
         notify_admins(
-            "New report on Pay My Bill",
+            "New report on Yearnly",
             f"{current_user.username} reported {target}: {reason.label}. Reports in the next "
             "hour won't email you; they wait in the queue.",
         )

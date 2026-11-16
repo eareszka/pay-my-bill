@@ -1,6 +1,15 @@
 // How it works (#120): name each move for the page transition, and let a swipe or the arrow keys
 // take Back and Next. Every step is an ordinary link, so the stories work the same without this.
 // Loaded in <head> without defer, on the doors and sign-up pages too, so pagereveal is heard before the first frame.
+
+// The doors arrive (#203): a fresh open of the home page (the app launching, a typed URL, an outside link)
+// fills each door like a tip jar. Moving around inside Yearnly, or going back, never replays it.
+const sameSite = (() => {
+  try { return Boolean(document.referrer) && new URL(document.referrer).origin === window.location.origin; } catch { return false; }
+})();
+const traversed = performance.getEntriesByType?.("navigation")[0]?.type === "back_forward";
+if (window.location.pathname === "/" && !sameSite && !traversed) document.documentElement.classList.add("arrive");
+
 // The doors count as step 0 of both stories.
 const stepOf = (url) => {
   const { pathname } = new URL(url);

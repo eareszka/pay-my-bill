@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% block title %}Pay My Bill{% endblock %}</title>
-  <meta name="theme-color" content="#0a0a0a">
+  <title>{% block title %}Yearnly{% endblock %}</title>
+  <meta name="theme-color" content="#3a7558">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32.png') }}">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
-  <meta name="apple-mobile-web-app-title" content="Pay My Bill">
+  <meta name="apple-mobile-web-app-title" content="Yearnly">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script src="{{ url_for('static', filename='js/pwa.js') }}" defer></script>
@@ -20,11 +20,15 @@
 {% macro nav_link(endpoint, icon, label, extra="") %}
   <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
-<body class="{% block body_class %}page{% endblock %}">
+{# Sign-up (the story's last step, #208) and Log in (#211) join the front door: no bar, no nav, no footer. #}
+{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how", "auth.signup", "auth.login") %}
+<body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
+  {# The front door (home and the How stories, logged out) has no bar at all (#205): the way in lives on the page. #}
+  {% if not front_door %}
   <header class="topbar">
-    <a class="brand" href="{{ url_for('main.home') }}">Pay My Bill</a>
+    <a class="brand" href="{{ url_for('main.home') }}">Yearnly</a>
     <nav aria-label="Main">
       {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
@@ -39,18 +43,21 @@
         {{ nav_link("auth.signup", "you", "Sign up") }}
       {% endif %}
     </nav>
-    {% if current_user.is_authenticated %}{% elif request.endpoint == 'auth.signup' %}<a class="btn topbar-signup" href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a>{% else %}<a class="btn topbar-signup" href="{{ url_for('auth.signup') }}">Sign up</a>{% endif %}
+    {% if not current_user.is_authenticated %}<a class="btn topbar-signup" href="{{ url_for('auth.signup') }}">Sign up</a>{% endif %}
   </header>
+  {% endif %}
   <main class="container{% block main_class %}{% endblock %}" id="main" tabindex="-1">
     {% for category, message in get_flashed_messages(with_categories=true) %}
       <p class="flash flash-{{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
     {% endfor %}
     {% block content %}{% endblock %}
   </main>
+  {% if not front_door %}
   <footer class="site-footer">
     <a href="{{ url_for('main.rules') }}">Rules</a>
     <a href="{{ url_for('main.terms') }}">Terms</a>
     <a href="{{ url_for('main.privacy') }}">Privacy</a>
   </footer>
+  {% endif %}
 </body>
 </html>

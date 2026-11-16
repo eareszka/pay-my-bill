@@ -59,13 +59,17 @@ def home() -> str | Response:
 
 
 # Each door opens its own story, one step per page, so Back and links work without JavaScript.
-STORY_STEPS = {"help": 4, "ask": 3}
+STORY_STEPS = {"help": 3, "ask": 3}
+# Steps that were cut (#198) send old links to the story's last step.
+RETIRED_STEPS = {("help", 4): 3}
 
 
 @bp.get("/how/<any(help, ask):path>", defaults={"step": 1})
 @bp.get("/how/<any(help, ask):path>/<int:step>")
-def how(path: str, step: int) -> str:
+def how(path: str, step: int) -> str | Response:
     total = STORY_STEPS[path]
+    if (path, step) in RETIRED_STEPS:
+        return redirect(url_for("main.how", path=path, step=RETIRED_STEPS[path, step]), 301)
     if not 1 <= step <= total:
         abort(404)
     other = "ask" if path == "help" else "help"

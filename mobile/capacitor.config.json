@@ -1,0 +1,15 @@
+{
+  "appId": "app.yearnly.ios",
+  "appName": "Yearnly",
+  "webDir": "www",
+  "server": {
+    "url": "https://yearnly.app",
+    "cleartext": false
+  },
+  "backgroundColor": "#3a7558",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#3a7558",
+    "scheme": "Yearnly"
+  }
+}

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% from "_field.html" import choice, field %}
-{% block title %}Sign up · Pay My Bill{% endblock %}
+{% block title %}Sign up · Yearnly{% endblock %}
 {% block body_class %}page stage-page join-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
 {% block content %}
 <div class="join">
-  <div class="join-step">
+  <div class="join-step join-step-{{ story or 'help' }}">
     <h1 class="join-line">Join in</h1>
     <p class="join-lede">Create your account: one account to chip in and to ask. You must be 18 or older.</p>
     <div class="join-card">
@@ -23,7 +23,7 @@
     <p class="join-login">Already have an account? <a href="{{ url_for('auth.login', next=request.args.get('next')) }}">Log in</a></p>
   </div>
   {% if story %}
-    <a class="how-other how-other-{{ story }} join-back" href="{{ url_for('main.how', path=story, step=4 if story == 'help' else 3) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to how {{ "helping" if story == "help" else "asking" }} works</a>
+    <a class="how-other how-other-{{ story }} join-back" href="{{ url_for('main.how', path=story, step=3) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to how {{ "helping" if story == "help" else "asking" }} works</a>
   {% endif %}
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Admin queue · Pay My Bill{% endblock %}
+{% block title %}Admin queue · Yearnly{% endblock %}
 {% macro action(endpoint, label, cls="btn btn-secondary") %}
   <form method="post" action="{{ url_for(endpoint, **kwargs) }}">
     {{ form.hidden_tag() }}

@@ -15,7 +15,7 @@ web
 A feel-good community where anyone can post an everyday want or need of up to $1,000 and anyone can chip in. Helping is visible and celebrated, and the person who got help says thanks and shows how it was used. Success in the closed beta: at least half of posts get a confirmed gift, at least 30% of donors give again within two weeks, under 2% of posts are removed for fundraising, and at least 70% of funded posts get a results update within 7 days.
 
 ## Positioning
-Crowdfunding sites are built for big campaigns and businesses. Pay My Bill is for tiny, personal, sometimes silly asks, and it rewards the people who give: XP, levels, badges, streaks, kudos, and leaderboards ranked by distinct people helped, never by dollars. Credit is honest, because only gifts the recipient confirms count. Money goes straight from the donor's Cash App, Venmo, or PayPal to the poster's; the app never holds it.
+Crowdfunding sites are built for big campaigns and businesses. Yearnly is for tiny, personal, sometimes silly asks, and it rewards the people who give: XP, levels, badges, streaks, kudos, and leaderboards ranked by distinct people helped, never by dollars. Credit is honest, because only gifts the recipient confirms count. Money goes straight from the donor's Cash App, Venmo, or PayPal to the poster's; the app never holds it.
 
 ## Operating Context
 - Used mostly on phones, as a mobile-first web app installable to the home screen (PWA). Later the same site is wrapped with Capacitor for the iOS App Store, keeping its own design rather than adopting native iOS conventions.
@@ -32,7 +32,7 @@ Crowdfunding sites are built for big campaigns and businesses. Pay My Bill is fo
 - Name: Yearnly (ADR 0017), on yearnly.app.
 
 ## Brand Commitments
-- The product is named **Yearnly** (ADR 0017, yearnly.app). The UI still says "Pay My Bill" until the rename story ships. "Chip in" stays the verb for giving. The only brand asset is the placeholder deck icon (#185).
+- The product is named **Yearnly** (ADR 0017, yearnly.app). The UI says Yearnly (#191). "Chip in" stays the verb for giving. The brand assets are the League Gothic wordmark and the deck icon with a Y monogram.
 
 ## Evidence on Hand
 - None yet. The product is pre-beta with no real users, so there are no testimonials, stats, or press. Future work must not invent any.

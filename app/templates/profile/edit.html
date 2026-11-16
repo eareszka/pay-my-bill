@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "_field.html" import field %}
-{% block title %}Settings · Pay My Bill{% endblock %}
+{% block title %}Settings · Yearnly{% endblock %}
 {% block content %}
   <a class="settings-back" href="{{ url_for('profile.show', username=current_user.username) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Your profile</a>
   <h1>Settings</h1>
@@ -31,7 +31,7 @@
           <button type="submit" class="btn btn-secondary">Payouts and bank details</button>
         </form>
       {% else %}
-        <p class="hint">Connect Stripe so people can pay you instantly by card, Apple Pay, or Google Pay. Stripe asks for your name, the last 4 of your SSN, and a bank account for payouts. Pay My Bill never sees your bank details.</p>
+        <p class="hint">Connect Stripe so people can pay you instantly by card, Apple Pay, or Google Pay. Stripe asks for your name, the last 4 of your SSN, and a bank account for payouts. Yearnly never sees your bank details.</p>
         <form method="post" action="{{ url_for('stripe.connect') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn">{{ "Finish Stripe setup" if current_user.stripe_account_id else "Connect Stripe" }}</button>

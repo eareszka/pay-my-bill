@@ -28,3 +28,6 @@ Thumbs.db
 # Impeccable design-review captures (local only)
 .impeccable/review/
 .impeccable/mocks/
+
+# Playwright e2e screenshots and findings (local only)
+tests/e2e/artifacts/

@@ -66,10 +66,10 @@ def send_verification(user: User) -> bool:
     reset = site_url("auth.reset_request")
     send_later(
         user.email,
-        "Verify your Pay My Bill email",
+        "Verify your Yearnly email",
         f"Hi {user.username},\n\nConfirm your email to start posting and chipping in:\n{link}\n\n"
         "This link expires in 48 hours.\n\n"
-        "Didn't sign up for Pay My Bill? Someone may have used your email. You can ignore "
+        "Didn't sign up for Yearnly? Someone may have used your email. You can ignore "
         f"this email, or take the account by resetting its password at {reset}",
     )
     return True
@@ -242,7 +242,7 @@ def reset_request() -> str | Response | tuple[str, int, dict[str, str]]:
             link = site_url("auth.reset_password", token=token)
             send_later(
                 user.email,
-                "Reset your Pay My Bill password",
+                "Reset your Yearnly password",
                 f"Hi {user.username},\n\nSet a new password here:\n{link}\n\n"
                 "This link expires in 1 hour and works once. If you didn't ask for it, "
                 "you can ignore this email.",
@@ -288,7 +288,7 @@ def reset_password(token: str) -> str | Response:
         db.session.commit()
         send_later(
             user.email,
-            "Your Pay My Bill password changed",
+            "Your Yearnly password changed",
             f"Hi {user.username},\n\nYour password was just changed. If this wasn't you, "
             f"reset it again at {site_url('auth.reset_request')} and tell us.",
         )

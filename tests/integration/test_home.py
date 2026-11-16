@@ -5,7 +5,7 @@ from flask.testing import FlaskClient
 
 from tests.conftest import MakeUser, login_as
 
-STORIES = [("help", 4, "/how/ask"), ("ask", 3, "/how/help")]
+STORIES = [("help", 3, "/how/ask"), ("ask", 3, "/how/help")]
 
 
 def visible_text(page: str) -> str:
@@ -24,9 +24,10 @@ def test_new_visitors_get_just_the_two_doors(client: FlaskClient) -> None:
     page = page_at(client, "/")
     assert '<a class="home-door home-door-help" href="/how/help">' in page
     assert '<a class="home-door home-door-ask" href="/how/ask">' in page
-    assert "Pay My Bill never holds your money." in page
+    assert '<a class="btn home-signup" href="/signup">Sign up</a>' in page
+    assert 'Already have an account? <a href="/login">Log in</a>' in page
     assert "how-step" not in page
-    assert 'aria-current="page"' not in page.split('aria-label="Main"')[1].split("</nav>")[0]
+    assert 'aria-label="Main"' not in page
 
 
 @pytest.mark.parametrize(("path", "total", "other"), STORIES)
@@ -92,8 +93,36 @@ def test_tracking_tags_still_show_the_doors(client: FlaskClient) -> None:
 
 
 def test_logged_out_top_bar_has_a_filled_sign_up(client: FlaskClient) -> None:
-    for url in ("/", "/feed", "/how/help"):
+    for url in ("/feed", "/leaders", "/rules"):
         assert '<a class="btn topbar-signup" href="/signup">Sign up</a>' in page_at(client, url)
+
+
+@pytest.mark.parametrize("url", ["/", "/how/help", "/how/ask/3", "/signup", "/login"])
+def test_front_door_shows_only_the_way_in(client: FlaskClient, url: str) -> None:
+    page = page_at(client, url)
+    assert '<body class="page stage-page' in page and "front-door" in page
+    assert '<header class="topbar">' not in page
+    assert 'aria-label="Main"' not in page
+    assert "site-footer" not in page
+
+
+def test_log_in_is_the_sign_up_bubble(client: FlaskClient) -> None:
+    page = page_at(client, "/login")
+    assert '<div class="join-step join-step-help">' in page
+    assert 'New here? <a href="/signup">Create an account</a>' in page
+
+
+@pytest.mark.parametrize("url", ["/feed", "/leaders", "/rules"])
+def test_other_logged_out_pages_keep_the_nav(client: FlaskClient, url: str) -> None:
+    page = page_at(client, url)
+    assert 'aria-label="Main"' in page and "site-footer" in page
+    assert "front-door" not in page
+
+
+def test_logged_in_stories_keep_the_nav(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("maria_g"))
+    page = page_at(client, "/how/help")
+    assert 'aria-label="Main"' in page and "front-door" not in page
 
 
 def test_feed_is_open_to_everyone(client: FlaskClient) -> None:
@@ -101,7 +130,7 @@ def test_feed_is_open_to_everyone(client: FlaskClient) -> None:
 
 
 def test_brand_goes_home(client: FlaskClient) -> None:
-    assert '<a class="brand" href="/">Pay My Bill</a>' in page_at(client, "/feed")
+    assert '<a class="brand" href="/">Yearnly</a>' in page_at(client, "/feed")
 
 
 @pytest.mark.parametrize(("path", "total", "other"), STORIES)
@@ -115,3 +144,33 @@ def test_sign_up_from_a_story_keeps_the_way_back(
 
 def test_sign_up_ignores_an_unknown_story(client: FlaskClient) -> None:
     assert "join-back" not in page_at(client, "/signup?from=elsewhere")
+
+
+def test_the_cut_help_step_goes_to_the_last_one(client: FlaskClient) -> None:
+    resp = client.get("/how/help/4")
+    assert resp.status_code == 301
+    assert resp.location == "/how/help/3"
+
+
+@pytest.mark.parametrize(("path", "total", "other"), STORIES)
+def test_steps_are_a_headline_and_one_example(
+    client: FlaskClient, path: str, total: int, other: str
+) -> None:
+    for step in range(1, total + 1):
+        page = page_at(client, step_url(path, step))
+        words = page.split('<div class="how-words">')[1].split("</div>")[0]
+        assert "<p>" not in words
+        assert page.count('class="how-example"') == 1
+
+
+def test_the_doors_arrive_from_a_blocking_head_script(client: FlaskClient) -> None:
+    page = page_at(client, "/")
+    head = page.split("</head>")[0]
+    assert re.search(r'<script src="/static/js/how\.js(\?[^"]*)?"></script>', head)
+    script = client.get("/static/js/how.js").get_data(as_text=True)
+    assert 'classList.add("arrive")' in script
+    css = client.get("/static/css/app.css").get_data(as_text=True)
+    assert ".arrive .home-door { animation: door-fill" in css
+    # A Windows checkout writes CRLF, so match either line ending.
+    reduced = r"@media \(prefers-reduced-motion: reduce\) \{\r?\n  \.arrive \.home-door"
+    assert re.search(reduced, css)
