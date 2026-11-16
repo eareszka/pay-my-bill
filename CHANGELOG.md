@@ -22,6 +22,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The site is served at https://yearnly.app (#35). Links in emails and the return links sent to Stripe use it (`APP_URL`), and email goes out as `Yearnly <no-reply@yearnly.app>` with DKIM, SPF, and DMARC set on the domain, so Outlook stops dropping verification emails. The onrender.com address still works.
 
 ### Documentation
+- What makes Tinder and Instagram feel fast, and which of it fits Yearnly (#220), in `docs/research/snappy-ux.md`. It ends with six candidate stories for the owner to pick, led by a seamless cut between tickets. Nothing in it pressures people to give.
 - The product's final name is Yearnly, on yearnly.app (ADR 0017, #35). The rename in the app comes in its own story.
 
 ### Added
