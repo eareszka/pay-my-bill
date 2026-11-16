@@ -13,6 +13,7 @@ pre-commit install
 cp .env.example .env
 flask --app app db upgrade      # create or upgrade the local SQLite DB
 flask --app app seed            # optional: 10 fake users + 20 posts (password: password123)
+flask --app app demo seed       # live site only for phone testing: 16 labeled test wants (demo clear removes them)
 flask --app app run
 pytest
 ```
