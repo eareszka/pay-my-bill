@@ -112,6 +112,19 @@ def test_log_in_with_a_wrong_password(ui: Ui, live_server: LiveServer) -> None:
     assert_clean(ui)
 
 
+def test_reset_request_lands_on_log_in(ui: Ui, live_server: LiveServer) -> None:
+    user = live_server.make_user("forgot")
+    ui.goto("/reset")
+    ui.page.fill("#email", f"{user}@example.com")
+    ui.page.click("form:has(#email) button[type=submit]")
+    ui.settle()
+    # The "check your email" message is a flash on the log-in page (#211 moved it).
+    assert "/login" in ui.page.url, ui.page.url
+    expect(ui.page.locator(".flash").first).to_be_visible()
+    ui.check("flash")
+    assert_clean(ui)
+
+
 def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     user = live_server.make_user("poster")
     ui.login(user)
