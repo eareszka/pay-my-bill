@@ -186,7 +186,7 @@ def test_the_doors_arrive_from_a_blocking_head_script(client: FlaskClient) -> No
     script = client.get("/static/js/how.js").get_data(as_text=True)
     assert 'classList.add("arrive")' in script
     css = client.get("/static/css/app.css").get_data(as_text=True)
-    assert ".arrive .home-door { animation: door-fill" in css
+    assert ".arrive .home-door { animation: door-rise" in css
     # A Windows checkout writes CRLF, so match either line ending.
     reduced = r"@media \(prefers-reduced-motion: reduce\) \{\r?\n  \.arrive \.home-door"
     assert re.search(reduced, css)

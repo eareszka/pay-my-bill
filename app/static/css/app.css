@@ -821,10 +821,11 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   html:active-view-transition-type(back)::view-transition-old(how-step) { animation-name: how-leave-back; }
   html:active-view-transition-type(open)::view-transition-new(how-step) { animation-delay: 220ms; }
 }
-/* The doors arrive (#203): on a fresh open each door's color fills up from its foot like a tip jar,
-   help then ask, the words rise in as their field lands, and the way in comes last. */
+/* The doors arrive (#203): on a fresh open each door rises into place, help then ask, the words rise in
+   as their field lands, and the way in comes last. Transform and opacity only, so it stays smooth while
+   the page is still loading (owner, 2026-11-16; the clip-path fill stuttered on phones). */
 @media (prefers-reduced-motion: no-preference) {
-  .arrive .home-door { animation: door-fill 520ms var(--ease-out) both; }
+  .arrive .home-door { animation: door-rise 520ms var(--ease-out) both; }
   .arrive .home-door-ask { animation-delay: 110ms; }
   .arrive .home-door > span:not(.home-mosaic) { animation: door-words 420ms var(--ease-out) 300ms both; }
   .arrive .home-door-ask > span:not(.home-mosaic) { animation-delay: 410ms; }
@@ -833,7 +834,7 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 @media (prefers-reduced-motion: reduce) {
   .arrive .home-door, .arrive .home-way-in { animation: how-fade-in 200ms ease-out both; }
 }
-@keyframes door-fill { from { clip-path: inset(100% -24px -24px -24px); } to { clip-path: inset(-24px); } }
+@keyframes door-rise { from { opacity: 0; transform: translateY(24px); } }
 @keyframes door-words { from { opacity: 0; transform: translateY(12px); } }
 @keyframes how-cut { from { opacity: 0; transform: translateX(32px); } }
 @keyframes how-cut-back { from { opacity: 0; transform: translateX(-32px); } }
