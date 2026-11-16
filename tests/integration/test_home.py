@@ -97,7 +97,7 @@ def test_logged_out_top_bar_has_a_filled_sign_up(client: FlaskClient) -> None:
         assert '<a class="btn topbar-signup" href="/signup">Sign up</a>' in page_at(client, url)
 
 
-@pytest.mark.parametrize("url", ["/", "/how/help", "/how/ask/3", "/signup"])
+@pytest.mark.parametrize("url", ["/", "/how/help", "/how/ask/3", "/signup", "/login"])
 def test_front_door_shows_only_the_way_in(client: FlaskClient, url: str) -> None:
     page = page_at(client, url)
     assert '<body class="page stage-page' in page and "front-door" in page
@@ -106,11 +106,10 @@ def test_front_door_shows_only_the_way_in(client: FlaskClient, url: str) -> None
     assert "site-footer" not in page
 
 
-def test_log_in_is_a_focused_form(client: FlaskClient) -> None:
+def test_log_in_is_the_sign_up_bubble(client: FlaskClient) -> None:
     page = page_at(client, "/login")
-    assert '<header class="topbar">' in page and "auth-door" in page
-    assert 'aria-label="Main"' not in page and "topbar-signup" not in page
-    assert "site-footer" in page
+    assert '<div class="join-step join-step-help">' in page
+    assert 'New here? <a href="/signup">Create an account</a>' in page
 
 
 @pytest.mark.parametrize("url", ["/feed", "/leaders", "/rules"])

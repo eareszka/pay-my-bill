@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 {% from "_field.html" import field %}
 {% block title %}Log in · Yearnly{% endblock %}
+{% block body_class %}page stage-page join-page{% endblock %}
+{% block main_class %} container-wide{% endblock %}
 {% block content %}
-  <h1>Log in</h1>
-  <form method="post" class="form page-form" novalidate>
-    {{ form.hidden_tag() }}
-    {{ field(form.identifier, autocomplete="username") }}
-    {{ field(form.password, autocomplete="current-password") }}
-    <button type="submit" class="btn">Log in</button>
-  </form>
-  <p><a href="{{ url_for('auth.reset_request') }}">Forgot your password?</a></p>
-  <p>New here? <a href="{{ url_for('auth.signup', next=request.args.get('next')) }}">Create an account</a></p>
+<div class="join">
+  {# The same speech bubble as sign-up (#211). #}
+  <div class="join-step join-step-help">
+    <h1 class="join-line">Log in</h1>
+    <div class="join-card">
+      <form method="post" class="form" novalidate>
+        {{ form.hidden_tag() }}
+        {{ field(form.identifier, autocomplete="username") }}
+        {{ field(form.password, autocomplete="current-password") }}
+        <button type="submit" class="btn">Log in</button>
+      </form>
+    </div>
+    <p class="join-login"><a href="{{ url_for('auth.reset_request') }}">Forgot your password?</a></p>
+    <p class="join-login">New here? <a href="{{ url_for('auth.signup', next=request.args.get('next')) }}">Create an account</a></p>
+  </div>
+</div>
 {% endblock %}
