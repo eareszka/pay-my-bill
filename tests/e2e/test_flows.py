@@ -51,6 +51,9 @@ def test_how_it_works_stories(ui: Ui) -> None:
         for step in (1, 2, 3):
             suffix = f"/how/{path}" + (f"/{step}" if step > 1 else "")
             expect(ui.page).to_have_url(re.compile(re.escape(suffix) + "/?$"))
+            # Sign up and Log in stay on screen on every step (2026-11-16).
+            expect(ui.page.locator(".how-way-in .home-signup")).to_be_in_viewport()
+            expect(ui.page.locator(".how-way-in .home-login a")).to_be_in_viewport()
             ui.check(f"{path}-step{step}")
             if step < 3:
                 ui.goto(f"/how/{path}/{step + 1}")
@@ -74,7 +77,7 @@ def test_sign_up(ui: Ui, size: str) -> None:
 
 
 def test_sign_up_from_each_story(ui: Ui) -> None:
-    # Arriving from a How story, sign-up wears that story's color (#208).
+    # Arriving from a How story, sign-up keeps that story's tail and the way back (#208).
     for story in ("help", "ask"):
         ui.goto(f"/signup?from={story}")
         expect(ui.page.locator("form button[type=submit]")).to_be_visible()
