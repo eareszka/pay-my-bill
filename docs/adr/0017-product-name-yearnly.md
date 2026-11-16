@@ -23,3 +23,11 @@ The product is **Yearnly**: from "yearn", the wanting behind every ask, big or s
 - The rename (wordmark, page titles, emails, Terms and Privacy, manifest, icon, PRODUCT.md, DESIGN.md) is its own Sprint 6 story, done through Impeccable. Until then, the UI still says Pay My Bill.
 - `APP_URL`, `MAIL_FROM`, and `CONTACT_EMAIL` move to the new domain once DNS, Brevo, and Render's custom domain are set up.
 - Search checks found no app, company, or mark named Yearnly; the nearest are "Yarnly" (a knitting app) and several "Yearly" calendar apps, which are different words in different fields. The owner confirms in USPTO Trademark Search and the app stores before buying.
+
+## Amendment (2026-11-14): an existing YEARNLY mark
+The owner's USPTO check found a live registration: **YEARNLY**, serial 99157922, Reg. No. 8051661, registered 2025-12-02 in **Class 28** (toys, games, sporting goods). Its owner likely also holds `yearnly.com`. The owner chose to keep the name, knowing:
+- Yearnly here is software and a giving service, an unrelated field, so the two can likely coexist. But that is not a legal opinion.
+- An application for our own YEARNLY mark could be refused over it, and the holder could file a complaint with Apple or Google.
+- Search results and the `.com` belong to them.
+
+Mitigation: get a flat-fee trademark clearance opinion before the public App Store launch (PB-12 to PB-19), and don't market toys, games, or merchandise under the name. If the opinion says no, rename before launch, while it's still cheap.
