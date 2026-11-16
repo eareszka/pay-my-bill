@@ -132,7 +132,6 @@ h3.section-title { font-size: 1rem; }
 .topbar .topbar-signup:hover { background: #e2eee6; }
 /* The front door (home and the How stories, logged out) has no bar and no nav (#196, #205). */
 .front-door { --nav-h: 0px; }
-.auth-door { --nav-h: 0px; }
 .topbar > nav {
   position: fixed;
   inset: auto 0 0;
@@ -414,6 +413,10 @@ h3.section-title { font-size: 1rem; }
 .flash-success { background: var(--good-tint); }
 .flash-error, .notice-error { background: var(--bad-tint); }
 .stage-page .container-wide > .flash { margin: 0; border-radius: 0; }
+/* With no bar, a message on the front door clears the status bar and sits above the bubble (#211). */
+.front-door .container-wide > .flash { max-width: 480px; margin: calc(env(safe-area-inset-top) + 12px) auto 0; border-radius: var(--radius); }
+.front-door .container-wide > .flash ~ .join { padding-top: 12px; }
+@media (max-width: 503px) { .front-door .container-wide > .flash { margin-inline: 12px; } }
 .group .notice { margin: 0; background: var(--bg); }
 
 /* Buttons: one filled action, everything else outlined. */
@@ -781,6 +784,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .join-step::before { content: ""; position: absolute; bottom: -12px; left: 0; width: 22px; height: 20px; background: var(--field); clip-path: polygon(0 0, 100% 0, 100% 6px, 0 100%); }
 .join-step-ask::before { right: 0; left: auto; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 6px); }
 .join-line { margin: 0 0 8px; font: 400 clamp(3.25rem, 15vw, 4.75rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
+.join-line + .join-card { margin-top: 14px; }
+.join-login + .join-login { margin-top: 4px; }
 .join-lede { margin: 0 0 14px; max-width: 40ch; color: var(--on-field-muted); }
 .join-card { padding: 16px 18px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
 .join-card .form { color: var(--ink); }

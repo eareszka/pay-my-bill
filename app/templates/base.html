@@ -20,18 +20,15 @@
 {% macro nav_link(endpoint, icon, label, extra="") %}
   <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
-{# Sign-up is the story's last step, so it joins the front door: no bar, no nav, no footer (#208). #}
-{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how", "auth.signup") %}
-{# Log in is a focused form: the bar keeps only the brand, and the line under the form is the way across (#208). #}
-{% set auth_door = not current_user.is_authenticated and request.endpoint == "auth.login" %}
-<body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}{% if auth_door %} auth-door{% endif %}">
+{# Sign-up (the story's last step, #208) and Log in (#211) join the front door: no bar, no nav, no footer. #}
+{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how", "auth.signup", "auth.login") %}
+<body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
   {# The front door (home and the How stories, logged out) has no bar at all (#205): the way in lives on the page. #}
   {% if not front_door %}
   <header class="topbar">
     <a class="brand" href="{{ url_for('main.home') }}">Yearnly</a>
-    {% if not auth_door %}
     <nav aria-label="Main">
       {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
@@ -47,7 +44,6 @@
       {% endif %}
     </nav>
     {% if not current_user.is_authenticated %}<a class="btn topbar-signup" href="{{ url_for('auth.signup') }}">Sign up</a>{% endif %}
-    {% endif %}
   </header>
   {% endif %}
   <main class="container{% block main_class %}{% endblock %}" id="main" tabindex="-1">
