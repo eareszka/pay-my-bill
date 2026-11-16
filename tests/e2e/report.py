@@ -21,6 +21,8 @@ TITLES = {
 
 
 def build(findings: Path = ARTIFACTS / "findings.jsonl") -> str:
+    if not findings.exists():
+        raise SystemExit(f"No {findings.name} yet. Run `pytest -m e2e --no-cov` first.")
     rows = [json.loads(line) for line in findings.read_text(encoding="utf-8").splitlines()]
     grouped: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
     shots: dict[str, set[str]] = defaultdict(set)

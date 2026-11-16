@@ -4,6 +4,8 @@ Every page along the way gets a full-page screenshot and the design checks; a te
 the flow breaks or if any check finds something.
 """
 
+import re
+
 import pytest
 from playwright.sync_api import expect
 from sqlalchemy import select
@@ -48,26 +50,25 @@ def test_how_it_works_stories(ui: Ui) -> None:
         ui.settle()
         for step in (1, 2, 3):
             suffix = f"/how/{path}" + (f"/{step}" if step > 1 else "")
-            assert ui.page.url.rstrip("/").endswith(suffix), ui.page.url
+            expect(ui.page).to_have_url(re.compile(re.escape(suffix) + "/?$"))
             ui.check(f"{path}-step{step}")
             if step < 3:
                 ui.goto(f"/how/{path}/{step + 1}")
     assert_clean(ui)
 
 
-def test_sign_up(ui: Ui, device: str) -> None:
+def test_sign_up(ui: Ui, size: str) -> None:
     ui.goto("/signup")
     ui.check("form")
     page = ui.page
-    name = f"newbie_{device}"
+    name = f"newbie_{size}"
     page.fill("#username", name)
     page.fill("#email", f"{name}@example.com")
     page.fill("#password", "a-long-enough-password")
     page.fill("#confirm", "a-long-enough-password")
     page.check("#adult")
-    page.click("form button[type=submit]")
-    ui.settle()
-    assert "/verify/pending" in page.url, page.url
+    ui.submit("form:has(#username) button[type=submit]")
+    expect(page).to_have_url(re.compile("/verify/pending"))
     ui.check("verify-pending")
     assert_clean(ui)
 
@@ -83,8 +84,7 @@ def test_sign_up_from_each_story(ui: Ui) -> None:
 
 def test_sign_up_errors(ui: Ui) -> None:
     ui.goto("/signup")
-    ui.page.click("form button[type=submit]")
-    ui.settle()
+    ui.submit("form:has(#username) button[type=submit]")
     expect(ui.page.locator(".error").first).to_be_visible()
     ui.check("errors")
     assert_clean(ui)
@@ -95,18 +95,18 @@ def test_log_in_to_the_feed(ui: Ui, live_server: LiveServer) -> None:
     ui.goto("/login")
     ui.check("form")
     ui.login(user)
-    assert "/feed" in ui.page.url, ui.page.url
+    expect(ui.page).to_have_url(re.compile("/feed"))
     ui.check("feed")
     # Logged in, the front door sends you on to the feed.
     ui.goto("/")
-    assert "/feed" in ui.page.url
+    expect(ui.page).to_have_url(re.compile("/feed"))
     assert_clean(ui)
 
 
 def test_log_in_with_a_wrong_password(ui: Ui, live_server: LiveServer) -> None:
     user = live_server.make_user("typo")
     ui.login(user, password="not-the-password")  # noqa: S106 - a deliberately wrong one
-    assert "/login" in ui.page.url, ui.page.url
+    expect(ui.page).to_have_url(re.compile("/login"))
     expect(ui.page.locator(".flash, .error").first).to_be_visible()
     ui.check("error")
     assert_clean(ui)
@@ -116,10 +116,9 @@ def test_reset_request_lands_on_log_in(ui: Ui, live_server: LiveServer) -> None:
     user = live_server.make_user("forgot")
     ui.goto("/reset")
     ui.page.fill("#email", f"{user}@example.com")
-    ui.page.click("form:has(#email) button[type=submit]")
-    ui.settle()
+    ui.submit("form:has(#email) button[type=submit]")
     # The "check your email" message is a flash on the log-in page (#211 moved it).
-    assert "/login" in ui.page.url, ui.page.url
+    expect(ui.page).to_have_url(re.compile("/login"))
     expect(ui.page.locator(".flash").first).to_be_visible()
     ui.check("flash")
     assert_clean(ui)
@@ -135,8 +134,7 @@ def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     page.fill("#title", "Help with the power bill")
     page.fill("#body", "The power bill came in higher than usual this month.")
     page.fill("#goal", "80")
-    page.click("form:has(#title) button[type=submit]")
-    ui.settle()
+    ui.submit("form:has(#title) button[type=submit]")
     expect(page.locator("h1")).to_contain_text("Help with the power bill")
     ui.check("detail")
     assert_clean(ui)
@@ -155,8 +153,7 @@ def test_chip_in_with_an_app(ui: Ui, live_server: LiveServer) -> None:
     # The first option is the "Choose app" placeholder; pick the first real app.
     first_app = page.locator("#method option:not([value=''])").first.get_attribute("value")
     page.select_option("#method", first_app)
-    page.click("form.chip-in .sent-row button[type=submit]")
-    ui.settle()
+    ui.submit("form.chip-in .sent-row button[type=submit]")
     expect(page.locator("[data-gift-recorded]")).to_be_visible()
     ui.check("gift-recorded")
     assert_clean(ui)
@@ -203,5 +200,6 @@ def test_arrival_respects_reduced_motion(make_ui: UiFactory) -> None:
     ui.page.wait_for_timeout(100)
     early = long_motion(ui.page)
     ui.settle()
-    ui.check("arrival-reduced", focus=False, extra=early)
+    late = long_motion(ui.page)
+    ui.check("arrival-reduced", focus=False, extra=early + late)
     assert_clean(ui)

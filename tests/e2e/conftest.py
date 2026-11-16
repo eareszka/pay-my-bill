@@ -81,6 +81,10 @@ def live_server(tmp_path_factory: pytest.TempPathFactory) -> Iterator[LiveServer
             "PHOTO_DIR": str(root / "photos"),
             "R2_BUCKET": "",
             "MAIL_ASYNC": False,
+            # Plain http from the start: cookie and HSTS settings are read when the app is
+            # built, and a developer's .env may carry the https production address.
+            "APP_URL": "http://127.0.0.1",
+            "SESSION_COOKIE_SECURE": False,
         }
     )
     server = make_server("127.0.0.1", 0, app, threaded=True)
@@ -116,12 +120,20 @@ class Ui:
         # Let the arrival and view-transition animations finish before measuring.
         self.page.wait_for_timeout(1200)
 
+    def submit(self, selector: str) -> None:
+        """Click a submit button and wait for the page it leads to, however slow."""
+        with self.page.expect_navigation():
+            self.page.click(selector)
+        self.settle()
+
     def login(self, username: str, password: str = SEED_PASSWORD) -> None:
         self.goto("/login")
         self.page.fill("#identifier", username)
         self.page.fill("#password", password)
-        self.page.click("form:has(#identifier) button[type=submit]")
-        self.settle()
+        self.submit("form:has(#identifier) button[type=submit]")
+
+    def path(self) -> str:
+        return self.page.url.removeprefix(self.base) or "/"
 
     def check(
         self, step: str, *, focus: bool = True, extra: list[dict[str, Any]] | None = None
@@ -136,22 +148,35 @@ class Ui:
         ]
         # A page that is itself a 404 logs its own status; that one is expected.
         expected_404 = step == "not-found"
-        problems += [
-            {"check": "console-error", "detail": e}
-            for e in self.console_errors
-            if not (expected_404 and "404" in e)
+        return self.record(step, problems, shot, skip=lambda e: expected_404 and "404" in e)
+
+    def flush(self, step: str = "after the last check") -> list[dict[str, Any]]:
+        """Record errors that came after the last check, so a test can't end on one unseen."""
+        return self.record(step, [], None)
+
+    def record(
+        self,
+        step: str,
+        problems: list[dict[str, Any]],
+        shot: Path | None,
+        skip: Callable[[str], bool] = lambda _: False,
+    ) -> list[dict[str, Any]]:
+        problems = [
+            *problems,
+            *({"check": "console-error", "detail": e} for e in self.console_errors if not skip(e)),
+            *({"check": "failed-request", "detail": r} for r in self.failed_requests),
         ]
-        problems += [{"check": "failed-request", "detail": r} for r in self.failed_requests]
         self.console_errors.clear()
         self.failed_requests.clear()
+        screenshot = str(shot.relative_to(ARTIFACTS.parent.parent.parent)) if shot else ""
         found = [
             {
                 **p,
-                "page": self.page.url.removeprefix(self.base) or "/",
+                "page": self.path(),
                 "step": step,
                 "device": self.device,
                 "test": self.test_name,
-                "screenshot": str(shot.relative_to(ARTIFACTS.parent.parent.parent)),
+                "screenshot": screenshot,
             }
             for p in problems
         ]
@@ -162,8 +187,9 @@ class Ui:
         return found
 
 
+# Not named `device`: pytest-playwright has a session-scoped fixture by that name.
 @pytest.fixture(params=list(DEVICES))
-def device(request: pytest.FixtureRequest) -> str:
+def size(request: pytest.FixtureRequest) -> str:
     return str(request.param)
 
 
@@ -172,22 +198,23 @@ UiFactory = Callable[..., Ui]
 
 @pytest.fixture
 def make_ui(
-    browser: Browser, live_server: LiveServer, device: str, request: pytest.FixtureRequest
+    browser: Browser, live_server: LiveServer, size: str, request: pytest.FixtureRequest
 ) -> Iterator[UiFactory]:
     contexts = []
 
     def make(**context_args: Any) -> Ui:
-        context = browser.new_context(**DEVICES[device], **context_args)
+        context = browser.new_context(**DEVICES[size], **context_args)
         contexts.append(context)
         page = context.new_page()
         name = request.node.originalname.removeprefix("test_")
-        ui = Ui(page, device, live_server.url, name)
+        ui = Ui(page, size, live_server.url, name)
 
         def log_error(text: str) -> None:
             # Chromium raises this when the harness navigates mid view-transition; slow clicks
             # through the same pages never do, so it's the test, not the app.
             if "Transition was aborted" not in text:
-                ui.console_errors.append(text)
+                # Name the page it happened on, which may not be the next one checked.
+                ui.console_errors.append(f"{text} (on {ui.path()})")
 
         def on_console(msg: ConsoleMessage) -> None:
             if msg.type == "error":

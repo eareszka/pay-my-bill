@@ -83,15 +83,27 @@ CONTRAST_JS = """
     const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   };
-  // The first solid background behind an element; null if a photo or gradient is in the way.
+  // Paint color `top` (with its alpha) over the solid color `under`.
+  const over = (top, under) => ({
+    r: top.r * top.a + under.r * (1 - top.a),
+    g: top.g * top.a + under.g * (1 - top.a),
+    b: top.b * top.a + under.b * (1 - top.a),
+    a: 1,
+  });
+  // The solid color behind an element, blending see-through layers down to the first solid
+  // one (or the white canvas); null if a photo or gradient is in the way.
   const backdrop = el => {
+    const layers = [];
+    let base = {r: 255, g: 255, b: 255, a: 1};
     for (let n = el; n; n = n.parentElement) {
       const s = getComputedStyle(n);
       if (s.backgroundImage !== 'none') return null;
       const c = parse(s.backgroundColor);
-      if (c && c.a >= 0.95) return c;
+      if (!c || c.a === 0) continue;
+      if (c.a >= 1) { base = c; break; }
+      layers.push(c);
     }
-    return {r: 255, g: 255, b: 255, a: 1};
+    return layers.reduceRight((under, top) => over(top, under), base);
   };
   const out = new Set();
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -103,13 +115,15 @@ CONTRAST_JS = """
     if (!r.width || !r.height) continue;
     const s = getComputedStyle(el);
     if (s.visibility === 'hidden' || parseFloat(s.opacity) === 0) continue;
-    const fg = parse(s.color), bg = backdrop(el);
-    if (!fg || !bg) continue;
+    const ink = parse(s.color), bg = backdrop(el);
+    if (!ink || !bg) continue;
+    // See-through text shows the background through it.
+    const fg = over(ink, bg);
     const [hi, lo] = [lum(fg), lum(bg)].sort((a, b) => b - a);
     const ratio = (hi + 0.05) / (lo + 0.05);
     const size = parseFloat(s.fontSize), bold = parseInt(s.fontWeight) >= 700;
     const need = size >= 24 || (bold && size >= 18.66) ? 3 : 4.5;
-    if (ratio < need) out.add(`"${text.slice(0, 40)}" is ${ratio.toFixed(2)}:1 (needs ${need}:1), ${s.color} on rgb(${bg.r}, ${bg.g}, ${bg.b})`);
+    if (ratio < need) out.add(`"${text.slice(0, 40)}" is ${ratio.toFixed(2)}:1 (needs ${need}:1), ${s.color} on rgb(${Math.round(bg.r)}, ${Math.round(bg.g)}, ${Math.round(bg.b)})`);
   }
   return [...out].slice(0, 10);
 }
@@ -117,11 +131,12 @@ CONTRAST_JS = """
 
 MOTION_JS = """
 () => document.getAnimations()
+  // activeDuration covers every loop, so a short animation that repeats forever is Infinity.
   .map(a => ({name: a.animationName || a.transitionProperty || 'animation',
-              ms: Number(a.effect?.getComputedTiming().duration) || 0,
+              ms: Number(a.effect?.getComputedTiming().activeDuration) || 0,
               target: a.effect?.target?.className || ''}))
   .filter(a => a.ms > 250)
-  .map(a => `${a.name} on .${String(a.target).split(' ').join('.')} runs ${Math.round(a.ms)}ms`)
+  .map(a => `${a.name} on .${String(a.target).split(' ').join('.')} runs ${Number.isFinite(a.ms) ? Math.round(a.ms) + 'ms' : 'forever'}`)
 """
 
 
@@ -149,19 +164,24 @@ def focus_visible(page: Page) -> list[Finding]:
     the whole viewport's pixels, not styles.
     """
     missing: list[str] = []
+    seen: list[str] = []
     page.evaluate("() => document.activeElement && document.activeElement.blur()")
     for _ in range(FOCUS_STOPS):
         page.keyboard.press("Tab")
         page.wait_for_timeout(FOCUS_SETTLE_MS)
         name = page.evaluate(FOCUS_JS)
-        if not name or name in missing:
+        if seen and name == seen[0]:
+            break  # Focus has wrapped around to the first control.
+        if not name or name in seen:
             continue
-        focused = page.screenshot()
+        seen.append(name)
+        # Frozen animations, so only the focus change itself can differ between the shots.
+        focused = page.screenshot(animations="disabled")
         page.evaluate(
             "() => { window.__e2eFocus = document.activeElement; window.__e2eFocus.blur(); }"
         )
         page.wait_for_timeout(FOCUS_SETTLE_MS)
-        blurred = page.screenshot()
+        blurred = page.screenshot(animations="disabled")
         # Put focus back so the next Tab carries on from here.
         page.evaluate("() => window.__e2eFocus.focus()")
         if focused == blurred:
@@ -188,8 +208,11 @@ class HasFindings(Protocol):
     device: str
     findings: list[Finding]
 
+    def flush(self, step: str = ...) -> list[Finding]: ...
+
 
 def assert_clean(ui: HasFindings) -> None:
     """Fail with a readable list of everything the design checks found."""
+    ui.flush()
     lines = [f"[{f['check']}] {f['page']} ({f['step']}): {f['detail']}" for f in ui.findings]
     assert not lines, f"{len(lines)} design findings on {ui.device}:\n" + "\n".join(lines)
