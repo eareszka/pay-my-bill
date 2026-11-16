@@ -20,4 +20,5 @@ THESIS: Signing up is the last move of the story, not a new page: the button you
 OWN-WORLD: Void stage, white ink, League Gothic "Join in", Public Sans for the rest; the form in a dark surface card with a 1.5px white edge and 16px corners; the story's field color only as the strip at the foot.
 FIRST VIEWPORT: Bar, "Join in", one sentence, the form card with the white Sign up, "Already have an account? Log in", and (from a story) the color strip "Back to how helping/asking works".
 FORM: Button Becomes the Form (owner pick, code-led; a local-extension round whose three options were authored, not dealt, so it has no roll of its own; the parent surface roll is seed:b7e4647302ecad91). View Transitions: join-card (story Sign up button to the form card), how-step (story words out, page content in), field-help/field-ask (story field sinks into the strip).
+AMENDMENT (owner, 2026-11-16): the button-into-card morph is replaced by a rise-in (24px, 380ms ease-out), because its pill clip snapped to the card's corners at the end. The bubble is Sage from either story; only the tail follows the story.
 FINISH: finish review and DESIGN.md updated.

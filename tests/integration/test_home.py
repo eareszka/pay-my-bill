@@ -48,11 +48,27 @@ def test_each_story_goes_one_step_at_a_time(
 
 
 @pytest.mark.parametrize(("path", "total", "other"), STORIES)
+def test_every_step_keeps_sign_up_and_log_in_at_the_foot(
+    client: FlaskClient, path: str, total: int, other: str
+) -> None:
+    for step in range(1, total + 1):
+        page = page_at(client, step_url(path, step))
+        way_in = page.split('<div class="home-way-in how-way-in">')[1]
+        assert f'<a class="btn home-signup" href="/signup?from={path}">Sign up</a>' in way_in
+        assert 'Already have an account? <a href="/login">Log in</a>' in way_in
+
+
+def test_logged_in_stories_have_no_way_in(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("maria_g"))
+    assert "how-way-in" not in page_at(client, "/how/help/2")
+
+
+@pytest.mark.parametrize(("path", "total", "other"), STORIES)
 def test_each_story_ends_on_sign_up_or_the_other_story(
     client: FlaskClient, path: str, total: int, other: str
 ) -> None:
     page = page_at(client, f"/how/{path}/{total}")
-    assert f'<a class="btn how-end" href="/signup?from={path}">Sign up</a>' in page
+    assert "how-end" not in page
     assert f'href="{other}">' in page
     assert "Or see how" in page
     assert "Next<svg" not in page
