@@ -6,7 +6,7 @@
 {% block head %}<script src="{{ url_for('static', filename='js/how.js') }}"></script>{% endblock %}
 {% block content %}
 <div class="join">
-  <div class="join-step">
+  <div class="join-step join-step-{{ story or 'help' }}">
     <h1 class="join-line">Join in</h1>
     <p class="join-lede">Create your account: one account to chip in and to ask. You must be 18 or older.</p>
     <div class="join-card">

@@ -35,8 +35,9 @@ def test_signup_page_renders(client: FlaskClient) -> None:
     assert b"Create your account" in resp.data
     assert b"Join in" in resp.data
     assert b"join-back" not in resp.data
-    # The top bar offers the other way in, not a second Sign up.
-    assert b'<a class="btn topbar-signup" href="/login">Log in</a>' in resp.data
+    # A focused form: the line under it is the one way across (#208).
+    assert b"topbar-signup" not in resp.data
+    assert b'aria-label="Main"' not in resp.data
 
 
 def test_signup_creates_hashed_user_and_sends_verification(
