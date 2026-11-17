@@ -235,6 +235,8 @@ h3.section-title { font-size: 1rem; }
 /* While a card is moving, the real neighbor waits underneath it. */
 .is-moving > .deck-ticket { z-index: 2; user-select: none; }
 .deck .deck-under { z-index: 1; pointer-events: none; }
+/* On a phone the card fills the screen, so swipe.js takes vertical moves too: up opens Chip in (#226). */
+@media (max-width: 959px) { .deck-ticket.swipe-up { touch-action: none; } }
 .card-body { position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; justify-content: flex-end; min-height: 0; padding: 64px 84px 18px 18px; }
 /* A poster's photo fills the card; it fades into the field under the words, so dark ink stays readable on any photo. */
 .has-photo { background: var(--field); }

@@ -1,4 +1,4 @@
-// Deal through the pile: swipe left for the next ticket, right to go back.
+// Deal through the pile: swipe left for the next ticket, right to go back, and up to Chip in (#226).
 // Back and Next ticket are ordinary links, so the feed works the same without this.
 const ticket = document.querySelector(".deck-ticket");
 const deck = document.querySelector(".deck");
@@ -9,12 +9,16 @@ const layout = document.querySelector(".deck-layout");
 const nextUnder = document.getElementById("deck-under-next");
 const backUnder = document.getElementById("deck-under-back");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+// Up opens Chip in on this ask, or the post itself when there's nothing to chip in on.
+const upLink = ticket?.querySelector(".tear-tab") || ticket?.querySelector(".card-title a");
 
 const START_DRAG_PX = 8;
 const COMMIT_SHARE = 0.3; // of the ticket's width
 const FLICK_PX_PER_MS = 0.5;
 const FLICK_MIN_PX = 30;
 const FLICK_WINDOW_MS = 100;
+const UP_COMMIT_PX = 80;
+const UP_GIVE = 0.6; // the card follows the finger a little less than sideways
 const MAX_TILT_DEG = 4;
 const RESIST = 0.25; // how far the ticket gives when there's nowhere to go
 const SETTLE = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -34,6 +38,10 @@ const tilt = (dx) => {
 const pose = (dx) => (calm.matches
   ? { opacity: 1 - Math.min(Math.abs(dx) / ticket.offsetWidth, 1) / 2 }
   : { transform: `translateX(${dx}px) rotate(${tilt(dx)}deg)` });
+
+const lift = (dy) => (calm.matches
+  ? { opacity: 1 - Math.min(-dy / ticket.offsetHeight, 1) / 2 }
+  : { transform: `translateY(${dy * UP_GIVE}px)` });
 
 // Load and decode the neighbors' photos now. A <template> never loads its images,
 // so without this a revealed card shows its bare color until the photo arrives.
@@ -111,11 +119,31 @@ const leave = (link, dx = 0) => {
   flight.finished.then(goTo, goTo);
 };
 
-const settle = (dx) => {
+// Lift the ticket off the top, then open Chip in.
+const rise = (dy) => {
+  if (leaving) return;
+  leaving = true;
+  const goTo = () => window.location.assign(upLink.href);
+  if (!ticket.animate) {
+    goTo();
+    return;
+  }
+  const keyframes = calm.matches
+    ? [lift(dy), { opacity: 0 }]
+    : [lift(dy), { transform: `translateY(${-ticket.offsetHeight / 3}px)`, opacity: 0 }];
+  const flight = ticket.animate(keyframes, {
+    duration: calm.matches ? 120 : 180,
+    easing: THROW,
+    fill: "forwards",
+  });
+  flight.finished.then(goTo, goTo);
+};
+
+const settle = (from) => {
   ticket.style.transform = "";
   ticket.style.opacity = "";
   const back = ticket.animate
-    ? ticket.animate([pose(dx), calm.matches ? { opacity: 1 } : { transform: "none" }], {
+    ? ticket.animate([from, calm.matches ? { opacity: 1 } : { transform: "none" }], {
       duration: calm.matches ? 120 : 200,
       easing: SETTLE,
     })
@@ -135,12 +163,12 @@ const prefetch = (link) => {
 };
 
 // How fast the pointer was going just before it let go, so a pause counts as no flick.
-const recentSpeed = (trail, now) => {
+const recentSpeed = (trail, now, axis = "x") => {
   const recent = trail.filter((point) => now - point.at <= FLICK_WINDOW_MS);
   if (recent.length < 2) return 0;
   const first = recent[0];
   const last = recent[recent.length - 1];
-  return last.at > first.at ? (last.x - first.x) / (last.at - first.at) : 0;
+  return last.at > first.at ? (last[axis] - first[axis]) / (last.at - first.at) : 0;
 };
 
 const onDown = (event) => {
@@ -151,7 +179,9 @@ const onDown = (event) => {
     x: event.clientX,
     y: event.clientY,
     active: false,
+    up: false,
     dx: 0,
+    dy: 0,
     trail: [],
   };
 };
@@ -162,17 +192,27 @@ const onMove = (event) => {
   if (!press.active) {
     const up = event.clientY - press.y;
     if (Math.abs(raw) < START_DRAG_PX && Math.abs(up) < START_DRAG_PX) return;
-    // Mostly vertical: this is a scroll, so leave it alone.
+    // Mostly vertical: up lifts the card toward Chip in; down does nothing. On phones the card
+    // fills the screen (touch-action: none, since Safari has no pan-down), so no scroll is lost.
     if (Math.abs(up) > Math.abs(raw)) {
-      press = null;
-      return;
+      if (up > 0 || !upLink) {
+        press = null;
+        return;
+      }
+      press.up = true;
     }
     press.active = true;
     dragged = true;
     ticket.setPointerCapture(event.pointerId);
     ticket.getAnimations().forEach((animation) => animation.cancel());
     window.getSelection()?.removeAllRanges();
-    moving(true);
+    if (!press.up) moving(true);
+  }
+  if (press.up) {
+    press.dy = Math.min(0, event.clientY - press.y);
+    press.trail.push({ x: event.clientX, y: event.clientY, at: event.timeStamp });
+    Object.assign(ticket.style, lift(press.dy));
+    return;
   }
   const target = raw < 0 ? nextLink : backLink;
   prefetch(target);
@@ -185,9 +225,15 @@ const onMove = (event) => {
 
 const onUp = (event) => {
   if (!press || event.pointerId !== press.id) return;
-  const { active, dx, trail } = press;
+  const { active, up, dx, dy, trail } = press;
   press = null;
   if (!active) return;
+  if (up) {
+    const rising = recentSpeed(trail, event.timeStamp, "y") < -FLICK_PX_PER_MS && -dy > FLICK_MIN_PX;
+    if (event.type === "pointerup" && (-dy > UP_COMMIT_PX || rising)) rise(dy);
+    else settle(lift(dy));
+    return;
+  }
   const target = dx < 0 ? nextLink : backLink;
   const speed = recentSpeed(trail, event.timeStamp);
   const flicked = Math.abs(speed) > FLICK_PX_PER_MS
@@ -198,7 +244,7 @@ const onUp = (event) => {
     ticket.style.opacity = "";
     leave(target, dx);
   } else {
-    settle(dx);
+    settle(pose(dx));
   }
 };
 
@@ -210,6 +256,8 @@ const typing = (element) => element instanceof HTMLElement
   && (element.isContentEditable || element.matches("input, select, textarea"));
 
 if (ticket && deck && (nextLink || backLink)) {
+  // Phones hand vertical moves on the card to this script, so up can open Chip in (#226).
+  if (upLink) ticket.classList.add("swipe-up");
   ticket.addEventListener("pointerdown", onDown);
   ticket.addEventListener("pointermove", onMove);
   ticket.addEventListener("pointerup", onUp);
