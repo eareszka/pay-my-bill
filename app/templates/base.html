@@ -1,10 +1,13 @@
 <!doctype html>
+{# Sign-up (the story's last step, #208) and Log in (#211) join the front door: no bar, no nav, no footer. #}
+{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how", "auth.signup", "auth.login") %}
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}Yearnly{% endblock %}</title>
-  <meta name="theme-color" content="#3a7558">
+  {# The browser chrome takes the page's top color: the pale ground on the front door, the green bar everywhere else (#218). #}
+  <meta name="theme-color" content="{{ '#f4f6f0' if front_door else '#3a7558' }}">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32.png') }}">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
@@ -20,8 +23,6 @@
 {% macro nav_link(endpoint, icon, label, extra="") %}
   <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
-{# Sign-up (the story's last step, #208) and Log in (#211) join the front door: no bar, no nav, no footer. #}
-{% set front_door = not current_user.is_authenticated and request.endpoint in ("main.home", "main.how", "auth.signup", "auth.login") %}
 <body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}
   <a class="skip-link" href="#main">Skip to content</a>
