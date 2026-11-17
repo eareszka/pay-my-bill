@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block body_class %}page stage-page{% endblock %}
+{% block body_class %}page stage-page feed-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block head %}{% if post and post.photo_key %}<link rel="preload" as="image" href="{{ photo_url(post.photo_key) }}" fetchpriority="high">{% endif %}{% endblock %}
 {% block content %}

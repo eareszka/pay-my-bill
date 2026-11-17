@@ -18,3 +18,4 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 
 ## Daily log
 - 2026-11-17: Drafted from Sprint 5's carry-over and the ui fixes in flight. Lanes and the todo session are set up (#232). Next: plan with the owner. Blocked: none.
+- 2026-11-17 (ui): #234: on phones the bars stay put and only long pages scroll between them; feed, door, and stories fit down to the SE. Next: #225, #227. Blocked: none.

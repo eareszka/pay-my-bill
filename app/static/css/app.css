@@ -81,6 +81,13 @@ input, textarea { caret-color: var(--ink); }
 ::placeholder { color: var(--muted); opacity: 1; }
 /* The ground runs under the safe areas and any overscroll, so no white ever shows at the edges (#218). */
 html { background: var(--bg); scrollbar-color: var(--edge) var(--bg); }
+/* On phones the bars never move (#234): the page scrolls only between them, inside body, and nothing rubber-bands.
+   The feed, front door and stories are built to fit, so they stay still. */
+@media (max-width: 959px) {
+  html { height: 100%; overflow: hidden; overscroll-behavior: none; }
+  body { height: 100dvh; overflow-y: auto; overscroll-behavior: none; }
+  .feed-page .site-footer { display: none; }
+}
 
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 h1 { margin: 12px 0 20px; font: 400 clamp(2.5rem, 11vw, 3.25rem) / 0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
@@ -750,6 +757,12 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   background: var(--field);
   border-radius: var(--r-bubble);
   touch-action: pan-y;
+}
+/* Short phones (iPhone SE) still fit the front door and the stories on one screen (#234). */
+@media (max-width: 959px) and (max-height: 700px) {
+  .home { gap: 10px; }
+  .home-doors { gap: 18px; }
+  .how, .how-field { gap: 14px; }
 }
 /* The door's photos carry into its story: three across the top of the field, fading to solid behind the headline. */
 .how-field:has(.home-mosaic) { isolation: isolate; }
