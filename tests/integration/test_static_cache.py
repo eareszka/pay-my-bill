@@ -98,3 +98,11 @@ def test_other_pages_have_no_prefetch(client: FlaskClient) -> None:
     page = client.get("/feed").get_data(as_text=True)
     assert 'rel="prefetch"' not in page
     assert "prefetch.js" not in page
+
+
+def test_fonts_are_kept_for_a_year_without_a_version(client: FlaskClient) -> None:
+    resp = client.get("/static/fonts/league-gothic-400.woff2")
+    assert resp.status_code == 200
+    assert resp.cache_control.max_age == YEAR
+    assert resp.cache_control.immutable
+    assert not resp.cache_control.no_cache

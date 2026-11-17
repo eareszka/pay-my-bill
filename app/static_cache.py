@@ -2,6 +2,9 @@
 
 Every static URL carries a hash of the file (`?v=`), so a deploy changes the URL and the
 browser never revalidates the CSS and scripts that block each page's first paint.
+Fonts keep plain URLs but are kept for a year too (#229): a font that had to be rechecked on
+every page showed the fallback face first and then snapped to the real one. A changed font
+file gets a new filename.
 """
 
 import hashlib
@@ -63,7 +66,8 @@ def init_app(app: Flask) -> None:
             return response
         filename = (request.view_args or {}).get("filename", "")
         # Only the current version is kept for good; an old ?v= still revalidates.
-        if request.args.get("v") and request.args["v"] == version_of(app, filename):
+        current = request.args.get("v") and request.args["v"] == version_of(app, filename)
+        if current or filename.startswith("fonts/"):
             response.cache_control.no_cache = None
             response.cache_control.public = True
             response.cache_control.max_age = YEAR
