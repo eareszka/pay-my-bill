@@ -4,8 +4,8 @@
 | Ceremony | When | Output |
 |---|---|---|
 | Sprint Planning | Monday, 30 min | `docs/sprints/sprint-NN.md`: goal, committed stories, points |
-| Daily check-in | Each work session | One line in the sprint file: done / next / blocked |
-| Backlog Refinement | Thursday, 20 min | Next sprint's stories meet the Definition of Ready |
+| Daily check-in | Each work session | One line of 200 characters or less in the sprint file: done / next / blocked |
+| Backlog Refinement | Thursday, 20 min | The todo session's issues are triaged into `agent:main` or `agent:ui`, and next sprint's stories meet the Definition of Ready |
 | Sprint Review | Sunday | Demo evidence; each story accepted or rejected against its acceptance criteria |
 | Retrospective | Sunday | Keep / Change / Try, with at most one action item |
 
@@ -37,4 +37,4 @@
 - **prod:** promoted from release tags, from v0.2-beta onward
 
 ## Labels
-`type:story|bug|chore|epic` · `priority:P0–P3` · `points:1|2|3|5|8` · `epic:<name>` · `sprint:NN`
+`agent:main|ui` · `type:story|bug|chore|epic` · `priority:P0–P3` · `points:1|2|3|5|8` · `epic:<name>` · `sprint:NN`
