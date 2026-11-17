@@ -180,38 +180,6 @@
           "#e3f3ea"
         ]
       },
-      "chip": {
-        "role": "tertiary",
-        "displayName": "Marigold",
-        "canonical": "#ffd166",
-        "oklch": "oklch(88.0% 0.135 86.1)",
-        "tonalRamp": [
-          "#0f0b03",
-          "#29241a",
-          "#4b4129",
-          "#715f37",
-          "#997f45",
-          "#c2a052",
-          "#eec361",
-          "#ffe98b"
-        ]
-      },
-      "chip-hover": {
-        "role": "tertiary",
-        "displayName": "Marigold Hover",
-        "canonical": "#f5c04a",
-        "oklch": "oklch(83.5% 0.144 84.0)",
-        "tonalRamp": [
-          "#0f0a03",
-          "#2c2414",
-          "#4f4020",
-          "#755d2b",
-          "#9e7d35",
-          "#c99e40",
-          "#f5c04b",
-          "#ffe88c"
-        ]
-      },
       "bg": {
         "role": "neutral",
         "displayName": "Jar Glass",
@@ -829,7 +797,7 @@
       "name": "Ask Ticket",
       "kind": "card",
       "refersTo": "ticket-need",
-      "description": "Signature: one ask as a Need Seafoam ask bubble (28px, 6px tail corner bottom-right) in dark ink, League Gothic title, pill field meter, Press Green rail, and the Marigold pill Chip in tab.",
+      "description": "Signature: one ask as a Need Seafoam ask bubble (28px, 6px tail corner bottom-right) in dark ink, League Gothic title, pill field meter, and Press Green rail.",
       "html": "<article class=\"ds-ticket\"><div class=\"ds-body\"><h2 class=\"ds-title\">Phone bill past due</h2><p class=\"ds-head\">Need · <b>priya_k</b> · Madison, WI</p><p class=\"ds-amt\"><strong>$45</strong> of $180</p><div class=\"ds-meter\"><i style=\"width:25%\"></i></div></div><nav class=\"ds-rail\"><a href=\"#\" class=\"ds-rail-btn\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7\"/><path d=\"M19 12H5\"/></svg><span>Back</span></a><a href=\"#\" class=\"ds-rail-btn ds-lit\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg><span>Next</span></a></nav><a class=\"ds-tab\" href=\"#\">Chip in</a></article>",
       "css": ".ds-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; } .ds-ticket { position: relative; display: flex; flex-direction: column; width: 320px; height: 520px; color: #16261d; background: #8fcfc0; border-radius: 28px 28px 6px 28px; overflow: hidden; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-body { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; padding: 64px 84px 18px 18px; } .ds-title { margin: auto 0; font: 400 3.5rem/0.92 'League Gothic', 'Arial Narrow', sans-serif; text-transform: uppercase; } .ds-head, .ds-amt { margin: 0; font-size: 0.9375rem; } .ds-head { color: #2f4a3a; } .ds-amt { margin-top: 14px; font-variant-numeric: tabular-nums; } .ds-amt strong { font-size: 1.75rem; } .ds-meter { height: 3px; margin-top: 10px; background: rgb(22 38 29 / 0.2); border-radius: 999px; } .ds-meter i { display: block; height: 100%; background: #16261d; border-radius: 999px; } .ds-rail { position: absolute; right: 10px; bottom: 96px; display: flex; flex-direction: column; gap: 14px; } .ds-rail-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 700 0.75rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; text-decoration: none; } .ds-rail-btn .ds-icon { width: 52px; height: 52px; padding: 12px; border-radius: 50%; transition: background-color 140ms ease-out, color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-rail-btn:hover .ds-icon, .ds-lit .ds-icon { color: #ffffff; background: #2f6249; } .ds-lit .ds-icon { transform: scale(1.08); } .ds-rail-btn:focus-visible { outline: none; } .ds-rail-btn:focus-visible .ds-icon { color: #ffffff; background: #2f6249; outline: 2px solid #2f6249; outline-offset: 2px; } .ds-tab { display: block; margin: 0 18px 18px; padding: 15px; font: 700 1.0625rem 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; text-align: center; text-decoration: none; color: #16261d; background: #ffd166; border-radius: 999px; transition: background-color 140ms ease-out; } .ds-tab:hover { background: #f5c04a; } .ds-tab:focus-visible { outline: 2px solid #16261d; outline-offset: 3px; }"
     },
@@ -892,25 +860,20 @@
   ],
   "narrative": {
     "northStar": "The Tip Jar",
-    "overview": "The app is a tip jar on a counter: small gifts from passersby, dropped in one at a time. The ground is pale jar glass (bg), the shell (top bar, phone nav, theme color, app icon) is a soft dollar green with white type, and inside it a single ask fills the screen as a light green speech bubble, Want Sage for helping and Need Seafoam for asking, with its title set huge in condensed uppercase in dark green ink. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's field is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. The one money action, Chip in, is a marigold tab, the jar's masking-tape label and the one warm note in the world, so giving never blends into the green chrome. There is no black anywhere: the darkest value is a green-black ink (#16261d).\n\nThe world is always light. There is no dark mode, and `prefers-color-scheme` is ignored (`color-scheme: light`). The working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense on the same ground with white panels, the same two typefaces, the same green filled button, and the same shapes. Asking and helping are a conversation (#205): an ask speaks from the right as a big soft bubble with one tight bottom-right corner, a helper's panel answers from the left with its tight corner bottom-left, and every button, tab, badge, and meter is a pill. Lists are hairline rows, progress is a single thin meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no dark scrim. The only gradients are fades into the field's own color: photos dissolve into the solid field so the words always sit on field.\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. Logged out, the front door (the home page and the How stories) has no bar at all: the way in lives on the page. At 960px and wider, the nav moves up into the bar, and the feed card takes the post page's shape: a wide landscape ask joined to a 400px Chip in panel, with big Back and Next buttons outside it. On a monitor nobody has to drag.",
+    "overview": "The app is a tip jar on a counter: small gifts from passersby, dropped in one at a time. The ground is pale jar glass (bg), the shell (top bar, phone nav, theme color, app icon) is a soft dollar green with white type, and inside it a single ask fills the screen as a light green speech bubble, Want Sage for helping and Need Seafoam for asking, with its title set huge in condensed uppercase in dark green ink. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's field is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. Tap the ask, or swipe it up, and its post opens; that is where you chip in (#235). There is no black anywhere: the darkest value is a green-black ink (#16261d).\n\nThe world is always light. There is no dark mode, and `prefers-color-scheme` is ignored (`color-scheme: light`). The working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense on the same ground with white panels, the same two typefaces, the same green filled button, and the same shapes. Asking and helping are a conversation (#205): an ask speaks from the right as a big soft bubble with one tight bottom-right corner, a helper's panel answers from the left with its tight corner bottom-left, and every button, tab, badge, and meter is a pill. Lists are hairline rows, progress is a single thin meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no dark scrim. The only gradients are fades into the field's own color: photos dissolve into the solid field so the words always sit on field.\n\nThe system is built for a phone held in one hand. It works at 360px without horizontal scroll and works without JavaScript, because every gesture has a real link behind it. Logged out, the front door (the home page and the How stories) has no bar at all: the way in lives on the page. At 960px and wider, the nav moves up into the bar, and the feed card takes the post page's shape: a wide landscape ask joined to a 400px Chip in panel, with big Back and Next buttons outside it. On a monitor nobody has to drag.",
     "keyCharacteristics": [
       "A pale jar-glass ground and a soft dollar-green shell with white type. Always light, no black anywhere.",
       "One light green field per ask (Want Sage or Need Seafoam) with dark green ink and no scrim.",
       "League Gothic uppercase for titles, set huge and tall. Public Sans for everything else.",
       "Two speech bubbles: asks speak from the right (a 6px bottom-right corner), helpers answer from the left (a 6px bottom-left corner), and only the big color fields grow a pointed tail.",
-      "A green filled primary, outlined secondary, a marigold Chip in as the one warm note, and tomato only for errors and destructive acts. Every button is a pill.",
+      "A green filled primary, outlined secondary, and tomato only for errors and destructive acts. Every button is a pill.",
       "A thin pill meter, hairline rows, and Lucide 2px line icons.",
       "Sideways gestures with a way back: left = next, right = back, each mirrored by a labeled rail button."
     ],
     "rules": [
       {
         "name": "The Dark Ink On Field Rule",
-        "body": "On a Sage or Seafoam field, every word and glyph set on the field itself is green-black ink (on-field, or on-field-muted for secondary lines), never white and never under a scrim. Filled controls on a field are only Marigold (Chip in, deep text), Dollar Green (the primary, such as the last step's Sign up, white text), Press Green (a lit rail glyph or the current feed tab, white), or a white example panel.",
-        "section": "colors"
-      },
-      {
-        "name": "The One Warm Note Rule",
-        "body": "Marigold is Chip in and nothing else: the feed card's tab and its example on the How stories. It never becomes a category, a badge, or decoration.",
+        "body": "On a Sage or Seafoam field, every word and glyph set on the field itself is green-black ink (on-field, or on-field-muted for secondary lines), never white and never under a scrim. Filled controls on a field are only Dollar Green (the primary, such as the last step's Sign up, white text), Press Green (a lit rail glyph or the current feed tab, white), or a white example panel.",
         "section": "colors"
       },
       {
@@ -955,7 +918,7 @@
       },
       {
         "name": "The Pill Rule",
-        "body": "Whatever you press is a pill: buttons, tabs, and the Chip in tab. Badges and meters are pills too. A gift's state is never a pill (see State Marks).",
+        "body": "Whatever you press is a pill: buttons and tabs. Badges and meters are pills too. A gift's state is never a pill (see State Marks).",
         "section": "shapes"
       }
     ],
@@ -963,10 +926,10 @@
       "**Do** keep the top bar and phone nav Dollar Green (#3a7558) with white type, the pages on the jar-glass ground, and the whole app light whatever the system setting.",
       "**Do** give each ask a Sage or Seafoam field with field-ink type and no scrim, and check that any new category color holds dark ink at 4.5:1 or better.",
       "**Do** shape asks as 28px bubbles with the 6px tail corner bottom-right, and helper panels as 22px bubbles with the 6px tail corner bottom-left.",
-      "**Do** make every button, tab, and Chip in tab a pill, and keep inputs, flashes, and notices at 14px.",
-      "**Do** fade every photo into the field's own color so the words, tabs, and Chip in sit on solid field.",
+      "**Do** make every button and tab a pill, and keep inputs, flashes, and notices at 14px.",
+      "**Do** fade every photo into the field's own color so the words and tabs sit on solid field.",
       "**Do** set titles in League Gothic uppercase and everything else in Public Sans, with tabular numerals for money and counts.",
-      "**Do** use the green filled button for the screen's main action, Marigold only for Chip in, and outline everything else.",
+      "**Do** use the green filled button for the screen's main action and outline everything else.",
       "**Do** show progress only with the thin pill meter, and lists only as hairline rows.",
       "**Do** use Lucide line icons at a 2px stroke from the `_icons.html` sprite, always with a visible text label.",
       "**Do** back every gesture with a labeled button and a real link, so the feed works without JavaScript and at 360px with no horizontal scroll.",
@@ -976,7 +939,7 @@
     "donts": [
       "**Don't** use black or a neutral gray-black anywhere, or add a dark mode.",
       "**Don't** put white text or a dark scrim on a Sage or Seafoam field.",
-      "**Don't** use Marigold for anything but Chip in, or tomato for anything but errors, disputed gifts, and destructive actions.",
+      "**Don't** use tomato for anything but errors, disputed gifts, and destructive actions.",
       "**Don't** add box or drop shadows, glass, glow, or gradients other than the fades into the field's own color.",
       "**Don't** give a bubble more than one tight corner, point an ask's tail left or a helper's right, or hang a pointed tail on anything but the home doors, the story fields, and the docked strips.",
       "**Don't** turn a gift's state into a pill or a filled badge. Use a shape and a word.",

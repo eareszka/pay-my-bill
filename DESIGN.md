@@ -1,6 +1,6 @@
 ---
 name: Yearnly
-description: One person's ask owns the screen. Flick sideways through people, flick back, and chip in with one tap.
+description: One person's ask owns the screen. Flick sideways through people, flick back, and tap or swipe up on one to chip in.
 colors:
   shell: "#3a7558"
   shell-deep: "#2f6249"
@@ -13,8 +13,6 @@ colors:
   on-field-muted: "#2f4a3a"
   field-track: "rgb(22 38 29 / 0.2)"
   press: "#2f6249"
-  chip: "#ffd166"
-  chip-hover: "#f5c04a"
   bg: "#f4f6f0"
   surface: "#ffffff"
   ink: "#16261d"
@@ -125,13 +123,6 @@ components:
     rounded: "{rounded.pill}"
     height: "52px"
     width: "100%"
-  chip-in-tab:
-    backgroundColor: "{colors.chip}"
-    textColor: "{colors.deep}"
-    rounded: "{rounded.pill}"
-    padding: "15px"
-  chip-in-tab-hover:
-    backgroundColor: "{colors.chip-hover}"
   ticket-need:
     backgroundColor: "{colors.need}"
     textColor: "{colors.on-field}"
@@ -237,7 +228,7 @@ components:
 
 **Creative North Star: "The Tip Jar"**
 
-The app is a tip jar on a counter: small gifts from passersby, dropped in one at a time. The ground is pale jar glass (bg), the shell (top bar, phone nav, theme color, app icon) is a soft dollar green with white type, and inside it a single ask fills the screen as a light green speech bubble, Want Sage for helping and Need Seafoam for asking, with its title set huge in condensed uppercase in dark green ink. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's field is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. The one money action, Chip in, is a marigold tab, the jar's masking-tape label and the one warm note in the world, so giving never blends into the green chrome. There is no black anywhere: the darkest value is a green-black ink (#16261d).
+The app is a tip jar on a counter: small gifts from passersby, dropped in one at a time. The ground is pale jar glass (bg), the shell (top bar, phone nav, theme color, app icon) is a soft dollar green with white type, and inside it a single ask fills the screen as a light green speech bubble, Want Sage for helping and Need Seafoam for asking, with its title set huge in condensed uppercase in dark green ink. You move through people sideways: drag left for the next ask, drag right to go back, and the neighboring ask's field is already waiting underneath, so every move reads as a cut from one field to the next rather than a scroll. Tap the ask, or swipe it up, and its post opens; that is where you chip in (#235). There is no black anywhere: the darkest value is a green-black ink (#16261d).
 
 The world is always light. There is no dark mode, and `prefers-color-scheme` is ignored (`color-scheme: light`). The working pages (Gifts, Leaders, profile, forms, admin, legal) are quiet and dense on the same ground with white panels, the same two typefaces, the same green filled button, and the same shapes. Asking and helping are a conversation (#205): an ask speaks from the right as a big soft bubble with one tight bottom-right corner, a helper's panel answers from the left with its tight corner bottom-left, and every button, tab, badge, and meter is a pill. Lists are hairline rows, progress is a single thin meter, and states are a small shape plus a word. There are no shadows, glass, or glow, and no dark scrim. The only gradients are fades into the field's own color: photos dissolve into the solid field so the words always sit on field.
 
@@ -248,13 +239,13 @@ The system is built for a phone held in one hand. It works at 360px without hori
 - One light green field per ask (Want Sage or Need Seafoam) with dark green ink and no scrim.
 - League Gothic uppercase for titles, set huge and tall. Public Sans for everything else.
 - Two speech bubbles: asks speak from the right (a 6px bottom-right corner), helpers answer from the left (a 6px bottom-left corner), and only the big color fields grow a pointed tail.
-- A green filled primary, outlined secondary, a marigold Chip in as the one warm note, and tomato only for errors and destructive acts. Every button is a pill.
+- A green filled primary, outlined secondary, and tomato only for errors and destructive acts. Every button is a pill.
 - A thin pill meter, hairline rows, and Lucide 2px line icons.
 - Sideways gestures with a way back: left = next, right = back, each mirrored by a labeled rail button.
 
 ## Colors
 
-A green family (ground, shell, two light fields, green-black ink) carries the whole world, with one marigold note for giving and tomato held back for trouble.
+A green family (ground, shell, two light fields, green-black ink) carries the whole world, with tomato held back for trouble.
 
 ### Primary
 - **Dollar Green** (shell): the top bar, the phone bottom nav, the browser theme color, the PWA background, and the app icon ground. White on it holds 5.43:1. The same green is the primary button fill (action-bg) with white text, the current text tab's pill, a checked checkbox or radio, and the small wordmark at the top of the logged-out home.
@@ -272,12 +263,11 @@ A green family (ground, shell, two light fields, green-black ink) carries the wh
 These two fields are provisional category colors. Story #119 replaces them with per-category fields, which must keep dark ink at 4.5:1 or better.
 
 ### Tertiary
-- **Marigold** (chip, chip-hover): the Chip in tab on the feed card and its copy on the How stories' example ask card, always with deep text (10.96:1).
 
 ### Neutral
 - **Jar Glass** (bg): the page background everywhere, the feed stage behind the deck, and inputs and notices inside panels.
 - **Panel White** (surface): panels, inputs, the rewards block, the desktop Chip in panel, the sign-up card, and every example piece on a story field.
-- **Green-Black Ink** (ink, deep): body text, focus rings, the meter fill, text on Marigold and on white controls set on the shell. It is the darkest color in the system.
+- **Green-Black Ink** (ink, deep): body text, focus rings, the meter fill, text on white controls set on the shell. It is the darkest color in the system.
 - **Moss Gray** (muted): hints, metadata, ranks, counts, inactive tabs, and the front door's "Already have an account?" line.
 - **Hairline** (line): row dividers, section rules, and the sign-up card's edge.
 - **Edge** (edge): input, checkbox, radio, and secondary-button strokes, the desktop rail circles, and the scrollbar thumb.
@@ -288,9 +278,8 @@ These two fields are provisional category colors. Story #119 replaces them with 
 - **Tomato** (bad, bad-text, bad-tint): errors, invalid fields, disputed marks, error flashes, and the destructive button.
 
 ### Named Rules
-**The Dark Ink On Field Rule.** On a Sage or Seafoam field, every word and glyph set on the field itself is green-black ink (on-field, or on-field-muted for secondary lines), never white and never under a scrim. Filled controls on a field are only Marigold (Chip in, deep text), Dollar Green (the primary, such as the last step's Sign up, white text), Press Green (a lit rail glyph or the current feed tab, white), or a white example panel.
+**The Dark Ink On Field Rule.** On a Sage or Seafoam field, every word and glyph set on the field itself is green-black ink (on-field, or on-field-muted for secondary lines), never white and never under a scrim. Filled controls on a field are only Dollar Green (the primary, such as the last step's Sign up, white text), Press Green (a lit rail glyph or the current feed tab, white), or a white example panel.
 
-**The One Warm Note Rule.** Marigold is Chip in and nothing else: the feed card's tab and its example on the How stories. It never becomes a category, a badge, or decoration.
 
 **The No Black Rule.** No black and no neutral gray-black anywhere. The darkest color is the green-black ink (#16261d). (The `#000` inside a mask-image gradient is an alpha stop, not a rendered color.)
 
@@ -323,15 +312,15 @@ These two fields are provisional category colors. Story #119 replaces them with 
 
 The layout is mobile first and single column. Ordinary pages sit in a 640px container with 16px padding (28px top and bottom at 960px and wider). Rhythm comes from 8, 12, and 16px gaps inside forms and panels, 18px panel padding, and 28px between major desktop columns.
 
-On phones, the top bar is 52px tall and the nav is a fixed 64px bar at the bottom (plus the safe-area inset) with four icon-over-label items (Feed, Post, Leaders, and the signed-in username in place of "You"; admins also get Admin). The feed stage fills the height between the two bars (minimum 520px), and the ask inside it is an inset bubble, 8px from the top, 10px from the sides, and 12px from the foot. Inside it, the All, Needs, and Wants pill tabs are centered at the top, the title sits mid-screen (at the top, under the tabs, when the ask has no photo, #208), and the foot holds meta, a three-line story, amounts, and the meter. The rail (Back, Next, and the count) sits at the right edge: Back is an outline glyph, Next is the one filled glyph (a 52px Press Green circle with a white arrow, Deep on hover and focus), and its label and the count tuck right under it as one control (#208), and the full-width Chip in pill is at the bottom.
+On phones, the top bar is 52px tall and the nav is a fixed 64px bar at the bottom (plus the safe-area inset) with four icon-over-label items (Feed, Post, Leaders, and the signed-in username in place of "You"; admins also get Admin). The feed stage fills the height between the two bars (minimum 520px), and the ask inside it is an inset bubble, 8px from the top, 10px from the sides, and 12px from the foot. Inside it, the All, Needs, and Wants pill tabs are centered at the top, the title sits mid-screen (at the top, under the tabs, when the ask has no photo, #208), and the foot holds meta, a three-line story, amounts, and the meter. The rail (Back, Next, and the count) sits at the right edge: Back is an outline glyph, Next is the one filled glyph (a 52px Press Green circle with a white arrow, Deep on hover and focus), and its label and the count tuck right under it as one control (#208). The card has no buttons of its own: a tap anywhere on it, or a swipe up, opens the post (#235).
 
 Logged out on the front door (the home page and the How stories), there is no top bar and no nav at all (#196, #205), and the bar height falls to the safe-area inset. Each page carries its own way in: the home page and every story step end on a Sign up pill and a Log in line.
 
-At 960px the nav moves into a 60px top bar as icon-beside-label items, centered within 1120px. The feed becomes one wide speech bubble, centered within about 1240px: the ask is its left side (up to 660px wide, `min(620px, 100dvh - 230px)` tall, 460px minimum, 28px left corners and square right corners) joined to a 400px Chip in panel on surface as its right side (28px top-right, the 6px tail corner bottom-right). With no panel, the stage is a whole ask bubble. The tabs sit centered above it. Back and Next are 60px outlined circles in 88px gutters outside the card, and the count with an "← → to move" hint sits centered below. The title rests just above who and where, as on the post hero. The on-card Chip in tab is hidden because the panel replaces it. Dragging still works but nothing depends on it, and a click or arrow key plays the same 180ms slide. The post page becomes a fluid story column beside a 400px side panel. Below 380px, the card's right padding tightens to 76px so the title clears the rail. The body clips horizontal overflow, so a thrown card never adds a sideways scroll.
+At 960px the nav moves into a 60px top bar as icon-beside-label items, centered within 1120px. The feed becomes one wide speech bubble, centered within about 1240px: the ask is its left side (up to 660px wide, `min(620px, 100dvh - 230px)` tall, 460px minimum, 28px left corners and square right corners) joined to a 400px Chip in panel on surface as its right side (28px top-right, the 6px tail corner bottom-right). With no panel, the stage is a whole ask bubble. The tabs sit centered above it. Back and Next are 60px outlined circles in 88px gutters outside the card, and the count with an "← → to move" hint sits centered below. The title rests just above who and where, as on the post hero. Dragging still works but nothing depends on it, and a click or arrow key plays the same 180ms slide. The post page becomes a fluid story column beside a 400px side panel. Below 380px, the card's right padding tightens to 76px so the title clears the rail. The body clips horizontal overflow, so a thrown card never adds a sideways scroll.
 
 ## Elevation & Depth
 
-The system is flat, with no shadows of any kind. Depth comes from tonal layering (jar-glass ground, then the light field, then white panels and the marigold tab) and, during a drag, from the real neighboring ask sitting underneath the one in your hand. Photos never sit on top of the words: they dissolve into the field behind them.
+The system is flat, with no shadows of any kind. Depth comes from tonal layering (jar-glass ground, then the light field, then white panels) and, during a drag, from the real neighboring ask sitting underneath the one in your hand. Photos never sit on top of the words: they dissolve into the field behind them.
 
 ### Named Rules
 **The Field Fade Only Rule.** The only gradients are fades into the field's own color. The feed card photo is masked transparent at 4%, solid from 18 to 30%, and transparent by 58%, and a photo card washes the field (85% field to transparent by 22%) behind the tabs. The post-hero photo is masked solid to 30% and transparent by 62%. The door and step mosaics fade to solid field before the words. Never a dark scrim, a fade to another hue, glass, glow, or a box or drop shadow.
@@ -344,7 +333,7 @@ Asking and helping are a conversation (owner, 2026-11-15, #205, "Two Speech Bubb
 - **Helper panel** (22px, with a 6px bottom-left tail corner; 22/22/22/6): panels (Chip in, forms, To confirm), the rewards block, and the sign-up card. Helpers answer from the left.
 - **The desktop feed** is one bubble split in two: the stage is 28/0/0/28 and the side panel 0/28/6/0, so the tail sits at the panel's foot on the right. On desktop the feed panel's inner group and the post page's side group drop their corners and sit flat.
 - **Big color fields** (28px bubbles): the home doors, the story fields, and the docked "other door" strips, including the sign-up page's "Back to how … works" strip. Help-side fields take the 6px corner bottom-left and ask-side fields bottom-right. On the home page both doors are Sage, but the tail still follows the door: "I want to help" bottom-left, "I need a hand" bottom-right.
-- **Pills** (999px): every button (including the bar's Sign up, the file picker's button, and the front door's 52px way in), the story's 48px Back (a white reply pill) and Next (the green pill), "See how … works" on the doors and the other-story bubble (white pills, owner's pick "Reply pills", #218), Settings' back link and every standalone link action (outlined pills), the Chip in tab and its example, tabs, the current nav item, the count badge, badge-list items, meters and their fills, the story step bars, and the Example tag.
+- **Pills** (999px): every button (including the bar's Sign up, the file picker's button, and the front door's 52px way in), the story's 48px Back (a white reply pill) and Next (the green pill), "See how … works" on the doors and the other-story bubble (white pills, owner's pick "Reply pills", #218), Settings' back link and every standalone link action (outlined pills), tabs, the current nav item, the count badge, badge-list items, meters and their fills, the story step bars, and the Example tag.
 - **Gentle** (14px): inputs, selects, textareas, flashes and notices, the skip link, the admin photo, and the "you" row on Leaders. Full-bleed flashes on a stage page stay square.
 - **Checkboxes and radios** are drawn, not native: 22px, a 1.5px edge stroke on surface, a 7px-rounded box or a round radio. Checked, they fill Dollar Green with a white check or a white 8px dot.
 - **Circles** (50%): rail glyphs (52px on a field, 60px outlined on desktop) and the state-mark rings. The disputed mark is a 10px square with 2px corners.
@@ -356,7 +345,7 @@ Borders are 1px hairlines for structure, 1.5px for control strokes, and 2px for 
 
 **The Tails On Fields Only Rule.** A pointed tail is a 22 by 14px clip-path triangle in the field's own color, hanging 12px below the tight corner (bottom-left on the help side, bottom-right on the ask side); from 960px it grows to 40 by 26px and hangs 22px below. The tail's box also reaches 6px up into its bubble (a 6px band above the triangle), so the rounded tail corner never leaves a seam beside it. Only the big color fields carry one: the home doors, the story fields, the sign-up bubble, and the docked strips. Tickets, the post hero, panels, and cards keep just the tight corner.
 
-**The Pill Rule.** Whatever you press is a pill: buttons, tabs, and the Chip in tab. **The 44 Rule** (#208): everything you tap is at least 44px tall, because the iPhone app is the target. Pills, tabs, choices, and the bar's buttons are 44px boxes; standalone text links (the footer, Forgot your password?, Report this post, Find someone to help, names in a card's meta) keep their look and get a 44px tap area from vertical padding, offset by a matching negative margin wherever the link is laid out as a box. Badges and meters are pills too. A gift's state is never a pill (see State Marks).
+**The Pill Rule.** Whatever you press is a pill: buttons and tabs. **The 44 Rule** (#208): everything you tap is at least 44px tall, because the iPhone app is the target. Pills, tabs, choices, and the bar's buttons are 44px boxes; standalone text links (the footer, Forgot your password?, Report this post, Find someone to help, names in a card's meta) keep their look and get a 44px tap area from vertical padding, offset by a matching negative margin wherever the link is laid out as a box. Badges and meters are pills too. A gift's state is never a pill (see State Marks).
 
 ## Components
 
@@ -369,9 +358,6 @@ Plain and confident. There is one green fill, and everything else is drawn in ou
 - **Way in:** on the logged-out home, a full-width primary 52px tall at 1.0625rem.
 - **Disabled:** 50% opacity with a not-allowed cursor.
 - **Focus:** a 2px ink outline offset by 2px everywhere; white on the shell bar, field ink on a field.
-
-### Chip in Tab
-The money action rides on the ask. It is a full-width Marigold pill with 15px padding, deep text at 1.0625rem 700, and 18px margins from the field's edges. Hover is chip-hover, and focus is a deep outline offset 3px. It links to the post's Chip in section, and on desktop the side panel replaces it.
 
 ### State Marks
 State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes a 0.875rem 700 label. Confirmed is a filled green dot, disputed is a filled tomato square with tomato text, expired is a filled gray dot, and waiting is an empty ring.
@@ -409,7 +395,7 @@ The single progress device. It is a 4px pill track with an ink pill fill to the 
 One ask per screen, with a real link for each move. Dragging past 8px picks up the card. It follows the finger with a tilt of up to 4deg, and the neighboring ask's field is revealed underneath. After 24px of travel, the rail glyph for the target lights (Press Green disc, white glyph, scale 1.08); hover and focus light it the same way. A release past 30% of the card's width, or a flick faster than 0.5px/ms, throws it off the screen in 180ms with `cubic-bezier(0.4, 0, 1, 1)` and follows the link. Otherwise it settles back in 200ms with `cubic-bezier(0.16, 1, 0.3, 1)`. With no neighbor, the card gives at 25% resistance. With reduced motion, the card fades instead of moving (120ms). On desktop the rail glyphs are 60px circles with a 1.5px edge stroke and ink glyphs on the ground, filling ink with a ground-colored glyph on hover. Gestures: left = next, right = back, and down = show less arrives in #119.
 
 ### Photo State
-A post may carry one poster photo (ADR 0015). On the feed card it fills the field edge to edge (`object-fit: cover`) and is itself masked into the field: transparent at 4%, solid from 18 to 30%, and gone by 58%, so the tabs, title, foot, and Chip in all sit on solid field. A wash of the field (85% to transparent by 22%) keeps the tabs on field at the very top. The title drops to sit just above the foot. On the post page the field header grows to `min(72vh, 600px)` (520px on desktop), with the photo solid to 30% and faded out by 62%. The ask's field stays underneath while the photo loads. A post with no photo is complete and never shows an empty frame.
+A post may carry one poster photo (ADR 0015). On the feed card it fills the field edge to edge (`object-fit: cover`) and is itself masked into the field: transparent at 4%, solid from 18 to 30%, and gone by 58%, so the tabs, title, and foot all sit on solid field. A wash of the field (85% to transparent by 22%) keeps the tabs on field at the very top. The title drops to sit just above the foot. On the post page the field header grows to `min(72vh, 600px)` (520px on desktop), with the photo solid to 30% and faded out by 62%. The ask's field stays underneath while the photo loads. A post with no photo is complete and never shows an empty frame.
 
 ### App Icon
 The Home Screen icon (#185, #191, #200) is the deck in miniature, on Dollar Green: a Need Seafoam ticket tilted -4° over a Want Sage ticket tilted 9°, both with 56/1024 corners, and a dark-ink League Gothic **Y** at 560/1024, centered on the front ticket. The monogram replaced the stacked wordmark because "YEARNLY" on one line is too small to read at 60px, and iOS prints the name under the icon anyway. The maskable version scales the same art to 78%. It's rendered from `docs/brand/yearnly-icon.html` in the real font and exported to `app/static/icons/` (180, 192, 512, maskable 512, and a 32 favicon), and the 1024 master (`docs/brand/yearnly-icon-1024.png`) goes into the iOS app.
@@ -424,7 +410,7 @@ The logged-out front door at `/` (#120) has no top bar (#205). It is one column 
 - **Stories:** `/how/help` and `/how/ask` (three steps each, #198), one step per page at `/how/<path>/<n>`, with no bar. The step is a column with 12px gutters (plus the safe-area insets) and a 22px gap. The field is a Sage bubble with its story's tail (help bottom-left, ask bottom-right), and it fills the screen: a row of 3px pill step bars (Field Track, deep through the current step), then the step line in League Gothic (clamp 2.75 to 4.25rem, 5.5rem at 960px and wider) with no label above it and no sentence under it (owner, 2026-11-14: "very simple, not as much wordage"), and one small example piece. At 960px the words and a 400px example column sit side by side (56px gap) inside the 1240px frame (24px gutters, 26px gap). The step nav at the foot of the field is Back, a tabular "n of N", and Next, all field-ink bold links with 20px arrows. On the last step Next drops out (Go to the feed when logged in). Back from step 1 returns to the doors. Logged out, the home page's way in (a full-width Sign up pill to `/signup?from=<story>` and "Already have an account? Log in") sits under the other door on every step, sticky at the screen foot on the ground color when a step runs taller than the screen (owner, 2026-11-16).
 - **The other door:** waits below the field as a smaller Sage bubble with its own tail (72px min, field ink and no scrim, a 1.75rem League Gothic line and "See how asking works" with the sliding arrow). On the last step it reads "Or see how …".
 - **Sign-up page** (owner's Impeccable pick "Button Becomes the Form", 2026-11-12): `/signup` is the story's last step (owner, #208): like the front door it has no bar, no nav and no footer, and "Join in", its sentence, the form card and the Log in line all sit inside a Sage speech bubble with that story's tail (the help tail on plain `/signup`; 18px 18px 22px padding, 28px 32px 32px from 960px), hugging its content in a 480px column. Earlier it was a stage page on the ground for everyone, in a 480px column. "Join in" in League Gothic at Display Hero size, one muted sentence (40ch max), then the form in a white helper card with a 1.5px hairline edge, 22px corners with the 6px tail bottom-left, and 16px 18px padding, and below it "Already have an account? Log in" in muted text with a bold ink link. Arriving from a story (`?from=help` or `?from=ask`), a Sage strip bubble with its story's pointed tail sits sticky at the foot, the bubble's 480px width, 18px above the screen foot on phones and sitting in place under the bubble from 960px: 56px min, a 20px back arrow and "Back to how helping works" (or asking), linking to that story's last step. The strip survives a rate-limited (429) submit. Any other `from` is ignored, and plain `/signup` has no strip.
-- **Example pieces:** the real app components (the mini ask card, the Chip in panel, the To confirm row, the rewards meter, state marks) as white panels inside the field, under an "Example" tag: a 0.75rem 700 field-ink pill outlined in 1.5px field ink. Each piece mirrors the real app in its real state and shape, so the pay step shows the filled pay-app buttons a post without card gifts shows, and the thank-you step shows a confirmed gift with the recipient's thanks. Example buttons are inert (default cursor, no press). The mini ask card is a white ask bubble (28px with the 6px tail bottom-right, 360px max) with ink text, a 2.5rem League Gothic title, the meter, and a Marigold pill Chip in tab. It never takes a category color, so the only fields on a step are its own and the other door's strip (owner, 2026-11-12).
+- **Example pieces:** the real app components (the mini ask card, the Chip in panel, the To confirm row, the rewards meter, state marks) as white panels inside the field, under an "Example" tag: a 0.75rem 700 field-ink pill outlined in 1.5px field ink. Each piece mirrors the real app in its real state and shape, so the pay step shows the filled pay-app buttons a post without card gifts shows, and the thank-you step shows a confirmed gift with the recipient's thanks. Example buttons are inert (default cursor, no press). The mini ask card is a white ask bubble (28px with the 6px tail bottom-right, 360px max) with ink text, a 2.5rem League Gothic title, and the meter. It never takes a category color, so the only fields on a step are its own and the other door's strip (owner, 2026-11-12).
 - **The arrival** (owner's Impeccable pick "The jar fills", 2026-11-14, #203): on a fresh open of `/` (the app launching, a typed URL, an outside link; never a same-site referrer or a back/forward visit), `how.js` sets `html.arrive` before the first paint. Each door's bubble rises 24px and fades in over 520ms on `--ease-out`, help first and ask 110ms later. It was a clip-path fill from the foot until the owner found it stuttering on phones (2026-11-16); every front-door move is now transform and opacity only. Each door's words rise 12px and fade in over 420ms from 300ms (ask from 410ms), and the way in fades in at 560ms. That's about 920ms in all. With reduced motion, the doors and the way in only fade in over 200ms. Without the class, everything is simply visible.
 - **The move:** cross-document View Transitions, only under `prefers-reduced-motion: no-preference`. The door, the story field, and the docked strip share one name per story (`field-help`, `field-ask`), so the tapped door grows into the field and the other door shrinks into the strip in 460ms on `--ease-out`. The transition group clips its overflow (28px corners at 960px). It holds the story's own field color only when both pages carry that field (how.js adds `keep-help` / `keep-ask`), so a field with no partner just fades. The snapshots are unscaled and anchored left bottom, so a growing door never ghosts. The step content (`how-step`) slides in 32px from the right and fades in over 420ms ease-out while the old step leaves left in 220ms ease-in. Going back reverses both directions. Every story move is transform and opacity only (no clip-path), so it runs on the compositor and stays smooth while the next page loads (2026-11-16). Opening a door or switching stories delays the incoming words 220ms so the field lands first. `how.js` is a blocking head script on the doors, story, and sign-up pages that sets these transition types on `pagereveal` (the doors count as step 0, sign-up from a story as step 99, so Back from it runs the back cut), and maps a 60px horizontal swipe (pointer, non-mouse) and the arrow keys to Back and Next.
 - **The handoff** (owner, 2026-11-16, replacing "Button Becomes the Form", whose pill-clipped morph snapped to the card at the end): from any step to sign-up, the step words leave (`how-step`), the Join in bubble (`join-step`) rises 24px and fades in over 380ms on `--ease-out`, and the story field sinks into the strip (`field-help` / `field-ask`). Leaving sign-up, the bubble fades out in 160ms. Field groups stack at z-index 1, under `how-step` and `join-step` at 2, so the words always ride in front of the sinking field.
@@ -436,10 +422,10 @@ The logged-out front door at `/` (#120) has no top bar (#205). It is one column 
 - **Do** keep the top bar and phone nav Dollar Green (#3a7558) with white type, the pages on the jar-glass ground, and the whole app light whatever the system setting.
 - **Do** give each ask a Sage or Seafoam field with field-ink type and no scrim, and check that any new category color holds dark ink at 4.5:1 or better.
 - **Do** shape asks as 28px bubbles with the 6px tail corner bottom-right, and helper panels as 22px bubbles with the 6px tail corner bottom-left.
-- **Do** make every button, tab, and Chip in tab a pill, and keep inputs, flashes, and notices at 14px.
-- **Do** fade every photo into the field's own color so the words, tabs, and Chip in sit on solid field.
+- **Do** make every button and tab a pill, and keep inputs, flashes, and notices at 14px.
+- **Do** fade every photo into the field's own color so the words and tabs sit on solid field.
 - **Do** set titles in League Gothic uppercase and everything else in Public Sans, with tabular numerals for money and counts.
-- **Do** use the green filled button for the screen's main action, Marigold only for Chip in, and outline everything else.
+- **Do** use the green filled button for the screen's main action and outline everything else.
 - **Do** show progress only with the thin pill meter, and lists only as hairline rows.
 - **Do** use Lucide line icons at a 2px stroke from the `_icons.html` sprite, always with a visible text label.
 - **Do** back every gesture with a labeled button and a real link, so the feed works without JavaScript and at 360px with no horizontal scroll.
@@ -449,7 +435,7 @@ The logged-out front door at `/` (#120) has no top bar (#205). It is one column 
 ### Don't:
 - **Don't** use black or a neutral gray-black anywhere, or add a dark mode.
 - **Don't** put white text or a dark scrim on a Sage or Seafoam field.
-- **Don't** use Marigold for anything but Chip in, or tomato for anything but errors, disputed gifts, and destructive actions.
+- **Don't** use tomato for anything but errors, disputed gifts, and destructive actions.
 - **Don't** add box or drop shadows, glass, glow, or gradients other than the fades into the field's own color.
 - **Don't** give a bubble more than one tight corner, point an ask's tail left or a helper's right, or hang a pointed tail on anything but the home doors, the story fields, and the docked strips.
 - **Don't** turn a gift's state into a pill or a filled badge. Use a shape and a word.

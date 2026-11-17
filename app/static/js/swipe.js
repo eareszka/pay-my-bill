@@ -1,4 +1,4 @@
-// Deal through the pile: swipe left for the next ticket, right to go back, and up to Chip in (#226).
+// Deal through the pile: swipe left for the next ticket, right to go back, and up to open the post (#235).
 // Back and Next ticket are ordinary links, so the feed works the same without this.
 const ticket = document.querySelector(".deck-ticket");
 const deck = document.querySelector(".deck");
@@ -9,8 +9,8 @@ const layout = document.querySelector(".deck-layout");
 const nextUnder = document.getElementById("deck-under-next");
 const backUnder = document.getElementById("deck-under-back");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-// Up opens Chip in on this ask, or the post itself when there's nothing to chip in on.
-const upLink = ticket?.querySelector(".tear-tab") || ticket?.querySelector(".card-title a");
+// Up opens the post, where Chip in lives.
+const upLink = ticket?.querySelector(".card-title a");
 
 const START_DRAG_PX = 8;
 const COMMIT_SHARE = 0.3; // of the ticket's width
@@ -119,7 +119,7 @@ const leave = (link, dx = 0) => {
   flight.finished.then(goTo, goTo);
 };
 
-// Lift the ticket off the top, then open Chip in.
+// Lift the ticket off the top, then open the post.
 const rise = (dy) => {
   if (leaving) return;
   leaving = true;
@@ -192,7 +192,7 @@ const onMove = (event) => {
   if (!press.active) {
     const up = event.clientY - press.y;
     if (Math.abs(raw) < START_DRAG_PX && Math.abs(up) < START_DRAG_PX) return;
-    // Mostly vertical: up lifts the card toward Chip in; down does nothing. On phones the card
+    // Mostly vertical: up lifts the card toward the post; down does nothing. On phones the card
     // fills the screen (touch-action: none, since Safari has no pan-down), so no scroll is lost.
     if (Math.abs(up) > Math.abs(raw)) {
       if (up > 0 || !upLink) {
@@ -256,14 +256,14 @@ const typing = (element) => element instanceof HTMLElement
   && (element.isContentEditable || element.matches("input, select, textarea"));
 
 if (ticket && deck && (nextLink || backLink)) {
-  // Phones hand vertical moves on the card to this script, so up can open Chip in (#226).
+  // Phones hand vertical moves on the card to this script, so up can open the post (#235).
   if (upLink) ticket.classList.add("swipe-up");
   ticket.addEventListener("pointerdown", onDown);
   ticket.addEventListener("pointermove", onMove);
   ticket.addEventListener("pointerup", onUp);
   ticket.addEventListener("pointercancel", onUp);
   ticket.addEventListener("dragstart", (event) => event.preventDefault());
-  // A drag is never a tap on the title or the Chip in tab.
+  // A drag is never a tap on the card.
   ticket.addEventListener("click", (event) => {
     if (!dragged) return;
     dragged = false;
