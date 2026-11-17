@@ -79,7 +79,8 @@ p, li { text-wrap: pretty; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 input, textarea { caret-color: var(--ink); }
 ::placeholder { color: var(--muted); opacity: 1; }
-html { scrollbar-color: var(--edge) var(--bg); }
+/* The ground runs under the safe areas and any overscroll, so no white ever shows at the edges (#218). */
+html { background: var(--bg); scrollbar-color: var(--edge) var(--bg); }
 
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 h1 { margin: 12px 0 20px; font: 400 clamp(2.5rem, 11vw, 3.25rem) / 0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
@@ -526,6 +527,9 @@ h3.section-title { font-size: 1rem; }
 .leader-people { justify-self: end; font-variant-numeric: tabular-nums; }
 .leader-you { margin: 12px 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
 .leader-cta { margin: 18px 0 0; }
+/* The board's one way on is the green pill (#218). */
+.leader-cta a { display: inline-flex; align-items: center; min-height: 46px; padding: 10px 18px; font-weight: 700; text-decoration: none; color: var(--action-fg); background: var(--action-bg); border-radius: var(--pill); }
+.leader-cta a:hover { background: var(--action-hover); }
 
 /* Profile */
 .rewards { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; padding: 18px 16px; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
@@ -552,7 +556,9 @@ h3.section-title { font-size: 1rem; }
 .profile-posts { margin-top: 32px; }
 .gift-section + .profile-posts { margin-top: 28px; }
 .post-list .meter { grid-column: 1 / -1; margin: 6px 0 2px; }
-.settings-back { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 700; text-decoration: none; }
+/* Back to your profile is a pill like every other move (#218). */
+.settings-back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 8px; padding: 8px 16px 8px 12px; font-weight: 700; text-decoration: none; border: 1.5px solid var(--edge); border-radius: var(--pill); }
+.settings-back:hover { border-color: var(--ink); }
 .settings-back .icon { width: 18px; height: 18px; }
 .post-list-goal { font-weight: 400; color: var(--muted); }
 .post-list-actions { display: inline-flex; gap: 16px; margin-left: auto; }
@@ -561,11 +567,10 @@ h3.section-title { font-size: 1rem; }
 .report-link { margin-top: 28px; font-size: 0.875rem; text-align: center; }
 .report-link a { color: var(--muted); }
 /* Standalone text links keep their look; padding on an inline link grows its tap area to 44px without moving a line (#208). */
-.report-link a, .leader-cta a, .join-login a, .form ~ p > a:only-child, .card-head a { padding-block: 14px; }
+.report-link a, .join-login a, .form ~ p > a:only-child, .card-head a { padding-block: 14px; }
 /* Where a link is laid out as a box, a matching negative margin keeps the row its old height. */
-.site-footer a, .settings-back { padding-block: 14px; margin-block: -14px; }
+.site-footer a { padding-block: 14px; margin-block: -14px; }
 .site-footer a { padding-inline: 4px; margin-inline: -4px; }
-.settings-back { margin-top: -6px; }
 .leader-list a { padding-block: 10px; margin-block: -10px; }
 .admin-item { margin-bottom: 12px; }
 .admin-item h3 { margin: 0 0 4px; font-size: 1rem; }
@@ -671,7 +676,9 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   color: var(--ink);
 }
 .home-mark { margin: 0; font: 400 1.875rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; color: var(--shell); }
-.home-doors { display: grid; gap: 24px; }
+/* The two bubbles share the height down to the way in, so the ground is only ever a gutter (#218). */
+.home-doors { display: grid; flex: 1; grid-auto-rows: minmax(var(--door-h), 1fr); gap: 24px; }
+.home-doors:not(:has(.home-mosaic)) { grid-auto-rows: 1fr; }
 .home-door {
   display: flex;
   flex-direction: column;
@@ -703,10 +710,24 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .home-door:has(.home-mosaic)::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; background: linear-gradient(to bottom, transparent 18%, var(--field) 50%); pointer-events: none; }
 .home-door-line { font: 400 clamp(2.75rem, 13vw, 4.25rem) / 0.92 var(--display); text-transform: uppercase; letter-spacing: 0.005em; }
 .home-door-text { max-width: 34ch; font-size: 1rem; }
-.home-door-go, .how-other-go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+/* Everything you press is a pill (#218): a white reply pill on the bubble, the green one for going on. */
+.home-door-go, .how-other-go, .how-nav .how-back {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 16px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: var(--pill);
+  transition: background-color var(--fast) ease-out, transform var(--fast) var(--ease-out);
+}
 .home-door-go { margin-top: 6px; }
 .home-door-go .icon, .how-other-go .icon { width: 20px; height: 20px; transition: transform var(--fast) var(--ease-out); }
-.home-door:hover .home-door-go, .how-other:hover .how-other-go { text-decoration: underline; text-underline-offset: 0.18em; }
+.home-door:hover .home-door-go, .how-other:hover .how-other-go, .how-nav .how-back:hover { background: var(--info-tint); }
+.home-door:active .home-door-go, .how-other:active .how-other-go, .how-nav a:active { transform: scale(0.98); }
 .home-door:hover .home-door-go .icon, .how-other:hover .how-other-go .icon { transform: translateX(4px); }
 .home-door:focus-visible, .how-other:focus-visible { outline: 2px solid var(--on-field); outline-offset: -6px; }
 .home-way-in { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 8px; }
@@ -754,8 +775,10 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .how-thanks { display: flex; flex-direction: column; gap: 6px; }
 .how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
-.how-nav a:not(.btn) { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; color: var(--on-field); text-decoration: none; }
-.how-nav a:not(.btn):hover { text-decoration: underline; text-underline-offset: 0.18em; }
+.how-nav a { min-height: 48px; text-decoration: none; }
+.how-nav .how-back { min-height: 48px; padding-left: 12px; }
+.how-nav .how-next { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px 8px 20px; font-weight: 700; color: var(--action-fg); background: var(--action-bg); border-radius: var(--pill); transition: background-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
+.how-nav .how-next:hover { background: var(--action-hover); }
 .how-nav .icon { width: 20px; height: 20px; }
 .how-count { font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .how-other {
@@ -848,8 +871,6 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .home { --door-h: clamp(380px, calc(100svh - 300px), 580px); width: 100%; max-width: 1240px; margin: 0 auto; padding: 36px 24px 36px; gap: 24px; }
   .home-doors { grid-template-columns: 1fr 1fr; column-gap: 28px; }
   .home-door-help, .home-door-ask { margin: 0; }
-  .home-door:not(:has(.home-mosaic)) { display: flex; align-self: end; }
-  .home-door:not(:has(.home-mosaic)) .home-door-line { align-self: auto; }
   .home-door::before, .how-field::before, .how-other::before { bottom: -22px; width: 40px; height: 32px; }
   .home-way-in { width: 100%; max-width: 420px; margin: auto auto 0; }
   /* The two doors share rows, so their headlines sit on one line whatever the sentences below them do. */
