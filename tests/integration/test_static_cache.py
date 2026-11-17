@@ -52,6 +52,7 @@ def test_story_step_is_kept_briefly_and_fetches_neighbors(client: FlaskClient) -
     resp = client.get("/how/help/2")
     assert resp.cache_control.private
     assert resp.cache_control.max_age == 60
+    assert "Cookie" in resp.vary
     page = resp.get_data(as_text=True)
     assert '<link rel="prefetch" href="/how/help/3">' in page
     assert '<link rel="prefetch" href="/how/help">' in page

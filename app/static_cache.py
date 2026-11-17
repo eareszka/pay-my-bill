@@ -37,6 +37,8 @@ def front_door_page(html: str) -> Response:
     if not get_flashed_messages():  # the messages this page already rendered
         response.cache_control.private = True
         response.cache_control.max_age = FRONT_DOOR_SECONDS
+        # Logging in rewrites the session cookie, so the kept logged-out copy stops matching.
+        response.vary.add("Cookie")
     return response
 
 
