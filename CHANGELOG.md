@@ -32,7 +32,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The product's final name is Yearnly, on yearnly.app (ADR 0017, #35). The rename in the app comes in its own story.
 
 ### Added
-- Trust information on posts (#79). Under the poster's name, the post page shows their results-update record ("Updated 1 of 2 past posts") once any came due, and "On Yearnly since" the month they joined. On profiles, the follow-through stat and posts come first, and the rewards panel moves below them and is hidden until the person has XP.
+- Trust information on posts (#79). Under the poster's name, the post page shows their results-update record ("Updated 1 of 2 posts") once any came due, and "On Yearnly since" the month they joined. On profiles, the follow-through stat and posts come first, and the rewards panel moves below them and is hidden from visitors until the person has XP. The owner always sees their own.
 - Install to the Home Screen like an app (#185). The site has a web app manifest, so "Add to Home Screen" on iPhone or Android opens it full-screen with its own icon and a void status bar, and no browser bar. The icon is the deck: a Need-red ticket over a Want-blue one, with the wordmark in League Gothic. It's a placeholder until the name is final (#35). A small service worker shows a "You're offline" page when there's no connection. Pages and data always come from the network, never from a cache. In landscape, the top bar clears the notch.
 
 ### Changed

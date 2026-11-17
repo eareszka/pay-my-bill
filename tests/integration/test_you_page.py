@@ -107,7 +107,7 @@ def test_posts_say_what_comes_next(client: FlaskClient, poster: User, donor: Use
     assert '<span class="chip">Update due by ' in page
     assert '<span class="chip chip-disputed">Update overdue</span>' in page
     assert f'href="/posts/{overdue.id}#update">Post update' in page
-    assert page.count('class="meter"') == 1
+    assert page.count('class="meter"') == 2
 
 
 def test_visitors_never_see_update_status(client: FlaskClient, poster: User, donor: User) -> None:

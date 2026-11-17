@@ -19,7 +19,7 @@
       <h1>{{ post.title }}</h1>
       {% include "posts/_meta.html" %}
       {% if not post.user.is_deleted %}
-        <p class="post-trust">{% if follow_through.due %}Updated {{ follow_through.updated }} of {{ follow_through.due }} past {{ "post" if follow_through.due == 1 else "posts" }} · {% endif %}On Yearnly since {{ "{:%b %Y}".format(post.user.created_at) }}</p>
+        <p class="post-trust">{% if follow_through.due %}{% include "profile/_follow_through.html" %} · {% endif %}On Yearnly since {{ "{:%b %Y}".format(post.user.created_at) }}</p>
       {% endif %}
       {% if post.edited_at %}<p class="post-edited">Edited {{ post.edited_at | date }}</p>{% endif %}
       <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>

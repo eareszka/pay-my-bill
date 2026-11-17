@@ -8,7 +8,7 @@
   </div>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
   {% if follow_through.due %}
-    <p class="follow-through">Updated {{ follow_through.updated }} of {{ follow_through.due }} {{ "post" if follow_through.due == 1 else "posts" }}</p>
+    <p class="follow-through">{% include "profile/_follow_through.html" %}</p>
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
   {% endif %}
   {% include "profile/_handles.html" %}
@@ -26,7 +26,7 @@
   {% else %}
     {% include "profile/_posts.html" %}
   {% endif %}
-  {% if progress.xp %}
+  {% if progress.xp or is_owner %}
     <section class="rewards" aria-label="Giving">
       <p class="rewards-level">Level {{ progress.level }}</p>
       {{ meter(progress.percent, "XP toward level " ~ (progress.level + 1)) }}

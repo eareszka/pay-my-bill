@@ -24,7 +24,7 @@ As a **donor**, I want to **be sure my gift will count before and after I pay** 
 
 ### S5-3 Trust information · #79 · 3 pts · P1
 As a **donor**, I want to **see who I'm sending money to** so that **I can decide with confidence**.
-- [x] The post page shows the follow-through stat, when there is one, and "On Pay My Bill since" a month and year.
+- [x] The post page shows the follow-through stat, when there is one, and "On Yearnly since" a month and year.
 - [x] Profiles list the person's past posts, as the Community Rules promise. Deleted and removed posts aren't listed.
 - [x] Follow-through and posts come before the rewards panel, which is hidden at 0 XP.
 
@@ -111,7 +111,7 @@ Chip in, after a pay tap (S5-2)     Post page trust (S5-3)
 | Sent $20 to $mariag        |      | ## Short on rent ##        |
 | on Cash App?               |      | Need · maria_g · Tampa, FL |
 | Name on your app (optional)|      | Updated 1 of 2 past posts  |
-| [                        ] |      | On Pay My Bill since Oct   |
+| [                        ] |      | On Yearnly since Oct       |
 | [I sent it]   [Not yet]    |      | == == .. .. .. .. .. .. .. |
 +----------------------------+      +----------------------------+
 

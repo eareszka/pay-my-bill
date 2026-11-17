@@ -15,7 +15,7 @@ from app.models import (
     utcnow,
 )
 from app.rewards import badges, confirmed_gifts, progress, streak
-from tests.conftest import MakeUser
+from tests.conftest import MakeUser, login_as
 
 
 def recipient(make_user: MakeUser, name: str, **fields: object) -> User:
@@ -75,11 +75,19 @@ def test_profile_shows_level_and_people_helped(client: FlaskClient, make_user: M
     assert 'aria-valuenow="20"' in page
 
 
-def test_new_profile_hides_rewards_at_zero_xp(client: FlaskClient, make_user: MakeUser) -> None:
+def test_new_profile_hides_rewards_from_visitors_at_zero_xp(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
     make_user("sam_helps")
     page = client.get("/u/sam_helps").get_data(as_text=True)
     assert 'class="rewards"' not in page
-    assert "XP" not in page
+
+
+def test_owner_sees_own_rewards_at_zero_xp(client: FlaskClient, make_user: MakeUser) -> None:
+    login_as(client, make_user("sam_helps"))
+    page = client.get("/u/sam_helps").get_data(as_text=True)
+    assert '<p class="rewards-level">Level 1</p>' in page
+    assert "0 / 100 XP · 0 people helped" in page
 
 
 def test_profile_shows_streak_only_when_active(client: FlaskClient, make_user: MakeUser) -> None:
