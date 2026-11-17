@@ -114,10 +114,11 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     csrf.init_app(app)
     login_manager.init_app(app)
 
-    from app import auth, demo, errors, photos, security, seed  # noqa: F401
+    from app import auth, demo, errors, photos, security, seed, static_cache  # noqa: F401
 
     photos.init_app(app)
     security.init_app(app)
+    static_cache.init_app(app)
 
     seed.register(app)
     demo.register(app)

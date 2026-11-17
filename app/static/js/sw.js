@@ -32,6 +32,7 @@ self.addEventListener("fetch", (event) => {
   }
   const url = new URL(request.url);
   if (url.origin === self.location.origin && url.pathname.startsWith("/static/")) {
-    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    // Static URLs carry a ?v= version (#219); the offline copy matches any version.
+    event.respondWith(fetch(request).catch(() => caches.match(request, { ignoreSearch: true })));
   }
 });
