@@ -206,3 +206,32 @@ def test_arrival_respects_reduced_motion(make_ui: UiFactory) -> None:
     late = long_motion(ui.page)
     ui.check("arrival-reduced", focus=False, extra=early + late)
     assert_clean(ui)
+
+
+def drag(ui: Ui, dx: float, dy: float) -> None:
+    box = ui.page.locator(".deck > .deck-ticket").bounding_box()
+    assert box is not None
+    x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+    mouse = ui.page.mouse
+    mouse.move(x, y)
+    mouse.down()
+    mouse.move(x + dx, y + dy, steps=12)
+    mouse.up()
+
+
+def test_swipe_up_opens_chip_in(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("swiper"))
+    ui.goto("/feed")
+    expect(ui.page.locator(".deck > .deck-ticket .tear-tab")).to_be_attached()
+    drag(ui, 0, -200)
+    ui.page.wait_for_url(re.compile(r"/posts/\d+#chip-in$"))
+    expect(ui.page.locator("#chip-in")).to_be_visible()
+
+
+def test_small_lift_and_sideways_swipe_still_work(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("swiper"))
+    ui.goto("/feed")
+    drag(ui, 0, -30)
+    assert ui.path() == "/feed"
+    drag(ui, -260, 0)
+    ui.page.wait_for_url(re.compile(r"/feed\?n=2"))
