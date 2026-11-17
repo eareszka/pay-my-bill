@@ -134,3 +134,35 @@ def test_profile_hides_the_stat_when_nothing_came_due(
 ) -> None:
     add_post(poster, donor, closed_days_ago=1)
     assert "Updated " not in client.get("/u/maria_g").get_data(as_text=True)
+
+
+def test_post_page_shows_follow_through_and_since(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    add_post(poster, donor, updated=True)
+    post = add_post(poster, donor)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Updated 1 of 2 posts · On Yearnly since " in page
+    assert f"since {poster.created_at:%b %Y}<" in page
+
+
+def test_post_page_shows_only_since_before_anything_came_due(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    post = add_post(poster, donor, closed_days_ago=1)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Updated " not in page
+    assert "On Yearnly since" in page
+
+
+def test_profile_lists_posts_before_rewards(client: FlaskClient, poster: User, donor: User) -> None:
+    add_post(poster, donor, updated=True)
+    add_post(donor, poster, updated=True)
+    donor.created_at = utcnow() - timedelta(days=4)
+    db.session.commit()
+    page = client.get("/u/maria_g").get_data(as_text=True)
+    assert (
+        page.index("Updated 1 of 1 post")
+        < page.index('<section class="profile-posts"')
+        < page.index('class="rewards"')
+    )
