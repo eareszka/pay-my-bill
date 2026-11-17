@@ -22,6 +22,7 @@ from app.extensions import db
 from app.models import Post, PostKind, open_posts
 from app.photos import LocalStore, store
 from app.routes.posts import chip_in_context
+from app.static_cache import front_door_page
 from app.top_spot import top_post
 
 bp = Blueprint("main", __name__)
@@ -53,8 +54,13 @@ def home() -> str | Response:
     args: dict[str, Any] = {k: v for k, v in request.args.items() if k in ("kind", "n")}
     if current_user.is_authenticated or args:
         return redirect(url_for("main.index", **args))
-    return render_template(
-        "home.html", help_photos=door_photos(funded=False), ask_photos=door_photos(funded=True)
+    return front_door_page(
+        render_template(
+            "home.html",
+            help_photos=door_photos(funded=False),
+            ask_photos=door_photos(funded=True),
+            prefetch=[url_for("main.how", path="help"), url_for("main.how", path="ask")],
+        )
     )
 
 
@@ -76,14 +82,26 @@ def how(path: str, step: int) -> str | Response:
     # Each step carries three of its door's photos, so neighboring steps never show the same ones.
     pool = door_photos(funded=path == "ask")
     start = (step - 1) % 2 * 3
-    return render_template(
+    html = render_template(
         "how/story.html",
         path=path,
         other=other,
         step=step,
         total=total,
         photos=pool[start : start + 3],
+        prefetch=story_neighbors(path, step, total),
     )
+    return front_door_page(html) if not current_user.is_authenticated else html
+
+
+def story_neighbors(path: str, step: int, total: int) -> list[str]:
+    # The pages one tap away, fetched ahead so Next and Back open at once (#219).
+    if current_user.is_authenticated:
+        return []
+    back = url_for("main.how", path=path, step=step - 1) if step > 1 else url_for("main.home")
+    if step < total:
+        return [url_for("main.how", path=path, step=step + 1), back]
+    return [back]  # Sign up carries a form token, so it's never kept or fetched ahead.
 
 
 @bp.get("/feed")
