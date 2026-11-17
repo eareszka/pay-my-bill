@@ -10,5 +10,4 @@
       {{ meter(post.progress_percent) }}
     </div>
   </div>
-  {% if post.user.can_be_paid and not is_owner %}<a class="tear-tab" href="{{ url_for('posts.show', post_id=post.id, _anchor='chip-in') }}">Chip in<span class="sr-only"> on {{ post.title }}</span></a>{% endif %}
 </article>

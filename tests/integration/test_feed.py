@@ -167,9 +167,11 @@ def test_ticket_opens_the_post(client: FlaskClient, make_user: MakeUser) -> None
     assert f'href="/posts/{post.id}"' in client.get("/feed").get_data(as_text=True)
 
 
-def test_no_chip_in_tab_without_a_way_to_pay(client: FlaskClient, make_user: MakeUser) -> None:
-    add_post(make_user(), "Only post")
-    assert "tear-tab" not in client.get("/feed").get_data(as_text=True)
+def test_ticket_has_no_chip_in_tab(client: FlaskClient, make_user: MakeUser) -> None:
+    # Chip in lives on the post page; the card itself opens it (#235).
+    add_post(make_user(venmo_handle="@they-pay"), "Only post")
+    login_as(client, make_user("donor"))
+    assert "#chip-in" not in client.get("/feed").get_data(as_text=True)
 
 
 def test_empty_state_for_logged_out_visitor(client: FlaskClient) -> None:
@@ -285,18 +287,6 @@ def test_last_ticket_wraps_to_the_first_underneath(
 def test_lone_ticket_has_nothing_underneath(client: FlaskClient, make_user: MakeUser) -> None:
     add_post(make_user(), "Only post")
     assert "<template" not in client.get("/feed").get_data(as_text=True)
-
-
-def test_neighbor_checks_its_own_owner(client: FlaskClient, make_user: MakeUser) -> None:
-    mine = make_user("mine", venmo_handle="@mine-pays")
-    theirs = make_user("theirs", venmo_handle="@they-pay")
-    add_post(mine, "My post")
-    add_post(theirs, "Their post")
-    login_as(client, mine)
-    for position in (1, 2):
-        page = client.get(f"/feed?n={position}").get_data(as_text=True)
-        under = under_card(page, "next") or under_card(page, "back")
-        assert ("tear-tab" in under) == ("Their post" in under)
 
 
 def test_tabs_and_rail_sit_around_the_stage(client: FlaskClient, make_user: MakeUser) -> None:

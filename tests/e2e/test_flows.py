@@ -219,13 +219,12 @@ def drag(ui: Ui, dx: float, dy: float) -> None:
     mouse.up()
 
 
-def test_swipe_up_opens_chip_in(ui: Ui, live_server: LiveServer) -> None:
+def test_swipe_up_opens_the_post(ui: Ui, live_server: LiveServer) -> None:
     ui.login(live_server.make_user("swiper"))
     ui.goto("/feed")
-    expect(ui.page.locator(".deck > .deck-ticket .tear-tab")).to_be_attached()
     drag(ui, 0, -200)
-    ui.page.wait_for_url(re.compile(r"/posts/\d+#chip-in$"))
-    expect(ui.page.locator("#chip-in")).to_be_visible()
+    ui.page.wait_for_url(re.compile(r"/posts/\d+$"))
+    expect(ui.page.locator("#chip-in")).to_be_attached()
 
 
 def test_small_lift_and_sideways_swipe_still_work(ui: Ui, live_server: LiveServer) -> None:
