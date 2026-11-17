@@ -192,7 +192,8 @@ const onMove = (event) => {
   if (!press.active) {
     const up = event.clientY - press.y;
     if (Math.abs(raw) < START_DRAG_PX && Math.abs(up) < START_DRAG_PX) return;
-    // Mostly vertical: up lifts the card toward Chip in; down is left to the page.
+    // Mostly vertical: up lifts the card toward Chip in; down does nothing. On phones the card
+    // fills the screen (touch-action: none, since Safari has no pan-down), so no scroll is lost.
     if (Math.abs(up) > Math.abs(raw)) {
       if (up > 0 || !upLink) {
         press = null;
