@@ -6,6 +6,10 @@
     <button type="submit" class="{{ cls }}">{{ label }}</button>
   </form>
 {% endmacro %}
+{% macro reaction_line(user_id) %}
+  {%- set counts = reactions.get(user_id) %}
+  {%- if counts %}<p class="hint admin-reactions">Reactions on their updates: {{ counts.get(ReactionKind.KUDOS, 0) }} kudos · {{ counts.get(ReactionKind.UP, 0) }} 👍 · {{ counts.get(ReactionKind.HMM, 0) }} 🤨</p>{% endif %}
+{%- endmacro %}
 {% block content %}
   <h1>Admin queue</h1>
 
@@ -14,6 +18,7 @@
     <article class="page-form admin-item">
       <h3><a href="{{ url_for('posts.show', post_id=post.id) }}">{{ post.title }}</a></h3>
       <p class="hint">by {{ post.user.username }} · {{ post.goal_cents | cents }} · {{ post.created_at | date }}</p>
+      {{ reaction_line(post.user_id) }}
       <p>{{ post.body }}</p>
       {% if post.photo_key %}<img class="admin-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo on this post" loading="lazy">{% endif %}
       <div class="actions">
@@ -35,6 +40,7 @@
       {% endif %}
       <p><strong>{{ report.reason.label }}</strong> · from {{ report.reporter.username }} · {{ report.created_at | date }}</p>
       {% if report.details %}<p>{{ report.details }}</p>{% endif %}
+      {{ reaction_line(report.post.user_id if report.post else report.user_id) }}
       {% if report.post and report.post.photo_key %}<img class="admin-photo" src="{{ photo_url(report.post.photo_key) }}" alt="Photo on this post" loading="lazy">{% endif %}
       <div class="actions">
         {% if report.post and report.post.photo_key %}{{ action("admin.remove_photo", "Remove photo", "btn btn-danger", post_id=report.post.id) }}{% endif %}

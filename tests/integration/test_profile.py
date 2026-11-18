@@ -4,6 +4,8 @@ import smtplib
 import pytest
 from flask.testing import FlaskClient
 
+from app.extensions import db
+from app.models import Post, PostKind, PostStatus, User
 from tests.conftest import MakeUser, login_as
 
 FORM = {
@@ -141,3 +143,51 @@ def test_whitespace_handle_saved_as_none(
     assert user.cashapp_handle is None
     assert user.city is None
     assert user.paypal_handle == "MariaG"
+
+
+CLEARED = {"cashapp_handle": "", "venmo_handle": "", "paypal_handle": "", "city": "", "state": ""}
+
+
+def live_post(user: User, status: PostStatus = PostStatus.OPEN) -> Post:
+    post = Post(user=user, kind=PostKind.NEED, title="Rent", body="Short.", goal_cents=5_000)
+    post.status = status
+    db.session.add(post)
+    db.session.commit()
+    return post
+
+
+@pytest.mark.parametrize("status", [PostStatus.OPEN, PostStatus.PENDING_REVIEW])
+def test_cannot_clear_the_last_handle_with_a_live_post(
+    client: FlaskClient, make_user: MakeUser, status: PostStatus
+) -> None:
+    user = make_user(venmo_handle="@alice")
+    live_post(user, status)
+    login_as(client, user)
+    resp = client.post("/profile", data=CLEARED)
+    assert resp.status_code == 400
+    assert "Keep one way to get paid while you have an open post" in resp.get_data(as_text=True)
+    db.session.refresh(user)
+    assert user.venmo_handle == "@alice"
+
+
+def test_can_swap_handles_with_a_live_post(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user(venmo_handle="@alice")
+    live_post(user)
+    login_as(client, user)
+    client.post("/profile", data={**CLEARED, "cashapp_handle": "alice"})
+    assert (user.cashapp_handle, user.venmo_handle) == ("$alice", None)
+
+
+def test_can_clear_handles_once_posts_are_closed(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user(venmo_handle="@alice")
+    live_post(user, PostStatus.CLOSED)
+    login_as(client, user)
+    assert client.post("/profile", data=CLEARED).status_code == 302
+    assert user.venmo_handle is None
+
+
+def test_card_counts_as_a_way_to_get_paid(client: FlaskClient, make_user: MakeUser) -> None:
+    user = make_user(venmo_handle="@alice", stripe_ready=True)
+    live_post(user)
+    login_as(client, user)
+    assert client.post("/profile", data=CLEARED).status_code == 302
