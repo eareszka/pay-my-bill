@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 - On the desktop feed, the Chip in panel scrolls inside the card's height again instead of stretching the row and pushing the card off-center (it grew with #81's name field).
+- A post is a sheet on the feed (#248, owner's iOS test). Swiping a card up, or tapping it, slides the post up over the feed instead of fading, and pulling the post down from its top slides it back to the feed. The bars stay still. On a post, Feed stays your current tab, and tapping Feed from another tab brings you back to that post.
 - Log in on a phone has no empty space under the bubble (#237, owner's iOS test). The bubble fills the screen like the home bubbles, with the form at its foot in thumb reach.
 - The feed, the front door, and the How stories no longer move under your finger on a phone (#234 follow-up, owner's iOS test). A drag on them never scrolls or bounces, but a pinch still zooms. They fit the iPhone SE with its safe areas, and a message at the top of the feed shortens the card instead of pushing it under the tabs.
 - The current pill slides between tabs (#227, owner's iOS test). In the bottom tab bar, the desktop nav, the All/Needs/Wants filter, Leaders, and the lists on You, the pill glides over from the tab you just left instead of jumping, Instagram-style. The labels stay still, and with reduced motion the pill just lands.
