@@ -3,12 +3,15 @@ from datetime import timedelta
 
 import pytest
 from flask.testing import FlaskClient
+from sqlalchemy import select
 
+from app.accounts import anonymize
 from app.extensions import db
-from app.models import Post, PostCategory, PostKind, User, utcnow
+from app.models import Post, PostCategory, PostKind, PostStatus, User, utcnow
 from app.show_less import COOKIE, parse
 from tests.conftest import PASSWORD, MakeUser, login_as
 from tests.integration.test_create_post import FORM
+from tests.integration.test_signup import FORM as SIGNUP
 
 
 @pytest.fixture(autouse=True)
@@ -210,3 +213,54 @@ def test_visitors_never_see_the_choice(client: FlaskClient, viewer: User) -> Non
     viewer.show_less = "rent"
     db.session.commit()
     assert "Showing you less" not in client.get("/u/dev_tom").get_data(as_text=True)
+
+
+def test_cookie_joins_the_account_at_sign_up(client: FlaskClient) -> None:
+    client.set_cookie(COOKIE, "rent")
+    resp = client.post("/signup", data=SIGNUP)
+    assert resp.status_code == 302
+    user = db.session.scalar(select(User).where(User.username == "new_user"))
+    assert user is not None and user.show_less == "rent"
+    assert f"{COOKIE}=;" in resp.headers["Set-Cookie"]
+
+
+def test_no_show_less_on_the_follow_through_pick(
+    client: FlaskClient, viewer: User, stack: tuple[Post, Post], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.routes.main.top_post", lambda kind: stack[1])
+    login_as(client, viewer)
+    assert 'class="show-less"' not in client.get("/feed").get_data(as_text=True)
+    assert 'class="show-less"' in client.get("/feed?n=2").get_data(as_text=True)
+
+
+def test_moving_a_post_to_another_category_is_not_an_edit(
+    client: FlaskClient, poster: User
+) -> None:
+    post = add_post(poster, "Launch day bus fare", PostCategory.RENT)
+    post.body = "Bus fare to my first shift."
+    db.session.commit()
+    login_as(client, poster)
+    data = {
+        "kind": "need",
+        "category": "transport",
+        "title": "Launch day bus fare",
+        "body": "Bus fare to my first shift.",
+        "goal": "100",
+    }
+    client.post(f"/posts/{post.id}/edit", data=data)
+    assert post.category is PostCategory.TRANSPORT
+    assert post.edited_at is None
+    assert post.status is PostStatus.OPEN
+
+
+def test_deleting_an_account_clears_the_choice(viewer: User) -> None:
+    viewer.show_less = "rent"
+    anonymize(viewer)
+    db.session.commit()
+    assert viewer.show_less is None
+
+
+def test_privacy_names_the_show_less_cookie(client: FlaskClient) -> None:
+    page = client.get("/privacy").get_data(as_text=True)
+    assert "We use two cookies" in page
+    assert "The only cookie" not in page

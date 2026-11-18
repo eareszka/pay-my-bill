@@ -230,7 +230,9 @@ def test_swipe_up_opens_the_post(ui: Ui, live_server: LiveServer) -> None:
 
 def test_swipe_down_shows_less_of_that_kind(ui: Ui, live_server: LiveServer) -> None:
     ui.login(live_server.make_user("lesser"))
-    ui.goto("/feed")
+    # The first ticket is the follow-through pick, which always stays first, so it has no
+    # Show less (#119 review); the second one does.
+    ui.goto("/feed?n=2")
     category = ui.page.locator("form.show-less").get_attribute("data-category")
     drag(ui, 0, 200)
     ui.page.wait_for_url(re.compile(rf"undo={category}"))

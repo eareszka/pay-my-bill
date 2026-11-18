@@ -127,7 +127,7 @@ def index() -> str:
     next_at = position + 1 if position < total else 1
     next_post = ticket_at(next_at, kind, top, less) if total > 1 else None
     back_post = ticket_at(position - 1, kind, top, less) if position > 1 else None
-    undo = request.args.get("undo")
+    undo = request.args.get("undo", type=PostCategory)
     return render_template(
         "index.html",
         post=post,
@@ -137,7 +137,8 @@ def index() -> str:
         position=position,
         total=total,
         less=less,
-        undo=PostCategory(undo) if undo in show_less.VALUES and undo in less else None,
+        undo=undo if undo in less else None,
+        top_pick=top is not None and position == 1,
         **(chip_in_context(post) if post else {}),
     )
 

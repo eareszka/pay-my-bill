@@ -38,3 +38,4 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-18 (ui): #236: How stories teach swipe/tap and show the real To confirm row (owner's picks); every step still fits an SE. #225 waits on the phone. Blocked: none.
 - 2026-11-18 (main): #80 review fixes: gift news is committed after render, only up to the newest gift shown, with no write when nothing is new. Next: #119 review fixes. Blocked: none.
 - 2026-11-18 (ui): #252: See more on the feed card and a Close (×) on the post sheet that returns to the same ticket; the gestures stay. #225 waits on the phone. Blocked: none.
+- 2026-11-18 (main): #119 review fixes: sign-up joins the cookie, delete clears it, Privacy names it, no Show less on the top pick, category moves aren't edits. Blocked: none.
