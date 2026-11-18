@@ -57,10 +57,10 @@
         {% endcall %}
       {% endif %}
       <div class="q-nav">
-        <button type="button" class="btn btn-secondary" data-q-back hidden>Back</button>
+        <button type="button" class="q-round q-back" data-q-back hidden><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg><span class="sr-only">Back</span></button>
         <button type="button" class="btn btn-secondary" data-q-skip hidden>Skip</button>
-        <button type="button" class="btn q-next" data-q-next aria-label="Next" hidden>→</button>
-        <button type="submit" class="btn" data-q-submit>Post</button>
+        <button type="button" class="q-round q-next" data-q-next hidden><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg><span class="sr-only">Next</span></button>
+        <button type="submit" class="btn q-post" data-q-submit>Post<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></button>
       </div>
     </form>
     <script src="{{ url_for('static', filename='js/once.js') }}" defer></script>
