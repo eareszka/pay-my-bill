@@ -13,7 +13,7 @@ from app.models import (
     User,
     utcnow,
 )
-from tests.conftest import MakeUser, login_as
+from tests.conftest import MakeUser, login_as, with_photo
 
 FORM = {
     "kind": "need",
@@ -43,13 +43,13 @@ def test_requires_login(client: FlaskClient) -> None:
 def test_unverified_user_prompted_to_verify(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user(verified=False, venmo_handle="@alice-v"))
     assert client.get("/posts/new").location == "/verify/pending"
-    assert client.post("/posts/new", data=FORM).location == "/verify/pending"
+    assert client.post("/posts/new", data=with_photo(FORM)).location == "/verify/pending"
     assert posts() == []
 
 
 def test_no_payment_handle_sent_to_profile(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user())
-    resp = client.post("/posts/new", data=FORM)
+    resp = client.post("/posts/new", data=with_photo(FORM))
     assert resp.location == "/profile"
     assert posts() == []
 
@@ -71,10 +71,12 @@ def test_form_asks_one_question_per_step(client: FlaskClient, poster: User) -> N
 
 
 def test_errors_keep_the_other_answers(client: FlaskClient, poster: User) -> None:
-    page = client.post("/posts/new", data={**FORM, "category": ""}).get_data(as_text=True)
+    page = client.post("/posts/new", data=with_photo({**FORM, "category": ""})).get_data(
+        as_text=True
+    )
     assert 'id="category-error"' in page
     assert 'value="Car battery died"' in page
-    page = client.post("/posts/new", data={**FORM, "title": ""}).get_data(as_text=True)
+    page = client.post("/posts/new", data=with_photo({**FORM, "title": ""})).get_data(as_text=True)
     assert 'value="bills" required checked' in page
     assert posts() == []
 
@@ -84,12 +86,12 @@ def test_rules_checkbox_hidden_once_accepted(client: FlaskClient, poster: User) 
     db.session.commit()
     page = client.get("/posts/new").get_data(as_text=True)
     assert 'name="accept_rules"' not in page
-    client.post("/posts/new", data={**FORM, "accept_rules": ""})
+    client.post("/posts/new", data=with_photo({**FORM, "accept_rules": ""}))
     assert len(posts()) == 1
 
 
 def test_create_open_post(client: FlaskClient, poster: User) -> None:
-    resp = client.post("/posts/new", data=FORM, follow_redirects=True)
+    resp = client.post("/posts/new", data=with_photo(FORM), follow_redirects=True)
     assert b"Your post is live." in resp.data
     (post,) = posts()
     assert (post.kind, post.status, post.goal_cents) == (PostKind.NEED, PostStatus.OPEN, 12_000)
@@ -98,14 +100,14 @@ def test_create_open_post(client: FlaskClient, poster: User) -> None:
 
 
 def test_first_post_requires_rules(client: FlaskClient, poster: User) -> None:
-    resp = client.post("/posts/new", data={**FORM, "accept_rules": ""})
+    resp = client.post("/posts/new", data=with_photo({**FORM, "accept_rules": ""}))
     assert b"You need to agree to the Community Rules" in resp.data
     assert posts() == []
     assert poster.rules_accepted_at is None
 
 
 def test_goal_at_cap_allowed(client: FlaskClient, poster: User) -> None:
-    client.post("/posts/new", data={**FORM, "goal": "1,000.00"})
+    client.post("/posts/new", data=with_photo({**FORM, "goal": "1,000.00"}))
     assert posts()[0].goal_cents == MAX_GOAL_CENTS
 
 
@@ -119,7 +121,7 @@ def test_goal_at_cap_allowed(client: FlaskClient, poster: User) -> None:
     ],
 )
 def test_bad_goal_rejected(client: FlaskClient, poster: User, goal: str, message: bytes) -> None:
-    resp = client.post("/posts/new", data={**FORM, "goal": goal})
+    resp = client.post("/posts/new", data=with_photo({**FORM, "goal": goal}))
     assert message in resp.data
     assert posts() == []
 
@@ -131,15 +133,15 @@ def test_bad_goal_rejected(client: FlaskClient, poster: User, goal: str, message
 def test_invalid_fields_rejected(
     client: FlaskClient, poster: User, overrides: dict[str, str]
 ) -> None:
-    assert client.post("/posts/new", data={**FORM, **overrides}).status_code == 200
+    assert client.post("/posts/new", data=with_photo({**FORM, **overrides})).status_code == 200
     assert posts() == []
 
 
 def test_third_open_post_rejected(client: FlaskClient, poster: User) -> None:
-    client.post("/posts/new", data=FORM)
-    client.post("/posts/new", data={**FORM, "title": "Help my startup"})
+    client.post("/posts/new", data=with_photo(FORM))
+    client.post("/posts/new", data=with_photo({**FORM, "title": "Help my startup"}))
     assert [p.status for p in posts()] == [PostStatus.OPEN, PostStatus.PENDING_REVIEW]
-    resp = client.post("/posts/new", data={**FORM, "title": "Third one"})
+    resp = client.post("/posts/new", data=with_photo({**FORM, "title": "Third one"}))
     assert resp.status_code == 409
     assert b"You already have 2 open posts" in resp.data
     assert len(posts()) == 2
@@ -148,18 +150,20 @@ def test_third_open_post_rejected(client: FlaskClient, poster: User) -> None:
 
 def test_closed_posts_do_not_count(client: FlaskClient, poster: User) -> None:
     for title in ("First post", "Second post"):
-        client.post("/posts/new", data={**FORM, "title": title})
+        client.post("/posts/new", data=with_photo({**FORM, "title": title}))
     for post in posts():
         post.status = PostStatus.FUNDED
     db.session.commit()
-    client.post("/posts/new", data={**FORM, "title": "Third post"})
+    client.post("/posts/new", data=with_photo({**FORM, "title": "Third post"}))
     assert len(posts()) == 3
 
 
 def test_fundraising_post_goes_to_review(client: FlaskClient, poster: User) -> None:
     resp = client.post(
         "/posts/new",
-        data={**FORM, "title": "Small shop", "body": "Need seed money for my LLC inventory."},
+        data=with_photo(
+            {**FORM, "title": "Small shop", "body": "Need seed money for my LLC inventory."}
+        ),
         follow_redirects=True,
     )
     assert b"after a quick review" in resp.data
@@ -172,12 +176,12 @@ def test_rules_page(client: FlaskClient) -> None:
 
 
 def test_rules_and_field_errors_reported_together(client: FlaskClient, poster: User) -> None:
-    resp = client.post("/posts/new", data={**FORM, "accept_rules": "", "goal": "5000"})
+    resp = client.post("/posts/new", data=with_photo({**FORM, "accept_rules": "", "goal": "5000"}))
     assert b"You need to agree to the Community Rules" in resp.data
     assert b"Goals are capped at $1,000." in resp.data
 
 
 def test_limit_text_uses_constant(client: FlaskClient, poster: User) -> None:
     for n in range(MAX_OPEN_POSTS):
-        client.post("/posts/new", data={**FORM, "title": f"Post number {n}"})
+        client.post("/posts/new", data=with_photo({**FORM, "title": f"Post number {n}"}))
     assert f"You already have {MAX_OPEN_POSTS} open posts".encode() in client.get("/posts/new").data

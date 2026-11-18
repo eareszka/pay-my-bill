@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField
+from flask_wtf.file import MultipleFileField
 from wtforms import (
     BooleanField,
     EmailField,
@@ -28,7 +28,7 @@ from app.models import MAX_GOAL_CENTS, Post, PostCategory, PostKind, ReportReaso
 from app.moderation import update_flagged_keywords
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
-from app.photos import PhotoError, process
+from app.photos import MAX_PHOTOS, PhotoError, process
 from app.regions import US_STATES
 
 
@@ -211,25 +211,29 @@ class PostForm(FlaskForm):
         validators=[DataRequired(message="Enter a goal amount.")],
         description=f"Up to {format_cents(MAX_GOAL_CENTS)}.",
     )
-    photo = FileField(
-        "Photo (optional)",
-        description="One photo, up to 8 MB: JPG, PNG, or WebP. We remove its location data.",
+    photos = MultipleFileField(
+        "Photos",
+        description=f"1 to {MAX_PHOTOS} photos, up to 8 MB each: JPG, PNG, or WebP. "
+        "We remove their location data.",
     )
     accept_rules = BooleanField("I agree to the Community Rules")
 
     goal_cents = 0
-    photo_data: bytes | None = None
+    photo_data: list[bytes]
 
     def __init__(self, *args: Any, require_rules: bool = False, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.require_rules = require_rules
 
-    def validate_photo(self, field: Field) -> None:
-        upload = field.data
-        if not upload or not getattr(upload, "filename", ""):
-            return
+    def validate_photos(self, field: Field) -> None:
+        # Each of the five boxes is its own file input, so empty boxes arrive as empty files.
+        uploads = [upload for upload in field.data or [] if getattr(upload, "filename", "")]
+        if not uploads:
+            raise ValidationError("Add at least one photo.")
+        if len(uploads) > MAX_PHOTOS:
+            raise ValidationError(f"Add up to {MAX_PHOTOS} photos.")
         try:
-            self.photo_data = process(upload.stream)
+            self.photo_data = [process(upload.stream) for upload in uploads]
         except PhotoError as error:
             raise ValidationError(str(error)) from error
 

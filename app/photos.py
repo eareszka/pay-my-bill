@@ -1,4 +1,4 @@
-"""One optional photo per post: check it, strip it, shrink it, and store it (ADR 0015)."""
+"""Up to five photos per post: check them, strip them, shrink them, and store them (ADR 0020)."""
 
 from __future__ import annotations
 
@@ -15,9 +15,10 @@ from sqlalchemy import select
 from app.extensions import db
 from app.models import PhotoDelete
 
+MAX_PHOTOS = 5
 MAX_PHOTO_BYTES = 8 * 1024 * 1024
-# An 8 MB photo plus the rest of the new-post form.
-MAX_UPLOAD_BYTES = 9 * 1024 * 1024
+# Five 8 MB photos plus the rest of the new-post form.
+MAX_UPLOAD_BYTES = MAX_PHOTOS * MAX_PHOTO_BYTES + 1024 * 1024
 MAX_SOURCE_PIXELS = 40_000_000  # about 7,300 x 5,500; anything bigger is refused, not decoded
 MAX_EDGE = 1600
 WEBP_QUALITY = 80
@@ -145,6 +146,7 @@ def init_app(app: Flask) -> None:
     app.extensions["photo_store"] = store
     app.jinja_env.globals["photo_url"] = photo_url
     app.jinja_env.globals["PHOTO_ACCEPT"] = PHOTO_ACCEPT
+    app.jinja_env.globals["MAX_PHOTOS"] = MAX_PHOTOS
 
 
 def store() -> PhotoStore:

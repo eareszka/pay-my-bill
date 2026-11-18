@@ -16,6 +16,8 @@ The new-post page at `/posts/new` (#275), asked one question per screen. Inherit
 - main's working version: `steps.js` shows one `[data-step]` at a time, sets `form[data-steps=on]`, moves the progress bar, and auto-advances after a single-choice pick (250 ms). A server error opens on the first step with an `.error`. Without JS the page is one long form. Keep that.
 - The form, validation, CSRF, moderation, the open-post limit and `edit.html` are unchanged.
 
+- #279 (owner, 2026-11-18): the photo step is five boxes like Hinge's photo grid (the owner's screenshot shows a 3×2 grid of rounded boxes, each with a +). The first is required and at most 5 are allowed. Each box is a `.q-photo-box` label around its own file input; `steps.js` sets the picked photo as the box's background and adds `.has-file`. Extra photos show in `.post-photos` on the post page.
+
 ## Direction contract
 
 Mode: Operate. Yearnly's world, with onboarding pacing (ui, 2026-11-18).

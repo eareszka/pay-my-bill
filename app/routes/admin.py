@@ -133,12 +133,13 @@ def approve(post_id: int) -> Response:
 def remove(post_id: int) -> Response:
     post = _post(post_id)
     post.status = PostStatus.REMOVED
-    # A removed post's photo goes too, or its URL stays public (#144).
-    photo_key, post.photo_key = post.photo_key, None
+    # A removed post's photos go too, or their URLs stay public (#144).
+    photo_keys = post.take_photos()
     _resolve(Report.post_id == post.id, resolution="removed")
     _log("remove post", _about(post))
     db.session.commit()
-    photos.discard(photo_key)
+    for key in photo_keys:
+        photos.discard(key)
     flash(f"Removed “{post.title}”.", "success")
     return redirect(url_for("admin.queue"))
 
@@ -147,14 +148,15 @@ def remove(post_id: int) -> Response:
 @admin_required
 def remove_photo(post_id: int) -> Response:
     post = _post(post_id)
-    photo_key, post.photo_key = post.photo_key, None
+    photo_keys = post.take_photos()
     _resolve(
         Report.post_id == post.id, Report.reason == ReportReason.PHOTO, resolution="photo_removed"
     )
     _log("remove photo", _about(post))
     db.session.commit()
-    photos.discard(photo_key)
-    flash(f"Removed the photo from “{post.title}”.", "success")
+    for key in photo_keys:
+        photos.discard(key)
+    flash(f"Removed the photos from “{post.title}”.", "success")
     return redirect(url_for("admin.queue"))
 
 
@@ -167,9 +169,7 @@ def _ban(user: User) -> list[str]:
     # counting toward anyone's rewards (#147).
     for post in user.posts:
         post.status = PostStatus.REMOVED
-        if post.photo_key:
-            photo_keys.append(post.photo_key)
-            post.photo_key = None
+        photo_keys += post.take_photos()
     _resolve(
         or_(Report.user_id == user.id, Report.post_id.in_([p.id for p in user.posts])),
         resolution="banned",

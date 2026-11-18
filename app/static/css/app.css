@@ -656,6 +656,16 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .admin-item { margin-bottom: 12px; }
 .admin-item h3 { margin: 0 0 4px; font-size: 1rem; }
 .admin-item .actions { margin-top: 10px; }
+/* The new-post photo step: five boxes, the first required (#279). Each box is a file input with its picture behind it. */
+.q-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.q-photo-box { position: relative; display: grid; place-items: center; aspect-ratio: 1; border: 1.5px dashed var(--edge); border-radius: var(--radius); background: var(--surface) center / cover no-repeat; cursor: pointer; }
+.q-photo-box:hover, .q-photo-box:focus-within { border-color: var(--ink); }
+.q-photo-box input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.q-photo-add { font-size: 2rem; color: var(--muted); }
+.q-photo-box.has-file { border-style: solid; }
+.q-photo-box.has-file .q-photo-add { visibility: hidden; }
+.post-photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.post-photos img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
 .admin-photo { display: block; width: 160px; height: 200px; margin-top: 8px; object-fit: cover; border-radius: var(--radius); }
 .legal h2 { margin: 24px 0 6px; font-size: 1.125rem; font-family: var(--sans); }
 .legal h2:first-of-type { margin-top: 8px; }

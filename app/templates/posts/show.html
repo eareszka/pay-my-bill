@@ -28,6 +28,11 @@
       {{ meter(post.progress_percent, "Progress toward goal") }}
     </header>
     <p class="post-body">{{ post.body }}</p>
+    {% if post.more_photo_keys %}
+      <div class="post-photos">
+        {% for key in post.more_photo_keys %}<img src="{{ photo_url(key) }}" alt="Photo {{ loop.index + 1 }} from {{ post.user.username }}" loading="lazy" decoding="async">{% endfor %}
+      </div>
+    {% endif %}
     <div class="post-side">
     {% if post.update_body %}
       <section class="group" id="update">
@@ -83,7 +88,7 @@
           {% if post.photo_key %}
             <form method="post" action="{{ url_for('posts.delete_photo', post_id=post.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-secondary">Remove photo</button>
+              <button type="submit" class="btn btn-secondary">Remove {{ "photos" if post.more_photo_keys else "photo" }}</button>
             </form>
           {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete {{ "update" if post.is_deleted else "post" }}</a>

@@ -16,7 +16,8 @@ def _origin(url: str) -> str:
 
 
 def content_security_policy(photo_url: str) -> str:
-    images = " ".join(filter(None, ("'self'", _origin(photo_url))))
+    # blob: lets the new-post photo boxes preview the poster's own picks (#279).
+    images = " ".join(filter(None, ("'self'", "blob:", _origin(photo_url))))
     return "; ".join(
         (
             "default-src 'self'",
