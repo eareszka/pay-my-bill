@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- `flask --app app auth prune` deletes login and email throttle rows older than a week, which is far past every limit's window. It runs in the daily job (#15). Email was already sent off the request path (#105).
 - A public Support page at `/support` (#264), linked from the footer, for the App Store listing. It covers how to email support@yearnly.app, report or block someone, where payment problems go, password reset, account deletion, and links to Rules, Terms, and Privacy.
 - The reminder emails run every day on their own (#258, PB-35). A GitHub Actions workflow runs `gifts remind` and `posts remind` at 15:00 UTC against Neon and Brevo, using the `DATABASE_URL` and `BREVO_API_KEY` repository secrets, and skips with a warning until they're set.
 
