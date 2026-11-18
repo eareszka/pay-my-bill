@@ -46,6 +46,17 @@ The current database expires around 2026-11-26. Staging data is disposable, so r
 
 To keep the data instead, upgrade the database to a paid plan before it expires.
 
+## Monitoring and backups (#259)
+- **Errors:** set `SENTRY_DSN` in the Render dashboard (Sentry free tier, a Flask project). Unhandled errors outside development are reported without request bodies, cookies, headers, query strings, users, or the tokens in `/verify`, `/reset`, and `/gifts/answer` links (`app/monitoring.py`). Outside development, database errors also hide row values (`hide_parameters`). With no DSN set, nothing is sent.
+- **Uptime:** in [UptimeRobot](https://uptimerobot.com) (free), add an HTTP(s) monitor for `https://yearnly.app/health` every 5 minutes, alerting the owner's email. It also keeps the free Render service from sleeping (one service running all month fits the 750 free hours).
+- **Backups:** Neon keeps a point-in-time history of the database. Its length depends on the plan, so check it under **Settings → Storage → History retention**. To restore:
+  1. In the Neon console, open the project → **Branches** → **Create branch**, and pick **Past data** at the time to go back to.
+  2. Copy the new branch's direct connection string. Run `DATABASE_URL=<it> flask --app app db current` and confirm it prints the latest revision.
+  3. To switch over, set Render's `DATABASE_URL` (and the `DATABASE_URL` GitHub secret) to the branch, or restore the main branch in place with **Restore**.
+  4. Check that [`/health`](https://yearnly.app/health) returns 200.
+
+  Test a restore once with a throwaway branch, then note the date here. Last tested: not yet.
+
 ## Docs
 - [Product requirements](docs/PRD.md)
 - [Development process](docs/process.md): sprints, Definition of Ready and Done, git workflow
