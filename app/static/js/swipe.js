@@ -265,7 +265,8 @@ const plainClick = (event) => !(
 const typing = (element) => element instanceof HTMLElement
   && (element.isContentEditable || element.matches("input, select, textarea"));
 
-if (ticket && deck && (nextLink || backLink)) {
+// A lone ticket still swipes: up opens it, down shows less of its kind (#119 review).
+if (ticket && deck) {
   // Phones hand vertical moves on the card to this script: up opens the post (#235), down shows less (#119).
   if (upLink) ticket.classList.add("swipe-up");
   ticket.addEventListener("pointerdown", onDown);

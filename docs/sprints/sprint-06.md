@@ -35,3 +35,4 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-18 (ui): #119 design on #246: Less rail glyph (owner's pick), swipe-down to Show less, undo line, profile list; desktop Chip in panel height fix. Blocked: none.
 - 2026-11-18 (ui): #248: the post slides up over the feed as a sheet, pull down slides it back, bars hold still, and Feed stays home on a post. Next: #236. Blocked: none.
 - 2026-11-18 (ui): #236: How stories teach swipe/tap and show the real To confirm row (owner's picks); every step still fits an SE. #225 waits on the phone. Blocked: none.
+- 2026-11-18 (ui): #119 review fixes: Less label on Safari before 17.4, desktop undo line under the card, a lone ticket still swipes. #253 (#252) is in review. Blocked: none.
