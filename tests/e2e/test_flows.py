@@ -284,3 +284,14 @@ def test_current_pill_slides_from_the_last_tab(ui: Ui, live_server: LiveServer) 
     ui.page.wait_for_url(re.compile(r"/leaders"))
     ui.page.wait_for_function("() => window.slides.length > 0")
     assert ui.page.evaluate("window.slides[0][0]") == "Leaders"
+
+
+@pytest.mark.parametrize("size", ["mobile"])
+def test_to_confirm_badge_floats_on_the_you_tab(ui: Ui) -> None:
+    ui.login("dev_tom")  # the seed leaves dev_tom a gift to confirm
+    you = ui.page.locator(".nav-user")
+    expect(you.locator(".badge")).to_be_visible()
+    assert you.locator(".badge").evaluate("el => getComputedStyle(el).position") == "absolute"
+    label = you.locator(".nav-label").bounding_box()
+    nav = ui.page.locator(".topbar > nav").bounding_box()
+    assert label and nav and label["y"] + label["height"] <= nav["y"] + nav["height"]

@@ -95,6 +95,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The card form says that a card from outside the US costs a little more, and that it comes out of the gift (#104).
 
 ### Fixed
+- On a phone, the count of gifts to confirm floats on the You tab again instead of pushing your username off the bottom of the tab bar (#245).
 - Card checkout offers only cards, Apple Pay, and Google Pay. Other methods have different fees that the donor's fee doesn't cover (#108).
 
 ### Changed
