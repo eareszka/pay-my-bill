@@ -1,0 +1,55 @@
+name: Daily jobs
+
+# The reminder emails (#258, PB-35): gifts waiting 3+ days to be confirmed, and results
+# updates coming due. Free on a public repo; it talks to Neon and Brevo directly.
+on:
+  schedule:
+    - cron: "0 15 * * *" # 15:00 UTC, mid-morning across the US
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-jobs
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      FLASK_ENV: production
+      APP_URL: https://yearnly.app
+      MAIL_FROM: Yearnly <no-reply@yearnly.app>
+      CONTACT_EMAIL: support@yearnly.app
+      MAIL_ASYNC: "0" # send before the job exits
+    steps:
+      - name: Check secrets
+        run: |
+          if [ -z "$DATABASE_URL" ] || [ -z "$BREVO_API_KEY" ]; then
+            echo "::warning::Set the DATABASE_URL and BREVO_API_KEY repository secrets to send reminders."
+            echo "skip=1" >> "$GITHUB_ENV"
+          fi
+      # Actions are pinned to a commit, not a movable tag (#177).
+      - if: env.skip != '1'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - if: env.skip != '1'
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - if: env.skip != '1'
+        name: Install
+        run: |
+          pip install --require-hashes -r requirements.lock
+          pip install --no-deps .
+      - if: env.skip != '1'
+        name: Send reminders
+        run: |
+          # Nothing here signs a link the site has to check, so a one-off key is enough.
+          export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+          flask --app app gifts remind
+          flask --app app posts remind
