@@ -354,7 +354,7 @@ def test_a_lone_ticket_still_swipes_down(make_ui: UiFactory, live_server: LiveSe
 
     ui.page.route(re.compile(r"/feed(\?.*)?$"), without_neighbors)
     ui.login(live_server.make_user("lone"))
-    ui.goto("/feed")
-    expect(ui.page.locator(".deck-next")).to_have_count(0)
+    ui.goto("/feed?n=2")  # not the follow-through pick, which has no Show less (#255)
+    expect(ui.page.locator(".deck-next, .deck-back")).to_have_count(0)
     drag(ui, 0, 200)
     ui.page.wait_for_url(re.compile(r"undo="))
