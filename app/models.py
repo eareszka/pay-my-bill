@@ -164,6 +164,8 @@ class User(Base):
     stripe_ready: Mapped[bool] = mapped_column(default=False, server_default="0")
     # Part of the session's user id, so raising it ends every existing session (#130).
     session_version: Mapped[int] = mapped_column(default=0, server_default="0")
+    # When the owner last saw their gift news; None (accounts from before #80) shows none.
+    gifts_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")

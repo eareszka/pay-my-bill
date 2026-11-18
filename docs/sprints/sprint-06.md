@@ -7,7 +7,7 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 ## Committed
 | Story | Issue | Lane | Points | Status |
 |---|---|---|---|---|
-| S5-4 Visible rewards | #80 | main → ui | 5 | To do |
+| S5-4 Visible rewards | #80 | main → ui | 5 | In progress (main) |
 | S5-5 Clear disputes | #81 | main | 3 | To do |
 | S5-10 Categories and show less | #119 | main → ui | 5 | To do |
 | Story bubble keeps its shape on Next | #217 | ui | — | In review (#223) |
@@ -22,3 +22,4 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-17 (ui): #234: on phones the bars stay put and only long pages scroll between them; feed, door, and stories fit down to the SE. Next: #225, #227. Blocked: none.
 - 2026-11-17 (ui): #227: the current pill slides from the last tab in every pill row. #225 is likely fixed by #223; asked the owner to recheck on the phone. Blocked: none.
 - 2026-11-17 (ui): #234 follow-up: feed, door, and stories locked still on phones (overflow hidden, touch-action pinch-zoom); a feed flash squeezes the stage. Blocked: none.
+- 2026-11-18 (main): #80: confirm email to the donor, one-time news banner on You, rewards strip on Chipped in. Next: ui pass, then #81. Blocked: none.

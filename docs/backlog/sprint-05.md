@@ -30,10 +30,10 @@ As a **donor**, I want to **see who I'm sending money to** so that **I can decid
 
 ### S5-4 Visible rewards · #80 · 5 pts · P1
 As a **donor**, I want to **see my progress and know when a gift counts** so that **giving feels rewarding**.
-- [ ] The username in the top bar opens your own profile, which links to editing it.
-- [ ] Gifts shows a strip with your level, people helped, and streak.
-- [ ] When a gift is confirmed, the donor gets one email: "maria_g confirmed your $20. You've helped 3 people." (owner decision).
-- [ ] The next visit to Gifts shows a one-time banner with the same news. It's plain, with no casino effects.
+- [x] The username in the top bar opens your own profile, which links to editing it.
+- [x] Gifts shows a strip with your level, people helped, and streak.
+- [x] When a gift is confirmed, the donor gets one email: "maria_g confirmed your $20. You've helped 3 people." (owner decision).
+- [x] The next visit to Gifts shows a one-time banner with the same news. It's plain, with no casino effects.
 
 ### S5-5 Clear disputes · #81 · 3 pts · P1
 As a **poster**, I want to **match a gift to my payment app**, and as a **donor**, I want to **know what happened** so that **disputes are fair**.
