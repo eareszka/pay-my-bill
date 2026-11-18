@@ -28,40 +28,40 @@ Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning.
 
 ## Toward the App Store (see `docs/roadmap.md`)
 
-### PB-12 Block another user · #TBD · 3 pts · P1 · epic:safety · v0.1-alpha
+### PB-12 Block another user · #257 · 3 pts · P1 · epic:safety · v0.1-alpha
 As a **user**, I want to **block someone** so that **I stop seeing them and they can't interact with me** (App Store Guideline 1.2).
-- [ ] Given another user's profile or post, when I block them, then their posts and updates are hidden from my feed.
-- [ ] Given they've blocked me or I've blocked them, then neither of us can pledge to the other's posts or give kudos.
-- [ ] Given my blocked list in settings, when I unblock someone, then their content shows again.
-- [ ] Blocking is silent: the blocked user isn't notified.
+- [x] Given another user's profile or post, when I block them, then their posts and updates are hidden from my feed.
+- [x] Given they've blocked me or I've blocked them, then neither of us can pledge to the other's posts or give kudos.
+- [x] Given my blocked list in settings, when I unblock someone, then their content shows again.
+- [x] Blocking is silent: the blocked user isn't notified.
 
 ### PB-13 Production hosting, domain, and HTTPS · #TBD · 3 pts · P0 · chore · v0.2-beta
 - [ ] ADR 0011 records the production host, plan, and monthly cost.
 - [ ] Production auto-deploys from tagged releases, separate from staging, on the domain chosen in PB-10, with HTTPS.
 - [ ] `SESSION_COOKIE_SECURE` and the other production settings come from env vars and are listed in `.env.example`.
 
-### PB-14 Transactional email provider · #TBD · 2 pts · P0 · epic:accounts · v0.2-beta
+### PB-14 Transactional email provider · Done (#96) · 2 pts · P0 · epic:accounts · v0.2-beta
 - [ ] `MAIL_SERVER` points at a provider (Postmark, Resend, or SES) with SPF and DKIM set up on the domain.
 - [ ] A verification email from production lands in the Gmail and iCloud inboxes, not spam.
 
-### PB-15 Monitoring and backups · #TBD · 2 pts · P1 · chore · v0.2-beta
+### PB-15 Monitoring and backups · #259 · 2 pts · P1 · chore · v0.2-beta
 - [ ] Unhandled errors are reported to an error tracker, with no passwords or tokens in the payload.
 - [ ] An uptime check on `/health` alerts the owner.
 - [ ] Daily Postgres backups, and a restore that's been tested once and written down in the README.
 
-### PB-16 Spike: Capacitor iOS wrapper · #TBD · 3 pts · P1 · spike · v1.0
+### PB-16 Spike: Capacitor iOS wrapper · Done (#193) · 3 pts · P1 · spike · v1.0
 - [ ] A Capacitor project that loads the production site, with a write-up in `docs/research/`.
 - [ ] A plan for the native features that clear Guideline 4.2: push notifications, the share sheet, and an offline screen.
 - [ ] ADR 0012 records the decision.
 
-### PB-17 Spike: iOS builds on macOS CI · #TBD · 2 pts · P1 · spike · v1.0
+### PB-17 Spike: iOS builds on macOS CI · Done (#193) · 2 pts · P1 · spike · v1.0
 - [ ] A GitHub Actions macOS workflow builds and signs the app and uploads it to TestFlight, with the signing secrets in GitHub secrets.
 
 ### PB-18 Apple Developer enrollment · #TBD · 1 pt · P1 · chore · v1.0 · owner
 - [ ] Decide on an individual or organization (LLC) account after the Phase 5 legal review. Get a D-U-N-S number if it's an organization.
 - [ ] Enrolled ($99/year), with the account holder recorded in the README.
 
-### PB-19 App Store listing and review pack · #TBD · 3 pts · P1 · chore · v1.0
+### PB-19 App Store listing and review pack · #260 · 3 pts · P1 · chore · v1.0
 - [ ] App Store Connect listing: name, description, icon, 6.7" and 6.5" screenshots, a privacy policy URL, and a support URL.
 - [ ] A privacy label covering email, payment handles, and user content. An age rating that matches the 18+ rule.
 - [ ] A demo account and review notes covering link-out gifts (Guideline 3.2.1(vii)), reporting, blocking, and account deletion.
@@ -77,7 +77,7 @@ From the PR #66 review. Do this with the admin queue, which adds approval. Today
 
 ### PB-23 Show reaction counts in the admin queue · #73 · 1 pt · P2 · epic:safety
 From the PR #72 review. Deleting a post hides its update and reactions, so admins lose the 🤨 signal (ADR 0008). The rows stay in the database.
-- [ ] Given a post with 🤨 reactions, deleted or not, when an admin opens the queue, then they see the count.
+- [x] Given a post with 🤨 reactions, deleted or not, when an admin opens the queue, then they see the count.
 
 ### PB-24 Keep the stack steady while browsing · #87 · 2 pts · P2 · epic:posts
 From the PR #86 review. Next ticket uses a position, so a new or closed post can repeat or skip a ticket mid-browse. A stable cursor would fix it. Done as part of PB-27.
@@ -147,7 +147,7 @@ As **anyone**, I want to **find my way around and see what a person is asking fo
 
 ## Safe to open and production
 
-### PB-33 Report a post or user, with an admin queue · #TBD · 5 pts · P0 · epic:safety · v0.1-alpha
+### PB-33 Report a post or user, with an admin queue · Done (#95) · 5 pts · P0 · epic:safety · v0.1-alpha
 As the **community**, we want **a way to report and act on bad posts** (App Store Guideline 1.2). Keyword-flagged posts have no way to be approved today. Do PB-22 and PB-23 with this.
 - [ ] Any verified user can report a post or user, with a reason.
 - [ ] Admins see reports and flagged posts in one queue, and can approve, remove, or ban.
@@ -157,13 +157,13 @@ As the **community**, we want **a way to report and act on bad posts** (App Stor
 - [x] Secure session cookies, security headers, and an upload limit are on in production.
 - [ ] The app refuses to start in production without `SECRET_KEY`.
 
-### PB-35 Scheduled jobs for reminders · #TBD · 1 pt · P1 · chore · v0.2-beta
+### PB-35 Scheduled jobs for reminders · #258 · 1 pt · P1 · chore · v0.2-beta
 - [ ] `flask gifts remind` and `flask posts remind` run daily without anyone starting them.
 
-### PB-36 Installable web app · #TBD · 3 pts · P1 · v0.2-beta
+### PB-36 Installable web app · Done (#185) · 3 pts · P1 · v0.2-beta
 - [ ] A manifest and icons let people add the site to a phone's home screen, and an offline screen shows when there's no connection. Pages with money or personal data aren't cached.
 
-### PB-37 Browser tests in the repo · #TBD · 2 pts · P2 · chore · v0.2-beta
+### PB-37 Browser tests in the repo · Done (#207) · 2 pts · P2 · chore · v0.2-beta
 - [ ] `tests/e2e` covers swiping and the chip-in flow.
 - [ ] Swiping has been checked by hand in Safari on an iPhone.
 
@@ -175,7 +175,7 @@ Follows PB-11's recruitment plan.
 ### PB-39 Lawyer review of Terms and Privacy · #TBD · 1 pt · P0 · chore · v1.0 · owner
 - [ ] A lawyer has reviewed both pages, and the owner has decided on an LLC, which decides the Apple account type in PB-18.
 
-### PB-40 Photos on posts · #TBD · 5 pts · P3 · epic:posts
+### PB-40 Photos on posts · Done (#122) · 5 pts · P3 · epic:posts
 Comes after PB-33, since photos need moderation. Compare cloud storage options and bring the cost to the owner first, with an ADR (T7).
 - [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename.
 

@@ -17,6 +17,7 @@ from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
 from app import show_less, stripe_pay
+from app.blocks import visible_posts
 from app.door_photos import door_photos
 from app.extensions import db
 from app.models import Post, PostCategory, PostKind, open_posts
@@ -42,7 +43,7 @@ def ticket_at(
     query = (
         select(Post)
         .options(joinedload(Post.user))
-        .where(open_posts())
+        .where(open_posts(), visible_posts())
         .order_by(*later, Post.created_at.desc(), Post.id.desc())
     )
     if kind:
@@ -112,7 +113,7 @@ def story_neighbors(path: str, step: int, total: int) -> list[str]:
 @bp.get("/feed")
 def index() -> str:
     kind = request.args.get("kind", type=PostKind)
-    count = select(func.count()).select_from(Post).where(open_posts())
+    count = select(func.count()).select_from(Post).where(open_posts(), visible_posts())
     if kind:
         count = count.where(Post.kind == kind)
     total = db.session.scalar(count) or 0
@@ -202,6 +203,12 @@ def terms() -> str:
 @bp.get("/privacy")
 def privacy() -> str:
     return render_template("legal/privacy.html")
+
+
+@bp.get("/support")
+def support() -> str:
+    # The App Store listing links here (#264).
+    return render_template("legal/support.html")
 
 
 @bp.get("/media/<path:key>")

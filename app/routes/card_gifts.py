@@ -9,6 +9,7 @@ from werkzeug.wrappers import Response
 
 from app import stripe_pay
 from app.auth import verified_required
+from app.blocks import viewer_apart
 from app.extensions import csrf, db
 from app.forms import GiftForm
 from app.mail import send_later
@@ -43,6 +44,8 @@ def _card_error(post: Post, message: str) -> tuple[str, int]:
 def checkout(post_id: int) -> Response | tuple[str, int]:
     post = db.session.get(Post, post_id) if post_id <= MAX_DB_INT else None
     if post is None or not can_view(post) or not stripe_pay.enabled():
+        abort(404)
+    if viewer_apart(post.user_id):
         abort(404)
     recipient = post.user
     if recipient.id == current_user.id:

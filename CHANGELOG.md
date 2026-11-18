@@ -3,6 +3,12 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Settings won't remove your last way to get paid while you have an open post, or one waiting for review (#21, owner's pick): "Keep one way to get paid while you have an open post, or close the post first." Swapping handles and card payouts (Stripe) still count.
+- A public Support page at `/support` (#264), linked from the footer, for the App Store listing. It covers how to email support@yearnly.app, report or block someone, where payment problems go, password reset, account deletion, and links to Rules, Terms, and Privacy.
+- The reminder emails run every day on their own (#258, PB-35). A GitHub Actions workflow runs `gifts remind` and `posts remind` at 15:00 UTC against Neon and Brevo, using the `DATABASE_URL` and `BREVO_API_KEY` repository secrets, and skips with a warning until they're set.
+- Block another user (#257, App Store Guideline 1.2). Block from someone's profile or post, and unblock from Settings → Blocked. A block works both ways: neither of you sees the other's posts in the feed or can open, chip in on, or react to them. It's silent, so they're never told. Deleting an account drops its blocks, and the Privacy page lists them. Migration 0021 adds `blocks`.
+
 ### Fixed
 - Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
 - Show less (#119 review): signing up now merges a logged-out choice too, account deletion clears it, the Privacy page names its cookie, the follow-through first ticket has no Show less (it always stays first), and moving a post to another category no longer marks it Edited or sends it back to review.

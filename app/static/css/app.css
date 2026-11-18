@@ -321,12 +321,19 @@ h3.section-title { font-size: 1rem; }
 .show-less-note form { flex: none; margin: 0; }
 .show-less-note .btn { min-height: 44px; padding-block: 6px; }
 /* On You: the categories you see less of, each with Show again. */
-.show-less-list { margin-top: 32px; }
-.show-less-list .hint { margin: 4px 0 0; }
-.show-less-list ul { margin: 12px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.show-less-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; font-weight: 700; }
-.show-less-list li + li { border-top: 1px solid var(--line); }
-.show-less-list form { margin: 0; }
+.show-less-list, .blocked-list { margin-top: 32px; }
+.show-less-list .hint, .blocked-list .hint { margin: 4px 0 0; }
+.show-less-list ul, .blocked-list ul { margin: 12px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.show-less-list li, .blocked-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; font-weight: 700; }
+.show-less-list li + li, .blocked-list li + li { border-top: 1px solid var(--line); }
+.show-less-list form, .blocked-list form { margin: 0; }
+/* Block (#257): a quiet safety action under Report. It asks first, in place, with the same prompt and pills as deleting a post. */
+.block-form { margin: 0; font-size: 0.875rem; text-align: center; }
+.block-ask { min-height: 44px; padding: 0 4px; font: inherit; color: var(--muted); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; background: none; border: 0; cursor: pointer; }
+.block-ask:hover { color: var(--ink); text-decoration-thickness: 2px; }
+.block-confirm { max-width: 400px; margin: 8px auto 0; text-align: left; font-size: 1rem; }
+.block-confirm .gift-actions { margin-top: 0; }
+.report-link:has(+ .block-form) { margin-bottom: 0; }
 .stage-empty { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 64px 24px; }
 .stage-empty p { margin: 0; color: var(--muted); }
 .stage-empty-title { font: 400 3rem/0.95 var(--display); text-transform: uppercase; color: var(--ink) !important; margin-bottom: 12px !important; }

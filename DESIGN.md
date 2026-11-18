@@ -394,6 +394,8 @@ Your own profile is the home for your stuff (#132). The header is your name in D
 - **Gift news** (#80): the one-time note under your region when gifts you sent were confirmed since your last visit. It's a Good Tint notice (14px, 12px 14px padding, ink text) with one line per gift and "You've helped N people" in 700. It's plain, with no motion, icons, or confetti.
 - **Rewards strip** (#80): Chipped in opens with one 700 line in tabular figures, "Level 2 · 3 people helped · 2-week streak", above the gift list's hairline. The full rewards panel stays lower on the page.
 
+- **Block** (#257, owner's pick "Confirm in place"): a quiet muted text action right under "Report this post" or "Report <name>". The first tap swaps it for the question, "**Block maria_g?** You won't see each other's posts, … They aren't told.", with a tomato Block pill and an outlined Cancel, the same in-place pattern as deleting a post. Without JS, it blocks at once. Unblock never asks. Settings → Blocked is a hairline list with Unblock pills, like Showing you less.
+
 ### Meter
 The single progress device. It is a 4px pill track with an ink pill fill to the percentage. On a field it becomes a Field Track (20% ink) with a deep fill, 3px tall on the card. In forced-colors mode it is drawn in CanvasText.
 

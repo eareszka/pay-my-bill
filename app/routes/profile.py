@@ -10,11 +10,11 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, logout_user
-from sqlalchemy import select
+from sqlalchemy import delete, exists, or_, select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
-from app import photos, show_less, stripe_pay
+from app import blocks, photos, show_less, stripe_pay
 from app.accounts import anonymize
 from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
@@ -24,17 +24,29 @@ from app.models import (
     DELETED_POST_BODY,
     DELETED_POST_TITLE,
     PUBLIC_STATUSES,
+    Block,
     Post,
     PostCategory,
     PostStatus,
     User,
+    open_posts,
 )
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 from app.routes import gifts as gift_routes
+from app.routes.auth import safe_next
 
 bp = Blueprint("profile", __name__)
 
 DISPLAY_PREFIX = {"PayPal": "paypal.me/"}
+
+KEEP_A_HANDLE = "Keep one way to get paid while you have an open post, or close the post first."
+
+
+def has_live_post(user: User) -> bool:
+    # Open, or waiting for review and about to open (#21).
+    live = or_(open_posts(), Post.status == PostStatus.PENDING_REVIEW)
+    return bool(db.session.scalar(select(exists().where(Post.user_id == user.id, live))))
+
 
 HANDLE_FIELDS = {
     "cashapp_handle": "Cash App",
@@ -63,7 +75,7 @@ def send_handle_change_notice(
 
 @bp.route("/profile", methods=["GET", "POST"])
 @login_required
-def edit() -> str | Response:
+def edit() -> str | Response | tuple[str, int]:
     user: User = current_user
     form = ProfileForm(obj=user)
     if form.validate_on_submit():
@@ -75,6 +87,16 @@ def edit() -> str | Response:
                 setattr(user, field, new)
         user.city = form.city.data or None
         user.state = form.state.data or None
+        if changes and not user.can_be_paid and has_live_post(user):
+            db.session.rollback()
+            form.cashapp_handle.errors = [KEEP_A_HANDLE]
+            page = render_template(
+                "profile/edit.html",
+                form=form,
+                delete_form=DeleteAccountForm(),
+                blocked=blocks.blocked_by(user),
+            )
+            return page, 400
         db.session.commit()
         if changes:
             send_handle_change_notice(user, changes)
@@ -87,7 +109,12 @@ def edit() -> str | Response:
             db.session.commit()
         except stripe.StripeError:
             current_app.logger.exception("Stripe status check failed for user %s", user.id)
-    return render_template("profile/edit.html", form=form, delete_form=DeleteAccountForm())
+    return render_template(
+        "profile/edit.html",
+        form=form,
+        delete_form=DeleteAccountForm(),
+        blocked=blocks.blocked_by(current_user),
+    )
 
 
 @bp.post("/account/delete")
@@ -111,7 +138,12 @@ def delete_account() -> str | Response | tuple[str, int]:
             return redirect(url_for("main.index"))
         else:
             delete_form.password.errors.append("That password isn't right.")
-    page = render_template("profile/edit.html", form=ProfileForm(obj=user), delete_form=delete_form)
+    page = render_template(
+        "profile/edit.html",
+        form=ProfileForm(obj=user),
+        delete_form=delete_form,
+        blocked=blocks.blocked_by(user),
+    )
     return page, 400
 
 
@@ -160,8 +192,42 @@ def show(username: str) -> str:
         disputing=request.args.get("dispute", type=int),
         news=news,
         less=[c for c in PostCategory if c in chosen] if is_owner else [],
+        blocking=current_user.is_authenticated
+        and not is_owner
+        and blocks.is_blocking(current_user, user),
     )
     # The news counts as seen only once its page rendered, and a visit with none writes nothing.
     if user.gifts_seen_at != seen_before:
         db.session.commit()
     return page
+
+
+def other_user(username: str) -> User:
+    other = db.session.scalar(select(User).where(User.username == username.lower()))
+    if other is None or other.id == current_user.id:
+        abort(404)
+    return other
+
+
+@bp.post("/u/<username>/block")
+@login_required
+def block(username: str) -> Response:
+    other = other_user(username)
+    if not blocks.is_blocking(current_user, other):
+        db.session.add(Block(blocker_id=current_user.id, blocked_id=other.id))
+        db.session.commit()
+    flash(f"You blocked {other.username}. You won't see each other's posts.", "success")
+    return redirect(url_for("profile.show", username=other.username))
+
+
+@bp.post("/u/<username>/unblock")
+@login_required
+def unblock(username: str) -> Response:
+    other = other_user(username)
+    db.session.execute(
+        delete(Block).where(Block.blocker_id == current_user.id, Block.blocked_id == other.id)
+    )
+    db.session.commit()
+    flash(f"You unblocked {other.username}.", "success")
+    back = request.form.get("next")
+    return redirect(safe_next(back) if back else url_for("profile.show", username=other.username))

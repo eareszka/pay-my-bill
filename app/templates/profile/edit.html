@@ -44,6 +44,25 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="btn btn-secondary">Log out</button>
   </form>
+  <section class="blocked-list" id="blocked" aria-labelledby="blocked-title">
+    <h2 class="section-title" id="blocked-title">Blocked</h2>
+    {% if blocked %}
+      <ul>
+        {% for person in blocked %}
+          <li>
+            <span>{{ person.username }}</span>
+            <form method="post" action="{{ url_for('profile.unblock', username=person.username) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="next" value="{{ url_for('profile.edit', _anchor='blocked') }}">
+              <button type="submit" class="btn btn-secondary">Unblock</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="hint">You haven't blocked anyone. Block someone from their profile.</p>
+    {% endif %}
+  </section>
   <section class="danger-zone" id="delete">
     <h2 class="section-title">Delete account</h2>
     {% if request.args.get("delete") or delete_form.errors %}

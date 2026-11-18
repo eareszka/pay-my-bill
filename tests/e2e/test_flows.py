@@ -370,3 +370,20 @@ def test_a_lone_ticket_still_swipes_down(make_ui: UiFactory, live_server: LiveSe
     expect(ui.page.locator(".deck-next, .deck-back")).to_have_count(0)
     drag(ui, 0, 200)
     ui.page.wait_for_url(re.compile(r"undo="))
+
+
+def test_block_asks_first_then_blocks(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("blocker"))
+    ui.goto("/u/maria_g")
+    ui.page.get_by_role("button", name="Block maria_g").click()
+    question = ui.page.locator(".block-confirm")
+    expect(question).to_be_visible()  # nothing is blocked until they say so
+    ui.check("block-ask")
+    ui.page.locator(".block-cancel").click()
+    expect(question).to_be_hidden()
+    ui.page.get_by_role("button", name="Block maria_g").click()
+    ui.submit(".block-confirm .btn-danger")
+    expect(ui.page.get_by_role("button", name="Unblock maria_g")).to_be_visible()
+    ui.goto("/profile#blocked")
+    expect(ui.page.locator(".blocked-list li")).to_have_count(1)
+    ui.check("blocked-list")
