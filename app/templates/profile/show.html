@@ -7,6 +7,12 @@
     {% if is_owner %}<a class="btn btn-secondary" href="{{ url_for('profile.edit') }}">Settings</a>{% endif %}
   </div>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
+  {% if news %}
+    <section class="gift-news" role="status" aria-label="Gift news">
+      {% for gift in news %}<p>{{ gift.post.user.username }} confirmed your {{ gift.amount_cents | cents }}.</p>{% endfor %}
+      {% if progress.people_helped %}<p class="gift-news-total">You've helped {{ progress.people_helped }} {{ "person" if progress.people_helped == 1 else "people" }}.</p>{% endif %}
+    </section>
+  {% endif %}
   {% if follow_through.due %}
     <p class="follow-through">{% include "profile/_follow_through.html" %}</p>
     <p class="hint follow-through-hint">Results updates shared, out of those due.</p>
@@ -18,6 +24,7 @@
       <a href="{{ url_for('profile.show', username=user.username, tab='chipped') }}"{% if tab == "chipped" %} aria-current="page"{% endif %}>Chipped in</a>
     </nav>
     {% if tab == "chipped" %}
+      <p class="rewards-strip">Level {{ progress.level }} · {{ progress.people_helped }} {{ "person" if progress.people_helped == 1 else "people" }} helped{% if streak %} · {{ streak }}-week streak{% endif %}</p>
       {% include "gifts/_sent.html" %}
     {% else %}
       {% if to_confirm %}{% include "gifts/_to_confirm.html" %}{% endif %}

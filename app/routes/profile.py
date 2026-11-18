@@ -154,4 +154,5 @@ def show(username: str) -> str:
         sent=gift_routes.sent_by(user) if is_owner and tab == "chipped" else [],
         sent_limit=gift_routes.MY_GIFTS_LIMIT,
         disputing=request.args.get("dispute", type=int),
+        news=gift_routes.gift_news(user) if is_owner else [],
     )
