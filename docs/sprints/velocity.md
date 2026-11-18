@@ -9,3 +9,4 @@
 | 4 | 16 | 16 | Follow-through |
 | 5 | 58 | 42 | Ran two weeks past its dates. #79 counts once #231 merges, #82 (3) moved to 5b, and 13 carried to Sprint 6 |
 | 5b | 12 | 12 | One-night launch |
+| 6 | 13 | 13 | The first sprint with lanes. 12 unpointed ui fixes also shipped |
