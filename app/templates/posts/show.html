@@ -5,6 +5,8 @@
 {% block body_class %}page stage-page post-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block content %}
+  {# The sheet's way back to the feed ticket (#252); sheet.js returns to the same ticket. #}
+  <div class="sheet-top"><a class="sheet-close" href="{{ url_for('main.index') }}" aria-label="Close, back to the feed"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></a></div>
   {% set is_owner = current_user.is_authenticated and current_user.id == post.user_id %}
   {% if post.status == PostStatus.PENDING_REVIEW %}
     <p class="notice">{% if is_owner %}Your post is waiting for review. Only you and moderators can see it until then.{% else %}Pending review: hidden from everyone except the poster and moderators.{% endif %}</p>

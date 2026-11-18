@@ -124,7 +124,9 @@ def signup() -> str | Response | tuple[str, int, dict[str, str]]:
                     session["after_verify"] = safe_next(request.args.get("next"))
                 send_verification(user)
                 flash("Account created. Check your email to verify it.", "success")
-                return redirect(url_for("auth.verify_pending"))
+                response = redirect(url_for("auth.verify_pending"))
+                show_less.join_account(user, response)
+                return response
     return render_template("auth/signup.html", form=form, story=story)
 
 

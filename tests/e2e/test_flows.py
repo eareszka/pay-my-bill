@@ -230,7 +230,9 @@ def test_swipe_up_opens_the_post(ui: Ui, live_server: LiveServer) -> None:
 
 def test_swipe_down_shows_less_of_that_kind(ui: Ui, live_server: LiveServer) -> None:
     ui.login(live_server.make_user("lesser"))
-    ui.goto("/feed")
+    # The first ticket is the follow-through pick, which always stays first, so it has no
+    # Show less (#119 review); the second one does.
+    ui.goto("/feed?n=2")
     category = ui.page.locator("form.show-less").get_attribute("data-category")
     drag(ui, 0, 200)
     ui.page.wait_for_url(re.compile(rf"undo={category}"))
@@ -341,6 +343,16 @@ def test_post_is_a_sheet_on_the_feed(ui: Ui, live_server: LiveServer) -> None:
     ui.page.wait_for_url(re.compile(re.escape(post) + "$"))  # Feed brings you back to that post
     ui.page.evaluate(PULL_DOWN)
     ui.page.wait_for_url(re.compile(r"/feed"))
+
+
+def test_see_more_opens_the_sheet_and_close_puts_it_back(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("closer"))
+    ui.goto("/feed?n=2")
+    ui.page.locator(".deck > .deck-ticket .ticket-more").click()
+    ui.page.wait_for_url(re.compile(r"/posts/\d+$"))
+    ui.check("sheet")
+    ui.page.locator(".sheet-close").click()
+    ui.page.wait_for_url(re.compile(r"/feed\?n=2$"))  # the same ticket, not the top of the feed
 
 
 def test_a_lone_ticket_still_swipes_down(make_ui: UiFactory, live_server: LiveServer) -> None:

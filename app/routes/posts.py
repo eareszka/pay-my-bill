@@ -368,18 +368,24 @@ def edit(post_id: int) -> str | Response:
     if post.story_only:
         del form.kind, form.title, form.goal
     if form.validate_on_submit():
-        before = (post.kind, post.category, post.title, post.body, post.goal_cents)
+        before = (post.kind, post.title, post.body, post.goal_cents)
+        category_before = post.category
         if not post.story_only:
             post.kind = PostKind(form.kind.data)
             post.title = form.title.data
             post.goal_cents = form.goal_cents
         post.category = PostCategory(form.category.data)
         post.body = form.body.data
-        if (post.kind, post.category, post.title, post.body, post.goal_cents) == before:
+        # Only the ask itself counts as an edit; moving it to another category doesn't (#119).
+        text_changed = (post.kind, post.title, post.body, post.goal_cents) != before
+        if not text_changed and post.category == category_before:
             db.session.rollback()
             return redirect(url_for("posts.show", post_id=post_id))
-        post.edited_at = utcnow()
-        flagged = post.status == PostStatus.OPEN and is_flagged(post.title, post.body)
+        if text_changed:
+            post.edited_at = utcnow()
+        flagged = (
+            text_changed and post.status == PostStatus.OPEN and is_flagged(post.title, post.body)
+        )
         if flagged:
             post.status = PostStatus.PENDING_REVIEW
         db.session.commit()

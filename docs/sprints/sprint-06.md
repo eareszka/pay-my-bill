@@ -15,8 +15,9 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 | Sliding active pill on the tab bar and filter | #227 | ui | — | Done (#240) |
 | No scrolling outside long pages | #234 | ui | — | Done (#241) |
 | Tap or swipe up opens the post | #235 | ui | — | Done (#238) |
-| Swipe up slides to the post, Home remembers it | #248 | ui | — | To do |
-| Story intro covers the new features | #236 | ui | — | To do |
+| Swipe up slides to the post, Home remembers it | #248 | ui | — | Done (#251) |
+| Story intro covers the new features | #236 | ui | — | Done (#250) |
+| Close × and See more on the post sheet | #252 | ui | — | Done (#253) |
 
 **Total:** 13 points, all done (Sprint 5: 42 of 58).
 
@@ -36,4 +37,6 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-18 (ui): #248: the post slides up over the feed as a sheet, pull down slides it back, bars hold still, and Feed stays home on a post. Next: #236. Blocked: none.
 - 2026-11-18 (ui): #236: How stories teach swipe/tap and show the real To confirm row (owner's picks); every step still fits an SE. #225 waits on the phone. Blocked: none.
 - 2026-11-18 (main): #80 review fixes: gift news is committed after render, only up to the newest gift shown, with no write when nothing is new. Next: #119 review fixes. Blocked: none.
+- 2026-11-18 (ui): #252: See more on the feed card and a Close (×) on the post sheet that returns to the same ticket; the gestures stay. #225 waits on the phone. Blocked: none.
+- 2026-11-18 (main): #119 review fixes: sign-up joins the cookie, delete clears it, Privacy names it, no Show less on the top pick, category moves aren't edits. Blocked: none.
 - 2026-11-18 (ui): #119 review fixes: Less label on Safari before 17.4, desktop undo line under the card, a lone ticket still swipes. #253 (#252) is in review. Blocked: none.

@@ -979,3 +979,15 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 }
 @keyframes sheet-in { from { transform: translateY(100%); } }
 @keyframes sheet-out { to { transform: translateY(100%); } }
+
+/* The post sheet's controls (#252): See more on the card opens it, Close at its top puts it back. */
+.ticket-more { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; min-height: 44px; margin: 4px 0 -12px; font-size: 0.875rem; font-weight: 700; color: var(--on-field); text-decoration: none; }
+.ticket-more .icon { width: 20px; height: 20px; }
+.ticket-more:hover { text-decoration: underline; }
+.ticket-more:focus-visible { outline-color: var(--on-field); }
+.sheet-top { position: sticky; top: var(--bar-h); z-index: 5; height: 0; }
+.sheet-close { position: absolute; top: 14px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 50%; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out; }
+/* Beside the Chip in panel on a wide screen, Close sits in the post's own corner, not on the panel. */
+@media (min-width: 960px) { main:has(.post > .post-side > .group) .sheet-close { right: calc(400px + 28px + 14px); } }
+.sheet-close .icon { width: 20px; height: 20px; }
+.sheet-close:hover { color: #ffffff; background: var(--press); border-color: var(--press); }

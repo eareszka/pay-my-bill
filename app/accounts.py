@@ -44,4 +44,5 @@ def anonymize(user: User) -> list[str]:
     user.email_verified_at = None
     user.city = user.state = None
     user.cashapp_handle = user.venmo_handle = user.paypal_handle = None
+    user.show_less = None
     return photo_keys

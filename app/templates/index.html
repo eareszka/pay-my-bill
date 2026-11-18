@@ -27,7 +27,7 @@
           {% if position > 1 %}<a class="rail-btn deck-back" href="{{ url_for('main.index', kind=kind, n=position - 1) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg><span>Back</span></a>{% endif %}
           {% if total > 1 %}<a class="rail-btn deck-next" href="{{ url_for('main.index', kind=kind, n=position + 1 if position < total else none) }}"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg><span>Next</span></a>{% endif %}
           <span class="deck-count">{{ position }} of {{ total }}{% if total > 1 %}<span class="deck-hint" aria-hidden="true"> · ← → to move</span>{% endif %}</span>
-          {% if post.category not in less %}
+          {% if post.category not in less and not top_pick %}
             <form method="post" action="{{ url_for('main.less', category=post.category.value) }}" class="show-less" data-category="{{ post.category.value }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="next" value="{{ url_for('main.index', kind=kind, n=position, undo=post.category.value) }}">

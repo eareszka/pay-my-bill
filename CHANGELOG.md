@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Fixed
 - Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
+- Show less (#119 review): signing up now merges a logged-out choice too, account deletion clears it, the Privacy page names its cookie, the follow-through first ticket has no Show less (it always stays first), and moving a post to another category no longer marks it Edited or sends it back to review.
 
 ### Added
 - Categories and Show less (#119, ADR 0018). Posters pick a category (Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, or Other), and existing posts became Other. "Show less" on a feed ticket moves that category to the end of your stack. It never hides a post, and the first ticket stays the follow-through pick. Undo is offered right away and later under "Showing you less" on your profile. Logged out, the choice lives in a cookie that joins your account when you log in. Migration 0020 adds `posts.category` and `users.show_less`.
@@ -16,6 +17,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - An iOS app shell for TestFlight (#193). `mobile/` holds a Capacitor 8 project (`app.yearnly.ios`) that opens https://yearnly.app full-screen, with the deck icon, a void launch screen, light status bar text, iPhone only, in portrait. A manual GitHub Actions workflow (`iOS TestFlight`) builds it on a macOS runner, signs it automatically with an App Store Connect API key, and uploads it, so no Mac is needed. The top bar now grows by the top safe-area inset, which is 0 in a browser, so the shell's content clears the status bar.
 
 ### Changed
+- The post sheet has visible controls (#252, owner's picks). A See more control under each feed card opens the post, the same as swiping up or tapping. A Close (×) at the top of the post takes you back to the same feed ticket, the same as pulling down. The gestures still work.
 - Show less review fixes (#119): the rail's "Less" label shows on older iPhones (Safari before 17.4), the desktop undo line sits under the card instead of the gap, and a lone post (say, the only Want) still swipes down to show less and up to open.
 - On the desktop feed, the Chip in panel scrolls inside the card's height again instead of stretching the row and pushing the card off-center (it grew with #81's name field).
 - A post is a sheet on the feed (#248, owner's iOS test). Swiping a card up, or tapping it, slides the post up over the feed instead of fading, and pulling the post down from its top slides it back to the feed. The bars stay still. On a post, Feed stays your current tab, and tapping Feed from another tab brings you back to that post.
