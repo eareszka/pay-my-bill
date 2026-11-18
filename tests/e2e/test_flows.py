@@ -7,7 +7,7 @@ the flow breaks or if any check finds something.
 import re
 
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Route, expect
 from sqlalchemy import select
 
 from app.extensions import db
@@ -353,3 +353,20 @@ def test_see_more_opens_the_sheet_and_close_puts_it_back(ui: Ui, live_server: Li
     ui.check("sheet")
     ui.page.locator(".sheet-close").click()
     ui.page.wait_for_url(re.compile(r"/feed\?n=2$"))  # the same ticket, not the top of the feed
+
+
+def test_a_lone_ticket_still_swipes_down(make_ui: UiFactory, live_server: LiveServer) -> None:
+    # The service worker would answer the feed before the route could strip its neighbors.
+    ui = make_ui(service_workers="block")
+
+    def without_neighbors(route: Route) -> None:
+        html = route.fetch().text()
+        html = re.sub(r'<a class="rail-btn deck-(back|next)".*?</a>', "", html)
+        route.fulfill(body=html, content_type="text/html")
+
+    ui.page.route(re.compile(r"/feed(\?.*)?$"), without_neighbors)
+    ui.login(live_server.make_user("lone"))
+    ui.goto("/feed?n=2")  # not the follow-through pick, which has no Show less (#255)
+    expect(ui.page.locator(".deck-next, .deck-back")).to_have_count(0)
+    drag(ui, 0, 200)
+    ui.page.wait_for_url(re.compile(r"undo="))

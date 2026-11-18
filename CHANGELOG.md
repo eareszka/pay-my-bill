@@ -18,6 +18,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 - The post sheet has visible controls (#252, owner's picks). A See more control under each feed card opens the post, the same as swiping up or tapping. A Close (×) at the top of the post takes you back to the same feed ticket, the same as pulling down. The gestures still work.
+- Show less review fixes (#119): the rail's "Less" label shows on older iPhones (Safari before 17.4), the desktop undo line sits under the card instead of the gap, and a lone post (say, the only Want) still swipes down to show less and up to open.
 - On the desktop feed, the Chip in panel scrolls inside the card's height again instead of stretching the row and pushing the card off-center (it grew with #81's name field).
 - A post is a sheet on the feed (#248, owner's iOS test). Swiping a card up, or tapping it, slides the post up over the feed instead of fading, and pulling the post down from its top slides it back to the feed. The bars stay still. On a post, Feed stays your current tab, and tapping Feed from another tab brings you back to that post.
 - The How stories catch up with the app (#236, owner's picks). Pick one person teaches the feed ("Swipe for the next person. Tap to open their post.") and its example card's info line matches the real one. Gifts land in your app shows the real To confirm row with the name on the sender's app, the sent date, and Confirm or Didn't get it. Every step still fits an iPhone SE.

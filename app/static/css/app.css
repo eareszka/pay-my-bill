@@ -313,7 +313,8 @@ h3.section-title { font-size: 1rem; }
 /* Show less (#119): a rail glyph like Back. The full "Show less <Category>" is its name; the rail shows "Less". */
 .show-less { order: 4; margin: 0; pointer-events: auto; }
 .rail-btn.show-less-btn { gap: 0; padding: 0; font-size: 0; font-family: inherit; background: none; border: 0; cursor: pointer; }
-.show-less-btn::after { content: "Less" / ""; margin-top: 4px; font-size: 0.75rem; }
+/* The plain content first: Safari before 17.4 drops the alt-text form, and the label with it. */
+.show-less-btn::after { content: "Less"; content: "Less" / ""; margin-top: 4px; font-size: 0.75rem; }
 /* Right after a Show less, an undo line sits under the card, in thumb reach. */
 .show-less-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px 8px 16px; font-size: 0.9375rem; line-height: 1.35; background: var(--info-tint); }
 .show-less-note p { margin: 0; }
@@ -665,7 +666,8 @@ h3.section-title { font-size: 1rem; }
   .deck-count { grid-area: count; justify-self: center; font-size: 0.8125rem; color: var(--muted); }
   .show-less { grid-area: next; align-self: end; justify-self: end; }
   .show-less-btn::after { font-size: 0.8125rem; }
-  .show-less-note { max-width: 660px; margin: 16px auto 0; border-radius: var(--radius); }
+  /* Under the card itself: the ask and its Chip in panel, between the two 88px rail gutters. */
+  .show-less-note { width: calc(100% - 176px); max-width: 1060px; margin: 16px auto 0; border-radius: var(--radius); }
   .deck-next { gap: 4px; }
   .deck-next .icon { color: var(--ink); background: none; }
   .deck-next + .deck-count { margin-top: 0; font-weight: 700; color: var(--muted); }
