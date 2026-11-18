@@ -16,9 +16,6 @@
   --deep: #16261d;
   /* Chip in and other filled marks on a field: a deep green, never black (#200 finish review). */
   --press: #2f6249;
-  /* Chip in is the masking-tape marigold, the one warm note, so giving never blends into the green chrome (owner, 2026-11-14). */
-  --chip: #ffd166;
-  --chip-hover: #f5c04a;
   --on-field: #16261d;
   --on-field-muted: #2f4a3a;
   --field-track: rgb(22 38 29 / 0.2);
@@ -242,13 +239,13 @@ h3.section-title { font-size: 1rem; }
 /* While a card is moving, the real neighbor waits underneath it. */
 .is-moving > .deck-ticket { z-index: 2; user-select: none; }
 .deck .deck-under { z-index: 1; pointer-events: none; }
-/* On a phone the card fills the screen, so swipe.js takes vertical moves too: up opens Chip in (#226). */
+/* On a phone the card fills the screen, so swipe.js takes vertical moves too: up opens the post (#235). */
 @media (max-width: 959px) { .deck-ticket.swipe-up { touch-action: none; } }
 .card-body { position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; justify-content: flex-end; min-height: 0; padding: 64px 84px 18px 18px; }
 /* A poster's photo fills the card; it fades into the field under the words, so dark ink stays readable on any photo. */
 .has-photo { background: var(--field); }
 .ticket-photo { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
-/* The photo itself fades out into the field, so the words and Chip in always sit on solid field. */
+/* The photo itself fades out into the field, so the words always sit on solid field. */
 .ticket-photo { -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 18%, #000 30%, transparent 58%); mask-image: linear-gradient(to bottom, transparent 4%, #000 18%, #000 30%, transparent 58%); }
 .has-photo .card-body { background: linear-gradient(to bottom, color-mix(in srgb, var(--field) 85%, transparent), transparent 22%); }
 .has-photo .card-title { margin-block: auto 0; }
@@ -269,23 +266,6 @@ h3.section-title { font-size: 1rem; }
 .ticket .amounts { margin-top: 14px !important; font-size: 1rem; font-variant-numeric: tabular-nums; }
 .ticket .amounts strong { font-size: 1.75rem; line-height: 1; }
 .ticket .meter { height: 3px; margin-top: 10px; }
-.tear-tab {
-  position: relative;
-  z-index: 1;
-  display: block;
-  margin: 0 18px 18px;
-  padding: 15px;
-  font-size: 1.0625rem;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
-  color: var(--deep);
-  background: var(--chip);
-  border-radius: var(--pill);
-  transition: background-color var(--fast) ease-out;
-}
-.tear-tab:hover { background: var(--chip-hover); }
-.tear-tab:focus-visible { outline-color: var(--deep); outline-offset: 3px; }
 
 /* The rail: Back and Next as glyphs on the right edge. The one you're dragging toward lights up. */
 .rail {
@@ -572,7 +552,7 @@ h3.section-title { font-size: 1rem; }
 .post-list-goal { font-weight: 400; color: var(--muted); }
 .post-list-actions { display: inline-flex; gap: 16px; margin-left: auto; }
 .post-list-actions a { display: inline-block; padding-block: 8px; margin-block: -8px; font-weight: 700; color: var(--ink); }
-.post-hero .post-edited { margin: 4px 0 0; font-size: 0.875rem; color: var(--on-field-muted); }
+.post-hero .post-edited, .post-hero .post-trust { margin: 4px 0 0; font-size: 0.875rem; color: var(--on-field-muted); }
 .report-link { margin-top: 28px; font-size: 0.875rem; text-align: center; }
 .report-link a { color: var(--muted); }
 /* Standalone text links keep their look; padding on an inline link grows its tap area to 44px without moving a line (#208). */
@@ -641,7 +621,6 @@ h3.section-title { font-size: 1rem; }
   .deck-layout:not(:has(.deck-side)) .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) calc(var(--r-bubble) - 6px) 0 calc(var(--r-bubble) - 6px); }
   .deck-side .group, .post .post-side > .group { padding: 0; background: none; border-radius: 0; }
   .deck-side .group { margin: 0; }
-  .deck .tear-tab { display: none; }
   .card-body { padding: 32px; }
   .card-title { margin-block: auto 0; }
   .rail { display: contents; }
@@ -786,7 +765,6 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
 .how-ask p { margin: 0; }
 .how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
-.how-ask-tab { display: block; margin-top: 14px; padding: 12px; text-align: center; font-weight: 700; color: var(--deep); background: var(--chip); border-radius: var(--pill); }
 .how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .how-thanks { display: flex; flex-direction: column; gap: 6px; }
 .how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
