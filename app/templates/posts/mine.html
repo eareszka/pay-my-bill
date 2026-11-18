@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Your posts · Yearnly{% endblock %}
+{% block content %}
+  <h1>Your posts</h1>
+  {% if at_limit %}
+    <p class="flash">You have {{ MAX_OPEN_POSTS }} open posts. Close or finish one to create another.</p>
+  {% else %}
+    <p><a class="btn" href="{{ url_for('posts.new') }}">Create new post</a></p>
+  {% endif %}
+  {% with is_owner = True, to_confirm = [] %}{% include "profile/_posts.html" %}{% endwith %}
+{% endblock %}

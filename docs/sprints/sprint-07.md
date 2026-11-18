@@ -17,6 +17,8 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 | Support page for the App Store listing | #264 | main | 1 | To do |
 | PB-19 App Store listing and review pack | #260 | ui | 3 | Pack in review (#263); blocked on #264, #265, #257, PB-39, demo account |
 | Create a post one question per screen (owner's ask) | #275 | main → ui | — | ui done, in review |
+| Post tab lists your posts (owner's ask) | #278 | main → ui | — | main done, waiting on ui |
+| Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | To do |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
 | *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | To do |
 | *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
@@ -36,3 +38,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18 (ui): #265 design on #273: the web tip is one row of pills (No tip, $1, $2, Other), and Other's amount box shows only when picked. Blocked: none.
 - 2026-11-18 (main): #275: new post asks one question per screen (owner's Hinge/Bumble ask), with progress bar, auto-next on picks, and errors opening on their step. Next: ui. Blocked: none.
 - 2026-11-18 (ui): #275 look: League Gothic questions (owner's pick), need/want rows that tick, emoji pills, a round → in thumb reach, slide between steps. Blocked: none.
+- 2026-11-18 (main): #278: the Post tab lists your posts under Create new post, and stays highlighted on the questions. Next: #279, five photos. Blocked: none.
