@@ -71,6 +71,12 @@
           <button type="button" class="btn btn-secondary step-sent" id="not-yet" hidden>Not yet</button>
         </div>
         {% if form.method.errors %}<small class="error" id="method-error">{{ form.method.errors | join(" ") }}</small>{% endif %}
+        <div class="field">
+          <label for="payer_name">{{ form.payer_name.label.text }}</label>
+          {% set name_attrs = dict(autocomplete="name", maxlength=60, aria_describedby="payer-name-hint") %}
+          {% if form.payer_name.errors %}{{ form.payer_name(aria_invalid="true", **name_attrs) }}{% else %}{{ form.payer_name(**name_attrs) }}{% endif %}
+          <small id="payer-name-hint"{% if form.payer_name.errors %} class="error"{% endif %}>{{ form.payer_name.errors[0] if form.payer_name.errors else "Only " ~ poster ~ " sees it, to find your payment." }}</small>
+        </div>
         <p class="hint">It counts once {{ poster }} confirms it came through.</p>
       {% elif post.is_open %}
         <p class="hint">Already paid? <a href="{{ url_for('auth.login', next=url_for('posts.show', post_id=post.id)) }}">Log in</a> to record your gift so it counts.</p>
