@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- Settings won't remove your last way to get paid while you have an open post, or one waiting for review (#21, owner's pick): "Keep one way to get paid while you have an open post, or close the post first." Swapping handles and card payouts (Stripe) still count.
 - A public Support page at `/support` (#264), linked from the footer, for the App Store listing. It covers how to email support@yearnly.app, report or block someone, where payment problems go, password reset, account deletion, and links to Rules, Terms, and Privacy.
 
 ### Fixed
