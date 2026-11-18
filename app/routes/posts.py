@@ -17,7 +17,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
-from app import format_date, photos, stripe_pay
+from app import format_date, is_development, photos, stripe_pay
 from app.accounts import delete_post
 from app.auth import login_required, verified_required
 from app.blocks import viewer_apart
@@ -455,3 +455,14 @@ def send_update_reminders() -> int:
 def remind_command() -> None:
     """Email posters on day 3 and day 6 of their results update deadline (run daily)."""
     click.echo(f"Update reminder emails sent: {send_update_reminders()}")
+
+
+@bp.cli.command("retry-photos")
+def retry_photos_command() -> None:
+    """Retry photo deletes that failed, so removed photos don't stay public (run daily)."""
+    # Without the bucket this would "delete" from a local folder and drop the queue.
+    if not current_app.config["R2_BUCKET"] and not is_development(current_app):
+        click.echo("No photo bucket is set, so photo deletes weren't retried.")
+        return
+    deleted, waiting = photos.retry_deletes()
+    click.echo(f"Photo deletes retried: {deleted} done, {waiting} still waiting")
