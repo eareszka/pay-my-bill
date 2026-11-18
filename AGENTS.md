@@ -14,11 +14,14 @@ The owner runs one Claude Code session per role and tells each session its role 
 |---|---|---|
 | **main** | `agent:main` issues: models, migrations, routes, business rules, tests, and plain working templates for new screens | Impeccable design work |
 | **ui** | `agent:ui` issues: Impeccable design, the look and motion in templates, CSS, and JS, and finish reviews | Models, migrations, or business rules |
-| **todo** | Turns each of the owner's testing notes into a GitHub issue: a short title, what happened, and where (page, device). No lane label | Code or branches |
+| **todo** | Turns each of the owner's testing notes into a GitHub issue: a short title, what happened, and where (page, device). Adds a lane label only when the owner names one | Code or branches |
 | **coordinator** | Triage of unlabeled issues (lane, type, priority), sprint planning with the owner, keeping this file and the sprint file short, `/code-review` on PRs | Feature code |
 
 - **Full-stack stories:** main owns the branch, builds the working version with tests, and comments `ready for ui` on the PR. ui adds design commits on the same branch and comments `ui done`. main merges once CI is green and the owner approves. Only the agent named in the latest handoff comment pushes to the branch.
 - **Before starting:** pull `main`, then check open PRs and your label. Don't touch another agent's branch unless it was handed to you. Comment on its PR instead.
+- **Own worktree:** check out branches only in your own worktree (`git worktree add ../pmb-<role> <branch>`). The shared repo directory stays on `main`.
+- **Messages:** session names change on every restart, so start each message with the role it's from and the role it's for (`ui → main:`).
+- **Owner decisions go on the issue as a comment.** The latest comment wins.
 - **Status lives in GitHub and the sprint file, not here.** This file holds rules and lasting facts only. Untriaged issues: `gh issue list --search "-label:agent:main -label:agent:ui"`.
 
 ## Reading by role

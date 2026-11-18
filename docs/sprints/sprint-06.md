@@ -9,12 +9,16 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 |---|---|---|---|---|
 | S5-4 Visible rewards | #80 | main → ui | 5 | Done (#242) |
 | S5-5 Clear disputes | #81 | main | 3 | Done (#243) |
-| S5-10 Categories and show less | #119 | main → ui | 5 | In review (ui) |
-| Story bubble keeps its shape on Next | #217 | ui | — | In review (#223) |
-| Bubble tails flicker between pages | #225 | ui | — | To do |
-| Sliding active pill on the tab bar and filter | #227 | ui | — | To do |
+| S5-10 Categories and show less | #119 | main → ui | 5 | Done (#246) |
+| Story bubble keeps its shape on Next | #217 | ui | — | Done (#223) |
+| Bubble tails flicker between pages | #225 | ui | — | Waiting on the owner's phone recheck |
+| Sliding active pill on the tab bar and filter | #227 | ui | — | Done (#240) |
+| No scrolling outside long pages | #234 | ui | — | Done (#241) |
+| Tap or swipe up opens the post | #235 | ui | — | Done (#238) |
+| Swipe up slides to the post, Home remembers it | #248 | ui | — | To do |
+| Story intro covers the new features | #236 | ui | — | To do |
 
-**Total:** 13 points (Sprint 5: 42 of 58).
+**Total:** 13 points, all done (Sprint 5: 42 of 58).
 
 ## Daily log
 - 2026-11-17: Drafted from Sprint 5's carry-over and the ui fixes in flight. Lanes and the todo session are set up (#232). Next: plan with the owner. Blocked: none.
