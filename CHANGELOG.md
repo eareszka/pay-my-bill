@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Fixed
 - Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
+- Show less (#119 review): signing up now merges a logged-out choice too, account deletion clears it, the Privacy page names its cookie, the follow-through first ticket has no Show less (it always stays first), and moving a post to another category no longer marks it Edited or sends it back to review.
 
 ### Added
 - Categories and Show less (#119, ADR 0018). Posters pick a category (Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, or Other), and existing posts became Other. "Show less" on a feed ticket moves that category to the end of your stack. It never hides a post, and the first ticket stays the follow-through pick. Undo is offered right away and later under "Showing you less" on your profile. Logged out, the choice lives in a cookie that joins your account when you log in. Migration 0020 adds `posts.category` and `users.show_less`.
