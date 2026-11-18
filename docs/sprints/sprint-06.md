@@ -40,3 +40,4 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-18 (ui): #252: See more on the feed card and a Close (×) on the post sheet that returns to the same ticket; the gestures stay. #225 waits on the phone. Blocked: none.
 - 2026-11-18 (main): #119 review fixes: sign-up joins the cookie, delete clears it, Privacy names it, no Show less on the top pick, category moves aren't edits. Blocked: none.
 - 2026-11-18 (ui): #119 review fixes: Less label on Safari before 17.4, desktop undo line under the card, a lone ticket still swipes. #253 (#252) is in review. Blocked: none.
+- 2026-11-18: Closed at 13 of 13 points, plus 12 unpointed ui fixes. #225 carries to Sprint 7. Blocked: none.
