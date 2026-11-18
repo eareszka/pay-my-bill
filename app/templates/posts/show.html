@@ -95,9 +95,6 @@
     <p class="report-link"><a href="{{ url_for('reports.post', post_id=post.id) }}">Report this post</a></p>
   {% endif %}
   {% if current_user.is_authenticated and current_user.id != post.user_id and not post.user.is_deleted %}
-    <form method="post" action="{{ url_for('profile.block', username=post.user.username) }}" class="block-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" class="btn btn-secondary">Block {{ post.user.username }}</button>
-    </form>
+    {% with name = post.user.username %}{% include "profile/_block.html" %}{% endwith %}
   {% endif %}
 {% endblock %}

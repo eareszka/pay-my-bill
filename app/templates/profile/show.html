@@ -68,10 +68,13 @@
     <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>
   {% endif %}
   {% if current_user.is_authenticated and current_user.id != user.id %}
-    <form method="post" action="{{ url_for('profile.unblock' if blocking else 'profile.block', username=user.username) }}" class="block-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" class="btn btn-secondary">{{ "Unblock" if blocking else "Block" }} {{ user.username }}</button>
-      {% if not blocking %}<p class="hint">You won't see each other's posts, and neither of you can chip in on or react to the other's. They aren't told.</p>{% endif %}
-    </form>
+    {% if blocking %}
+      <form method="post" action="{{ url_for('profile.unblock', username=user.username) }}" class="block-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="block-ask">Unblock {{ user.username }}</button>
+      </form>
+    {% else %}
+      {% with name = user.username %}{% include "profile/_block.html" %}{% endwith %}
+    {% endif %}
   {% endif %}
 {% endblock %}
