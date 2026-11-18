@@ -10,7 +10,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, logout_user
-from sqlalchemy import select
+from sqlalchemy import exists, or_, select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
@@ -28,6 +28,7 @@ from app.models import (
     PostCategory,
     PostStatus,
     User,
+    open_posts,
 )
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 from app.routes import gifts as gift_routes
@@ -35,6 +36,15 @@ from app.routes import gifts as gift_routes
 bp = Blueprint("profile", __name__)
 
 DISPLAY_PREFIX = {"PayPal": "paypal.me/"}
+
+KEEP_A_HANDLE = "Keep one way to get paid while you have an open post, or close the post first."
+
+
+def has_live_post(user: User) -> bool:
+    # Open, or waiting for review and about to open (#21).
+    live = or_(open_posts(), Post.status == PostStatus.PENDING_REVIEW)
+    return bool(db.session.scalar(select(exists().where(Post.user_id == user.id, live))))
+
 
 HANDLE_FIELDS = {
     "cashapp_handle": "Cash App",
@@ -63,7 +73,7 @@ def send_handle_change_notice(
 
 @bp.route("/profile", methods=["GET", "POST"])
 @login_required
-def edit() -> str | Response:
+def edit() -> str | Response | tuple[str, int]:
     user: User = current_user
     form = ProfileForm(obj=user)
     if form.validate_on_submit():
@@ -75,6 +85,11 @@ def edit() -> str | Response:
                 setattr(user, field, new)
         user.city = form.city.data or None
         user.state = form.state.data or None
+        if changes and not user.can_be_paid and has_live_post(user):
+            db.session.rollback()
+            form.cashapp_handle.errors = [KEEP_A_HANDLE]
+            page = render_template("profile/edit.html", form=form, delete_form=DeleteAccountForm())
+            return page, 400
         db.session.commit()
         if changes:
             send_handle_change_notice(user, changes)
