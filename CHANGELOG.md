@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- The reminder emails run every day on their own (#258, PB-35). A GitHub Actions workflow runs `gifts remind` and `posts remind` at 15:00 UTC against Neon and Brevo, using the `DATABASE_URL` and `BREVO_API_KEY` repository secrets, and skips with a warning until they're set.
+
 ### Fixed
 - Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
 - Show less (#119 review): signing up now merges a logged-out choice too, account deletion clears it, the Privacy page names its cookie, the follow-through first ticket has no Show less (it always stays first), and moving a post to another category no longer marks it Edited or sends it back to review.
