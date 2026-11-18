@@ -759,6 +759,18 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .how, .how-field { gap: 14px; }
   .home { padding-block: calc(env(safe-area-inset-top) + 14px) calc(env(safe-area-inset-bottom) + 12px); }
   .how > .how-way-in { padding-block: 4px calc(env(safe-area-inset-bottom) + 8px); }
+  /* The other story's whole bubble is its link; on a short screen it drops the pill to make room (#236). */
+  .how-other-go { display: none; }
+  .how .how-other { min-height: 64px; }
+  .how .how-line { font-size: 2.5rem; }
+  .how .how-field { padding-top: 14px; }
+  .how-hint { margin-top: 6px; font-size: 0.875rem; line-height: 1.35; }
+  .how-ask { padding: 16px 16px 12px; }
+  .how-ask .how-ask-title { font-size: 1.875rem; }
+  .how-ask .amounts strong { font-size: 1.375rem; }
+  .how-piece .group { padding-block: 14px; }
+  .how-piece .gift-amount { font-size: 1.375rem; }
+  .how-piece .gift-actions { margin-top: 8px; }
 }
 /* The door's photos carry into its story: three across the top of the field, fading to solid behind the headline. */
 .how-field:has(.home-mosaic) { isolation: isolate; }
@@ -782,7 +794,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .how-ask { max-width: 360px; padding: 20px 18px 16px; color: var(--ink); background: var(--surface); border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
 .how-ask p { margin: 0; }
 .how-ask .how-ask-title { margin-bottom: 8px; font: 400 2.5rem/0.92 var(--display); text-transform: uppercase; }
-.how-confirmed { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* The feed's gestures in one quiet line under the example card (#236). */
+.how-hint { margin: 10px 0 0; font-size: 0.9375rem; color: var(--on-field-muted); }
 .how-thanks { display: flex; flex-direction: column; gap: 6px; }
 .how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
 .how-nav a { min-height: 48px; text-decoration: none; }
