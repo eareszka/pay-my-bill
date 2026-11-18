@@ -82,6 +82,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         R2_BUCKET=os.environ.get("R2_BUCKET", ""),
         R2_PUBLIC_URL=os.environ.get("R2_PUBLIC_URL", ""),
         PHOTO_DIR=os.environ.get("PHOTO_DIR", ""),
+        # Unhandled errors go to Sentry when set (#259).
+        SENTRY_DSN=os.environ.get("SENTRY_DSN", ""),
         # Forms are small; the photo upload raises its own limit (#155).
         MAX_CONTENT_LENGTH=1024 * 1024,
         # Donors leave for their payment app mid-form, so tokens last for the session.
@@ -91,6 +93,11 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         app.config.update(config)
     if not is_development(app):
         check_production(app.config)
+        # Database errors in logs and error reports show no row values, like emails (#259).
+        app.config.setdefault("SQLALCHEMY_ENGINE_OPTIONS", {})["hide_parameters"] = True
+        from app import monitoring
+
+        monitoring.init(app.config["SENTRY_DSN"], environment=app.config["APP_URL"])
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url(app.config["SQLALCHEMY_DATABASE_URI"])
     app.logger.setLevel(logging.INFO)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)  # type: ignore[method-assign]
