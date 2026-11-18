@@ -54,6 +54,34 @@ class PostKind(StrEnum):
     NEED = "need"
 
 
+class PostCategory(StrEnum):
+    RENT = "rent"
+    BILLS = "bills"
+    FOOD = "food"
+    TRANSPORT = "transport"
+    HEALTH = "health"
+    KIDS = "kids"
+    FUN = "fun"
+    OTHER = "other"
+
+    @property
+    def label(self) -> str:
+        return CATEGORY_LABELS[self]
+
+
+# Confirmed by the owner on 2026-11-11 (#119).
+CATEGORY_LABELS = {
+    PostCategory.RENT: "Rent and housing",
+    PostCategory.BILLS: "Bills and utilities",
+    PostCategory.FOOD: "Groceries and food",
+    PostCategory.TRANSPORT: "Car and transport",
+    PostCategory.HEALTH: "Health",
+    PostCategory.KIDS: "Kids and school",
+    PostCategory.FUN: "Fun and games",
+    PostCategory.OTHER: "Other",
+}
+
+
 class PostStatus(StrEnum):
     PENDING_REVIEW = "pending_review"
     OPEN = "open"
@@ -166,6 +194,8 @@ class User(Base):
     session_version: Mapped[int] = mapped_column(default=0, server_default="0")
     # When the owner last saw their gift news; None (accounts from before #80) shows none.
     gifts_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=utcnow)
+    # Categories moved later in this person's stack, comma-separated (#119).
+    show_less: Mapped[str | None] = mapped_column(String(100))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     posts: Mapped[list["Post"]] = relationship(back_populates="user")
@@ -215,6 +245,11 @@ class Post(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     kind: Mapped[PostKind] = mapped_column(_enum_column(PostKind, "post_kind"))
+    category: Mapped[PostCategory] = mapped_column(
+        _enum_column(PostCategory, "post_category"),
+        default=PostCategory.OTHER,
+        server_default=PostCategory.OTHER.value,
+    )
     title: Mapped[str] = mapped_column(String(80))
     body: Mapped[str] = mapped_column(Text)
     goal_cents: Mapped[int]

@@ -1,4 +1,5 @@
-// Deal through the pile: swipe left for the next ticket, right to go back, and up to open the post (#235).
+// Deal through the pile: swipe left for the next ticket, right to go back, up to open the post (#235),
+// and down to see less of its category (#119).
 // Back and Next ticket are ordinary links, so the feed works the same without this.
 const ticket = document.querySelector(".deck-ticket");
 const deck = document.querySelector(".deck");
@@ -11,6 +12,8 @@ const backUnder = document.getElementById("deck-under-back");
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 // Up opens the post, where Chip in lives.
 const upLink = ticket?.querySelector(".card-title a");
+// Down sends the rail's Show less form, when this category isn't already shown less.
+const lessForm = document.querySelector("form.show-less");
 
 const START_DRAG_PX = 8;
 const COMMIT_SHARE = 0.3; // of the ticket's width
@@ -40,7 +43,7 @@ const pose = (dx) => (calm.matches
   : { transform: `translateX(${dx}px) rotate(${tilt(dx)}deg)` });
 
 const lift = (dy) => (calm.matches
-  ? { opacity: 1 - Math.min(-dy / ticket.offsetHeight, 1) / 2 }
+  ? { opacity: 1 - Math.min(Math.abs(dy) / ticket.offsetHeight, 1) / 2 }
   : { transform: `translateY(${dy * UP_GIVE}px)` });
 
 // Load and decode the neighbors' photos now. A <template> never loads its images,
@@ -119,18 +122,23 @@ const leave = (link, dx = 0) => {
   flight.finished.then(goTo, goTo);
 };
 
-// Lift the ticket off the top, then open the post.
+// Lift the ticket off the top and open the post, or drop it off the bottom and show less of its kind.
 const rise = (dy) => {
   if (leaving) return;
   leaving = true;
-  const goTo = () => window.location.assign(upLink.href);
+  const down = dy > 0;
+  const goTo = () => {
+    if (!down) window.location.assign(upLink.href);
+    else if (lessForm.requestSubmit) lessForm.requestSubmit();
+    else lessForm.submit();
+  };
   if (!ticket.animate) {
     goTo();
     return;
   }
   const keyframes = calm.matches
     ? [lift(dy), { opacity: 0 }]
-    : [lift(dy), { transform: `translateY(${-ticket.offsetHeight / 3}px)`, opacity: 0 }];
+    : [lift(dy), { transform: `translateY(${(down ? 1 : -1) * ticket.offsetHeight / 3}px)`, opacity: 0 }];
   const flight = ticket.animate(keyframes, {
     duration: calm.matches ? 120 : 180,
     easing: THROW,
@@ -179,7 +187,7 @@ const onDown = (event) => {
     x: event.clientX,
     y: event.clientY,
     active: false,
-    up: false,
+    vertical: false,
     dx: 0,
     dy: 0,
     trail: [],
@@ -192,24 +200,25 @@ const onMove = (event) => {
   if (!press.active) {
     const up = event.clientY - press.y;
     if (Math.abs(raw) < START_DRAG_PX && Math.abs(up) < START_DRAG_PX) return;
-    // Mostly vertical: up lifts the card toward the post; down does nothing. On phones the card
-    // fills the screen (touch-action: none, since Safari has no pan-down), so no scroll is lost.
+    // Mostly vertical: up lifts the card toward the post, down drops it toward Show less. On phones
+    // the card fills the screen (touch-action: none, since Safari has no pan-down), so no scroll is lost.
     if (Math.abs(up) > Math.abs(raw)) {
-      if (up > 0 || !upLink) {
+      if (!(up > 0 ? lessForm : upLink)) {
         press = null;
         return;
       }
-      press.up = true;
+      press.vertical = true;
+      press.sign = Math.sign(up);
     }
     press.active = true;
     dragged = true;
     ticket.setPointerCapture(event.pointerId);
     ticket.getAnimations().forEach((animation) => animation.cancel());
     window.getSelection()?.removeAllRanges();
-    if (!press.up) moving(true);
+    if (!press.vertical) moving(true);
   }
-  if (press.up) {
-    press.dy = Math.min(0, event.clientY - press.y);
+  if (press.vertical) {
+    press.dy = press.sign * Math.max(0, press.sign * (event.clientY - press.y));
     press.trail.push({ x: event.clientX, y: event.clientY, at: event.timeStamp });
     Object.assign(ticket.style, lift(press.dy));
     return;
@@ -225,12 +234,12 @@ const onMove = (event) => {
 
 const onUp = (event) => {
   if (!press || event.pointerId !== press.id) return;
-  const { active, up, dx, dy, trail } = press;
+  const { active, vertical, dx, dy, trail } = press;
   press = null;
   if (!active) return;
-  if (up) {
-    const rising = recentSpeed(trail, event.timeStamp, "y") < -FLICK_PX_PER_MS && -dy > FLICK_MIN_PX;
-    if (event.type === "pointerup" && (-dy > UP_COMMIT_PX || rising)) rise(dy);
+  if (vertical) {
+    const flung = Math.sign(dy) * recentSpeed(trail, event.timeStamp, "y") > FLICK_PX_PER_MS && Math.abs(dy) > FLICK_MIN_PX;
+    if (event.type === "pointerup" && (Math.abs(dy) > UP_COMMIT_PX || flung)) rise(dy);
     else settle(lift(dy));
     return;
   }
@@ -256,7 +265,7 @@ const typing = (element) => element instanceof HTMLElement
   && (element.isContentEditable || element.matches("input, select, textarea"));
 
 if (ticket && deck && (nextLink || backLink)) {
-  // Phones hand vertical moves on the card to this script, so up can open the post (#235).
+  // Phones hand vertical moves on the card to this script: up opens the post (#235), down shows less (#119).
   if (upLink) ticket.classList.add("swipe-up");
   ticket.addEventListener("pointerdown", onDown);
   ticket.addEventListener("pointermove", onMove);

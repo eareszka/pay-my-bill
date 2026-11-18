@@ -24,7 +24,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app.models import MAX_GOAL_CENTS, Post, PostKind, ReportReason
+from app.models import MAX_GOAL_CENTS, Post, PostCategory, PostKind, ReportReason
 from app.moderation import update_flagged_keywords
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
@@ -180,6 +180,13 @@ class PostForm(FlaskForm):
             SelectChoice(PostKind.WANT.value, "Want"),
         ],
         validators=[DataRequired(message="Choose Need or Want.")],
+    )
+    category = SelectField(
+        "Category",
+        choices=[SelectChoice("", "Choose a category")]
+        + [SelectChoice(c.value, c.label) for c in PostCategory],
+        validators=[DataRequired(message="Choose a category.")],
+        validate_choice=True,
     )
     title = StringField(
         "Title",
