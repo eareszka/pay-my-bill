@@ -1,32 +1,69 @@
 {% extends "base.html" %}
 {% from "_field.html" import choice, field %}
+{% set emoji = {"rent": "🏠", "bills": "💡", "food": "🛒", "transport": "🚗", "health": "🩺", "kids": "🎒", "fun": "🎮", "other": "✨"} %}
+{% macro step(question, hint=None, optional=False) %}
+  <section class="q-step" data-step{% if optional %} data-optional{% endif %}>
+    <h2 class="q-question">{{ question }}</h2>
+    {% if hint %}<p class="hint">{{ hint }}</p>{% endif %}
+    {{ caller() }}
+  </section>
+{% endmacro %}
 {% block title %}New post · Yearnly{% endblock %}
 {% block content %}
   <h1>Ask for a hand</h1>
   {% if at_limit %}
     <p class="flash flash-error">You already have {{ MAX_OPEN_POSTS }} open posts. Close or finish one before posting again.</p>
   {% else %}
-    <form method="post" class="form page-form" enctype="multipart/form-data" novalidate data-once>
+    <form method="post" class="form page-form q-form" enctype="multipart/form-data" novalidate data-once>
       {{ form.hidden_tag() }}
-      <fieldset class="plain-group">
-        <legend>{{ form.kind.label.text }}</legend>
-        <div class="choices">
-          {% for option in form.kind %}
-            <label class="choice">{% if form.kind.errors %}{{ option(aria_describedby="kind-error", autofocus=loop.first) }}{% else %}{{ option() }}{% endif %} {{ option.label.text }}</label>
-          {% endfor %}
-        </div>
-        {% if form.kind.errors %}<small class="error" id="kind-error">{{ form.kind.errors | join(" ") }}</small>{% endif %}
-      </fieldset>
-      {{ field(form.category) }}
-      {{ field(form.title, maxlength=80) }}
-      {{ field(form.body, rows=6, maxlength=2000) }}
-      {{ field(form.photo, accept=PHOTO_ACCEPT) }}
-      {{ field(form.goal, inputmode="decimal", placeholder="$120") }}
+      <div class="q-progress" hidden><div class="q-progress-bar"></div></div>
+      {% call step("Is this a need or a want?", "Needs keep life running. Wants make it better. Both are welcome.") %}
+        <fieldset class="plain-group">
+          <legend class="sr-only">{{ form.kind.label.text }}</legend>
+          <div class="choices q-options">
+            {% for option in form.kind %}
+              <label class="choice">{% if form.kind.errors %}{{ option(aria_describedby="kind-error", autofocus=loop.first, required=True) }}{% else %}{{ option(required=True) }}{% endif %} {{ option.label.text }}</label>
+            {% endfor %}
+          </div>
+          {% if form.kind.errors %}<small class="error" id="kind-error">{{ form.kind.errors | join(" ") }}</small>{% endif %}
+        </fieldset>
+      {% endcall %}
+      {% call step("What's it for?", "Pick the one that fits best.") %}
+        <fieldset class="plain-group">
+          <legend class="sr-only">{{ form.category.label.text }}</legend>
+          <div class="choices q-pills">
+            {% for opt in form.category.choices if opt.value %}{% set value, label = opt.value, opt.label %}
+              <label class="choice"><input type="radio" name="{{ form.category.name }}" value="{{ value }}" required{% if form.category.data == value %} checked{% endif %}{% if form.category.errors %} aria-describedby="category-error"{% if loop.first %} autofocus{% endif %}{% endif %}> {{ emoji[value] }} {{ label }}</label>
+            {% endfor %}
+          </div>
+          {% if form.category.errors %}<small class="error" id="category-error">{{ form.category.errors | join(" ") }}</small>{% endif %}
+        </fieldset>
+      {% endcall %}
+      {% call step("Give it a title", "A few words people see first.") %}
+        {{ field(form.title, maxlength=80, minlength=3, required=True) }}
+      {% endcall %}
+      {% call step("Tell your story") %}
+        {{ field(form.body, rows=6, maxlength=2000, minlength=10, required=True) }}
+      {% endcall %}
+      {% call step("How much do you need?") %}
+        {{ field(form.goal, inputmode="decimal", placeholder="$120", required=True) }}
+      {% endcall %}
+      {% call step("Add a photo", "A picture of what it's for helps people say yes.", optional=True) %}
+        {{ field(form.photo, accept=PHOTO_ACCEPT) }}
+      {% endcall %}
       {% if form.require_rules %}
-        {% call choice(form.accept_rules) %}I agree to the <a href="{{ url_for('main.rules') }}" target="_blank">Community Rules</a>{% endcall %}
+        {% call step("One last thing") %}
+          {% call choice(form.accept_rules) %}I agree to the <a href="{{ url_for('main.rules') }}" target="_blank">Community Rules</a>{% endcall %}
+        {% endcall %}
       {% endif %}
-      <button type="submit" class="btn">Post</button>
+      <div class="q-nav">
+        <button type="button" class="btn btn-secondary" data-q-back hidden>Back</button>
+        <button type="button" class="btn btn-secondary" data-q-skip hidden>Skip</button>
+        <button type="button" class="btn q-next" data-q-next aria-label="Next" hidden>→</button>
+        <button type="submit" class="btn" data-q-submit>Post</button>
+      </div>
     </form>
     <script src="{{ url_for('static', filename='js/once.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/steps.js') }}" defer></script>
   {% endif %}
 {% endblock %}

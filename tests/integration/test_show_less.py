@@ -65,8 +65,8 @@ def show_less(client: FlaskClient, category: str = "rent", next_: str = "/feed?u
 def test_new_posts_need_a_category(client: FlaskClient, poster: User) -> None:
     login_as(client, poster)
     page = client.get("/posts/new").get_data(as_text=True)
-    assert '<option value="">Choose a category</option>' in page
-    assert '<option value="fun">Fun and games</option>' in page
+    assert 'name="category" value=""' not in page
+    assert 'name="category" value="fun" required> 🎮 Fun and games' in page
     resp = client.post("/posts/new", data={**FORM, "category": ""})
     assert "Choose a category." in resp.get_data(as_text=True)
     client.post("/posts/new", data={**FORM, "category": "loans"})

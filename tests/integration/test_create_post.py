@@ -3,7 +3,16 @@ from flask.testing import FlaskClient
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import MAX_GOAL_CENTS, MAX_OPEN_POSTS, Post, PostKind, PostStatus, User, utcnow
+from app.models import (
+    MAX_GOAL_CENTS,
+    MAX_OPEN_POSTS,
+    Post,
+    PostCategory,
+    PostKind,
+    PostStatus,
+    User,
+    utcnow,
+)
 from tests.conftest import MakeUser, login_as
 
 FORM = {
@@ -50,6 +59,24 @@ def test_form_renders_with_rules_checkbox(client: FlaskClient, poster: User) -> 
     assert "Ask for a hand" in page
     assert "Community Rules" in page
     assert 'name="accept_rules"' in page
+
+
+def test_form_asks_one_question_per_step(client: FlaskClient, poster: User) -> None:
+    page = client.get("/posts/new").get_data(as_text=True)
+    assert page.count("data-step") == 7
+    assert page.count('type="radio" name="category"') == len(PostCategory)
+    poster.rules_accepted_at = utcnow()
+    db.session.commit()
+    assert client.get("/posts/new").get_data(as_text=True).count("data-step") == 6
+
+
+def test_errors_keep_the_other_answers(client: FlaskClient, poster: User) -> None:
+    page = client.post("/posts/new", data={**FORM, "category": ""}).get_data(as_text=True)
+    assert 'id="category-error"' in page
+    assert 'value="Car battery died"' in page
+    page = client.post("/posts/new", data={**FORM, "title": ""}).get_data(as_text=True)
+    assert 'value="bills" required checked' in page
+    assert posts() == []
 
 
 def test_rules_checkbox_hidden_once_accepted(client: FlaskClient, poster: User) -> None:

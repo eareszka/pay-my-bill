@@ -385,6 +385,13 @@ h3.section-title { font-size: 1rem; }
 .plain-group legend { padding: 0; margin-bottom: 4px; font-weight: 700; }
 .form { display: flex; flex-direction: column; gap: 16px; }
 .page-form { margin-bottom: 20px; }
+/* New post, one question per screen (#275). steps.js hides the other questions; ui owns the look. */
+.q-progress { height: 4px; background: var(--edge); border-radius: var(--pill); overflow: hidden; }
+.q-progress-bar { width: 0; height: 100%; background: var(--ink); transition: width var(--fast) ease-out; }
+.q-question { margin: 0; }
+.q-step { display: flex; flex-direction: column; gap: 12px; }
+.q-nav { display: flex; gap: 8px; }
+.q-nav .q-next, .q-nav [data-q-submit] { margin-left: auto; }
 .field { display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
 .field small { font-size: 0.875rem; font-weight: 400; }
 .field input, .field select, .field textarea {

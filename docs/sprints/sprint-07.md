@@ -16,6 +16,7 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 | PB-51 Retry photo deletes that fail | #149 | main | 1 | To do |
 | Support page for the App Store listing | #264 | main | 1 | To do |
 | PB-19 App Store listing and review pack | #260 | ui | 3 | Pack in review (#263); blocked on #264, #265, #257, PB-39, demo account |
+| Create a post one question per screen (owner's ask) | #275 | main → ui | — | main done, waiting on ui |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
 | *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | To do |
 | *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
@@ -33,3 +34,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18: Owner chose an optional tip on the web only in place of the 1% fee (#265). Added #264 support page. Blocked: none.
 - 2026-11-18 (ui): #257 design on #266: Block asks first in place (owner's pick), sits quietly under Report, and Settings → Blocked is a hairline list. Blocked: none.
 - 2026-11-18 (ui): #265 design on #273: the web tip is one row of pills (No tip, $1, $2, Other), and Other's amount box shows only when picked. Blocked: none.
+- 2026-11-18 (main): #275: new post asks one question per screen (owner's Hinge/Bumble ask), with progress bar, auto-next on picks, and errors opening on their step. Next: ui. Blocked: none.
