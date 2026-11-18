@@ -425,3 +425,26 @@ def test_dismissing_a_post_report_logs_the_post(
     client.post(f"/admin/reports/{report.id}/dismiss")
     action = db.session.scalars(select(AdminAction)).one()
     assert action.target == f"report {report.id} on post {post.id} by maria_g: {post.title}"
+
+
+def test_queue_shows_reaction_counts_even_on_deleted_posts(
+    client: FlaskClient, make_user: MakeUser
+) -> None:
+    from app.models import Reaction, ReactionKind, Report, ReportReason
+
+    admin = make_user("boss", is_admin=True)
+    poster = make_user("maria_g")
+    fans = [make_user(f"fan{i}") for i in range(3)]
+    gone = Post(user=poster, kind=PostKind.NEED, title="Old", body="Old post.", goal_cents=5_000)
+    gone.status = PostStatus.REMOVED
+    db.session.add(gone)
+    db.session.flush()
+    for fan, kind in zip(
+        fans, [ReactionKind.HMM, ReactionKind.HMM, ReactionKind.KUDOS], strict=True
+    ):
+        db.session.add(Reaction(post_id=gone.id, user_id=fan.id, kind=kind))
+    db.session.add(Report(reporter=fans[0], user=poster, reason=ReportReason.SCAM))
+    db.session.commit()
+    login_as(client, admin)
+    page = client.get("/admin").get_data(as_text=True)
+    assert "Reactions on their updates: 1 kudos · 0 👍 · 2 🤨" in page
