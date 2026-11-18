@@ -16,7 +16,7 @@ from flask import (
 )
 from flask_login import current_user
 from sqlalchemy import Select, func, select, update
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 from werkzeug.wrappers import Response
 
 from app.auth import login_required, verified_required
@@ -39,11 +39,49 @@ from app.models import (
     utcnow,
 )
 from app.money import format_cents
+from app.rewards import confirmed_gifts, progress
 from app.routes.posts import render_post, send_update_notice
 from app.tokens import GIFT_ANSWER, make_token, read_token
 from app.urls import site_url
 
 bp = Blueprint("gifts", __name__)
+
+
+def send_confirmed_notice(donation: Donation) -> None:
+    donor, post = donation.donor, donation.post
+    if donor.is_deleted:
+        return
+    subject = f"{post.user.username} confirmed your {format_cents(donation.amount_cents)}"
+    helped = progress(confirmed_gifts(donor)).people_helped
+    people = f" You've helped {helped} {'person' if helped == 1 else 'people'}." if helped else ""
+    body = (
+        f'Hi {donor.username},\n\n{subject} for "{post.title}".{people}\n\n'
+        f"See your gifts: {site_url('gifts.index', tab='chipped')}"
+    )
+    send_later(donor.email, subject, body)
+
+
+def gift_news(user: User) -> list[Donation]:
+    """Gifts confirmed since the owner last looked, once (#80); card gifts never wait on this."""
+    seen, user.gifts_seen_at = user.gifts_seen_at, utcnow()
+    db.session.commit()
+    if seen is None:
+        return []
+    return list(
+        db.session.scalars(
+            select(Donation)
+            .join(Donation.post)
+            .options(contains_eager(Donation.post).joinedload(Post.user))
+            .where(
+                Donation.donor_id == user.id,
+                Donation.status == DonationStatus.CONFIRMED,
+                Donation.method != PaymentMethod.CARD,
+                Donation.resolved_at > seen,
+                Post.status != PostStatus.REMOVED,
+            )
+            .order_by(Donation.resolved_at, Donation.id)
+        )
+    )
 
 
 def as_name(donation: Donation) -> str:
@@ -200,6 +238,7 @@ def settle(donation: Donation, action: str) -> tuple[str, str]:
     if not confirmed:
         return f"Marked {amount} from {donor} as not received.", "info"
     post, funded = count_confirmed(donation, already_heard)
+    send_confirmed_notice(donation)
     if funded:
         return f'Confirmed {amount} from {donor}. "{post.title}" is fully funded!', "success"
     if post.owes_update:

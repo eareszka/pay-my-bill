@@ -552,6 +552,11 @@ h3.section-title { font-size: 1rem; }
 .profile-head h1 { min-width: 0; overflow-wrap: anywhere; }
 .profile-head .btn { flex: none; min-height: 44px; padding: 6px 14px; }
 .profile-tabs { margin-top: 32px; }
+/* Visible rewards (#80): plain news and a plain tally, no confetti. A confirmed gift is good news, so it takes the good tint. */
+.gift-news { margin: 16px 0 0; padding: 12px 14px; color: var(--ink); background: var(--good-tint); border-radius: var(--radius); }
+.gift-news p { margin: 0; }
+.gift-news-total { margin-top: 4px !important; font-weight: 700; }
+.rewards-strip { margin: 0 0 4px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .profile-tabs + .gift-section, .profile-tabs + .profile-posts { margin-top: 0; }
 .profile-posts { margin-top: 32px; }
 .gift-section + .profile-posts { margin-top: 28px; }

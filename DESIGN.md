@@ -389,6 +389,9 @@ Dense hairline rows with no cards inside cards. Gift and leader lists are bounde
 ### The You Page
 Your own profile is the home for your stuff (#132). The header is your name in Display with an outlined Settings button on the right, your region, the rewards panel, and your handles. Below, pill tabs (real links) switch between **Posts** and **Chipped in**. Posts starts with To confirm when gifts are waiting, then your posts as hairline rows: the bold title, "$X of $Y" on the right, the meter while open, and "Need · " plus one state mark that says what's next (Open until a date, Update due by a date, Update overdue as the disputed mark, Funded, In review, Closed), with small Post update, Edit, and Delete links. Chipped in lists your gifts with their state marks. Visitors see the header, handles, and public posts only, never what you gave. Settings (`/profile`) is a form page with a "← Your profile" link.
 
+- **Gift news** (#80): the one-time note under your region when gifts you sent were confirmed since your last visit. It's a Good Tint notice (14px, 12px 14px padding, ink text) with one line per gift and "You've helped N people" in 700. It's plain, with no motion, icons, or confetti.
+- **Rewards strip** (#80): Chipped in opens with one 700 line in tabular figures, "Level 2 · 3 people helped · 2-week streak", above the gift list's hairline. The full rewards panel stays lower on the page.
+
 ### Meter
 The single progress device. It is a 4px pill track with an ink pill fill to the percentage. On a field it becomes a Field Track (20% ink) with a deep fill, 3px tall on the card. In forced-colors mode it is drawn in CanvasText.
 

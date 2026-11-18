@@ -66,7 +66,9 @@ def add_pending(post: Post, donor: User) -> Donation:
 
 
 def emails(caplog: pytest.LogCaptureFixture, address: str) -> int:
-    return sum(address in r.getMessage() for r in caplog.records)
+    # Results-update notices only; confirming a gift also emails its donor (#80).
+    messages = [r.getMessage() for r in caplog.records]
+    return sum(address in m and "confirmed your" not in m for m in messages)
 
 
 def test_open_post_owes_nothing(poster: User, donor: User) -> None:
