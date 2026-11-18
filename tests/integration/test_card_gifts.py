@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 import smtplib
 import time
 from datetime import timedelta
@@ -103,7 +104,7 @@ def gifts() -> list[Donation]:
 
 @pytest.mark.parametrize(
     ("paid", "parts"),
-    [(500, (45, 5, 450)), (2_000, (88, 20, 1_892)), (100_000, (2_930, 1_000, 96_070))],
+    [(500, (45, 0, 455)), (2_000, (88, 0, 1_912)), (100_000, (2_930, 0, 97_070))],
 )
 def test_fees_come_out_of_the_gift(paid: int, parts: tuple[int, int, int]) -> None:
     assert stripe_pay.split(paid) == parts
@@ -139,8 +140,9 @@ def test_post_page_offers_instant_card_gift(client: FlaskClient, post: Post, don
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Chip in instantly" in page
     assert "You pay exactly what you enter" in page
-    assert "a 1% Yearnly fee come out of it" in page
-    assert 'data-platform-rate="0.01"' in page
+    assert "Yearnly takes no fee." in page
+    assert 'data-platform-rate="0"' in page
+    assert "Tip to support Yearnly (optional)" in page
     assert "js/card-net.js" in page
     assert "A card from outside the US costs a little more" in page
     assert "Or pay in an app" not in page
@@ -184,10 +186,11 @@ def test_checkout_redirects_to_stripe_with_direct_charge(
     params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
     assert params["line_items"][0]["price_data"]["unit_amount"] == 2_000
     assert (
-        "maria_g gets about $18.92"
+        "maria_g gets about $19.12"
         in params["line_items"][0]["price_data"]["product_data"]["description"]
     )
-    assert params["payment_intent_data"]["application_fee_amount"] == 20
+    assert len(params["line_items"]) == 1
+    assert "application_fee_amount" not in params["payment_intent_data"]
     assert params["allowed_payment_method_types"] == ["card"]
     assert "transfer_data" not in params["payment_intent_data"]
     options = fake_client.v1.checkout.sessions.create.call_args.kwargs["options"]
@@ -195,29 +198,30 @@ def test_checkout_redirects_to_stripe_with_direct_charge(
     assert params["metadata"] == {
         "post_id": str(post.id),
         "donor_id": str(donor.id),
-        "gift_cents": "1892",
-        "fee_cents": "108",
-        "platform_fee_cents": "20",
+        "gift_cents": "1912",
+        "fee_cents": "88",
+        "platform_fee_cents": "0",
     }
     assert params["customer_email"] == "dev_tom@example.com"
     assert params["success_url"] == f"http://localhost/posts/{post.id}?paid=1"
     assert gifts() == []
 
 
-def test_checkout_without_platform_fee(
+def test_checkout_with_a_platform_fee_still_works(
     app: Flask, client: FlaskClient, post: Post, donor: User, fake_client: MagicMock
 ) -> None:
-    app.config["PLATFORM_FEE_RATE"] = "0"
+    app.config["PLATFORM_FEE_RATE"] = "0.01"
     login_as(client, donor)
     assert client.post(f"/posts/{post.id}/card", data={"amount": "20"}).status_code == 303
     params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
-    assert "application_fee_amount" not in params["payment_intent_data"]
-    assert params["metadata"]["gift_cents"] == "1912"
+    assert params["payment_intent_data"]["application_fee_amount"] == 20
+    assert params["metadata"]["gift_cents"] == "1892"
 
 
 def test_terms_disclose_the_fees(client: FlaskClient) -> None:
     page = client.get("/terms").get_data(as_text=True)
-    assert "a 1% Yearnly platform fee come out of each card gift" in page
+    assert "Yearnly takes no fee on any gift." in page
+    assert "There's no tip in the iOS app." in page
 
 
 @pytest.mark.parametrize(
@@ -282,16 +286,16 @@ def test_paid_webhook_records_a_confirmed_gift_once(
     assert resp.status_code == 200
     [gift] = gifts()
     assert (gift.amount_cents, gift.fee_cents, gift.method, gift.status) == (
-        1_892,
-        108,
+        1_912,
+        88,
         PaymentMethod.CARD,
         DonationStatus.CONFIRMED,
     )
     assert (gift.stripe_session_id, gift.stripe_payment_intent) == ("cs_1", "pi_1")
-    assert post.raised_cents == 1_892
-    assert "dev_tom sent you $18.92" in caplog.text
+    assert post.raised_cents == 1_912
+    assert "dev_tom sent you $19.12" in caplog.text
     assert "Your $20 gift to maria_g went through" in caplog.text
-    assert "maria_g gets about $18.92 after fees" in caplog.text
+    assert "maria_g gets about $19.12 after the card fee" in caplog.text
     assert signed(client, paid_event(post, donor)).status_code == 200
     assert len(gifts()) == 1
 
@@ -473,7 +477,7 @@ def test_won_dispute_counts_the_gift_again(
     signed(client, charge_event("charge.dispute.closed", status="won"))
     [gift] = gifts()
     assert gift.status == DonationStatus.CONFIRMED
-    assert post.raised_cents == 1_892
+    assert post.raised_cents == 1_912
     assert "A card dispute was won" in caplog.text
     signed(client, charge_event("charge.dispute.closed", status="won"))
     assert "A card dispute was won" in caplog.text
@@ -563,3 +567,79 @@ def test_failed_checkout_rechecks_the_recipient(
     recipient.stripe_ready = True
     db.session.commit()
     assert client.post(f"/posts/{post.id}/card", data={"amount": "20"}).status_code == 400
+
+
+def test_checkout_adds_an_optional_tip_yearnly_absorbs_its_fee(
+    client: FlaskClient, post: Post, donor: User, fake_client: MagicMock
+) -> None:
+    login_as(client, donor)
+    client.post(f"/posts/{post.id}/card", data={"amount": "20", "tip": "200"})
+    params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
+    gift, tip = params["line_items"]
+    assert gift["price_data"]["unit_amount"] == 2_000
+    assert tip["price_data"]["unit_amount"] == 200
+    assert tip["price_data"]["product_data"]["name"] == "Tip to support Yearnly"
+    # Yearnly keeps the tip less Stripe's 2.9% on it, so the recipient's share is unchanged.
+    assert params["payment_intent_data"]["application_fee_amount"] == 200 - 6
+    assert params["metadata"]["gift_cents"] == "1912"
+    assert params["metadata"]["tip_cents"] == "200"
+
+
+@pytest.mark.parametrize(
+    ("form", "cents"),
+    [({"tip": "0"}, None), ({"tip": "100"}, 100), ({"tip": "other", "tip_other": "3.50"}, 350)],
+)
+def test_tip_choices(
+    client: FlaskClient,
+    post: Post,
+    donor: User,
+    fake_client: MagicMock,
+    form: dict[str, str],
+    cents: int | None,
+) -> None:
+    login_as(client, donor)
+    client.post(f"/posts/{post.id}/card", data={"amount": "20", **form})
+    meta = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]["metadata"]
+    assert meta.get("tip_cents") == (str(cents) if cents else None)
+
+
+@pytest.mark.parametrize(
+    "form",
+    [{"tip": "300"}, {"tip": "other", "tip_other": "51"}, {"tip": "other", "tip_other": "x"}],
+)
+def test_bad_tips_are_refused(
+    client: FlaskClient, post: Post, donor: User, fake_client: MagicMock, form: dict[str, str]
+) -> None:
+    login_as(client, donor)
+    resp = client.post(f"/posts/{post.id}/card", data={"amount": "20", **form})
+    assert resp.status_code == 400
+    assert "A tip can be up to $50, or none." in resp.get_data(as_text=True)
+    fake_client.v1.checkout.sessions.create.assert_not_called()
+
+
+def test_no_tip_inside_the_ios_app(
+    client: FlaskClient, post: Post, donor: User, fake_client: MagicMock
+) -> None:
+    login_as(client, donor)
+    app_ua = {"User-Agent": "Mozilla/5.0 (iPhone) YearnlyApp"}
+    page = client.get(f"/posts/{post.id}", headers=app_ua).get_data(as_text=True)
+    assert "Tip to support Yearnly" not in page
+    client.post(f"/posts/{post.id}/card", data={"amount": "20", "tip": "200"}, headers=app_ua)
+    params = fake_client.v1.checkout.sessions.create.call_args.kwargs["params"]
+    assert len(params["line_items"]) == 1
+    assert "tip_cents" not in params["metadata"]
+
+
+def test_a_tip_is_never_part_of_the_gift(
+    client: FlaskClient, post: Post, donor: User, caplog: pytest.LogCaptureFixture
+) -> None:
+    event = paid_event(post, donor)
+    event["data"]["object"]["metadata"]["tip_cents"] = "200"
+    event["data"]["object"]["amount_total"] = 2_200
+    with caplog.at_level(logging.INFO):
+        signed(client, event)
+    [gift] = gifts()
+    assert gift.amount_cents == 1_912
+    assert post.raised_cents == 1_912
+    assert "Your $20 gift to maria_g went through" in caplog.text
+    assert "Your $2 tip to support Yearnly was a separate line." in caplog.text

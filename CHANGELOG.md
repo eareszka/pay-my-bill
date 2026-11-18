@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- No platform fee, and an optional tip (#265, ADR 0019, amending ADR 0016). `PLATFORM_FEE_RATE` now defaults to 0, so the only cut of a card gift is Stripe's card fee. On the website, card checkout offers "Tip to support Yearnly" (none by default, $1, $2, or up to $50) as a separate line. Yearnly absorbs Stripe's fee on it, so the recipient gets the same, and the tip never counts toward a post or rewards. The iOS shell adds `YearnlyApp` to its user agent, and there the tip is left out and refused on the server. The Terms are updated.
 - Settings won't remove your last way to get paid while you have an open post, or one waiting for review (#21, owner's pick): "Keep one way to get paid while you have an open post, or close the post first." Swapping handles and card payouts (Stripe) still count.
 - A public Support page at `/support` (#264), linked from the footer, for the App Store listing. It covers how to email support@yearnly.app, report or block someone, where payment problems go, password reset, account deletion, and links to Rules, Terms, and Privacy.
 - The reminder emails run every day on their own (#258, PB-35). A GitHub Actions workflow runs `gifts remind` and `posts remind` at 15:00 UTC against Neon and Brevo, using the `DATABASE_URL` and `BREVO_API_KEY` repository secrets, and skips with a warning until they're set.

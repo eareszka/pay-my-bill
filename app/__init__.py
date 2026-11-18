@@ -73,8 +73,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         STRIPE_SECRET_KEY=os.environ.get("STRIPE_SECRET_KEY", ""),
         STRIPE_WEBHOOK_SECRET=os.environ.get("STRIPE_WEBHOOK_SECRET", ""),
         STRIPE_CONNECT_WEBHOOK_SECRET=os.environ.get("STRIPE_CONNECT_WEBHOOK_SECRET", ""),
-        # Yearnly's cut of each card gift (ADR 0016); 0 turns it off.
-        PLATFORM_FEE_RATE=os.environ.get("PLATFORM_FEE_RATE") or "0.01",
+        # A cut of each card gift (ADR 0016). Off since ADR 0019: Yearnly takes optional tips.
+        PLATFORM_FEE_RATE=os.environ.get("PLATFORM_FEE_RATE") or "0",
         # Post photos go to Cloudflare R2 when a bucket is set, else to PHOTO_DIR (ADR 0015).
         R2_ACCOUNT_ID=os.environ.get("R2_ACCOUNT_ID", ""),
         R2_ACCESS_KEY_ID=os.environ.get("R2_ACCESS_KEY_ID", ""),
@@ -158,6 +158,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,
         PostStatus=models.PostStatus,
         DonationStatus=models.DonationStatus,
+        in_app_shell=stripe_pay.in_app_shell,
         PENDING_GIFT_DAYS=models.PENDING_GIFT_DAYS,
         ReactionKind=models.ReactionKind,
         LEGAL_UPDATED="November 12, 2026",
