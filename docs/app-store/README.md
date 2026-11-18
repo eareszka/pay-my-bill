@@ -4,11 +4,11 @@ Everything to paste into App Store Connect for Yearnly's first iOS submission, p
 
 ## Before submitting (blockers)
 These are owner or main decisions. The pack is ready around them.
-1. **Card gifts and Guideline 3.2.1(vii).** Apple lets an app skip in-app purchase for person-to-person gifts only if "100% of the funds go to the receiver of the gift." Link-out gifts (Cash App, Venmo, PayPal) meet that. Card gifts take a 1% platform fee (ADR 0016), and Stripe's fee also comes out of the gift. Choose one before submitting: set `PLATFORM_FEE_RATE=0`, hide "Chip in instantly" inside the iOS shell, or accept the review risk.
-2. **A support URL.** Apple needs a web page, not just an email. Nothing on the site lists `support@yearnly.app` yet. A small `/support` page (main) fixes that.
+1. **Card gifts and Guideline 3.2.1(vii).** Apple lets an app skip in-app purchase for person-to-person gifts only if "100% of the funds go to the receiver of the gift." The owner's decision (2026-11-18): no platform fee on any gift, an optional "Support Yearnly" tip on the web only, and no tip or fee in the iOS shell (#265, main then ui). Submit after #265 ships. One question remains for the PB-39 legal review: Stripe's card processing fee still comes out of a card gift (ADR 0016), so check whether Apple accepts that, or whether the donor should cover it in the app.
+2. **A support URL.** Apple needs a web page, not just an email. The `/support` page is #264 (main).
 3. **Blocking.** Guideline 1.2 requires that users can block abusive users. That's PB-12 (#257), and it has to ship first.
-4. **The privacy policy's "Draft, pending legal review" line.** Reviewers read the policy, so finish the legal review (PB-39) or decide to ship it as is.
-5. **The demo account.** The owner creates it on production (see Review notes). The credentials go only into App Store Connect, never into this repo.
+4. **The privacy policy's "Draft, pending legal review" line.** Reviewers read the policy, so finish the legal review (PB-39). This is on the owner's list.
+5. **The demo account.** The owner creates it on production (see Review notes). The credentials go only into App Store Connect, never into this repo. This is on the owner's list.
 
 ## Listing
 | Field | Value |
@@ -63,7 +63,7 @@ Order: 1 front door, 2 how it works, 3 the feed, 4 a post, 5 Chip in, 6 your gif
 | User Content: Photos | Yes | Yes | App Functionality | An optional post photo |
 | User Content: Other User Content | Yes | Yes | App Functionality | Posts, results updates, payment handles, reports, and the self-reported city and state |
 | Identifiers: User ID | Yes | Yes | App Functionality | Username |
-| Financial Info: Payment Info | Card gifts only | Yes | App Functionality | Collected by Stripe Checkout, not by Yearnly. Drop this row if blocker 1 hides card gifts |
+| Financial Info: Payment Info | Card gifts only | Yes | App Functionality | Collected by Stripe Checkout, not by Yearnly |
 
 Not collected: precise or coarse location from the device (the city is typed in), contacts, browsing history, health, and diagnostics. If PB-15's error tracker ships first, add **Diagnostics: Crash Data**.
 
@@ -80,7 +80,7 @@ Login attempts and IP addresses are kept only to stop password guessing. Check w
 >
 > **What the app is:** people post small personal wants and needs, up to $1,000, and other adults chip in.
 >
-> **Payments (3.2.1(vii)):** gifts go from one person to another in the giver's own Cash App, Venmo, or PayPal. Tapping a pay button on a post opens that app, and Yearnly never receives or holds the money. Giving is optional, and the whole gift goes to the receiver. Nothing is unlocked by paying. XP, levels, and badges count *people helped*, not dollars, and are earned only when the receiver confirms a gift.
+> **Payments (3.2.1(vii)):** gifts go from one person to another in the giver's own Cash App, Venmo, or PayPal. Tapping a pay button on a post opens that app, and Yearnly never receives or holds the money. Giving is optional. Yearnly takes no fee on any gift, and the app has no tips, so the whole gift goes to the receiver. Nothing is unlocked by paying. XP, levels, and badges count *people helped*, not dollars, and are earned only when the receiver confirms a gift.
 >
 > **User-generated content (1.2):**
 > - Every post has "Report this post", and every profile has "Report <name>". Reports go to an admin queue at /admin.
