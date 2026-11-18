@@ -133,11 +133,15 @@ def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     ui.goto("/posts/new")
     ui.check("form")
     page = ui.page
+    # One question per screen: picking an option moves on by itself, typed answers use Next.
     page.check("input[name=kind][value=need]")
-    page.select_option("#category", "bills")
+    page.check("input[name=category][value=bills]")
     page.fill("#title", "Help with the power bill")
+    page.click("[data-q-next]")
     page.fill("#body", "The power bill came in higher than usual this month.")
+    page.click("[data-q-next]")
     page.fill("#goal", "80")
+    page.click("[data-q-next]")
     ui.submit("form:has(#title) button[type=submit]")
     expect(page.locator("h1")).to_contain_text("Help with the power bill")
     ui.check("detail")
