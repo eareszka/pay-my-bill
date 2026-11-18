@@ -228,6 +228,16 @@ def test_swipe_up_opens_the_post(ui: Ui, live_server: LiveServer) -> None:
     expect(ui.page.locator("#chip-in")).to_be_attached()
 
 
+def test_swipe_down_shows_less_of_that_kind(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("lesser"))
+    ui.goto("/feed")
+    category = ui.page.locator("form.show-less").get_attribute("data-category")
+    drag(ui, 0, 200)
+    ui.page.wait_for_url(re.compile(rf"undo={category}"))
+    expect(ui.page.locator(".show-less-note")).to_be_visible()
+    ui.check("show-less")
+
+
 def test_small_lift_and_sideways_swipe_still_work(ui: Ui, live_server: LiveServer) -> None:
     ui.login(live_server.make_user("swiper"))
     ui.goto("/feed")

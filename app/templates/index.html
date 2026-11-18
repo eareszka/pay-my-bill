@@ -11,16 +11,6 @@
           <a href="{{ url_for('main.index', kind=value) }}" {% if kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
         {% endfor %}
       </nav>
-      {% if undo %}
-        <div class="show-less-note" role="status">
-          <p>You'll see {{ undo.label }} posts later in your stack. None are hidden.</p>
-          <form method="post" action="{{ url_for('main.more', category=undo.value) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="next" value="{{ url_for('main.index', kind=kind, n=position) }}">
-            <button type="submit" class="btn btn-secondary">Undo</button>
-          </form>
-        </div>
-      {% endif %}
       <div class="stage">
         {% if post %}
           {% set is_owner = current_user.is_authenticated and current_user.id == post.user_id %}
@@ -41,7 +31,7 @@
             <form method="post" action="{{ url_for('main.less', category=post.category.value) }}" class="show-less" data-category="{{ post.category.value }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="next" value="{{ url_for('main.index', kind=kind, n=position, undo=post.category.value) }}">
-              <button type="submit" class="btn btn-secondary">Show less {{ post.category.label }}</button>
+              <button type="submit" class="rail-btn show-less-btn"><svg class="icon" aria-hidden="true"><use href="#i-less"/></svg>Show less {{ post.category.label }}</button>
             </form>
           {% endif %}
         </nav>
@@ -52,6 +42,17 @@
         </aside>
       {% endif %}
     </div>
+    {# Right after a Show less: undo, under the card in thumb reach. #}
+    {% if undo %}
+      <div class="show-less-note" role="status">
+        <p>You'll see {{ undo.label }} posts later in your stack. None are hidden.</p>
+        <form method="post" action="{{ url_for('main.more', category=undo.value) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ url_for('main.index', kind=kind, n=position) }}">
+          <button type="submit" class="btn btn-secondary">Undo</button>
+        </form>
+      </div>
+    {% endif %}
     {% if post %}
       {# The tickets either side stay inert in a template until a swipe reveals one. #}
       {% for side, neighbor in [("next", next_post), ("back", back_post)] if neighbor %}

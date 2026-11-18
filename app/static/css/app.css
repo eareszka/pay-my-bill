@@ -310,6 +310,22 @@ h3.section-title { font-size: 1rem; }
 .deck-next .icon { color: #ffffff; background: var(--press); }
 .deck-next:hover .icon, .deck-next:focus-visible .icon { background: var(--deep); }
 .deck-next + .deck-count { margin-top: -12px; font-weight: 400; color: var(--on-field-muted); }
+/* Show less (#119): a rail glyph like Back. The full "Show less <Category>" is its name; the rail shows "Less". */
+.show-less { order: 4; margin: 0; pointer-events: auto; }
+.rail-btn.show-less-btn { gap: 0; padding: 0; font-size: 0; font-family: inherit; background: none; border: 0; cursor: pointer; }
+.show-less-btn::after { content: "Less" / ""; margin-top: 4px; font-size: 0.75rem; }
+/* Right after a Show less, an undo line sits under the card, in thumb reach. */
+.show-less-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px 8px 16px; font-size: 0.9375rem; line-height: 1.35; background: var(--info-tint); }
+.show-less-note p { margin: 0; }
+.show-less-note form { flex: none; margin: 0; }
+.show-less-note .btn { min-height: 44px; padding-block: 6px; }
+/* On You: the categories you see less of, each with Show again. */
+.show-less-list { margin-top: 32px; }
+.show-less-list .hint { margin: 4px 0 0; }
+.show-less-list ul { margin: 12px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.show-less-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; font-weight: 700; }
+.show-less-list li + li { border-top: 1px solid var(--line); }
+.show-less-list form { margin: 0; }
 .stage-empty { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 64px 24px; }
 .stage-empty p { margin: 0; color: var(--muted); }
 .stage-empty-title { font: 400 3rem/0.95 var(--display); text-transform: uppercase; color: var(--ink) !important; margin-bottom: 12px !important; }
@@ -630,7 +646,8 @@ h3.section-title { font-size: 1rem; }
   .deck-layout > .tabs { position: static; grid-area: tabs; padding: 0; }
   .stage { grid-area: stage; height: min(620px, calc(100dvh - var(--bar-h) - 170px)); min-height: 460px; border-radius: var(--r-bubble) 0 0 var(--r-bubble); }
   .deck-layout:not(:has(.deck-side)) .stage { grid-column: stage / side; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
-  .deck-side { grid-area: side; align-self: stretch; display: flex; flex-direction: column; overflow-y: auto; padding: 28px; background: var(--surface); border-radius: 0 var(--r-bubble) var(--r-tail) 0; }
+  /* contain: size keeps a tall Chip in panel from stretching the row; it scrolls inside the card's height. */
+  .deck-side { grid-area: side; align-self: stretch; contain: size; display: flex; flex-direction: column; overflow-y: auto; padding: 28px; background: var(--surface); border-radius: 0 var(--r-bubble) var(--r-tail) 0; }
   .deck .deck-ticket { inset: 0; border-radius: 0; }
   .deck .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) 0 0 calc(var(--r-bubble) - 6px); }
   .deck-layout:not(:has(.deck-side)) .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) calc(var(--r-bubble) - 6px) 0 calc(var(--r-bubble) - 6px); }
@@ -646,6 +663,9 @@ h3.section-title { font-size: 1rem; }
   .rail-btn .icon { width: 60px; height: 60px; padding: 17px; color: var(--ink); border: 1.5px solid var(--edge); }
   .rail-btn:hover .icon { color: var(--bg); background: var(--ink); }
   .deck-count { grid-area: count; justify-self: center; font-size: 0.8125rem; color: var(--muted); }
+  .show-less { grid-area: next; align-self: end; justify-self: end; }
+  .show-less-btn::after { font-size: 0.8125rem; }
+  .show-less-note { max-width: 660px; margin: 16px auto 0; border-radius: var(--radius); }
   .deck-next { gap: 4px; }
   .deck-next .icon { color: var(--ink); background: none; }
   .deck-next + .deck-count { margin-top: 0; font-weight: 700; color: var(--muted); }
