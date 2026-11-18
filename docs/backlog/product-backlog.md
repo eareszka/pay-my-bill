@@ -30,10 +30,10 @@ Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning.
 
 ### PB-12 Block another user · #257 · 3 pts · P1 · epic:safety · v0.1-alpha
 As a **user**, I want to **block someone** so that **I stop seeing them and they can't interact with me** (App Store Guideline 1.2).
-- [ ] Given another user's profile or post, when I block them, then their posts and updates are hidden from my feed.
-- [ ] Given they've blocked me or I've blocked them, then neither of us can pledge to the other's posts or give kudos.
-- [ ] Given my blocked list in settings, when I unblock someone, then their content shows again.
-- [ ] Blocking is silent: the blocked user isn't notified.
+- [x] Given another user's profile or post, when I block them, then their posts and updates are hidden from my feed.
+- [x] Given they've blocked me or I've blocked them, then neither of us can pledge to the other's posts or give kudos.
+- [x] Given my blocked list in settings, when I unblock someone, then their content shows again.
+- [x] Blocking is silent: the blocked user isn't notified.
 
 ### PB-13 Production hosting, domain, and HTTPS · #TBD · 3 pts · P0 · chore · v0.2-beta
 - [ ] ADR 0011 records the production host, plan, and monthly cost.

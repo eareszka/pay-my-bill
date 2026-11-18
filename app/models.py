@@ -456,6 +456,18 @@ class Donation(Base):
         return "expired" if self.is_expired else self.status.value
 
 
+class Block(Base):
+    """One user blocking another (#257); it applies both ways."""
+
+    __tablename__ = "blocks"
+    __table_args__ = (UniqueConstraint("blocker_id", "blocked_id", name="one_block_each"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    blocker_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    blocked_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Reaction(Base):
     __tablename__ = "reactions"
     __table_args__ = (UniqueConstraint("post_id", "user_id", "kind", name="one_reaction_each"),)

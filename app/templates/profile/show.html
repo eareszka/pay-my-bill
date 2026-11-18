@@ -67,4 +67,14 @@
   {% if not current_user.is_authenticated or current_user.id != user.id %}
     <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>
   {% endif %}
+  {% if current_user.is_authenticated and current_user.id != user.id %}
+    {% if blocking %}
+      <form method="post" action="{{ url_for('profile.unblock', username=user.username) }}" class="block-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="block-ask">Unblock {{ user.username }}</button>
+      </form>
+    {% else %}
+      {% with name = user.username %}{% include "profile/_block.html" %}{% endwith %}
+    {% endif %}
+  {% endif %}
 {% endblock %}

@@ -66,5 +66,8 @@ disallow_subclassing_any = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "--cov=app --cov-report=term-missing --cov-fail-under=80 -m 'not e2e'"
-markers = ["e2e: browser tests against a live server (run with: pytest -m e2e --no-cov)"]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=80 -m 'not e2e and not appstore'"
+markers = [
+    "e2e: browser tests against a live server (run with: pytest -m e2e --no-cov)",
+    "appstore: writes the App Store screenshots to docs/app-store/screenshots (pytest -m appstore --no-cov)",
+]

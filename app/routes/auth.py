@@ -2,6 +2,7 @@ import hmac
 from functools import cache
 from urllib.parse import urlsplit
 
+import click
 from flask import (
     Blueprint,
     flash,
@@ -26,6 +27,7 @@ from app.auth import (
     begin_login_attempt,
     login_required,
     mark_login_succeeded,
+    prune_login_attempts,
 )
 from app.extensions import db
 from app.forms import EmptyForm, LoginForm, ResetPasswordForm, ResetRequestForm, SignupForm
@@ -317,3 +319,9 @@ def logout() -> Response:
     session.clear()
     flash("You're logged out.", "info")
     return redirect(url_for("main.index"))
+
+
+@bp.cli.command("prune")
+def prune_command() -> None:
+    """Delete login and email throttle rows older than a week (run daily)."""
+    click.echo(f"Old login attempts deleted: {prune_login_attempts()}")

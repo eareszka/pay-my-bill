@@ -1,0 +1,13 @@
+{# Block asks first, in place (#257, owner's pick); block.js turns the first tap into the question. Without JS it blocks straight away. #}
+<form method="post" action="{{ url_for('profile.block', username=name) }}" class="block-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="block-ask">Block {{ name }}</button>
+  <div class="block-confirm" hidden>
+    <p class="confirm-prompt"><strong>Block {{ name }}?</strong> You won't see each other's posts, and neither of you can chip in on or react to the other's. They aren't told.</p>
+    <div class="gift-actions">
+      <button type="submit" class="btn btn-danger">Block</button>
+      <button type="button" class="btn btn-secondary block-cancel">Cancel</button>
+    </div>
+  </div>
+</form>
+<script src="{{ url_for('static', filename='js/block.js') }}" defer></script>

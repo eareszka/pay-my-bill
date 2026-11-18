@@ -31,3 +31,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18: Drafted from the roadmap and main's order. Opened #257–#261 and labeled the lanes. Next: the owner confirms. Blocked: none.
 - 2026-11-18 (ui): #260: App Store pack drafted (listing, privacy label, review notes, screenshots). Blockers: card-gift 1% fee vs 3.2.1(vii), /support page, #257, demo account.
 - 2026-11-18: Owner chose an optional tip on the web only in place of the 1% fee (#265). Added #264 support page. Blocked: none.
+- 2026-11-18 (ui): #257 design on #266: Block asks first in place (owner's pick), sits quietly under Report, and Settings → Blocked is a hairline list. Blocked: none.
