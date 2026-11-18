@@ -1,13 +1,16 @@
 import io
 import logging
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import Flask
 from PIL import Image
+from sqlalchemy import select
 
 from app import create_app, photos
+from app.extensions import db
+from app.models import PhotoDelete
 from app.photos import LocalStore, PhotoError, R2Store, process
 
 
@@ -134,3 +137,51 @@ def test_discard_ignores_no_photo_and_logs_failures(
     with caplog.at_level(logging.ERROR):
         photos.discard("posts/a.webp")
     assert "Couldn't delete photo posts/a.webp" in caplog.text
+
+
+def queued() -> list[str]:
+    return list(db.session.scalars(select(PhotoDelete.key)))
+
+
+def test_a_failed_delete_waits_for_a_retry(app: Flask) -> None:
+    broken = MagicMock()
+    broken.delete.side_effect = OSError("bucket down")
+    app.extensions["photo_store"] = broken
+    photos.discard("posts/a.webp")
+    photos.discard("posts/a.webp")
+    assert queued() == ["posts/a.webp"]
+    assert photos.retry_deletes() == (0, 1)
+    broken.delete.side_effect = None
+    assert photos.retry_deletes() == (1, 0)
+    broken.delete.assert_called_with("posts/a.webp")
+    assert queued() == []
+
+
+def test_queueing_a_retry_never_raises(app: Flask, caplog: pytest.LogCaptureFixture) -> None:
+    broken = MagicMock()
+    broken.delete.side_effect = OSError("bucket down")
+    app.extensions["photo_store"] = broken
+    with (
+        patch.object(db.session, "commit", side_effect=OSError("db down")),
+        caplog.at_level(logging.ERROR),
+    ):
+        photos.discard("posts/b.webp")
+    assert "Couldn't queue photo posts/b.webp for a retry" in caplog.text
+
+
+def test_retry_command(app: Flask) -> None:
+    db.session.add(PhotoDelete(key="posts/c.webp"))
+    db.session.commit()
+    result = app.test_cli_runner().invoke(args=["posts", "retry-photos"])
+    assert "Photo deletes retried: 1 done, 0 still waiting" in result.output
+
+
+def test_retry_command_needs_the_bucket_outside_development(
+    app: Flask, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    db.session.add(PhotoDelete(key="posts/d.webp"))
+    db.session.commit()
+    monkeypatch.setattr("app.routes.posts.is_development", lambda app: False)
+    result = app.test_cli_runner().invoke(args=["posts", "retry-photos"])
+    assert "No photo bucket is set" in result.output
+    assert queued() == ["posts/d.webp"]

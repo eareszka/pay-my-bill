@@ -468,6 +468,15 @@ class Block(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class PhotoDelete(Base):
+    """A stored photo whose delete failed, kept until a retry succeeds (#149, PB-51)."""
+
+    __tablename__ = "photo_deletes"
+
+    key: Mapped[str] = mapped_column(String(255), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Reaction(Base):
     __tablename__ = "reactions"
     __table_args__ = (UniqueConstraint("post_id", "user_id", "kind", name="one_reaction_each"),)
