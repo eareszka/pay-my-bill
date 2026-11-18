@@ -17,7 +17,7 @@
 {% macro step_body(path, step) %}
 {% if path == "help" and step == 1 %}
   {{ words("Pick one person") }}
-  <figure class="how-piece">{{ example() }}{{ ask_card("Short on rent this month", "maria_g · Milwaukee, WI · Need", "$45", "$120", 38) }}</figure>
+  <figure class="how-piece">{{ example() }}{{ ask_card("Short on rent this month", "Need · maria_g · Milwaukee, WI", "$45", "$120", 38) }}<p class="how-hint">Swipe for the next person. Tap to open their post.</p></figure>
 {% elif path == "help" and step == 2 %}
   {{ words("Pay in your own app") }}
   <figure class="how-piece">
@@ -37,12 +37,17 @@
   </figure>
 {% elif step == 1 %}
   {{ words("Ask for up to $1,000") }}
-  <figure class="how-piece">{{ example() }}{{ ask_card("Concert tickets for my sister's birthday", "dev_tom · Madison, WI · Want", "$0", "$300", 0) }}</figure>
+  <figure class="how-piece">{{ example() }}{{ ask_card("Concert tickets for my sister's birthday", "Want · dev_tom · Madison, WI", "$0", "$300", 0) }}</figure>
 {% elif step == 2 %}
   {{ words("Gifts land in your app") }}
   <figure class="how-piece">
     {{ example() }}
-    <div class="group how-panel"><div class="how-confirmed"><p><strong>$40</strong> via Venmo from lee_w</p><span class="chip chip-confirmed">Confirmed</span></div></div>
+    <div class="group how-panel">
+      <p class="gift-amount">$40</p>
+      <p class="gift-meta">via Venmo from lee_w as “Lee Wong”</p>
+      <p class="hint">Sent Nov 3</p>
+      <div class="gift-actions"><span class="btn">Confirm</span><span class="btn btn-secondary">Didn't get it</span></div>
+    </div>
   </figure>
 {% else %}
   {{ words("Say how it went") }}
