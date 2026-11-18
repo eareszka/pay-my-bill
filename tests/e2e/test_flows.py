@@ -239,12 +239,23 @@ def test_small_lift_and_sideways_swipe_still_work(ui: Ui, live_server: LiveServe
 @pytest.mark.parametrize("size", ["mobile"])
 def test_bars_stay_put_and_only_long_pages_scroll(ui: Ui, live_server: LiveServer) -> None:
     overflow = "() => document.body.scrollHeight - document.body.clientHeight"
+    # Still pages fit and are locked: a drag never pans or bounces them, a pinch still zooms.
+    locked = "() => ['overflowY', 'touchAction'].map(k => getComputedStyle(document.body)[k])"
     for path in ["/", *(f"/how/{story}/{step}" for story in ("help", "ask") for step in (1, 2, 3))]:
         ui.goto(path)
         assert ui.page.evaluate(overflow) <= 1, path
+        assert ui.page.evaluate(locked) == ["hidden", "pinch-zoom"], path
     ui.login(live_server.make_user("still"))
     ui.goto("/feed")
     assert ui.page.evaluate(overflow) <= 1
+    assert ui.page.evaluate(locked) == ["hidden", "pinch-zoom"]
+    # A flash on the feed squeezes the stage instead of pushing it under the tabs.
+    ui.goto("/profile")
+    ui.submit("form[action='/logout'] button[type=submit]")
+    expect(ui.page.locator(".flash")).to_be_visible()
+    stage_bottom = "document.querySelector('.stage').getBoundingClientRect().bottom"
+    nav_top = "document.querySelector('.topbar > nav').getBoundingClientRect().top"
+    assert ui.page.evaluate(f"{stage_bottom} <= {nav_top} + 1")
     ui.goto("/terms")
     assert ui.page.evaluate(overflow) > 0
     ui.page.mouse.wheel(0, 5000)

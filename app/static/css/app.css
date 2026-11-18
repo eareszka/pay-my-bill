@@ -79,11 +79,18 @@ input, textarea { caret-color: var(--ink); }
 /* The ground runs under the safe areas and any overscroll, so no white ever shows at the edges (#218). */
 html { background: var(--bg); scrollbar-color: var(--edge) var(--bg); }
 /* On phones the bars never move (#234): the page scrolls only between them, inside body, and nothing rubber-bands.
-   The feed, front door and stories are built to fit, so they stay still. */
+   The feed, front door and stories are built to fit, and they're locked still. */
 @media (max-width: 959px) {
   html { height: 100%; overflow: hidden; overscroll-behavior: none; }
   body { height: 100dvh; overflow-y: auto; overscroll-behavior: none; }
   .feed-page .site-footer { display: none; }
+  /* Still pages never pan or bounce, even when a drag starts on them; a pinch still zooms. */
+  body:is(.feed-page, .home-page, .how-page) { overflow: hidden; touch-action: pinch-zoom; }
+  /* The feed's stage takes whatever height a flash leaves it, so nothing drops below the tabs. */
+  .feed-page .container-wide, .feed-page .feed, .feed-page .deck-layout { display: flex; flex-direction: column; min-height: 0; }
+  .feed-page .container-wide { height: calc(100dvh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); }
+  .feed-page .feed, .feed-page .deck-layout, .feed-page .stage { flex: 1; }
+  .feed-page .stage { height: auto; min-height: 0; }
 }
 
 h1, h2, h3 { margin: 0; text-wrap: balance; }
@@ -742,6 +749,8 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .home { gap: 10px; }
   .home-doors { gap: 18px; }
   .how, .how-field { gap: 14px; }
+  .home { padding-block: calc(env(safe-area-inset-top) + 14px) calc(env(safe-area-inset-bottom) + 12px); }
+  .how > .how-way-in { padding-block: 4px calc(env(safe-area-inset-bottom) + 8px); }
 }
 /* The door's photos carry into its story: three across the top of the field, fading to solid behind the headline. */
 .how-field:has(.home-mosaic) { isolation: isolate; }
