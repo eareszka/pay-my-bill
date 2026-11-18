@@ -37,3 +37,16 @@ def test_signup_links_terms_and_requires_agreement(client: FlaskClient) -> None:
     assert resp.status_code == 200
     assert b"agree to the Terms and Privacy Policy" in resp.data
     assert db.session.scalar(select(func.count()).select_from(User)) == 0
+
+
+def test_support_page_is_public(client: FlaskClient) -> None:
+    resp = client.get("/support")
+    assert resp.status_code == 200
+    page = resp.get_data(as_text=True)
+    assert 'href="mailto:support@yearnly.app"' in page
+    for href in ("/rules", "/terms", "/privacy", "/reset"):
+        assert f'href="{href}"' in page
+
+
+def test_footer_links_to_support(client: FlaskClient) -> None:
+    assert 'href="/support">Support</a>' in client.get("/rules").get_data(as_text=True)
