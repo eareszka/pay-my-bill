@@ -15,8 +15,9 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 | Sliding active pill on the tab bar and filter | #227 | ui | — | Done (#240) |
 | No scrolling outside long pages | #234 | ui | — | Done (#241) |
 | Tap or swipe up opens the post | #235 | ui | — | Done (#238) |
-| Swipe up slides to the post, Home remembers it | #248 | ui | — | To do |
-| Story intro covers the new features | #236 | ui | — | To do |
+| Swipe up slides to the post, Home remembers it | #248 | ui | — | Done (#251) |
+| Story intro covers the new features | #236 | ui | — | Done (#250) |
+| Close × and See more on the post sheet | #252 | ui | — | Done (#253) |
 
 **Total:** 13 points, all done (Sprint 5: 42 of 58).
 
