@@ -1,7 +1,7 @@
 import click
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
-from sqlalchemy import or_, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
@@ -16,6 +16,8 @@ from app.models import (
     AdminAction,
     Post,
     PostStatus,
+    Reaction,
+    ReactionKind,
     Report,
     ReportReason,
     User,
@@ -61,6 +63,20 @@ def _about(post: Post) -> str:
 RECENT_ACTIONS = 25
 
 
+def reaction_counts(user_ids: set[int | None]) -> dict[int, dict[ReactionKind, int]]:
+    """Reactions on each person's updates, deleted posts included, so 🤨 isn't lost (#73)."""
+    rows = db.session.execute(
+        select(Post.user_id, Reaction.kind, func.count())
+        .join(Post, Reaction.post_id == Post.id)
+        .where(Post.user_id.in_(user_ids))
+        .group_by(Post.user_id, Reaction.kind)
+    )
+    counts: dict[int, dict[ReactionKind, int]] = {}
+    for user_id, kind, count in rows:
+        counts.setdefault(user_id, {})[kind] = count
+    return counts
+
+
 @bp.get("")
 @admin_required
 def queue() -> str:
@@ -82,8 +98,12 @@ def queue() -> str:
         .order_by(AdminAction.created_at.desc(), AdminAction.id.desc())
         .limit(RECENT_ACTIONS)
     ).all()
+    people = {post.user_id for post in flagged} | {
+        report.post.user_id if report.post else report.user_id for report in reports
+    }
     return render_template(
         "admin/queue.html",
+        reactions=reaction_counts(people),
         flagged=flagged,
         reports=reports,
         farms=suspected_farms(),
