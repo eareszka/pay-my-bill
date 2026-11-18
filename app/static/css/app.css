@@ -172,7 +172,7 @@ h3.section-title { font-size: 1rem; }
 .topbar > nav a:hover, .topbar > nav a[aria-current="page"] { color: var(--on-shell); }
 .topbar > nav a[aria-current="page"] .icon { stroke-width: 2.5; }
 /* On phones the current tab sits in a deeper green cell with a white rule along its top. */
-.topbar > nav a > * { position: relative; }
+.topbar > nav a > :not(.badge) { position: relative; }
 /* Every row's current pill is a ::before under the labels, so pill.js can slide it from the last tab (#227). */
 .topbar > nav a[aria-current="page"]::before { content: ""; position: absolute; z-index: -1; top: 7px; right: calc(50% - 29px); left: calc(50% - 29px); height: 32px; background: var(--shell-deep); border-radius: var(--pill); }
 .nav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-inline: 4px; }

@@ -26,5 +26,6 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-17 (ui): #80 design pass on #242: gift news as a Good Tint notice and the rewards strip as a 700 tally line, CSS only. Next: nav badge fix. Blocked: none.
 - 2026-11-18 (main): #81: sent dates, optional payer name for the poster only, Not received wording, next steps on Not received and Expired. Next: #119. Blocked: none.
 - 2026-11-17 (ui): #237: the Log in bubble fills the phone screen with its form at the foot, like the home bubbles (#218). #242 design pass done. Blocked: none.
+- 2026-11-17 (ui): #245: the to-confirm badge floats on the You tab again (a CSS specificity bug). #244 (#237) is in review. Blocked: none.
 - 2026-11-18 (main): #119: categories, Show less moves a category later (ADR 0018), undo on the feed and profile, cookie when logged out. Next: ui adds swipe down. Blocked: none.
 - 2026-11-18 (ui): #119 design on #246: Less rail glyph (owner's pick), swipe-down to Show less, undo line, profile list; desktop Chip in panel height fix. Blocked: none.
