@@ -1,7 +1,7 @@
 name: Daily jobs
 
 # The reminder emails (#258, PB-35): gifts waiting 3+ days to be confirmed, and results
-# updates coming due. Free on a public repo; it talks to Neon and Brevo directly.
+# updates coming due. Then old login throttle rows are pruned (#15). Free on a public repo; it talks to Neon and Brevo directly.
 on:
   schedule:
     - cron: "0 15 * * *" # 15:00 UTC, mid-morning across the US
@@ -53,3 +53,4 @@ jobs:
           export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
           flask --app app gifts remind
           flask --app app posts remind
+          flask --app app auth prune
