@@ -72,7 +72,7 @@ def test_lists_gifts_to_confirm_and_my_gifts(
     gift_id = waiting.id
     assert f'action="/gifts/{gift_id}/confirm"' in to_confirm
     assert f'href="/u/maria_g?dispute={gift_id}#gift-{gift_id}">Didn\'t get it</a>' in to_confirm
-    assert "Dispute this gift?" not in to_confirm
+    assert "as not received?" not in to_confirm
     assert '<span class="gift-list-amount">$15</span>' in sent
     assert 'chip-disputed">Not received' in sent
 
@@ -82,7 +82,7 @@ def test_dispute_asks_before_acting(client: FlaskClient, poster: User, donor: Us
     second = add_gift(first.post, donor, 500)
     login_as(client, poster)
     page = client.get(f"/gifts?dispute={first.id}", follow_redirects=True).get_data(as_text=True)
-    assert "Dispute this gift? dev_tom won't get credit for $20." in page
+    assert "Mark $20 from dev_tom as not received? They won't get credit for it." in page
     assert f'action="/gifts/{first.id}/dispute"' in page
     assert f'action="/gifts/{first.id}/confirm"' not in page
     assert f'href="/u/maria_g#gift-{first.id}">Cancel</a>' in page

@@ -5,7 +5,8 @@
   <h1>Did {{ amount }} arrive?</h1>
   <div class="gift">
     <p class="gift-amount">{{ amount }}</p>
-    <p class="gift-meta">via {{ donation.method.label }} from {{ donation.donor.username }}</p>
+    <p class="gift-meta">via {{ donation.method.label }} from {{ donation.donor.username }}{% if donation.payer_name %} as “{{ donation.payer_name }}”{% endif %}</p>
+    <p class="hint gift-sent">Sent <time datetime="{{ donation.created_at.isoformat() }}">{{ donation.created_at | date }}</time></p>
     <p class="hint">for {{ donation.post.title }}</p>
     {% if donation.status != DonationStatus.PENDING %}
       <p>This gift was already handled.</p>
@@ -18,7 +19,7 @@
         </form>
         <form method="post" action="{{ url_for('gifts.answer_post', token=token, action='dispute') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-secondary">No, it didn't</button>
+          <button type="submit" class="btn btn-secondary">Didn't get it</button>
         </form>
       </div>
     {% endif %}
