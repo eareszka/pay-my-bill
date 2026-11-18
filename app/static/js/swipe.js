@@ -132,7 +132,8 @@ const rise = (dy) => {
     else if (lessForm.requestSubmit) lessForm.requestSubmit();
     else lessForm.submit();
   };
-  if (!ticket.animate) {
+  // Up: the post slides up over the feed as a sheet (#248), so the card stays where the finger left it.
+  if (!ticket.animate || (!down && !calm.matches)) {
     goTo();
     return;
   }
@@ -301,6 +302,8 @@ if (ticket && deck && (nextLink || backLink)) {
     leaving = false;
     press = null;
     ticket.getAnimations().forEach((animation) => animation.cancel());
+    ticket.style.transform = "";
+    ticket.style.opacity = "";
     moving(false);
     if (panel) {
       panel.inert = false;
