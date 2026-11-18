@@ -62,6 +62,11 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
         return _card_error(post, f"{limits}, like 20 or 12.50.")
     if not MIN_CARD_GIFT_CENTS <= gift_cents <= post.goal_cents:
         return _card_error(post, f"{limits}.")
+    tip_cents = 0 if stripe_pay.in_app_shell() else _tip_cents()
+    if tip_cents is None:
+        return _card_error(
+            post, f"A tip can be up to {format_cents(stripe_pay.MAX_TIP_CENTS)}, or none."
+        )
     back = site_url("posts.show", post_id=post.id)
     try:
         url = stripe_pay.checkout_url(
@@ -74,6 +79,7 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
             paid_cents=gift_cents,
             success_url=site_url("posts.show", post_id=post.id, paid=1),
             cancel_url=back,
+            tip_cents=tip_cents,
         )
     except stripe.StripeError:
         current_app.logger.exception("Stripe checkout failed for post %s", post.id)
@@ -87,6 +93,21 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
     if not url:
         return _card_error(post, "Stripe isn't answering right now. Try again in a minute.")
     return redirect(url, code=303)
+
+
+def _tip_cents() -> int | None:
+    """The optional tip in cents (ADR 0019); None if it isn't a usable amount."""
+    choice = request.form.get("tip", "0")
+    if choice == "other":
+        try:
+            cents = parse_dollars(request.form.get("tip_other", ""))
+        except ValueError:
+            return None
+    elif choice.isdigit() and int(choice) in (0, *stripe_pay.TIP_CHOICES_CENTS):
+        cents = int(choice)
+    else:
+        return None
+    return cents if 0 <= cents <= stripe_pay.MAX_TIP_CENTS else None
 
 
 def _meta_int(meta: dict[str, Any], key: str) -> int | None:
@@ -155,14 +176,21 @@ def record_card_gift(session: dict[str, Any], account: str | None) -> None:
         + f"\n\n{link}",
     )
     # Stripe's own total is what the donor paid; fees came out of it (ADR 0016).
-    paid_cents = _meta_int(session, "amount_total") or donation.amount_cents + donation.fee_cents
-    paid = format_cents(paid_cents)
+    # A tip is never part of the gift: no XP, no progress (ADR 0019).
+    tip_cents = _meta_int(meta, "tip_cents") or 0
+    total_cents = _meta_int(session, "amount_total") or donation.amount_cents + donation.fee_cents
+    paid = format_cents(total_cents - tip_cents)
+    tip = (
+        f"\n\nYour {format_cents(tip_cents)} tip to support Yearnly was a separate line. Thank you!"
+        if tip_cents
+        else ""
+    )
     send_later(
         donor.email,
         f"Your {paid} gift to {post.user.username} went through",
         f'Hi {donor.username},\n\nYour {paid} gift for "{post.title}" went through, and '
-        f"{post.user.username} gets about {amount} after fees. "
-        "It already counts toward your rewards. Thank you!\n\n" + link,
+        f"{post.user.username} gets about {amount} after the card fee. "
+        f"It already counts toward your rewards. Thank you!{tip}\n\n" + link,
     )
 
 

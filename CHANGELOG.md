@@ -4,6 +4,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 ### Added
+- No platform fee, and an optional tip (#265, ADR 0019, amending ADR 0016). `PLATFORM_FEE_RATE` now defaults to 0, so the only cut of a card gift is Stripe's card fee. On the website, card checkout offers "Tip to support Yearnly" (none by default, $1, $2, or up to $50) as a separate line. Yearnly absorbs Stripe's fee on it, so the recipient gets the same, and the tip never counts toward a post or rewards. The iOS shell adds `YearnlyApp` to its user agent, and there the tip is left out and refused on the server. The Terms are updated.
 - Settings won't remove your last way to get paid while you have an open post, or one waiting for review (#21, owner's pick): "Keep one way to get paid while you have an open post, or close the post first." Swapping handles and card payouts (Stripe) still count.
 - `flask --app app auth prune` deletes login and email throttle rows older than a week, which is far past every limit's window. It runs in the daily job (#15). Email was already sent off the request path (#105).
 - Monitoring (#259, PB-15, owner's picks). With `SENTRY_DSN` set, unhandled errors go to Sentry, scrubbed of request bodies, cookies, headers, query strings, users, and link tokens. Database errors hide row values. The README covers the UptimeRobot check on `/health` and Neon's point-in-time restore. New dependency: `sentry-sdk[flask]`.

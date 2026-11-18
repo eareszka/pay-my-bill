@@ -31,7 +31,7 @@ The owner runs one Claude Code session per role and tells each session its role 
    - 0002: link-out payments (Cash App, Venmo, PayPal). 0014 and 0016: card gifts through Stripe Connect with a 1% fee (0014 is Proposed until Stripe approves the platform)
    - 0004: **only recipient-confirmed donations count** toward XP, badges, streaks, leaderboards, and post progress
    - 0006: money is integer cents · 0010: XP per person helped (amount-blind) · 0013: the top of the board rewards follow-through
-   - 0015: post photos in R2 · 0017: the product name is Yearnly · 0018: Show less moves a category later in your stack
+   - 0015: post photos in R2 · 0017: the product name is Yearnly · 0018: Show less moves a category later in your stack · 0019: no platform fee; an optional tip on the web only (amends 0016)
 - **ui:** `PRODUCT.md`, `DESIGN.md`, and the `.impeccable/surfaces/` brief for the screen you're working on.
 - **coordinator:** `docs/backlog/product-backlog.md`, `docs/roadmap.md`, and `docs/sprints/velocity.md`.
 

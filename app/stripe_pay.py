@@ -3,8 +3,11 @@
 from decimal import ROUND_CEILING, Decimal
 
 import stripe
-from flask import current_app
-from stripe.params.checkout import SessionCreateParamsPaymentIntentData
+from flask import current_app, request
+from stripe.params.checkout import (
+    SessionCreateParamsLineItem,
+    SessionCreateParamsPaymentIntentData,
+)
 
 from app.models import User
 from app.money import format_cents
@@ -140,6 +143,22 @@ def fee_terms() -> dict[str, str]:
     }
 
 
+# An optional "Support Yearnly" tip on the web (ADR 0019), never inside the iOS app.
+TIP_CHOICES_CENTS = (100, 200)
+MAX_TIP_CENTS = 5_000
+APP_SHELL_MARKER = "YearnlyApp"  # appended to the iOS shell's user agent (capacitor.config.json)
+
+
+def in_app_shell() -> bool:
+    return APP_SHELL_MARKER in (request.user_agent.string or "")
+
+
+def tip_kept(tip_cents: int) -> int:
+    """What Yearnly keeps of a tip: it absorbs Stripe's percentage on the tip, so the
+    recipient's share of the charge is the same as with no tip (ADR 0019)."""
+    return tip_cents - _cents_up(tip_cents * CARD_FEE_RATE) if tip_cents else 0
+
+
 def split(paid_cents: int) -> tuple[int, int, int]:
     """Stripe's fee (US cards), Yearnly's fee, and what the recipient keeps (ADR 0016)."""
     stripe_fee = _cents_up(paid_cents * CARD_FEE_RATE) + CARD_FEE_FIXED_CENTS
@@ -158,6 +177,7 @@ def checkout_url(
     paid_cents: int,
     success_url: str,
     cancel_url: str,
+    tip_cents: int = 0,
 ) -> str:
     stripe_fee, platform_fee, net = split(paid_cents)
     metadata = {
@@ -167,9 +187,28 @@ def checkout_url(
         "fee_cents": str(stripe_fee + platform_fee),
         "platform_fee_cents": str(platform_fee),
     }
+    if tip_cents:
+        metadata["tip_cents"] = str(tip_cents)
     payment_intent: SessionCreateParamsPaymentIntentData = {"metadata": metadata}
-    if platform_fee:
-        payment_intent["application_fee_amount"] = platform_fee
+    if platform_fee or tip_cents:
+        payment_intent["application_fee_amount"] = platform_fee + tip_kept(tip_cents)
+    tip_line: list[SessionCreateParamsLineItem] = (
+        [
+            {
+                "quantity": 1,
+                "price_data": {
+                    "currency": "usd",
+                    "unit_amount": tip_cents,
+                    "product_data": {
+                        "name": "Tip to support Yearnly",
+                        "description": f"Optional, and not part of the gift to {recipient}.",
+                    },
+                },
+            }
+        ]
+        if tip_cents
+        else []
+    )
     session = client().v1.checkout.sessions.create(
         params={
             "mode": "payment",
@@ -185,11 +224,12 @@ def checkout_url(
                         "unit_amount": paid_cents,
                         "product_data": {
                             "name": f"Gift to {recipient}",
-                            "description": f"For “{title}”. Card and Yearnly fees come "
-                            f"out of it, so {recipient} gets about {format_cents(net)}.",
+                            "description": f"For “{title}”. The card fee comes out of it, "
+                            f"so {recipient} gets about {format_cents(net)}.",
                         },
                     },
-                }
+                },
+                *tip_line,
             ],
             # A direct charge on the recipient's account (Managed Risk, ADR 0014): Stripe
             # takes its fee from the charge and Yearnly's application fee goes to the

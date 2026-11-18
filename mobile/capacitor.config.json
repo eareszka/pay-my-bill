@@ -7,6 +7,7 @@
     "cleartext": false
   },
   "backgroundColor": "#3a7558",
+  "appendUserAgent": "YearnlyApp",
   "ios": {
     "contentInset": "never",
     "backgroundColor": "#3a7558",
