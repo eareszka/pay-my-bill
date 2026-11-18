@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Added
 - A public Support page at `/support` (#264), linked from the footer, for the App Store listing. It covers how to email support@yearnly.app, report or block someone, where payment problems go, password reset, account deletion, and links to Rules, Terms, and Privacy.
+- The reminder emails run every day on their own (#258, PB-35). A GitHub Actions workflow runs `gifts remind` and `posts remind` at 15:00 UTC against Neon and Brevo, using the `DATABASE_URL` and `BREVO_API_KEY` repository secrets, and skips with a warning until they're set.
 
 ### Fixed
 - Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
