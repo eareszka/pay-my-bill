@@ -140,7 +140,9 @@ def show(username: str) -> str:
         .limit(PROFILE_POST_LIMIT)
     ).all()
     tab = "chipped" if is_owner and request.args.get("tab") == "chipped" else "posts"
-    return render_template(
+    seen_before = user.gifts_seen_at
+    news = gift_routes.gift_news(user) if is_owner else []
+    page = render_template(
         "profile/show.html",
         user=user,
         progress=stats,
@@ -155,6 +157,10 @@ def show(username: str) -> str:
         sent=gift_routes.sent_by(user) if is_owner and tab == "chipped" else [],
         sent_limit=gift_routes.MY_GIFTS_LIMIT,
         disputing=request.args.get("dispute", type=int),
-        news=gift_routes.gift_news(user) if is_owner else [],
+        news=news,
         less=[c for c in PostCategory if c in show_less.parse(user.show_less)] if is_owner else [],
     )
+    # The news counts as seen only once its page rendered, and a visit with none writes nothing.
+    if user.gifts_seen_at != seen_before:
+        db.session.commit()
+    return page
