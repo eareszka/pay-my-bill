@@ -10,6 +10,10 @@ from typing import IO, Any, Protocol
 
 from flask import Flask, current_app, url_for
 from PIL import Image, ImageOps, UnidentifiedImageError
+from sqlalchemy import select
+
+from app.extensions import db
+from app.models import PhotoDelete
 
 MAX_PHOTO_BYTES = 8 * 1024 * 1024
 # An 8 MB photo plus the rest of the new-post form.
@@ -159,10 +163,33 @@ def save(data: bytes) -> str:
 
 
 def discard(key: str | None) -> None:
-    """Remove a stored photo. A failure is logged, never shown: the post change already stands."""
+    """Remove a stored photo. A failure is logged and queued for a retry, never shown:
+    the post change already stands, but the photo mustn't stay public (#149)."""
     if not key:
         return
     try:
         store().delete(key)
     except Exception:  # storage can fail in many ways, and the row is already gone
         current_app.logger.exception("Couldn't delete photo %s", key)
+        try:
+            db.session.merge(PhotoDelete(key=key))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            current_app.logger.exception("Couldn't queue photo %s for a retry", key)
+
+
+def retry_deletes() -> tuple[int, int]:
+    """Try each queued photo delete again; returns (deleted, still waiting)."""
+    deleted = waiting = 0
+    for pending in db.session.scalars(select(PhotoDelete).order_by(PhotoDelete.created_at)).all():
+        try:
+            store().delete(pending.key)
+        except Exception:  # still failing; it waits for the next run
+            current_app.logger.exception("Retrying the delete of photo %s failed", pending.key)
+            waiting += 1
+            continue
+        db.session.delete(pending)
+        db.session.commit()
+        deleted += 1
+    return deleted, waiting
