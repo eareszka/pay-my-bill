@@ -226,6 +226,7 @@ def test_flagged_post_notifies_admins(
         "/posts/new",
         data={
             "kind": "want",
+            "category": "bills",
             "title": "Seed money for my startup",
             "body": "Help me launch my business.",
             "goal": "500",

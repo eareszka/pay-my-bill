@@ -7,9 +7,9 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 ## Committed
 | Story | Issue | Lane | Points | Status |
 |---|---|---|---|---|
-| S5-4 Visible rewards | #80 | main → ui | 5 | In review (#242) |
+| S5-4 Visible rewards | #80 | main → ui | 5 | Done (#242) |
 | S5-5 Clear disputes | #81 | main | 3 | Done (#243) |
-| S5-10 Categories and show less | #119 | main → ui | 5 | To do |
+| S5-10 Categories and show less | #119 | main → ui | 5 | In review (ui) |
 | Story bubble keeps its shape on Next | #217 | ui | — | In review (#223) |
 | Bubble tails flicker between pages | #225 | ui | — | To do |
 | Sliding active pill on the tab bar and filter | #227 | ui | — | To do |
@@ -27,4 +27,6 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-18 (main): #81: sent dates, optional payer name for the poster only, Not received wording, next steps on Not received and Expired. Next: #119. Blocked: none.
 - 2026-11-17 (ui): #237: the Log in bubble fills the phone screen with its form at the foot, like the home bubbles (#218). #242 design pass done. Blocked: none.
 - 2026-11-17 (ui): #245: the to-confirm badge floats on the You tab again (a CSS specificity bug). #244 (#237) is in review. Blocked: none.
+- 2026-11-18 (main): #119: categories, Show less moves a category later (ADR 0018), undo on the feed and profile, cookie when logged out. Next: ui adds swipe down. Blocked: none.
+- 2026-11-18 (ui): #119 design on #246: Less rail glyph (owner's pick), swipe-down to Show less, undo line, profile list; desktop Chip in panel height fix. Blocked: none.
 - 2026-11-18 (ui): #236: How stories teach swipe/tap and show the real To confirm row (owner's picks); every step still fits an SE. #225 waits on the phone. Blocked: none.

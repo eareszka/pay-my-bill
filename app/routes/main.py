@@ -12,15 +12,16 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.orm import joinedload
 from werkzeug.wrappers import Response
 
-from app import stripe_pay
+from app import show_less, stripe_pay
 from app.door_photos import door_photos
 from app.extensions import db
-from app.models import Post, PostKind, open_posts
+from app.models import Post, PostCategory, PostKind, open_posts
 from app.photos import LocalStore, store
+from app.routes.auth import safe_next
 from app.routes.posts import chip_in_context
 from app.static_cache import front_door_page
 from app.top_spot import top_post
@@ -30,15 +31,19 @@ bp = Blueprint("main", __name__)
 PHOTO_KEY = re.compile(r"posts/[0-9a-f]{32}\.webp")
 
 
-def ticket_at(position: int, kind: PostKind | None, top: Post | None) -> Post | None:
-    # The earned ticket comes first (ADR 0013), then the rest of the stack, newest first.
+def ticket_at(
+    position: int, kind: PostKind | None, top: Post | None, less: set[PostCategory]
+) -> Post | None:
+    # The earned ticket comes first (ADR 0013), then the rest of the stack, newest first,
+    # with categories the viewer sees less of moved to the end (ADR 0018).
     if top and position == 1:
         return top
+    later = [case((Post.category.in_(less), 1), else_=0)] if less else []
     query = (
         select(Post)
         .options(joinedload(Post.user))
         .where(open_posts())
-        .order_by(Post.created_at.desc(), Post.id.desc())
+        .order_by(*later, Post.created_at.desc(), Post.id.desc())
     )
     if kind:
         query = query.where(Post.kind == kind)
@@ -115,11 +120,14 @@ def index() -> str:
     # An old link can point past the end of a stack that has shrunk.
     if not 1 <= position <= total:
         position = 1
+    less = show_less.chosen()
     top = top_post(kind) if total else None
-    post = ticket_at(position, kind, top) if total else None
+    post = ticket_at(position, kind, top, less) if total else None
     # The tickets either side go in the page, so a swipe reveals one straight away.
-    next_post = ticket_at(position + 1 if position < total else 1, kind, top) if total > 1 else None
-    back_post = ticket_at(position - 1, kind, top) if position > 1 else None
+    next_at = position + 1 if position < total else 1
+    next_post = ticket_at(next_at, kind, top, less) if total > 1 else None
+    back_post = ticket_at(position - 1, kind, top, less) if position > 1 else None
+    undo = request.args.get("undo")
     return render_template(
         "index.html",
         post=post,
@@ -128,8 +136,30 @@ def index() -> str:
         kind=kind.value if kind else None,
         position=position,
         total=total,
+        less=less,
+        undo=PostCategory(undo) if undo in show_less.VALUES and undo in less else None,
         **(chip_in_context(post) if post else {}),
     )
+
+
+def category_or_404(value: str) -> PostCategory:
+    if value not in show_less.VALUES:
+        abort(404)
+    return PostCategory(value)
+
+
+@bp.post("/feed/less/<category>")
+def less(category: str) -> Response:
+    response = redirect(safe_next(request.form.get("next")))
+    show_less.save(show_less.chosen() | {category_or_404(category)}, response)
+    return response
+
+
+@bp.post("/feed/more/<category>")
+def more(category: str) -> Response:
+    response = redirect(safe_next(request.form.get("next")))
+    show_less.save(show_less.chosen() - {category_or_404(category)}, response)
+    return response
 
 
 def static_dir() -> str:

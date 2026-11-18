@@ -46,6 +46,24 @@
       {% endif %}
     </section>
   {% endif %}
+  {% if less %}
+    <section class="show-less-list" aria-labelledby="less-title">
+      <h2 class="section-title" id="less-title">Showing you less</h2>
+      <p class="hint">These come later in your stack. None are hidden.</p>
+      <ul>
+        {% for category in less %}
+          <li>
+            <span>{{ category.label }}</span>
+            <form method="post" action="{{ url_for('main.more', category=category.value) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="next" value="{{ url_for('profile.show', username=user.username) }}">
+              <button type="submit" class="btn btn-secondary">Show again</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
   {% if not current_user.is_authenticated or current_user.id != user.id %}
     <p class="report-link"><a href="{{ url_for('reports.user', username=user.username) }}">Report {{ user.username }}</a></p>
   {% endif %}

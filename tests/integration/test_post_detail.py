@@ -124,6 +124,7 @@ def test_new_post_redirects_to_detail(client: FlaskClient, owner: User) -> None:
         "/posts/new",
         data={
             "kind": "want",
+            "category": "bills",
             "title": "Concert tickets",
             "body": "My favorite band is touring.",
             "goal": "80",

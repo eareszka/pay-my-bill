@@ -146,7 +146,13 @@ def test_auto_closed_post_frees_a_slot(client: FlaskClient, poster: User) -> Non
     login_as(client, poster)
     response = client.post(
         "/posts/new",
-        data={"kind": "need", "title": "Phone bill", "body": "Need it for work.", "goal": "20"},
+        data={
+            "kind": "need",
+            "category": "bills",
+            "title": "Phone bill",
+            "body": "Need it for work.",
+            "goal": "20",
+        },
     )
     assert response.status_code == 302
 
@@ -168,7 +174,13 @@ def test_pending_review_post_still_takes_a_slot(client: FlaskClient, poster: Use
     login_as(client, poster)
     response = client.post(
         "/posts/new",
-        data={"kind": "need", "title": "Phone bill", "body": "Need it for work.", "goal": "20"},
+        data={
+            "kind": "need",
+            "category": "bills",
+            "title": "Phone bill",
+            "body": "Need it for work.",
+            "goal": "20",
+        },
     )
     assert response.status_code == 409
 

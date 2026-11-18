@@ -14,7 +14,7 @@ from sqlalchemy import select
 from werkzeug.security import check_password_hash
 from werkzeug.wrappers import Response
 
-from app import photos, stripe_pay
+from app import photos, show_less, stripe_pay
 from app.accounts import anonymize
 from app.auth import begin_login_attempt, login_required, mark_login_succeeded
 from app.extensions import db
@@ -25,6 +25,7 @@ from app.models import (
     DELETED_POST_TITLE,
     PUBLIC_STATUSES,
     Post,
+    PostCategory,
     PostStatus,
     User,
 )
@@ -155,4 +156,5 @@ def show(username: str) -> str:
         sent_limit=gift_routes.MY_GIFTS_LIMIT,
         disputing=request.args.get("dispute", type=int),
         news=gift_routes.gift_news(user) if is_owner else [],
+        less=[c for c in PostCategory if c in show_less.parse(user.show_less)] if is_owner else [],
     )

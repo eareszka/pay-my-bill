@@ -17,6 +17,7 @@
         </div>
         {% if form.kind.errors %}<small class="error" id="kind-error">{{ form.kind.errors | join(" ") }}</small>{% endif %}
       </fieldset>
+      {{ field(form.category) }}
       {{ field(form.title, maxlength=80) }}
       {{ field(form.body, rows=6, maxlength=2000) }}
       {{ field(form.photo, accept=PHOTO_ACCEPT) }}

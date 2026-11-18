@@ -17,6 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.wrappers import Response
 
+from app import show_less
 from app.auth import (
     LOGIN_WINDOW,
     SIGNUP_WINDOW,
@@ -210,7 +211,9 @@ def login() -> str | Response | tuple[str, int, dict[str, str]]:
             next_page = safe_next(request.args.get("next"))
             if not user.is_verified and request.args.get("next"):
                 session["after_verify"] = next_page
-            return redirect(next_page)
+            response = redirect(next_page)
+            show_less.join_account(user, response)
+            return response
         form.password.errors.append("Wrong username, email, or password.")
     return render_template("auth/login.html", form=form)
 
