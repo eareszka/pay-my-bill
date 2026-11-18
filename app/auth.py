@@ -6,7 +6,7 @@ from typing import Any, cast
 import flask_login
 from flask import abort, flash, redirect, request, url_for
 from flask_login import current_user
-from sqlalchemy import ColumnElement, func, select
+from sqlalchemy import ColumnElement, delete, func, select
 from werkzeug.wrappers import Response
 
 from app.extensions import db, login_manager
@@ -25,6 +25,17 @@ MAX_SIGNUPS_PER_IP = 10
 SIGNUP_WINDOW = timedelta(hours=1)
 # The colon keeps it apart from every username, like "reset:" and "verify:".
 SIGNUP_IDENTIFIER = "signup:"
+# Far past the longest throttle window above, so pruning never lifts a limit (#15).
+KEEP_ATTEMPTS = timedelta(days=7)
+
+
+def prune_login_attempts() -> int:
+    """Delete throttle rows no limit can still use; returns how many went."""
+    result = db.session.execute(
+        delete(LoginAttempt).where(LoginAttempt.created_at < utcnow() - KEEP_ATTEMPTS)
+    )
+    db.session.commit()
+    return int(getattr(result, "rowcount", 0) or 0)
 
 
 def load_user(user_id: str) -> User | None:

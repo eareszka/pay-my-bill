@@ -30,7 +30,7 @@ Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yam
 
 Daily jobs run from GitHub Actions (`.github/workflows/daily-jobs.yml`, 15:00 UTC, #258). `flask --app app gifts remind` emails posters about gifts waiting 3 or more days to be confirmed. They need the `DATABASE_URL` (Neon's direct connection string) and `BREVO_API_KEY` repository secrets, and they skip with a warning until both are set. Run them early from Actions → Daily jobs → Run workflow.
 
-`flask --app app posts remind` emails posters on day 3 and day 6 of their 7-day results update deadline, once each. It runs in the same workflow.
+`flask --app app posts remind` emails posters on day 3 and day 6 of their 7-day results update deadline, once each. It runs in the same workflow, followed by `flask --app app auth prune`, which deletes login and email throttle rows older than a week (#15).
 
 Config comes only from environment variables (see `.env.example`). Never commit secrets.
 
