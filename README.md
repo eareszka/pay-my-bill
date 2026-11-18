@@ -28,9 +28,9 @@ Staging runs on [Render](https://render.com) from the [`render.yaml`](render.yam
 - On each start, `flask db upgrade` applies any new migrations before gunicorn starts.
 - Every push to `main` deploys automatically. There are no manual steps after the first Blueprint sync.
 
-Daily job: `flask --app app gifts remind` emails posters about gifts waiting 3 or more days to be confirmed. Free staging has no cron, so run it by hand there. In production it becomes a scheduled job (roadmap Phase 2).
+Daily jobs run from GitHub Actions (`.github/workflows/daily-jobs.yml`, 15:00 UTC, #258). `flask --app app gifts remind` emails posters about gifts waiting 3 or more days to be confirmed. They need the `DATABASE_URL` (Neon's direct connection string) and `BREVO_API_KEY` repository secrets, and they skip with a warning until both are set. Run them early from Actions → Daily jobs → Run workflow.
 
-Daily job: `flask --app app posts remind` emails posters on day 3 and day 6 of their 7-day results update deadline, once each. It runs the same way.
+`flask --app app posts remind` emails posters on day 3 and day 6 of their 7-day results update deadline, once each. It runs in the same workflow.
 
 Config comes only from environment variables (see `.env.example`). Never commit secrets.
 
