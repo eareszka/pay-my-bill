@@ -19,7 +19,13 @@ from app.models import (
 )
 from tests.conftest import MakeUser, login_as
 
-EDIT = {"kind": "want", "title": "New tires", "body": "My front tires are bald.", "goal": "$250"}
+EDIT = {
+    "kind": "want",
+    "category": "bills",
+    "title": "New tires",
+    "body": "My front tires are bald.",
+    "goal": "$250",
+}
 
 
 @pytest.fixture
@@ -81,7 +87,13 @@ def test_owner_edits_every_field_before_a_gift(client: FlaskClient, poster: User
 def test_unchanged_save_is_not_marked_edited(client: FlaskClient, poster: User) -> None:
     post = add_post(poster)
     login_as(client, poster)
-    data = {"kind": "need", "title": "Rent", "body": "Short on rent this month.", "goal": "90"}
+    data = {
+        "kind": "need",
+        "category": "other",
+        "title": "Rent",
+        "body": "Short on rent this month.",
+        "goal": "90",
+    }
     resp = client.post(f"/posts/{post.id}/edit", data=data)
     assert resp.status_code == 302
     db.session.refresh(post)

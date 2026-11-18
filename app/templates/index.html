@@ -27,6 +27,13 @@
           {% if position > 1 %}<a class="rail-btn deck-back" href="{{ url_for('main.index', kind=kind, n=position - 1) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg><span>Back</span></a>{% endif %}
           {% if total > 1 %}<a class="rail-btn deck-next" href="{{ url_for('main.index', kind=kind, n=position + 1 if position < total else none) }}"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg><span>Next</span></a>{% endif %}
           <span class="deck-count">{{ position }} of {{ total }}{% if total > 1 %}<span class="deck-hint" aria-hidden="true"> · ← → to move</span>{% endif %}</span>
+          {% if post.category not in less %}
+            <form method="post" action="{{ url_for('main.less', category=post.category.value) }}" class="show-less" data-category="{{ post.category.value }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="next" value="{{ url_for('main.index', kind=kind, n=position, undo=post.category.value) }}">
+              <button type="submit" class="rail-btn show-less-btn"><svg class="icon" aria-hidden="true"><use href="#i-less"/></svg>Show less {{ post.category.label }}</button>
+            </form>
+          {% endif %}
         </nav>
         {# On a wide screen, give right here. On a phone, the card opens the post instead (#235). #}
         <aside class="deck-side">
@@ -35,6 +42,17 @@
         </aside>
       {% endif %}
     </div>
+    {# Right after a Show less: undo, under the card in thumb reach. #}
+    {% if undo %}
+      <div class="show-less-note" role="status">
+        <p>You'll see {{ undo.label }} posts later in your stack. None are hidden.</p>
+        <form method="post" action="{{ url_for('main.more', category=undo.value) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ url_for('main.index', kind=kind, n=position) }}">
+          <button type="submit" class="btn btn-secondary">Undo</button>
+        </form>
+      </div>
+    {% endif %}
     {% if post %}
       {# The tickets either side stay inert in a template until a swipe reveals one. #}
       {% for side, neighbor in [("next", next_post), ("back", back_post)] if neighbor %}
