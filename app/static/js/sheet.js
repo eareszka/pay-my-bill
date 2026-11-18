@@ -37,11 +37,28 @@
     else if (isPost(from) && isFeed(to)) event.viewTransition.types.add("sheet-close");
   });
 
+  // Back to the same feed ticket: Back in history when you came from the feed, else the feed you last saw.
+  const back = () => {
+    let from = null;
+    try { from = new URL(document.referrer); } catch {}
+    if (from?.origin === window.location.origin && isFeed(from.pathname)) window.history.back();
+    else window.location.assign(read(AT) || "/feed");
+  };
+
+  const plain = (event) => !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0);
+
+  // The sheet's Close (#252) does what a pull down does.
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest?.(".sheet-close") || !plain(event)) return;
+    event.preventDefault();
+    back();
+  });
+
   document.addEventListener("click", (event) => {
     const link = event.target.closest?.('.topbar > nav a[href="/feed"]');
     const home = read(HOME);
     if (!link || !home || isPost(window.location.pathname)) return;
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    if (!plain(event)) return;
     event.preventDefault();
     window.location.assign(home);
   });
@@ -53,13 +70,6 @@
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
     const top = () => Math.max(document.body.scrollTop, document.documentElement.scrollTop) <= 0;
     let pull = null;
-
-    const back = () => {
-      let from = null;
-      try { from = new URL(document.referrer); } catch {}
-      if (from?.origin === window.location.origin && isFeed(from.pathname)) window.history.back();
-      else window.location.assign(read(AT) || "/feed");
-    };
 
     document.addEventListener("touchstart", (event) => {
       const [touch] = event.touches;
