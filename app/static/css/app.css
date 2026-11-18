@@ -930,3 +930,17 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
   .join-step::before { bottom: -22px; width: 40px; height: 32px; }
   .join-back { position: relative; bottom: auto; }
 }
+
+/* The bars hold still through every page change; the page under them is what moves (#248). */
+@media (prefers-reduced-motion: no-preference) {
+  .topbar { view-transition-name: topbar; }
+  .topbar > nav { view-transition-name: tabbar; }
+  ::view-transition-group(topbar), ::view-transition-group(tabbar) { z-index: 3; animation: none; }
+  ::view-transition-old(topbar), ::view-transition-old(tabbar) { display: none; }
+  ::view-transition-new(topbar), ::view-transition-new(tabbar) { animation: none; }
+  /* A post is a sheet on the feed: it slides up over the feed, and back down off it, faster. */
+  html:active-view-transition-type(sheet-open)::view-transition-new(root) { animation: sheet-in 320ms var(--ease-out) both; }
+  html:active-view-transition-type(sheet-close)::view-transition-old(root) { z-index: 1; animation: sheet-out 240ms cubic-bezier(0.4, 0, 1, 1) both; }
+}
+@keyframes sheet-in { from { transform: translateY(100%); } }
+@keyframes sheet-out { to { transform: translateY(100%); } }

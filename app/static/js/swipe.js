@@ -124,7 +124,8 @@ const rise = (dy) => {
   if (leaving) return;
   leaving = true;
   const goTo = () => window.location.assign(upLink.href);
-  if (!ticket.animate) {
+  // The post slides up over the feed as a sheet (#248), so the card just stays where the finger left it.
+  if (!ticket.animate || !calm.matches) {
     goTo();
     return;
   }
@@ -292,6 +293,8 @@ if (ticket && deck && (nextLink || backLink)) {
     leaving = false;
     press = null;
     ticket.getAnimations().forEach((animation) => animation.cancel());
+    ticket.style.transform = "";
+    ticket.style.opacity = "";
     moving(false);
     if (panel) {
       panel.inert = false;

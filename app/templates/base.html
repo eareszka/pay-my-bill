@@ -16,6 +16,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script src="{{ url_for('static', filename='js/pwa.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/pill.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sheet.js') }}"></script>
   <link rel="preload" href="{{ url_for('static', filename='fonts/league-gothic-400.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-400.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
@@ -24,7 +25,7 @@
   {% block head %}{% endblock %}
 </head>
 {% macro nav_link(endpoint, icon, label, extra="") %}
-  <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
+  <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint or (endpoint == "main.index" and request.endpoint == "posts.show") %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
 <body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}

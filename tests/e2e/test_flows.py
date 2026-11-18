@@ -302,3 +302,31 @@ def test_to_confirm_badge_floats_on_the_you_tab(ui: Ui) -> None:
     label = you.locator(".nav-label").bounding_box()
     nav = ui.page.locator(".topbar > nav").bounding_box()
     assert label and nav and label["y"] + label["height"] <= nav["y"] + nav["height"]
+
+
+PULL_DOWN = """() => {
+  const at = (y) => [new Touch({identifier: 1, target: document.body, clientX: 200, clientY: y})];
+  const fire = (type, y) => document.dispatchEvent(new TouchEvent(type, {
+    touches: type === "touchend" ? [] : at(y), changedTouches: at(y), bubbles: true}));
+  fire("touchstart", 200);
+  fire("touchmove", 300);
+  fire("touchmove", 420);
+  fire("touchend", 420);
+}"""
+
+
+@pytest.mark.parametrize("size", ["mobile"])
+def test_post_is_a_sheet_on_the_feed(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("sheet"))
+    ui.goto("/feed")
+    drag(ui, 0, -200)
+    ui.page.wait_for_url(re.compile(r"/posts/\d+$"))
+    post = ui.path()
+    feed_tab = ui.page.locator('.topbar > nav a[href="/feed"]')
+    expect(feed_tab).to_have_attribute("aria-current", "page")  # the post is still home
+    ui.page.get_by_role("link", name="Leaders").click()
+    ui.page.wait_for_url(re.compile(r"/leaders"))
+    feed_tab.click()
+    ui.page.wait_for_url(re.compile(re.escape(post) + "$"))  # Feed brings you back to that post
+    ui.page.evaluate(PULL_DOWN)
+    ui.page.wait_for_url(re.compile(r"/feed"))
