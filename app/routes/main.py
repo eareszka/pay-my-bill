@@ -204,6 +204,12 @@ def privacy() -> str:
     return render_template("legal/privacy.html")
 
 
+@bp.get("/support")
+def support() -> str:
+    # The App Store listing links here (#264).
+    return render_template("legal/support.html")
+
+
 @bp.get("/media/<path:key>")
 def media(key: str) -> Response:
     # Local photos only; in production they come straight from the R2 bucket.
