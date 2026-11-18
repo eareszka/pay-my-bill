@@ -185,7 +185,13 @@ def test_need_or_want_error_is_focused_and_linked(client: FlaskClient, make_user
 
 def test_same_post_twice_makes_one_post(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user(venmo_handle="@maria-g", rules_accepted_at=utcnow()))
-    form = {"kind": "need", "title": "Phone bill", "body": "Need it for work.", "goal": "20"}
+    form = {
+        "kind": "need",
+        "category": "bills",
+        "title": "Phone bill",
+        "body": "Need it for work.",
+        "goal": "20",
+    }
     first = client.post("/posts/new", data=form)
     second = client.post("/posts/new", data=form)
     assert second.location == first.location

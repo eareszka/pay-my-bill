@@ -24,6 +24,7 @@ from tests.conftest import PASSWORD, MakeUser, login_as
 
 FORM = {
     "kind": "want",
+    "category": "bills",
     "title": "New running shoes",
     "body": "Training for my first 5K and my shoes are done.",
     "goal": "$90",

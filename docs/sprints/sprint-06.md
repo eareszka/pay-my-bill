@@ -7,9 +7,9 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 ## Committed
 | Story | Issue | Lane | Points | Status |
 |---|---|---|---|---|
-| S5-4 Visible rewards | #80 | main → ui | 5 | In review (#242) |
+| S5-4 Visible rewards | #80 | main → ui | 5 | Done (#242) |
 | S5-5 Clear disputes | #81 | main | 3 | Done (#243) |
-| S5-10 Categories and show less | #119 | main → ui | 5 | To do |
+| S5-10 Categories and show less | #119 | main → ui | 5 | In review (ui) |
 | Story bubble keeps its shape on Next | #217 | ui | — | In review (#223) |
 | Bubble tails flicker between pages | #225 | ui | — | To do |
 | Sliding active pill on the tab bar and filter | #227 | ui | — | To do |
@@ -25,3 +25,4 @@ Sprint 5 closed on 2026-11-17 with 42 of 58 points (#79 finishes it through #231
 - 2026-11-18 (main): #80: confirm email to the donor, one-time news banner on You, rewards strip on Chipped in. Next: ui pass, then #81. Blocked: none.
 - 2026-11-17 (ui): #80 design pass on #242: gift news as a Good Tint notice and the rewards strip as a 700 tally line, CSS only. Next: nav badge fix. Blocked: none.
 - 2026-11-18 (main): #81: sent dates, optional payer name for the poster only, Not received wording, next steps on Not received and Expired. Next: #119. Blocked: none.
+- 2026-11-18 (main): #119: categories, Show less moves a category later (ADR 0018), undo on the feed and profile, cookie when logged out. Next: ui adds swipe down. Blocked: none.

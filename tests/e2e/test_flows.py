@@ -134,6 +134,7 @@ def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     ui.check("form")
     page = ui.page
     page.check("input[name=kind][value=need]")
+    page.select_option("#category", "bills")
     page.fill("#title", "Help with the power bill")
     page.fill("#body", "The power bill came in higher than usual this month.")
     page.fill("#goal", "80")

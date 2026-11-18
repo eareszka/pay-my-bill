@@ -8,6 +8,7 @@ from tests.conftest import MakeUser, login_as
 
 FORM = {
     "kind": "need",
+    "category": "bills",
     "title": "Car battery died",
     "body": "Need a new battery to get to work this week.",
     "goal": "$120",

@@ -31,6 +31,7 @@ from app.models import (
     PUBLIC_STATUSES,
     UPDATE_DUE_DAYS,
     Post,
+    PostCategory,
     PostKind,
     PostStatus,
     Reaction,
@@ -131,6 +132,7 @@ def new() -> str | Response | tuple[str, int]:
         post = Post(
             user=user,
             kind=PostKind(form.kind.data),
+            category=PostCategory(form.category.data),
             title=form.title.data,
             body=form.body.data,
             goal_cents=form.goal_cents,
@@ -356,6 +358,7 @@ def edit(post_id: int) -> str | Response:
     form = PostForm(
         data={
             "kind": post.kind.value,
+            "category": post.category.value,
             "title": post.title,
             "body": post.body,
             "goal": format_cents(post.goal_cents),
@@ -365,13 +368,14 @@ def edit(post_id: int) -> str | Response:
     if post.story_only:
         del form.kind, form.title, form.goal
     if form.validate_on_submit():
-        before = (post.kind, post.title, post.body, post.goal_cents)
+        before = (post.kind, post.category, post.title, post.body, post.goal_cents)
         if not post.story_only:
             post.kind = PostKind(form.kind.data)
             post.title = form.title.data
             post.goal_cents = form.goal_cents
+        post.category = PostCategory(form.category.data)
         post.body = form.body.data
-        if (post.kind, post.title, post.body, post.goal_cents) == before:
+        if (post.kind, post.category, post.title, post.body, post.goal_cents) == before:
             db.session.rollback()
             return redirect(url_for("posts.show", post_id=post_id))
         post.edited_at = utcnow()

@@ -23,7 +23,13 @@ from app.routes.posts import overdue_post, send_update_reminders
 from tests.conftest import MakeUser, login_as
 
 NOTE = "Made rent on time. Thank you all so much."
-FORM = {"kind": "need", "title": "Phone bill", "body": "Need it for work.", "goal": "20"}
+FORM = {
+    "kind": "need",
+    "category": "bills",
+    "title": "Phone bill",
+    "body": "Need it for work.",
+    "goal": "20",
+}
 
 
 @pytest.fixture
