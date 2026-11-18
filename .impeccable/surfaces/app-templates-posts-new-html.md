@@ -18,4 +18,11 @@ The new-post page at `/posts/new` (#275), asked one question per screen. Inherit
 
 ## Direction contract
 
-To be set by ui (Impeccable).
+Mode: Operate. Yearnly's world, with onboarding pacing (ui, 2026-11-18).
+
+- The page title hides while the steps run; the progress bar (4px, mark-empty track, Dollar Green fill, 320ms) leads the screen.
+- The question is League Gothic uppercase at the h1 size (owner's pick "Yearnly display", over Hinge's bold sentence case), with the hint under it in muted 1rem. A text step's field label is for screen readers only, since the question names it.
+- Need or want: full-width 64px hairline rows, the word in 1.25rem 700 on the left and a 26px rounded box on the right that fills Dollar Green and ticks.
+- Category: 48px emoji pills that wrap, as hidden real radios (the tip row's pattern), filling Dollar Green with white text.
+- The foot: a 60px Press Green → circle at the right (Deep on hover), a 52px outlined ← circle and Skip at the left, and on the last step a "Post →" primary pill in place of the →. On a phone the form fills the space between the bars and the footer hides, so the → is in thumb reach and nothing scrolls.
+- Motion: the step slides 32px in from the side you're heading to and fades in over 300ms on `--ease-out`; a ticked box pops in. Reduced motion cuts.

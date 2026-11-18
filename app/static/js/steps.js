@@ -15,6 +15,8 @@ if (steps.length) {
   let current = Math.max(failed, 0);
 
   function show(index, focus = true) {
+    // The question slides in from the side you're heading to.
+    if (index !== current) form.dataset.dir = index > current ? "next" : "back";
     current = index;
     steps.forEach((step, i) => { step.hidden = i !== index; });
     const last = index === steps.length - 1;

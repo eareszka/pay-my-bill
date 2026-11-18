@@ -374,6 +374,7 @@ State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes 
 - **Hover / Focus:** the stroke turns ink, and focus adds a 2px ink outline offset by 1px.
 - **Error:** a 2px tomato stroke, with the hint swapped for a bold bad-text message.
 - **Checkboxes and radios:** 22px with a 1.5px edge stroke on surface, a 7px-rounded box or a round radio. Hover turns the stroke ink, and checked fills Dollar Green with a white check or dot.
+- **The new-post questions** (#275, owner's Hinge/Bumble ask): one question per screen under a 4px Dollar Green progress bar, the question in League Gothic at the h1 size (owner's pick) with a muted hint. Need or want are 64px hairline rows with a 26px box on the right that ticks; categories are 48px emoji pills that fill Dollar Green. A 60px Press Green → circle sits bottom right, with a 52px outlined ← and Skip at the left, and the last step's "Post →" pill takes the →'s place. On a phone the form fills the screen between the bars. Steps slide 32px in from the side you're heading to over 300ms. Without JS it's one plain form.
 
 ### Navigation
 - **Phone:** a fixed Dollar Green bar at the bottom with a Deep Dollar top border and Lucide 24px icons over 0.75rem 700 labels in Pale Mint. The current page turns white, its icon stroke thickens to 2.5, and a 58 by 32px Deep Dollar pill sits behind its icon. A white pill count badge with deep text on You marks gifts waiting to be confirmed. You opens your own profile, where Gifts now lives.

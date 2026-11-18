@@ -385,13 +385,58 @@ h3.section-title { font-size: 1rem; }
 .plain-group legend { padding: 0; margin-bottom: 4px; font-weight: 700; }
 .form { display: flex; flex-direction: column; gap: 16px; }
 .page-form { margin-bottom: 20px; }
-/* New post, one question per screen (#275). steps.js hides the other questions; ui owns the look. */
-.q-progress { height: 4px; background: var(--edge); border-radius: var(--pill); overflow: hidden; }
-.q-progress-bar { width: 0; height: 100%; background: var(--ink); transition: width var(--fast) ease-out; }
-.q-question { margin: 0; }
+/* New post, one question per screen (#275), like dating-app onboarding: a thin bar, one big question, rows or
+   pills to tap, and a round → at the foot. steps.js sets data-steps=on; without it the page is one plain form. */
+.q-progress { height: 4px; background: var(--mark-empty); border-radius: var(--pill); overflow: hidden; }
+.q-progress-bar { width: 0; height: 100%; background: var(--shell); border-radius: var(--pill); transition: width 320ms var(--ease-out); }
+.q-question { margin: 0; font: 400 clamp(2.5rem, 11vw, 3.25rem) / 0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
 .q-step { display: flex; flex-direction: column; gap: 12px; }
-.q-nav { display: flex; gap: 8px; }
-.q-nav .q-next, .q-nav [data-q-submit] { margin-left: auto; }
+.q-step > .hint { margin-top: -2px; font-size: 1rem; }
+.q-nav { display: flex; align-items: center; gap: 10px; }
+.q-nav .q-next, .q-nav .q-post { margin-left: auto; }
+.q-round { display: grid; place-items: center; flex: none; width: 52px; height: 52px; padding: 0; color: var(--ink); background: transparent; border: 1.5px solid var(--edge); border-radius: 50%; cursor: pointer; transition: background-color var(--fast) ease-out, border-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
+.q-round:hover { border-color: var(--ink); }
+.q-round:active { transform: scale(0.94); }
+.q-next { width: 60px; height: 60px; color: #ffffff; background: var(--press); border-color: var(--press); }
+.q-next:hover, .q-next:focus-visible { background: var(--deep); border-color: var(--deep); }
+.q-post { min-height: 56px; padding-inline: 24px 20px; font-size: 1.0625rem; }
+/* Need or want: full-width hairline rows with the box on the right, ticked when picked. */
+.q-options { flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+.q-options .choice { flex-direction: row-reverse; justify-content: space-between; min-height: 64px; font-size: 1.25rem; font-weight: 700; border-bottom: 1px solid var(--line); cursor: pointer; }
+.q-options .choice input[type="radio"] { width: 26px; height: 26px; border-radius: 7px; }
+.q-options .choice input:focus-visible { outline: none; }
+.q-options .choice:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--radius); }
+.q-options .choice input[type="radio"]:checked::after { content: ""; width: 12px; height: 7px; margin-top: -3px; background: none; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; border-radius: 0; rotate: -45deg; }
+/* What it's for: emoji pills that wrap. The radios stay real but hidden, as on the tip row. */
+.q-pills { gap: 10px; }
+.q-pills .choice { position: relative; gap: 0; min-height: 48px; padding: 0 18px 0 14px; font-weight: 700; border: 1.5px solid var(--edge); border-radius: var(--pill); cursor: pointer; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
+.q-pills .choice input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+.q-pills .choice:hover { border-color: var(--ink); }
+.q-pills .choice:active, .q-options .choice:active { transform: scale(0.98); }
+.q-pills .choice:has(input:checked) { color: #ffffff; background: var(--shell); border-color: var(--shell); }
+.q-pills .choice:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.q-form[data-steps="on"] { gap: 28px; }
+/* The question names the field, so the page title and the field's label are for screen readers only. */
+h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.q-form[data-steps="on"] .q-step { flex: 1; }
+.q-form[data-steps="on"] .field input:not([type="file"]), .q-form[data-steps="on"] .field textarea { font-size: 1.125rem; }
+.q-form[data-steps="on"] .field textarea { min-height: 200px; }
+.q-form[data-steps="on"] #goal { max-width: 12rem; font-size: 1.75rem; font-weight: 700; }
+.q-form[data-steps="on"] > .q-progress { margin-top: 8px; }
+/* On a phone the questions fill the space between the bars, with the → in thumb reach. */
+@media (max-width: 959px) {
+  .q-form[data-steps="on"] { min-height: calc(100dvh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom) - 32px); margin-bottom: 0; }
+  body:has(.q-form[data-steps="on"]) .site-footer { display: none; }
+}
+@media (min-width: 960px) { .q-form[data-steps="on"] { min-height: 560px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .q-form[data-dir="next"] .q-step:not([hidden]) { animation: q-in 300ms var(--ease-out) both; }
+  .q-form[data-dir="back"] .q-step:not([hidden]) { animation: q-in-back 300ms var(--ease-out) both; }
+  .q-options .choice input:checked::after { animation: q-tick 220ms var(--ease-out); }
+}
+@keyframes q-in { from { opacity: 0; translate: 32px 0; } }
+@keyframes q-in-back { from { opacity: 0; translate: -32px 0; } }
+@keyframes q-tick { from { scale: 0.4; } }
 .field { display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
 .field small { font-size: 0.875rem; font-weight: 400; }
 .field input, .field select, .field textarea {
