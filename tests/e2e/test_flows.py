@@ -287,6 +287,12 @@ def test_current_pill_slides_from_the_last_tab(ui: Ui, live_server: LiveServer) 
 
 
 @pytest.mark.parametrize("size", ["mobile"])
+def test_log_in_bubble_fills_the_phone(ui: Ui) -> None:
+    ui.goto("/login")
+    gap = "() => innerHeight - document.querySelector('.join-step').getBoundingClientRect().bottom"
+    assert ui.page.evaluate(gap) <= 40  # only the tail and a gutter below the bubble (#237)
+
+
 def test_to_confirm_badge_floats_on_the_you_tab(ui: Ui) -> None:
     ui.login("dev_tom")  # the seed leaves dev_tom a gift to confirm
     you = ui.page.locator(".nav-user")
