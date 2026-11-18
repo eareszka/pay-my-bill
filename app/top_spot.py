@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload, selectinload
 
+from app.blocks import visible_posts
 from app.extensions import db
 from app.models import (
     MIN_ACCOUNT_AGE_DAYS,
@@ -48,7 +49,11 @@ def top_post(kind: PostKind | None = None) -> Post | None:
     overdue update, or no way to be paid, is out. Closest to its goal breaks ties.
     """
     with_donors = selectinload(Post.donations).joinedload(Donation.donor)
-    query = select(Post).options(joinedload(Post.user), with_donors).where(open_posts())
+    query = (
+        select(Post)
+        .options(joinedload(Post.user), with_donors)
+        .where(open_posts(), visible_posts())
+    )
     if kind:
         query = query.where(Post.kind == kind)
     candidates = [post for post in db.session.scalars(query) if post.user.can_be_paid]

@@ -20,6 +20,7 @@ from werkzeug.wrappers import Response
 from app import format_date, photos, stripe_pay
 from app.accounts import delete_post
 from app.auth import login_required, verified_required
+from app.blocks import viewer_apart
 from app.extensions import db
 from app.forms import GiftForm, PostForm, ResultsUpdateForm
 from app.mail import send_email, send_later
@@ -169,7 +170,7 @@ def show(post_id: int) -> str:
         if post_id <= MAX_DB_INT
         else None
     )
-    if post is None or not can_view(post):
+    if post is None or not can_view(post) or viewer_apart(post.user_id):
         abort(404)
     return render_post(post, GiftForm.for_post(post))
 
@@ -303,7 +304,12 @@ def update(post_id: int) -> Response | tuple[str, int]:
 @verified_required
 def react(post_id: int, kind: str) -> Response:
     post = locked_post(post_id)
-    if post is None or post.status not in PUBLIC_STATUSES or not post.update_body:
+    if (
+        post is None
+        or post.status not in PUBLIC_STATUSES
+        or not post.update_body
+        or viewer_apart(post.user_id)
+    ):
         db.session.rollback()
         abort(404)
     user: User = current_user

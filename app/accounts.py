@@ -1,10 +1,11 @@
-from sqlalchemy import delete, update
+from sqlalchemy import delete, or_, update
 
 from app.extensions import db
 from app.models import (
     DELETED_EMAIL_DOMAIN,
     DELETED_POST_BODY,
     DELETED_POST_TITLE,
+    Block,
     Donation,
     LoginAttempt,
     Post,
@@ -37,6 +38,9 @@ def anonymize(user: User) -> list[str]:
     identifiers = (user.username, user.email, f"reset:{user.email}", f"verify:{user.id}")
     db.session.execute(delete(LoginAttempt).where(LoginAttempt.identifier.in_(identifiers)))
     db.session.execute(delete(Reaction).where(Reaction.user_id == user.id))
+    db.session.execute(
+        delete(Block).where(or_(Block.blocker_id == user.id, Block.blocked_id == user.id))
+    )
     db.session.execute(update(Donation).where(Donation.donor_id == user.id).values(payer_name=None))
     user.username = f"deleted-{user.id}"
     user.email = f"deleted-{user.id}{DELETED_EMAIL_DOMAIN}"
