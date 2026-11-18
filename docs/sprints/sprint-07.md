@@ -14,11 +14,13 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 | PB-23 Reaction counts in the admin queue | #73 | main | 1 | To do |
 | Keep a payment handle while a post is open | #21 | main | 2 | To do |
 | PB-51 Retry photo deletes that fail | #149 | main | 1 | To do |
-| PB-19 App Store listing and review pack | #260 | ui | 3 | To do |
+| Support page for the App Store listing | #264 | main | 1 | To do |
+| PB-19 App Store listing and review pack | #260 | ui | 3 | Pack in review (#263); blocked on #264, #265, #257, PB-39, demo account |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
-| *Stretch:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
+| *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | To do |
+| *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
 
-**Total:** 15 points, plus 8 stretch (Sprint 6: 13 of 13).
+**Total:** 16 points, plus 13 stretch (Sprint 6: 13 of 13).
 
 ## Needs the owner
 - **Costs and accounts:** PB-13 paid hosting (prices first), PB-48 photos on our own domain, PB-18 Apple enrollment (TestFlight already runs, so likely done), PB-35 only if the scheduler costs money.
@@ -27,3 +29,5 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 
 ## Daily log
 - 2026-11-18: Drafted from the roadmap and main's order. Opened #257–#261 and labeled the lanes. Next: the owner confirms. Blocked: none.
+- 2026-11-18 (ui): #260: App Store pack drafted (listing, privacy label, review notes, screenshots). Blockers: card-gift 1% fee vs 3.2.1(vii), /support page, #257, demo account.
+- 2026-11-18: Owner chose an optional tip on the web only in place of the 1% fee (#265). Added #264 support page. Blocked: none.
