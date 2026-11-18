@@ -234,3 +234,20 @@ def test_small_lift_and_sideways_swipe_still_work(ui: Ui, live_server: LiveServe
     assert ui.path() == "/feed"
     drag(ui, -260, 0)
     ui.page.wait_for_url(re.compile(r"/feed\?n=2"))
+
+
+@pytest.mark.parametrize("size", ["mobile"])
+def test_bars_stay_put_and_only_long_pages_scroll(ui: Ui, live_server: LiveServer) -> None:
+    overflow = "() => document.body.scrollHeight - document.body.clientHeight"
+    for path in ["/", *(f"/how/{story}/{step}" for story in ("help", "ask") for step in (1, 2, 3))]:
+        ui.goto(path)
+        assert ui.page.evaluate(overflow) <= 1, path
+    ui.login(live_server.make_user("still"))
+    ui.goto("/feed")
+    assert ui.page.evaluate(overflow) <= 1
+    ui.goto("/terms")
+    assert ui.page.evaluate(overflow) > 0
+    ui.page.mouse.wheel(0, 5000)
+    ui.page.wait_for_function("() => document.body.scrollTop > 0")
+    bar_top = "document.querySelector('.topbar').getBoundingClientRect().top"
+    assert ui.page.evaluate(f"[scrollY, {bar_top}]") == [0, 0]
