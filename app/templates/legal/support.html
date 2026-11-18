@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Support · Yearnly{% endblock %}
+{% block content %}
+  <h1>Support</h1>
+  <article class="page-form legal">
+    <h2>Get help</h2>
+    <p>Email <a href="mailto:support@yearnly.app">support@yearnly.app</a>. A person reads every message, usually within two days.</p>
+    <h2>Report a post or a person</h2>
+    <p>Tap <strong>Report</strong> at the bottom of any post or profile. An admin reviews every report. To stop seeing someone, tap <strong>Block</strong> on their profile or post. You can unblock them in Settings.</p>
+    <h2>Money</h2>
+    <p>Yearnly never holds app payments. Cash App, Venmo, and PayPal gifts go straight between people, so a payment problem goes to that app's support. Card gifts go through Stripe.</p>
+    <h2>Your account</h2>
+    <p>Reset a forgotten password from <a href="{{ url_for('auth.reset_request') }}">Log in</a>. You can delete your account any time in Settings, which removes your profile and posts.</p>
+    <h2>The fine print</h2>
+    <p><a href="{{ url_for('main.rules') }}">Community Rules</a> · <a href="{{ url_for('main.terms') }}">Terms</a> · <a href="{{ url_for('main.privacy') }}">Privacy</a></p>
+  </article>
+{% endblock %}
