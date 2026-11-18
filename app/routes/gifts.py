@@ -62,12 +62,15 @@ def send_confirmed_notice(donation: Donation) -> None:
 
 
 def gift_news(user: User) -> list[Donation]:
-    """Gifts confirmed since the owner last looked, once (#80); card gifts never wait on this."""
-    seen, user.gifts_seen_at = user.gifts_seen_at, utcnow()
-    db.session.commit()
-    if seen is None:
+    """Gifts confirmed since the owner last looked, once (#80); card gifts never wait on this.
+
+    Seen moves only up to the newest gift shown, so a gift confirmed while the page loads
+    still shows next time. The caller commits once the page has rendered.
+    """
+    if user.gifts_seen_at is None:
+        user.gifts_seen_at = utcnow()
         return []
-    return list(
+    news = list(
         db.session.scalars(
             select(Donation)
             .join(Donation.post)
@@ -76,12 +79,15 @@ def gift_news(user: User) -> list[Donation]:
                 Donation.donor_id == user.id,
                 Donation.status == DonationStatus.CONFIRMED,
                 Donation.method != PaymentMethod.CARD,
-                Donation.resolved_at > seen,
+                Donation.resolved_at > user.gifts_seen_at,
                 Post.status != PostStatus.REMOVED,
             )
             .order_by(Donation.resolved_at, Donation.id)
         )
     )
+    if news:
+        user.gifts_seen_at = news[-1].resolved_at
+    return news
 
 
 def as_name(donation: Donation) -> str:
