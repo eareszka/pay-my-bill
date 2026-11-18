@@ -392,6 +392,8 @@ class Donation(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     reminded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # The name on the donor's payment app, shown only to the poster (#81).
+    payer_name: Mapped[str | None] = mapped_column(String(60))
     # Card gifts through Stripe (ADR 0014): the session makes webhooks idempotent.
     stripe_session_id: Mapped[str | None] = mapped_column(String(255), unique=True)
     stripe_payment_intent: Mapped[str | None] = mapped_column(String(255), index=True)

@@ -46,11 +46,15 @@ from app.urls import site_url
 bp = Blueprint("gifts", __name__)
 
 
+def as_name(donation: Donation) -> str:
+    return f' as "{donation.payer_name}"' if donation.payer_name else ""
+
+
 def send_gift_notice(donation: Donation) -> None:
     post = donation.post
     body = (
         f"Hi {post.user.username},\n\n{donation.donor.username} says they sent you "
-        f"{format_cents(donation.amount_cents)} via {donation.method.label} "
+        f"{format_cents(donation.amount_cents)} via {donation.method.label}{as_name(donation)} "
         f'for "{post.title}".\n\nCheck {donation.method.label}, then answer in one tap:\n'
         f"{answer_link(donation)}\n\n"
         f"Or see them on your profile: {site_url('gifts.index')}"
@@ -94,6 +98,7 @@ def create(post_id: int) -> Response | tuple[str, int]:
         donor=donor,
         amount_cents=form.amount_cents,
         method=PaymentMethod(form.method.data),
+        payer_name=form.payer_name.data,
     )
     db.session.add(donation)
     db.session.commit()
@@ -293,14 +298,15 @@ def send_reminders() -> int:
         if poster.is_deleted:
             continue
         lines = "\n".join(
-            f"- {format_cents(g.amount_cents)} via {g.method.label} "
+            f"- {format_cents(g.amount_cents)} via {g.method.label}{as_name(g)} "
             f'from {g.donor.username} for "{g.post.title}"'
             for g in gifts
         )
         body = (
             f"Hi {poster.username},\n\n"
             f"These gifts are still waiting for you to confirm:\n{lines}\n\n"
-            f"Check your payment app, then confirm or dispute them here:\n{link}\n\n"
+            "Check your payment app, then confirm each one or mark it not received here:\n"
+            f"{link}\n\n"
             f"Gifts nobody confirms expire after {PENDING_GIFT_DAYS} days, "
             "and whoever sent them gets no credit."
         )

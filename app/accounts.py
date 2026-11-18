@@ -1,10 +1,11 @@
-from sqlalchemy import delete
+from sqlalchemy import delete, update
 
 from app.extensions import db
 from app.models import (
     DELETED_EMAIL_DOMAIN,
     DELETED_POST_BODY,
     DELETED_POST_TITLE,
+    Donation,
     LoginAttempt,
     Post,
     PostStatus,
@@ -36,6 +37,7 @@ def anonymize(user: User) -> list[str]:
     identifiers = (user.username, user.email, f"reset:{user.email}", f"verify:{user.id}")
     db.session.execute(delete(LoginAttempt).where(LoginAttempt.identifier.in_(identifiers)))
     db.session.execute(delete(Reaction).where(Reaction.user_id == user.id))
+    db.session.execute(update(Donation).where(Donation.donor_id == user.id).values(payer_name=None))
     user.username = f"deleted-{user.id}"
     user.email = f"deleted-{user.id}{DELETED_EMAIL_DOMAIN}"
     user.password_hash = "!"  # noqa: S105 - not a hash, so no password matches

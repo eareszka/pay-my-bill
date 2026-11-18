@@ -254,6 +254,11 @@ class GiftForm(FlaskForm):
         validators=[DataRequired(message="Pick the app you used.")],
         validate_choice=True,
     )
+    payer_name = StringField(
+        "Name on your app (optional)",
+        filters=[_strip_to_none],
+        validators=[Optional(), Length(max=60, message="Names are up to 60 characters.")],
+    )
 
     amount_cents = 0
     max_cents = MAX_GOAL_CENTS

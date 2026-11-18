@@ -158,6 +158,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,
         PostStatus=models.PostStatus,
         DonationStatus=models.DonationStatus,
+        PENDING_GIFT_DAYS=models.PENDING_GIFT_DAYS,
         ReactionKind=models.ReactionKind,
         LEGAL_UPDATED="November 12, 2026",
         CONTACT_EMAIL=app.config["CONTACT_EMAIL"],

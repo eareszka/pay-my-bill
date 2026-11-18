@@ -7,6 +7,13 @@
           <a class="gift-list-title" href="{{ url_for('posts.show', post_id=gift.post_id) }}">{{ gift.post.title }}</a>
           <span class="gift-list-amount">{{ gift.amount_cents | cents }}</span>
           <span class="gift-list-meta">to <a href="{{ url_for('profile.show', username=gift.post.user.username) }}">{{ gift.post.user.username }}</a> <span class="chip chip-{{ gift.status_class }}">{{ gift.status_label }}</span></span>
+          <p class="hint gift-sent">Sent <time datetime="{{ gift.created_at.isoformat() }}">{{ gift.created_at | date }}</time></p>
+          {% set poster = gift.post.user.username %}
+          {% if gift.status_class == "disputed" %}
+            <p class="hint gift-explain">{% if gift.method.value == "card" %}The card payment was reversed, so it doesn't count.{% else %}{{ poster }} said it didn't arrive, so it doesn't count. Check {{ gift.method.label }}. If the money left your account, record it again on the post while it's open, with the name on your app, so {{ poster }} can find it.{% endif %}</p>
+          {% elif gift.status_class == "expired" %}
+            <p class="hint gift-explain">{{ poster }} didn't confirm it within {{ PENDING_GIFT_DAYS }} days, so it doesn't count toward your rewards. Any money you sent still went to them.</p>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>
