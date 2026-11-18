@@ -262,3 +262,25 @@ def test_bars_stay_put_and_only_long_pages_scroll(ui: Ui, live_server: LiveServe
     ui.page.wait_for_function("() => document.body.scrollTop > 0")
     bar_top = "document.querySelector('.topbar').getBoundingClientRect().top"
     assert ui.page.evaluate(f"[scrollY, {bar_top}]") == [0, 0]
+
+
+def test_current_pill_slides_from_the_last_tab(ui: Ui, live_server: LiveServer) -> None:
+    ui.page.add_init_script(
+        "window.slides = []; const animate = Element.prototype.animate;"
+        "Element.prototype.animate = function (frames, options) {"
+        " if (options?.pseudoElement === '::before')"
+        "  window.slides.push([this.textContent.trim(), frames[0].left]);"
+        " return animate.call(this, frames, options); };"
+    )
+    ui.login(live_server.make_user("slider"))
+    ui.goto("/feed")
+    ui.page.get_by_role("link", name="Needs", exact=True).click()
+    ui.page.wait_for_url(re.compile(r"/feed\?kind=need"))
+    ui.page.wait_for_function("() => window.slides.length > 0")
+    label, start = ui.page.evaluate("window.slides[0]")
+    assert label == "Needs"
+    assert float(start.removesuffix("px")) < 0  # it starts back over All, to the left
+    ui.page.get_by_role("link", name="Leaders").click()
+    ui.page.wait_for_url(re.compile(r"/leaders"))
+    ui.page.wait_for_function("() => window.slides.length > 0")
+    assert ui.page.evaluate("window.slides[0][0]") == "Leaders"

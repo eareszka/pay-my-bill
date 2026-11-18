@@ -98,7 +98,10 @@ CONTRAST_JS = """
     for (let n = el; n; n = n.parentElement) {
       const s = getComputedStyle(n);
       if (s.backgroundImage !== 'none') return null;
-      const c = parse(s.backgroundColor);
+      // A current tab's pill is its ::before, painted under the label (#227).
+      const pill = getComputedStyle(n, '::before');
+      const own = parse(s.backgroundColor);
+      const c = own && own.a ? own : pill.content !== 'none' && pill.position === 'absolute' ? parse(pill.backgroundColor) : own;
       if (!c || c.a === 0) continue;
       if (c.a >= 1) { base = c; break; }
       layers.push(c);
