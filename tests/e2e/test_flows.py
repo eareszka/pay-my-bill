@@ -291,3 +291,14 @@ def test_log_in_bubble_fills_the_phone(ui: Ui) -> None:
     ui.goto("/login")
     gap = "() => innerHeight - document.querySelector('.join-step').getBoundingClientRect().bottom"
     assert ui.page.evaluate(gap) <= 40  # only the tail and a gutter below the bubble (#237)
+
+
+@pytest.mark.parametrize("size", ["mobile"])
+def test_to_confirm_badge_floats_on_the_you_tab(ui: Ui) -> None:
+    ui.login("dev_tom")  # the seed leaves dev_tom a gift to confirm
+    you = ui.page.locator(".nav-user")
+    expect(you.locator(".badge")).to_be_visible()
+    assert you.locator(".badge").evaluate("el => getComputedStyle(el).position") == "absolute"
+    label = you.locator(".nav-label").bounding_box()
+    nav = ui.page.locator(".topbar > nav").bounding_box()
+    assert label and nav and label["y"] + label["height"] <= nav["y"] + nav["height"]
