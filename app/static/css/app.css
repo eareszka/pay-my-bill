@@ -822,6 +822,10 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .join-login a { color: var(--on-field); font-weight: 700; }
 .join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; width: 100%; max-width: 480px; margin: auto auto 0; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
 .join-back .icon { width: 20px; height: 20px; }
+/* On a phone the Log in bubble fills the screen like the home bubbles (#237, after #218), its form at the foot in thumb reach. */
+@media (max-width: 959px) {
+  .join-page .join-step { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; }
+}
 
 /* Every bubble keeps its own shape through a move (#217): nothing morphs size, so no frame is a plain rounded box.
    A bubble on both pages (the story field and the docked strip, step to step) stays put and crossfades in place;

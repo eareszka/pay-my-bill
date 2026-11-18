@@ -284,3 +284,10 @@ def test_current_pill_slides_from_the_last_tab(ui: Ui, live_server: LiveServer) 
     ui.page.wait_for_url(re.compile(r"/leaders"))
     ui.page.wait_for_function("() => window.slides.length > 0")
     assert ui.page.evaluate("window.slides[0][0]") == "Leaders"
+
+
+@pytest.mark.parametrize("size", ["mobile"])
+def test_log_in_bubble_fills_the_phone(ui: Ui) -> None:
+    ui.goto("/login")
+    gap = "() => innerHeight - document.querySelector('.join-step').getBoundingClientRect().bottom"
+    assert ui.page.evaluate(gap) <= 40  # only the tail and a gutter below the bubble (#237)
