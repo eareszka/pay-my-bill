@@ -20,6 +20,7 @@ from sqlalchemy.orm import contains_eager, joinedload
 from werkzeug.wrappers import Response
 
 from app.auth import login_required, verified_required
+from app.blocks import viewer_apart
 from app.extensions import db
 from app.forms import GiftForm
 from app.mail import send_email, send_later
@@ -115,7 +116,8 @@ def create(post_id: int) -> Response | tuple[str, int]:
         if post_id <= MAX_DB_INT
         else None
     )
-    if post is None or post.status not in PUBLIC_STATUSES:
+    if post is None or post.status not in PUBLIC_STATUSES or viewer_apart(post.user_id):
+        db.session.rollback()
         abort(404)
     if not post.takes_gifts:
         db.session.rollback()
