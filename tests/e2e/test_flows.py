@@ -293,6 +293,7 @@ def test_log_in_bubble_fills_the_phone(ui: Ui) -> None:
     assert ui.page.evaluate(gap) <= 40  # only the tail and a gutter below the bubble (#237)
 
 
+@pytest.mark.parametrize("size", ["mobile"])
 def test_to_confirm_badge_floats_on_the_you_tab(ui: Ui) -> None:
     ui.login("dev_tom")  # the seed leaves dev_tom a gift to confirm
     you = ui.page.locator(".nav-user")
