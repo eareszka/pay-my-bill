@@ -396,6 +396,8 @@ Your own profile is the home for your stuff (#132). The header is your name in D
 
 - **Block** (#257, owner's pick "Confirm in place"): a quiet muted text action right under "Report this post" or "Report <name>". The first tap swaps it for the question, "**Block maria_g?** You won't see each other's posts, … They aren't told.", with a tomato Block pill and an outlined Cancel, the same in-place pattern as deleting a post. Without JS, it blocks at once. Unblock never asks. Settings → Blocked is a hairline list with Unblock pills, like Showing you less.
 
+- **The web tip** (#265, ADR 0019): on the website's card form only, "Tip to support Yearnly (optional)" is one row of 44px pills, No tip, $1, $2, and Other, as hidden real radios. The picked pill fills Dollar Green with white text, and No tip is picked by default. The Other amount box (a standard 48px input, 7.5rem wide) shows only while Other is picked, using `:has()` with no script. A muted line says the poster gets the same either way. It never appears in the iOS shell.
+
 ### Meter
 The single progress device. It is a 4px pill track with an ink pill fill to the percentage. On a field it becomes a Field Track (20% ink) with a deep fill, 3px tall on the card. In forced-colors mode it is drawn in CanvasText.
 
