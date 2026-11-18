@@ -37,10 +37,10 @@ As a **donor**, I want to **see my progress and know when a gift counts** so tha
 
 ### S5-5 Clear disputes · #81 · 3 pts · P1
 As a **poster**, I want to **match a gift to my payment app**, and as a **donor**, I want to **know what happened** so that **disputes are fair**.
-- [ ] Both gift lists show when each gift was sent.
-- [ ] When tapping "I sent it", a donor can add the name shown on their payment app, visible only to that poster (owner decision). The Privacy page must cover it.
-- [ ] One wording throughout: "Didn't get it" and "Not received", with no "Dispute".
-- [ ] Not received and Expired gifts explain what happened and what to do next.
+- [x] Both gift lists show when each gift was sent.
+- [x] When tapping "I sent it", a donor can add the name shown on their payment app, visible only to that poster (owner decision). The Privacy page must cover it.
+- [x] One wording throughout: "Didn't get it" and "Not received", with no "Dispute".
+- [x] Not received and Expired gifts explain what happened and what to do next.
 
 ### S5-6 Password reset · #82 · 3 pts · P1
 As a **user**, I want to **reset a forgotten password** so that **I don't lose my account**.
