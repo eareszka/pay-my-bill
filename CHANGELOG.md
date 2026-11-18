@@ -3,6 +3,9 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
+
 ### Added
 - Categories and Show less (#119, ADR 0018). Posters pick a category (Rent and housing, Bills and utilities, Groceries and food, Car and transport, Health, Kids and school, Fun and games, or Other), and existing posts became Other. "Show less" on a feed ticket moves that category to the end of your stack. It never hides a post, and the first ticket stays the follow-through pick. Undo is offered right away and later under "Showing you less" on your profile. Logged out, the choice lives in a cookie that joins your account when you log in. Migration 0020 adds `posts.category` and `users.show_less`.
 - Visible rewards (#80). When a poster confirms a gift, the donor gets one email ("maria_g confirmed your $20. You've helped 3 people."), and their next visit to You shows the same news once in a plain banner. Card gifts, which count without a confirmation, never show in it. Chipped in starts with a strip: level, people helped, and streak. Migration 0019 adds `users.gifts_seen_at`; accounts from before it start with no backlog.

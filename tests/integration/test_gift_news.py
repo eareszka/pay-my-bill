@@ -116,3 +116,23 @@ def test_chipped_in_shows_the_rewards_strip(client: FlaskClient, poster: User, d
 def test_chipped_in_strip_for_a_new_donor(client: FlaskClient, donor: User) -> None:
     page = you_page(client, donor, "chipped")
     assert '<p class="rewards-strip">Level 1 · 0 people helped</p>' in page
+
+
+def test_a_visit_with_no_news_writes_nothing(client: FlaskClient, donor: User) -> None:
+    seen(donor)
+    before = donor.gifts_seen_at
+    you_page(client, donor)
+    db.session.refresh(donor)
+    assert donor.gifts_seen_at == before
+
+
+def test_seen_moves_only_to_the_newest_gift_shown(
+    client: FlaskClient, poster: User, donor: User
+) -> None:
+    seen(donor)
+    gift = add_gift(add_post(poster), donor)
+    confirm(gift)
+    you_page(client, donor)
+    db.session.rollback()  # Only a committed seen time survives the request.
+    db.session.refresh(donor)
+    assert donor.gifts_seen_at == gift.resolved_at
