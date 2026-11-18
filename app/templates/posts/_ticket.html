@@ -9,5 +9,7 @@
       <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</p>
       {{ meter(post.progress_percent) }}
     </div>
+    {# Says out loud what a swipe up or a tap does (#252). #}
+    <a class="ticket-more" href="{{ url_for('posts.show', post_id=post.id) }}"><svg class="icon" aria-hidden="true"><use href="#i-more"/></svg>See more<span class="sr-only"> about {{ post.title }}</span></a>
   </div>
 </article>
