@@ -798,31 +798,51 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; width: 100%; max-width: 480px; margin: auto auto 0; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
 .join-back .icon { width: 20px; height: 20px; }
 
-/* The door you take grows into the story while the other shrinks into the strip; each step's words cut in from the right. */
+/* Every bubble keeps its own shape through a move (#217): nothing morphs size, so no frame is a plain rounded box.
+   A bubble on both pages (the story field and the docked strip, step to step) stays put and crossfades in place;
+   one that is leaving fades out where it is, and one that is arriving rises 24px and fades in. The step's words
+   cut in from the right. Transform and opacity only, about 260ms, so it stays smooth on phones while the next page loads. */
 @media (prefers-reduced-motion: no-preference) {
-  .home-door-help, .how-story-help .how-field, .how-other-help { view-transition-name: field-help; }
-  .home-door-ask, .how-story-ask .how-field, .how-other-ask { view-transition-name: field-ask; }
+  .home-door-help { view-transition-name: door-help; }
+  .home-door-ask { view-transition-name: door-ask; }
+  .how-story-help .how-field { view-transition-name: field-help; }
+  .how-story-ask .how-field { view-transition-name: field-ask; }
+  .how-other-help { view-transition-name: strip-help; }
+  .how-other-ask { view-transition-name: strip-ask; }
   .how-step { view-transition-name: how-step; }
   .join-step { view-transition-name: join-step; }
-  /* The step words and the Join in bubble ride in front of the field sinking to the foot. */
-  ::view-transition-group(field-help), ::view-transition-group(field-ask) { z-index: 1; }
+  /* The words ride in front of the bubbles. */
+  ::view-transition-group(door-help), ::view-transition-group(door-ask),
+  ::view-transition-group(field-help), ::view-transition-group(field-ask),
+  ::view-transition-group(strip-help), ::view-transition-group(strip-ask) { z-index: 1; }
   ::view-transition-group(how-step), ::view-transition-group(join-step) { z-index: 2; }
-  /* Join in rises into place (owner, 2026-11-16). Every story move is transform and opacity only, so it stays smooth while the next page loads. */
-  ::view-transition-new(join-step) { animation: join-rise 380ms var(--ease-out) both; }
-  ::view-transition-old(join-step) { animation: how-fade-out 160ms ease-in both; }
-  ::view-transition-group(field-help), ::view-transition-group(field-ask) { overflow: clip; border-radius: var(--r-bubble); animation-duration: 460ms; animation-timing-function: var(--ease-out); }
-  /* When both pages carry a field, its group holds the field's own color so a growing door never shows a ghosted band.
-     A field with no partner just fades (how.js names the pairs). */
-  html:active-view-transition-type(keep-help)::view-transition-group(field-help) { background: var(--want); }
-  html:active-view-transition-type(keep-ask)::view-transition-group(field-ask) { background: var(--want); }
-  ::view-transition-old(field-help), ::view-transition-new(field-help),
-  ::view-transition-old(field-ask), ::view-transition-new(field-ask) { height: 100%; object-fit: none; object-position: left bottom; animation-duration: 460ms; }
-  ::view-transition-group(how-step) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
-  ::view-transition-new(how-step) { animation: how-cut 420ms var(--ease-out) both; }
-  ::view-transition-old(how-step) { animation: how-leave 220ms ease-in both; }
+  /* A bubble's group never animates its size or place; its snapshots, tail included, carry the move. */
+  ::view-transition-group(door-help), ::view-transition-group(door-ask),
+  ::view-transition-group(field-help), ::view-transition-group(field-ask),
+  ::view-transition-group(strip-help), ::view-transition-group(strip-ask) { animation: none; }
+  ::view-transition-old(door-help), ::view-transition-old(door-ask),
+  ::view-transition-old(field-help), ::view-transition-old(field-ask),
+  ::view-transition-old(strip-help), ::view-transition-old(strip-ask),
+  ::view-transition-new(door-help), ::view-transition-new(door-ask),
+  ::view-transition-new(field-help), ::view-transition-new(field-ask),
+  ::view-transition-new(strip-help), ::view-transition-new(strip-ask) { animation-duration: 240ms; animation-timing-function: ease-out; }
+  ::view-transition-old(door-help):only-child, ::view-transition-old(door-ask):only-child,
+  ::view-transition-old(field-help):only-child, ::view-transition-old(field-ask):only-child,
+  ::view-transition-old(strip-help):only-child, ::view-transition-old(strip-ask):only-child,
+  ::view-transition-old(join-step) { animation: how-fade-out 180ms ease-in both; }
+  ::view-transition-new(door-help):only-child, ::view-transition-new(door-ask):only-child,
+  ::view-transition-new(field-help):only-child, ::view-transition-new(field-ask):only-child,
+  ::view-transition-new(strip-help):only-child, ::view-transition-new(strip-ask):only-child,
+  ::view-transition-new(join-step) { animation: join-rise 280ms var(--ease-out) both; }
+  /* Help leads and ask follows a beat later, as on the front door. */
+  ::view-transition-new(door-ask):only-child { animation-delay: 40ms; }
+  ::view-transition-group(how-step) { animation-duration: 280ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-new(how-step) { animation: how-cut 280ms var(--ease-out) both; }
+  ::view-transition-old(how-step) { animation: how-leave 160ms ease-in both; }
   html:active-view-transition-type(back)::view-transition-new(how-step) { animation-name: how-cut-back; }
   html:active-view-transition-type(back)::view-transition-old(how-step) { animation-name: how-leave-back; }
-  html:active-view-transition-type(open)::view-transition-new(how-step) { animation-delay: 220ms; }
+  /* Opening a door, the field rises in just ahead of its words. */
+  html:active-view-transition-type(open)::view-transition-new(how-step) { animation-delay: 40ms; }
 }
 /* The doors arrive (#203): on a fresh open each door rises into place, help then ask, the words rise in
    as their field lands, and the way in comes last. Transform and opacity only, so it stays smooth while

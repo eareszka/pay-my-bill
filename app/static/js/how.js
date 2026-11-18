@@ -20,13 +20,6 @@ const stepOf = (url) => {
   return match ? { path: match[1], step: Number(match[2] || 1) } : null;
 };
 
-// The doors and both stories carry both fields; sign-up from a story carries only that story's.
-const fieldsOf = (url) => {
-  const at = stepOf(url);
-  if (!at) return [];
-  return at.step === 99 ? [at.path] : ["help", "ask"];
-};
-
 // Opening a door, or swapping to the other story, lets the field land before the words cut in.
 // Going back cuts in from the left.
 window.addEventListener("pagereveal", (event) => {
@@ -34,10 +27,6 @@ window.addEventListener("pagereveal", (event) => {
   if (!event.viewTransition || !from) return;
   const was = stepOf(from);
   const now = stepOf(window.location.href);
-  // A field morphs only when both pages carry it; only then does its group hold the field color.
-  for (const field of fieldsOf(from)) {
-    if (fieldsOf(window.location.href).includes(field)) event.viewTransition.types.add(`keep-${field}`);
-  }
   if (!was || !now) return;
   if (was.step > now.step && (was.path === now.path || !now.path)) event.viewTransition.types.add("back");
   else if (was.path !== now.path) event.viewTransition.types.add("open");
