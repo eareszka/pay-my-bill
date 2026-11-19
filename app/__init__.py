@@ -157,6 +157,7 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     from app import stripe_pay
     from app.money import format_cents
+    from app.urls import site_url
 
     app.add_template_filter(format_cents, "cents")
     app.add_template_filter(format_date, "date")
@@ -166,6 +167,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
         MAX_BIO_CHARS=models.MAX_BIO_CHARS,
         CATEGORY_EMOJI={c.value: c.emoji for c in models.PostCategory},
         PostStatus=models.PostStatus,
+        PUBLIC_STATUSES=models.PUBLIC_STATUSES,
+        site_url=site_url,
         DonationStatus=models.DonationStatus,
         in_app_shell=stripe_pay.in_app_shell,
         PENDING_GIFT_DAYS=models.PENDING_GIFT_DAYS,
