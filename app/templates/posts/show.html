@@ -69,9 +69,16 @@
           <p class="hint">Posters who follow through get first shot at the top of the board.</p>
           <p class="hint">Receipts are never needed. Don't share account numbers or medical details.</p>
           {{ field(update_form.note, rows=4, maxlength=2000) }}
-          {{ field(update_form.photo, accept=PHOTO_ACCEPT) }}
+          {# One photo box like the new-post grid's (#69); steps.js shows the picked photo in it. #}
+          {% set photo = update_form.photo %}
+          <div class="field update-photo-field">
+            <span aria-hidden="true">{{ photo.label.text }}</span>
+            <label class="q-photo-box"><input type="file" id="{{ photo.id }}" name="{{ photo.name }}" accept="{{ PHOTO_ACCEPT }}" aria-describedby="{{ photo.id }}-{{ 'error' if photo.errors else 'hint' }}"{% if photo.errors %} aria-invalid="true" autofocus{% endif %}><span class="q-photo-add" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></span><span class="sr-only">{{ photo.label.text }}</span></label>
+            {% if photo.errors %}<small class="error" id="{{ photo.id }}-error">{{ photo.errors | join(" ") }}</small>{% else %}<small id="{{ photo.id }}-hint">{{ photo.description }}</small>{% endif %}
+          </div>
           <button type="submit" class="btn">Post update</button>
         </form>
+        <script src="{{ url_for('static', filename='js/steps.js') }}" defer></script>
       </section>
     {% elif post.owes_update and not post.user.is_deleted %}
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
