@@ -332,6 +332,14 @@ def update(post_id: int) -> Response | tuple[str, int]:
     if not form.validate_on_submit():
         db.session.rollback()
         return render_post(post, GiftForm.for_post(post), form), 400
+    if form.photo_data:
+        try:
+            post.update_photo_key = photos.save(form.photo_data)
+        except Exception:  # storage can fail in many ways; the poster can try again
+            current_app.logger.exception("Couldn't store a results update photo")
+            db.session.rollback()
+            form.photo.errors = ["We couldn't save that photo. Try again, or post without it."]
+            return render_post(post, GiftForm.for_post(post), form), 503
     post.update_body = form.note.data
     post.update_posted_at = utcnow()
     db.session.commit()

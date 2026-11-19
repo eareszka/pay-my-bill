@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 from flask_wtf import FlaskForm
-from flask_wtf.file import MultipleFileField
+from flask_wtf.file import FileField, MultipleFileField
 from wtforms import (
     BooleanField,
     EmailField,
@@ -321,6 +321,21 @@ class ResultsUpdateForm(FlaskForm):
         ],
         description="At least 20 characters.",
     )
+    photo = FileField(
+        "Photo (optional)",
+        description="One photo of how it went, up to 8 MB. Never a receipt. "
+        "We remove its location data.",
+    )
+    photo_data: bytes | None = None
+
+    def validate_photo(self, field: Field) -> None:
+        upload = field.data
+        if not upload or not getattr(upload, "filename", ""):
+            return
+        try:
+            self.photo_data = process(upload.stream)
+        except PhotoError as error:
+            raise ValidationError(str(error)) from error
 
     def validate_note(self, field: TextAreaField) -> None:
         # Runs even when Length has already refused the note, so an oversized body

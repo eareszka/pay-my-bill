@@ -7,7 +7,7 @@
 |---|---|---|---|---|
 | PB-48 Photos on our own domain | #289 | main + owner | 1 | Steps in README; waiting on the owner |
 | PB-44 Share an ask | #288 | main → ui | 2 | To do |
-| PB-20 Photo on a results update | #69 | main → ui | 2 | To do |
+| PB-20 Photo on a results update | #69 | main → ui | 2 | Ready for ui |
 | PB-52 Push notifications in the iOS app (from Sprint 7) | #261 | main → ui | 8 | Blocked: APNs key from the owner's Apple account |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
 
@@ -21,3 +21,4 @@
 ## Daily log
 - 2026-11-19: Owner picked PB-44, PB-20, and PB-48. Opened #288 and #289, carried #261 and #225. Blocked: none.
 - 2026-11-19 (main): #289: Cloudflare steps for photos.yearnly.app in the README; no code change (CSP follows R2_PUBLIC_URL). Next: #288 Share. Blocked: owner does the steps.
+- 2026-11-19 (main): #69: optional photo on a results update (same checks as post photos, never a receipt). Next: ui; #261 waits on the APNs key. Blocked: none.

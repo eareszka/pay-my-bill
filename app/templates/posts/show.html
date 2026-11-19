@@ -54,6 +54,7 @@
         <h2 class="section-title">Results update</h2>
         <p class="hint">Posted {{ post.update_posted_at | date }}</p>
         <p class="post-body update-body">{{ post.update_body }}</p>
+        {% if post.update_photo_key %}<img class="update-photo" src="{{ photo_url(post.update_photo_key) }}" alt="Photo from {{ post.user.username }}'s update" loading="lazy" decoding="async">{% endif %}
         {% include "posts/_reactions.html" %}
       </section>
     {% elif post.owes_update and is_owner %}
@@ -62,11 +63,12 @@
         <h2 class="section-title">Results update</h2>
         <p class="update-due">{% if post.update_overdue %}This was due {{ post.update_last_day | date }}, and you can't create new posts until it's up.{% else %}Due by {{ post.update_last_day | date }}.{% endif %}</p>
         <p class="hint">Tell the {{ "person who" if helped == 1 else helped ~ " people who" }} helped how it went.</p>
-        <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}" class="form" novalidate>
+        <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}" class="form" enctype="multipart/form-data" novalidate>
           {{ update_form.hidden_tag() }}
           <p class="hint">Posters who follow through get first shot at the top of the board.</p>
           <p class="hint">Receipts are never needed. Don't share account numbers or medical details.</p>
           {{ field(update_form.note, rows=4, maxlength=2000) }}
+          {{ field(update_form.photo, accept=PHOTO_ACCEPT) }}
           <button type="submit" class="btn">Post update</button>
         </form>
       </section>
@@ -102,10 +104,10 @@
         <div class="actions">
           {% if post.can_edit %}<a class="btn btn-secondary" href="{{ url_for('posts.edit', post_id=post.id) }}">Edit post</a>{% endif %}
           {% if post.is_open %}<a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, close=1) }}#delete">Close post</a>{% endif %}
-          {% if post.photo_key %}
+          {% if post.photo_keys %}
             <form method="post" action="{{ url_for('posts.delete_photo', post_id=post.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-secondary">Remove {{ "photos" if post.more_photo_keys else "photo" }}</button>
+              <button type="submit" class="btn btn-secondary">Remove {{ "photos" if post.photo_keys | length > 1 else "photo" }}</button>
             </form>
           {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete {{ "update" if post.is_deleted else "post" }}</a>

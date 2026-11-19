@@ -111,9 +111,9 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     @app.before_request
     def photo_upload_limit() -> None:
-        # The new-post form is the only one with a photo, so the only one allowed a large
-        # body. Registered before CSRF, which reads the form in its own before_request (#155).
-        if request.endpoint == "posts.new":
+        # The new-post and results-update forms take photos, so only they're allowed a
+        # large body. Registered before CSRF, which reads the form in its own before_request (#155).
+        if request.endpoint in ("posts.new", "posts.update"):
             request.max_content_length = MAX_UPLOAD_BYTES
 
     db.init_app(app)

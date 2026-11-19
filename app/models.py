@@ -285,6 +285,8 @@ class Post(Base):
     # The cover photo; the rest of a post's photos follow it in more_photo_keys (ADR 0020).
     photo_key: Mapped[str | None] = mapped_column(String(80))
     more_photo_keys: Mapped[list[str]] = mapped_column(JSON, default=list, server_default="[]")
+    # An optional photo on the results update (#69, ADR 0008), never a receipt.
+    update_photo_key: Mapped[str | None] = mapped_column(String(80))
 
     user: Mapped[User] = relationship(back_populates="posts")
     donations: Mapped[list["Donation"]] = relationship(
@@ -297,12 +299,14 @@ class Post(Base):
 
     @property
     def photo_keys(self) -> list[str]:
-        return [self.photo_key, *self.more_photo_keys] if self.photo_key else []
+        """Every photo the post holds: the post's own, then the results update's."""
+        cover = [self.photo_key, *self.more_photo_keys] if self.photo_key else []
+        return cover + ([self.update_photo_key] if self.update_photo_key else [])
 
     def take_photos(self) -> list[str]:
         """Drop every photo from the post. Returns the keys, to discard once the change commits."""
         keys = self.photo_keys
-        self.photo_key, self.more_photo_keys = None, []
+        self.photo_key, self.more_photo_keys, self.update_photo_key = None, [], None
         return keys
 
     @property
