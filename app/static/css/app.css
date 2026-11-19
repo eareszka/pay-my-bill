@@ -675,6 +675,10 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .q-photo-box.has-file { border: 0; }
 .q-photo-box.has-file .q-photo-add { visibility: hidden; }
 .q-photos:has(.q-photo-box:first-child.has-file) + .error { display: none; }
+/* The results update's photo (#69): one box from the new-post grid on the form, the picked photo whole under the note. */
+.update-photo-field .q-photo-box { align-self: flex-start; width: 140px; }
+.update-photo-field:has(.has-file) .error { display: none; }
+.update-photo { display: block; width: 100%; height: auto; max-height: 560px; object-fit: cover; border-radius: var(--radius); background: var(--info-tint); }
 /* The post sheet (#282), Bumble-style: the whole person in one scroll. Big photos sit between the story bubble,
    the fact pills and the poster's card, all speaking from the right like the ask itself. */
 .post > .post-body { max-width: none; margin: 12px 0; padding: 20px 18px; font-size: 1.125rem; line-height: 1.55; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }

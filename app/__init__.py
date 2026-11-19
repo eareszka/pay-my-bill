@@ -107,14 +107,16 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     parse_fee_rate(str(app.config["PLATFORM_FEE_RATE"]))
     from app.extensions import csrf, db, login_manager, migrate
-    from app.photos import MAX_UPLOAD_BYTES
+    from app.photos import MAX_UPDATE_UPLOAD_BYTES, MAX_UPLOAD_BYTES
 
     @app.before_request
     def photo_upload_limit() -> None:
-        # The new-post form is the only one with a photo, so the only one allowed a large
-        # body. Registered before CSRF, which reads the form in its own before_request (#155).
+        # The new-post and results-update forms take photos, so only they're allowed a
+        # large body. Registered before CSRF, which reads the form in its own before_request (#155).
         if request.endpoint == "posts.new":
             request.max_content_length = MAX_UPLOAD_BYTES
+        elif request.endpoint == "posts.update":
+            request.max_content_length = MAX_UPDATE_UPLOAD_BYTES
 
     db.init_app(app)
     migrate.init_app(app, db)

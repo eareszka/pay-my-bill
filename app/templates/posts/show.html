@@ -55,6 +55,7 @@
         <h2 class="section-title">Results update</h2>
         <p class="hint">Posted {{ post.update_posted_at | date }}</p>
         <p class="post-body update-body">{{ post.update_body }}</p>
+        {% if post.update_photo_key %}<img class="update-photo" src="{{ photo_url(post.update_photo_key) }}" alt="Photo from {{ post.user.username }}'s update" loading="lazy" decoding="async">{% endif %}
         {% include "posts/_reactions.html" %}
       </section>
     {% elif post.owes_update and is_owner %}
@@ -63,13 +64,21 @@
         <h2 class="section-title">Results update</h2>
         <p class="update-due">{% if post.update_overdue %}This was due {{ post.update_last_day | date }}, and you can't create new posts until it's up.{% else %}Due by {{ post.update_last_day | date }}.{% endif %}</p>
         <p class="hint">Tell the {{ "person who" if helped == 1 else helped ~ " people who" }} helped how it went.</p>
-        <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}" class="form" novalidate>
+        <form method="post" action="{{ url_for('posts.update', post_id=post.id) }}" class="form" enctype="multipart/form-data" novalidate>
           {{ update_form.hidden_tag() }}
           <p class="hint">Posters who follow through get first shot at the top of the board.</p>
           <p class="hint">Receipts are never needed. Don't share account numbers or medical details.</p>
           {{ field(update_form.note, rows=4, maxlength=2000) }}
+          {# One photo box like the new-post grid's (#69); steps.js shows the picked photo in it. #}
+          {% set photo = update_form.photo %}
+          <div class="field update-photo-field">
+            <span aria-hidden="true">{{ photo.label.text }}</span>
+            <label class="q-photo-box"><input type="file" id="{{ photo.id }}" name="{{ photo.name }}" accept="{{ PHOTO_ACCEPT }}" aria-describedby="{{ photo.id }}-{{ 'error' if photo.errors else 'hint' }}"{% if photo.errors %} aria-invalid="true" autofocus{% endif %}><span class="q-photo-add" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></span><span class="sr-only">{{ photo.label.text }}</span></label>
+            {% if photo.errors %}<small class="error" id="{{ photo.id }}-error">{{ photo.errors | join(" ") }}</small>{% else %}<small id="{{ photo.id }}-hint">{{ photo.description }}</small>{% endif %}
+          </div>
           <button type="submit" class="btn">Post update</button>
         </form>
+        <script src="{{ url_for('static', filename='js/steps.js') }}" defer></script>
       </section>
     {% elif post.owes_update and not post.user.is_deleted %}
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
@@ -107,6 +116,12 @@
             <form method="post" action="{{ url_for('posts.delete_photo', post_id=post.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn btn-secondary">Remove {{ "photos" if post.more_photo_keys else "photo" }}</button>
+            </form>
+          {% endif %}
+          {% if post.update_photo_key %}
+            <form method="post" action="{{ url_for('posts.delete_update_photo', post_id=post.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-secondary">Remove update photo</button>
             </form>
           {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete {{ "update" if post.is_deleted else "post" }}</a>
