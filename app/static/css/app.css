@@ -1090,12 +1090,34 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .ticket-more .icon { width: 20px; height: 20px; }
 .ticket-more:hover { text-decoration: underline; }
 .ticket-more:focus-visible { outline-color: var(--on-field); }
-.sheet-top { position: sticky; top: var(--bar-h); z-index: 5; height: 0; }
-.sheet-close { position: absolute; top: 14px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 50%; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out; }
+.sheet-top { --sheet-right: 12px; position: sticky; top: var(--bar-h); z-index: 5; height: 0; }
+.sheet-close { position: absolute; top: 14px; right: var(--sheet-right); display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 50%; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out; }
 /* Beside the Chip in panel on a wide screen, Close sits in the post's own corner, not on the panel. */
-@media (min-width: 960px) { main:has(.post > .post-side > .group) .sheet-close { right: calc(400px + 28px + 14px); } }
+@media (min-width: 960px) { main:has(.post > .post-side > .group) .sheet-top { --sheet-right: calc(400px + 28px + 14px); } }
 .sheet-close .icon { width: 20px; height: 20px; }
 .sheet-close:hover { color: #ffffff; background: var(--press); border-color: var(--press); }
+
+/* Share (#288). On the feed it's the last rail glyph (an outline glyph like Back); on a wide screen it sits at the
+   foot of the Back gutter, mirroring Show less. On the post it's a white pill left of Close. "Link copied" shows
+   as a small pill beside it for a moment. */
+.share { position: relative; display: flex; flex-direction: column; align-items: center; }
+.rail-share { order: 5; pointer-events: auto; }
+.share-btn { font-family: inherit; cursor: pointer; }
+.rail-btn.share-btn { padding: 0; background: none; border: 0; }
+.share-status { position: absolute; z-index: 1; padding: 6px 12px; font-size: 0.8125rem; font-weight: 700; line-height: 1.2; white-space: nowrap; color: var(--ink); background: var(--surface); border-radius: var(--pill); pointer-events: none; }
+.share-status:empty { display: none; }
+.rail-share .share-status { top: 14px; right: calc(100% + 8px); }
+.sheet-share { position: absolute; top: 14px; right: calc(var(--sheet-right) + 52px); }
+.sheet-share .share-btn { gap: 6px; min-height: 44px; padding: 0 16px 0 12px; font-size: 0.9375rem; background: var(--surface); border-color: var(--line); }
+.sheet-share .share-btn:hover { color: #ffffff; background: var(--press); border-color: var(--press); }
+.sheet-share .icon { width: 18px; height: 18px; }
+.sheet-share .share-status { top: calc(100% + 6px); right: 0; border: 1.5px solid var(--line); }
+@media (min-width: 960px) {
+  .rail-share { grid-area: back; align-self: end; justify-self: start; }
+  .rail-share .share-status { top: auto; right: auto; bottom: calc(100% + 8px); left: 0; }
+}
+@keyframes share-pop { from { opacity: 0; scale: 0.9; } }
+@media (prefers-reduced-motion: no-preference) { .share-status { animation: share-pop 200ms var(--ease-out); } }
 
 /* The optional web tip (#265): No tip, $1, $2, or Other as one row of pills. The radios stay real but hidden.
    No tip is picked by default, and the Other amount shows only when Other is picked. */
