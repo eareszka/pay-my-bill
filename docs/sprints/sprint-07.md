@@ -7,21 +7,20 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 ## Committed
 | Story | Issue | Lane | Points | Status |
 |---|---|---|---|---|
-| PB-12 Block another user | #257 | main | 3 | In progress |
-| PB-35 Scheduled jobs for reminders | #258 | main | 1 | To do |
-| Send email off the request path, prune login_attempts | #15 | main | 2 | To do |
-| PB-15 Monitoring and backups | #259 | main | 2 | Needs the owner's tracker pick |
-| PB-23 Reaction counts in the admin queue | #73 | main | 1 | To do |
-| Keep a payment handle while a post is open | #21 | main | 2 | To do |
-| PB-51 Retry photo deletes that fail | #149 | main | 1 | To do |
-| Support page for the App Store listing | #264 | main | 1 | To do |
-| PB-19 App Store listing and review pack | #260 | ui | 3 | Pack in review (#263); blocked on #264, #265, #257, PB-39, demo account |
-| Create a post one question per screen (owner's ask) | #275 | main → ui | — | ui done, in review |
-| Post tab lists your posts (owner's ask) | #278 | main → ui | — | ui done, in review |
-| Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | To do |
-| Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | ui done, in review |
+| PB-12 Block another user | #257 | main | 3 | Done |
+| PB-35 Scheduled jobs for reminders | #258 | main | 1 | Done |
+| Send email off the request path, prune login_attempts | #15 | main | 2 | Done |
+| PB-15 Monitoring and backups | #259 | main | 2 | Done |
+| PB-23 Reaction counts in the admin queue | #73 | main | 1 | Done |
+| Keep a payment handle while a post is open | #21 | main | 2 | Done |
+| PB-51 Retry photo deletes that fail | #149 | main | 1 | Done |
+| Support page for the App Store listing | #264 | main | 1 | Done |
+| PB-19 App Store listing and review pack | #260 | ui | 3 | Done |
+| Create a post one question per screen (owner's ask) | #275 | main → ui | — | Done |
+| Post tab lists your posts (owner's ask) | #278 | main → ui | — | Done |
+| Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | Done |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
-| *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | To do |
+| *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | Done |
 | *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
 
 **Total:** 16 points, plus 13 stretch (Sprint 6: 13 of 13).
@@ -43,3 +42,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18 (ui): #278 look on #280: Create new post is a full-width pill with the post icon, and the empty list drops its duplicate link. Next: #281 photos. Blocked: none.
 - 2026-11-18 (main): #279: five photo boxes on new posts, first required (ADR 0020); cover stays the feed photo, all photos deleted together. Next: ui. Blocked: none.
 - 2026-11-18 (ui): #279 look on #281: photo boxes are a 4:5 grid with a green + and a Cover tag, error and focus states, and the post's extra photos as tiles. Blocked: none.
+- 2026-11-19 (main): Merged #280 (#278) and #281 (#279). Table: merged stories marked Done, duplicate #279 row removed. Left: #261 (Apple enrollment), #225, #282. Blocked: none.
