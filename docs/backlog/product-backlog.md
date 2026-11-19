@@ -4,12 +4,12 @@ Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning.
 
 ---
 
-### PB-7 Terms of Service and Privacy Policy pages · #32 · 2 pts · P0 · epic:safety
+### PB-7 Terms of Service and Privacy Policy pages · Done (#32) · 2 pts · P0 · epic:safety
 - [ ] `/terms` and `/privacy` exist and are linked in the footer and on the signup form.
 - [ ] Terms state: 18+, no business fundraising, the app never holds money, needs aren't verified, and donations are gifts at the donor's own risk.
 - [ ] Marked as drafts; a lawyer review is a v1.0 gate (PRD).
 
-### PB-8 Staging Postgres before it expires · #33 · 1 pt · P0 · chore
+### PB-8 Staging Postgres before it expires · Done (#33) · 1 pt · P0 · chore
 - [ ] Before 2026-11-26, staging Postgres is either on a paid plan or recreated, with the steps written in the README.
 
 ### PB-9 Spike: payment-app terms · #34 · 2 pts · P1 · spike
@@ -17,7 +17,7 @@ Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning.
 - [ ] Whether cosmetic perks (PB-30) fit Apple's Guideline 3.2.1(vii), that gifts stay optional and go entirely to the recipient.
 - [ ] Any required changes become backlog items or a new ADR.
 
-### PB-10 Spike: product name and domain · #35 · 2 pts · P2 · spike
+### PB-10 Spike: product name and domain · Done (#35) · 2 pts · P2 · spike
 - [x] Three or more candidate names, each checked against USPTO search, domain availability, and app-store conflicts.
 - [x] The owner picks one; an ADR records it (ADR 0017: Yearnly).
 
@@ -28,7 +28,7 @@ Stories and spikes that aren't in a sprint yet. Pull them in at Sprint Planning.
 
 ## Toward the App Store (see `docs/roadmap.md`)
 
-### PB-12 Block another user · #257 · 3 pts · P1 · epic:safety · v0.1-alpha
+### PB-12 Block another user · Done (#257) · 3 pts · P1 · epic:safety · v0.1-alpha
 As a **user**, I want to **block someone** so that **I stop seeing them and they can't interact with me** (App Store Guideline 1.2).
 - [x] Given another user's profile or post, when I block them, then their posts and updates are hidden from my feed.
 - [x] Given they've blocked me or I've blocked them, then neither of us can pledge to the other's posts or give kudos.
@@ -44,7 +44,7 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 - [ ] `MAIL_SERVER` points at a provider (Postmark, Resend, or SES) with SPF and DKIM set up on the domain.
 - [ ] A verification email from production lands in the Gmail and iCloud inboxes, not spam.
 
-### PB-15 Monitoring and backups · #259 · 2 pts · P1 · chore · v0.2-beta
+### PB-15 Monitoring and backups · Done (#259) · 2 pts · P1 · chore · v0.2-beta
 - [ ] Unhandled errors are reported to an error tracker, with no passwords or tokens in the payload.
 - [ ] An uptime check on `/health` alerts the owner.
 - [ ] Daily Postgres backups, and a restore that's been tested once and written down in the README.
@@ -61,7 +61,7 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 - [ ] Decide on an individual or organization (LLC) account after the Phase 5 legal review. Get a D-U-N-S number if it's an organization.
 - [ ] Enrolled ($99/year), with the account holder recorded in the README.
 
-### PB-19 App Store listing and review pack · #260 · 3 pts · P1 · chore · v1.0
+### PB-19 App Store listing and review pack · Done (#260) · 3 pts · P1 · chore · v1.0
 - [ ] App Store Connect listing: name, description, icon, 6.7" and 6.5" screenshots, a privacy policy URL, and a support URL.
 - [ ] A privacy label covering email, payment handles, and user content. An age rating that matches the 18+ rule.
 - [ ] A demo account and review notes covering link-out gifts (Guideline 3.2.1(vii)), reporting, blocking, and account deletion.
@@ -71,11 +71,11 @@ As a **user**, I want to **block someone** so that **I stop seeing them and they
 Moved out of PB-1 by the owner (2026-11-02). Text-only updates ship first.
 - [ ] Given an optional photo, when I upload it, then the type and size are validated and it's stored under a random filename (T7).
 
-### PB-22 The 30 days start when a flagged post is approved · #68 · 1 pt · P1 · epic:safety
+### PB-22 The 30 days start when a flagged post is approved · Done (#68) · 1 pt · P1 · epic:safety
 From the PR #66 review. Do this with the admin queue, which adds approval. Today the clock runs from `created_at`, so time in review uses up a post's open window.
 - [ ] Given a flagged post approved on day 25, then it stays open for 30 days from approval.
 
-### PB-23 Show reaction counts in the admin queue · #73 · 1 pt · P2 · epic:safety
+### PB-23 Show reaction counts in the admin queue · Done (#73) · 1 pt · P2 · epic:safety
 From the PR #72 review. Deleting a post hides its update and reactions, so admins lose the 🤨 signal (ADR 0008). The rows stay in the database.
 - [x] Given a post with 🤨 reactions, deleted or not, when an admin opens the queue, then they see the count.
 
@@ -153,11 +153,11 @@ As the **community**, we want **a way to report and act on bad posts** (App Stor
 - [ ] Admins see reports and flagged posts in one queue, and can approve, remove, or ban.
 - [ ] A banned user can't log in, and their open posts leave the feed.
 
-### PB-34 Production settings and security headers · #142 · 2 pts · P0 · chore · v0.2-beta
+### PB-34 Production settings and security headers · Done (#142) · 2 pts · P0 · chore · v0.2-beta
 - [x] Secure session cookies, security headers, and an upload limit are on in production.
-- [ ] The app refuses to start in production without `SECRET_KEY`.
+- [x] The app refuses to start in production without `SECRET_KEY` (#152).
 
-### PB-35 Scheduled jobs for reminders · #258 · 1 pt · P1 · chore · v0.2-beta
+### PB-35 Scheduled jobs for reminders · Done (#258) · 1 pt · P1 · chore · v0.2-beta
 - [ ] `flask gifts remind` and `flask posts remind` run daily without anyone starting them.
 
 ### PB-36 Installable web app · Done (#185) · 3 pts · P1 · v0.2-beta
@@ -189,17 +189,17 @@ ADR 0014. The owner applies. Nothing about real payments ships until this is don
 - [ ] Stripe's answer on the crowdfunding review is recorded in `docs/research/`, along with fees and dispute liability.
 - [ ] PB-9 is updated for Apple Guideline 3.2.1(vii) with Stripe fees.
 
-### PB-42 Recipients connect Stripe · #TBD · 3 pts · P0 · epic:donations
+### PB-42 Recipients connect Stripe · Done · 3 pts · P0 · epic:donations
 - [ ] From their profile, a recipient starts Stripe-hosted Express onboarding and comes back to a clear status: not started, pending, or ready.
 - [ ] Only ready recipients can take card gifts. Account status is updated from the `account.updated` webhook.
 
-### PB-43 Instant card gifts · #TBD · 5 pts · P0 · epic:donations
+### PB-43 Instant card gifts · Done · 5 pts · P0 · epic:donations
 - [ ] A donor picks an amount and pays with card, Apple Pay, or Google Pay through Stripe Checkout, as a destination charge to the recipient with no platform fee.
 - [ ] A signed, idempotent webhook records the gift as confirmed at once (amending ADR 0004), and the donor sees their rewards.
 - [ ] Refunds and disputes from Stripe un-count the gift and flag it in the admin queue.
 - [ ] Terms and Privacy are updated for card gifts.
 
-### PB-50 Flat card gifts with a platform fee · #183 · 2 pts · P0 · epic:donations
+### PB-50 Flat card gifts with a platform fee · Done (#183), fee removed by ADR 0019 (#265) · 2 pts · P0 · epic:donations
 Owner request (2026-11-12), ADR 0016.
 - [x] The donor pays exactly the typed amount. Stripe's fee and a 1% application fee come out of it.
 - [x] Progress counts the recipient's estimated net. The donor email shows what they paid.
