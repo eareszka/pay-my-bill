@@ -7,6 +7,7 @@
     {% if is_owner %}<a class="btn btn-secondary" href="{{ url_for('profile.edit') }}">Settings</a>{% endif %}
   </div>
   {% if user.region %}<p class="muted">{{ user.region }}</p>{% endif %}
+  {% if user.bio %}<p class="profile-bio">{{ user.bio }}</p>{% endif %}
   {% if news %}
     <section class="gift-news" role="status" aria-label="Gift news">
       {% for gift in news %}<p>{{ gift.post.user.username }} confirmed your {{ gift.amount_cents | cents }}.</p>{% endfor %}

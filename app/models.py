@@ -69,6 +69,10 @@ class PostCategory(StrEnum):
     def label(self) -> str:
         return CATEGORY_LABELS[self]
 
+    @property
+    def emoji(self) -> str:
+        return CATEGORY_EMOJI[self]
+
 
 # Confirmed by the owner on 2026-11-11 (#119).
 CATEGORY_LABELS = {
@@ -81,6 +85,17 @@ CATEGORY_LABELS = {
     PostCategory.FUN: "Fun and games",
     PostCategory.OTHER: "Other",
 }
+CATEGORY_EMOJI = {
+    PostCategory.RENT: "🏠",
+    PostCategory.BILLS: "💡",
+    PostCategory.FOOD: "🛒",
+    PostCategory.TRANSPORT: "🚗",
+    PostCategory.HEALTH: "🩺",
+    PostCategory.KIDS: "🎒",
+    PostCategory.FUN: "🎮",
+    PostCategory.OTHER: "✨",
+}
+MAX_BIO_CHARS = 300
 
 
 class PostStatus(StrEnum):
@@ -182,6 +197,7 @@ class User(Base):
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     city: Mapped[str | None] = mapped_column(String(80))
     state: Mapped[str | None] = mapped_column(String(2))
+    bio: Mapped[str | None] = mapped_column(String(MAX_BIO_CHARS))
     cashapp_handle: Mapped[str | None] = mapped_column(String(40))
     venmo_handle: Mapped[str | None] = mapped_column(String(40))
     paypal_handle: Mapped[str | None] = mapped_column(String(40))

@@ -163,6 +163,8 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
     app.jinja_env.globals.update(
         MAX_GOAL=format_cents(models.MAX_GOAL_CENTS),
         MAX_OPEN_POSTS=models.MAX_OPEN_POSTS,
+        MAX_BIO_CHARS=models.MAX_BIO_CHARS,
+        CATEGORY_EMOJI={c.value: c.emoji for c in models.PostCategory},
         PostStatus=models.PostStatus,
         DonationStatus=models.DonationStatus,
         in_app_shell=stripe_pay.in_app_shell,

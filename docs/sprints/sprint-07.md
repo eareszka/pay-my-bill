@@ -43,3 +43,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18 (main): #279: five photo boxes on new posts, first required (ADR 0020); cover stays the feed photo, all photos deleted together. Next: ui. Blocked: none.
 - 2026-11-18 (ui): #279 look on #281: photo boxes are a 4:5 grid with a green + and a Cover tag, error and focus states, and the post's extra photos as tiles. Blocked: none.
 - 2026-11-19 (main): Merged #280 (#278) and #281 (#279). Table: merged stories marked Done, duplicate #279 row removed. Left: #261 (Apple enrollment), #225, #282. Blocked: none.
+- 2026-11-19 (main): #282: post sheet shows the whole person (bio, poster card, stats, photos interleaved) and a Chip in button for visitors. Next: ui. Blocked: none.

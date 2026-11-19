@@ -46,7 +46,7 @@ def anonymize(user: User) -> list[str]:
     user.email = f"deleted-{user.id}{DELETED_EMAIL_DOMAIN}"
     user.password_hash = "!"  # noqa: S105 - not a hash, so no password matches
     user.email_verified_at = None
-    user.city = user.state = None
+    user.city = user.state = user.bio = None
     user.cashapp_handle = user.venmo_handle = user.paypal_handle = None
     user.show_less = None
     return photo_keys

@@ -7,6 +7,10 @@
   <form method="post" class="form" novalidate>
     {{ form.hidden_tag() }}
     <fieldset class="group">
+      <legend>About you</legend>
+      {{ field(form.bio, rows=3, maxlength=MAX_BIO_CHARS) }}
+    </fieldset>
+    <fieldset class="group">
       <legend>Region</legend>
       <p class="hint">Just your city and state. We never use GPS.</p>
       {{ field(form.city, autocomplete="address-level2") }}
