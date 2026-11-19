@@ -46,6 +46,16 @@ The current database expires around 2026-11-26. Staging data is disposable, so r
 
 To keep the data instead, upgrade the database to a paid plan before it expires.
 
+## Photos on our own domain (#289)
+Photos are stored by key, and their address is `R2_PUBLIC_URL` plus the key, so moving to a new domain needs no data change. The CSP's `img-src` follows `R2_PUBLIC_URL` on its own. R2's `r2.dev` development URL is rate-limited and not meant for production, so before launch:
+
+1. In Cloudflare: **R2** → the photo bucket → **Settings** → **Custom Domains** → **Connect Domain**. Enter `photos.yearnly.app` and confirm. Cloudflare adds the DNS record itself, and it stays orange-clouded. Wait until the domain shows **Active**.
+2. Open a photo at its new address to check it: `https://photos.yearnly.app/posts/<key>.webp`. Copy a key from any photo on yearnly.app; it's the part after the host.
+3. In Render: the web service → **Environment** → set `R2_PUBLIC_URL` to `https://photos.yearnly.app` → **Save**. Render redeploys.
+4. In GitHub: **Settings** → **Secrets and variables** → **Actions** → update `R2_PUBLIC_URL` the same way, for the daily jobs.
+5. On yearnly.app, open a post with a photo. The image should load, and its address should start with `https://photos.yearnly.app/`.
+6. Back in the bucket's **Settings**, set **Public Development URL** to **Disabled**. Photos now load only from the custom domain.
+
 ## Monitoring and backups (#259)
 - **Errors:** set `SENTRY_DSN` in the Render dashboard (Sentry free tier, a Flask project). Unhandled errors outside development are reported without request bodies, cookies, headers, query strings, users, or the tokens in `/verify`, `/reset`, and `/gifts/answer` links (`app/monitoring.py`). Outside development, database errors also hide row values (`hide_parameters`). With no DSN set, nothing is sent.
 - **Uptime:** in [UptimeRobot](https://uptimerobot.com) (free), add an HTTP(s) monitor for `https://yearnly.app/health` every 5 minutes, alerting the owner's email. It also keeps the free Render service from sleeping (one service running all month fits the 750 free hours).
