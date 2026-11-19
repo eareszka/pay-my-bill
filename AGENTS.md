@@ -25,7 +25,7 @@ The owner runs one Claude Code session per role and tells each session its role 
 - **Status lives in GitHub and the sprint file, not here.** This file holds rules and lasting facts only. Untriaged issues: `gh issue list --search "-label:agent:main -label:agent:ui"`.
 
 ## Reading by role
-- **Everyone:** this file, `docs/process.md`, and the current sprint, `docs/sprints/sprint-07.md` (acceptance criteria are in the `docs/backlog/` file it links).
+- **Everyone:** this file, `docs/process.md`, and the current sprint, `docs/sprints/sprint-08.md` (acceptance criteria are in the `docs/backlog/` file it links).
 - **main:** `docs/PRD.md`, `docs/threat-model.md` (abuse cases and their mitigations), and `docs/adr/`. **Don't reverse an ADR without writing a new one.** Each file's Status line says whether it's current:
    - 0001: web PWA, not native · 0003: Flask + SQLAlchemy + Jinja/vanilla JS (no SPA framework) · 0005: Render for staging
    - 0002: link-out payments (Cash App, Venmo, PayPal). 0014 and 0016: card gifts through Stripe Connect with a 1% fee (0014 is Proposed until Stripe approves the platform)

@@ -205,7 +205,7 @@ Owner request (2026-11-12), ADR 0016.
 - [x] Progress counts the recipient's estimated net. The donor email shows what they paid.
 - [x] The card form shows a live net estimate. The Terms disclose the fees.
 
-### PB-44 Share an ask · #TBD · 2 pts · P2 · epic:posts
+### PB-44 Share an ask · #288 · 2 pts · P2 · epic:posts
 From the #118 finish review: the full-screen feed's rail has room for Share.
 - [ ] A Share button on the rail and post page opens the phone's share sheet, or copies the post link where that isn't available.
 

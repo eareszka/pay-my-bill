@@ -18,9 +18,9 @@
 | Post tab lists your posts (owner's ask) | #278 | main → ui | — | Done |
 | Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | Done |
 | Post sheet shows the whole person, Bumble-style (owner's ask) | #282 | main → ui | — | Done |
-| Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
+| Bubble tails flicker (from Sprint 6) | #225 | ui | — | Carried to Sprint 8 |
 | *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | Done |
-| *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
+| *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | Carried to Sprint 8 |
 
 **Total:** 16 points, plus 13 stretch (Sprint 6: 13 of 13).
 
@@ -46,3 +46,4 @@
 - 2026-11-19 (main): #282: post sheet shows the whole person (bio, poster card, stats, photos interleaved) and a Chip in button for visitors. Next: ui. Blocked: none.
 - 2026-11-19 (ui): #282 look on #286: story and poster card as white bubbles, fact pills, full-width photos, a floating Chip in that hides while the panel shows. Blocked: none.
 - 2026-11-19: #282 merged (#286). Left: #261 (Apple enrollment), #225 phone recheck. Blocked: none.
+- 2026-11-19: Closed early: 21 of 16 points. #261 and #225 carry to Sprint 8. Blocked: none.
