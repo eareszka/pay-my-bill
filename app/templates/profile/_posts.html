@@ -29,7 +29,7 @@
     </ul>
     {% if posts | length == post_limit %}<p class="hint gift-list-note">Showing the latest {{ post_limit }} posts.</p>{% endif %}
   {% elif is_owner %}
-    <p class="empty">You haven't posted yet. <a href="{{ url_for('posts.new') }}">Ask for a hand</a>.</p>
+    <p class="empty">You haven't posted yet.{% if not create_above %} <a href="{{ url_for('posts.new') }}">Ask for a hand</a>.{% endif %}</p>
   {% else %}
     <p class="empty">{{ user.username }} hasn't posted yet.</p>
   {% endif %}

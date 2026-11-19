@@ -25,7 +25,7 @@
   {% block head %}{% endblock %}
 </head>
 {% macro nav_link(endpoint, icon, label, extra="") %}
-  <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint or (endpoint == "main.index" and request.endpoint == "posts.show") %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
+  <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint or (endpoint == "main.index" and request.endpoint == "posts.show") or (endpoint == "posts.mine" and request.endpoint == "posts.new") %} aria-current="page"{% endif %}><svg class="icon" aria-hidden="true"><use href="#i-{{ icon }}"/></svg><span class="nav-label">{{ label }}</span>{{ extra }}</a>
 {% endmacro %}
 <body class="{% block body_class %}page{% endblock %}{% if front_door %} front-door{% endif %}">
   {% include "_icons.html" %}
@@ -37,7 +37,7 @@
     <nav aria-label="Main">
       {{ nav_link("main.index", "feed", "Feed") }}
       {% if current_user.is_authenticated %}
-        {{ nav_link("posts.new", "post", "Post") }}
+        {{ nav_link("posts.mine", "post", "Post") }}
         {% set gift_badge %}{% if pending_gift_count %}<span class="badge" aria-hidden="true">{{ pending_gift_count }}</span><span class="sr-only">, {{ pending_gift_count }} to confirm</span>{% endif %}{% endset %}
         {{ nav_link("leaders.index", "leaders", "Leaders") }}
         {% if current_user.is_admin %}{{ nav_link("admin.queue", "admin", "Admin") }}{% endif %}

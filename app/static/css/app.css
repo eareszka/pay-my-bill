@@ -622,6 +622,10 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .handles dd { margin: 0; font-weight: 700; }
 
 .empty { color: var(--muted); }
+/* The Post tab (#278): Create new post leads, full width in thumb reach on a phone, above your posts. */
+.post-create { margin-bottom: 20px; }
+a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625rem; text-decoration: none; }
+@media (min-width: 960px) { a.post-create { display: inline-flex; width: auto; } }
 .rules { padding-left: 20px; }
 .rules li { margin-bottom: 10px; }
 .profile-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
