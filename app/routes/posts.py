@@ -25,6 +25,8 @@ from app.extensions import db
 from app.forms import GiftForm, PostForm, ResultsUpdateForm
 from app.mail import send_email, send_later
 from app.models import (
+    DELETED_POST_BODY,
+    DELETED_POST_TITLE,
     LATE_GIFT_HOURS,
     MAX_DB_INT,
     MAX_OPEN_POSTS,
@@ -52,6 +54,23 @@ from app.urls import site_url
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
 DUPLICATE_POST_SECONDS = 60
+POST_LIST_LIMIT = 20
+
+
+def posts_by(user: User, is_owner: bool) -> list[Post]:
+    shown = [*PUBLIC_STATUSES, PostStatus.PENDING_REVIEW] if is_owner else PUBLIC_STATUSES
+    return list(
+        db.session.scalars(
+            select(Post)
+            .where(
+                Post.user_id == user.id,
+                Post.status.in_(shown),
+                ~((Post.title == DELETED_POST_TITLE) & (Post.body == DELETED_POST_BODY)),
+            )
+            .order_by(Post.created_at.desc(), Post.id.desc())
+            .limit(POST_LIST_LIMIT)
+        )
+    )
 
 
 def active_post_count(user: User) -> int:
@@ -92,6 +111,21 @@ def posts_owing_update(user: User | None = None) -> list[Post]:
 def overdue_post(user: User) -> Post | None:
     # Worked out from dates when asked, so a missed job can't block or unblock anyone.
     return next((post for post in posts_owing_update(user) if post.update_overdue), None)
+
+
+@bp.get("/")
+@login_required
+def mine() -> str:
+    """The Post tab: your posts, with Create new post at the top (#278)."""
+    user: User = current_user
+    return render_template(
+        "posts/mine.html",
+        user=user,
+        posts=posts_by(user, is_owner=True),
+        is_owner=True,
+        post_limit=POST_LIST_LIMIT,
+        at_limit=active_post_count(user) >= MAX_OPEN_POSTS,
+    )
 
 
 @bp.route("/new", methods=["GET", "POST"])

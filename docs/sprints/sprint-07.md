@@ -36,3 +36,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18 (ui): #265 design on #273: the web tip is one row of pills (No tip, $1, $2, Other), and Other's amount box shows only when picked. Blocked: none.
 - 2026-11-18 (main): #275: new post asks one question per screen (owner's Hinge/Bumble ask), with progress bar, auto-next on picks, and errors opening on their step. Next: ui. Blocked: none.
 - 2026-11-18 (ui): #275 look: League Gothic questions (owner's pick), need/want rows that tick, emoji pills, a round → in thumb reach, slide between steps. Blocked: none.
+- 2026-11-18 (main): #278: Post tab lists your posts with Create new post on top (owner's ask). Next: ui, then #279 five photos. Blocked: none.

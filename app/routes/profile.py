@@ -21,9 +21,6 @@ from app.extensions import db
 from app.forms import DeleteAccountForm, ProfileForm
 from app.mail import send_later
 from app.models import (
-    DELETED_POST_BODY,
-    DELETED_POST_TITLE,
-    PUBLIC_STATUSES,
     Block,
     Post,
     PostCategory,
@@ -34,6 +31,7 @@ from app.models import (
 from app.rewards import badges, confirmed_gifts, follow_through, progress, streak
 from app.routes import gifts as gift_routes
 from app.routes.auth import safe_next
+from app.routes.posts import POST_LIST_LIMIT, posts_by
 
 bp = Blueprint("profile", __name__)
 
@@ -147,9 +145,6 @@ def delete_account() -> str | Response | tuple[str, int]:
     return page, 400
 
 
-PROFILE_POST_LIMIT = 20
-
-
 @bp.get("/u/<username>")
 def show(username: str) -> str:
     user = db.session.scalar(select(User).where(User.username == username.lower()))
@@ -160,17 +155,7 @@ def show(username: str) -> str:
         abort(404)
     gifts = confirmed_gifts(user)
     stats = progress(gifts)
-    shown = [*PUBLIC_STATUSES, PostStatus.PENDING_REVIEW] if is_owner else PUBLIC_STATUSES
-    posts = db.session.scalars(
-        select(Post)
-        .where(
-            Post.user_id == user.id,
-            Post.status.in_(shown),
-            ~((Post.title == DELETED_POST_TITLE) & (Post.body == DELETED_POST_BODY)),
-        )
-        .order_by(Post.created_at.desc(), Post.id.desc())
-        .limit(PROFILE_POST_LIMIT)
-    ).all()
+    posts = posts_by(user, is_owner)
     tab = "chipped" if is_owner and request.args.get("tab") == "chipped" else "posts"
     seen_before = user.gifts_seen_at
     news = gift_routes.gift_news(user) if is_owner else []
@@ -184,7 +169,7 @@ def show(username: str) -> str:
         follow_through=follow_through(user),
         posts=posts,
         is_owner=is_owner,
-        post_limit=PROFILE_POST_LIMIT,
+        post_limit=POST_LIST_LIMIT,
         tab=tab,
         to_confirm=gift_routes.pending_for(user) if is_owner and tab == "posts" else [],
         sent=gift_routes.sent_by(user) if is_owner and tab == "chipped" else [],
