@@ -1,0 +1,22 @@
+# Sprint 8: Share and photos
+
+**Dates:** 2026-11-19 → 2026-11-25 · **Goal:** people can share an ask, a results update can show a photo, and photos load from our own domain ([backlog](../backlog/product-backlog.md))
+
+## Committed
+| Story | Issue | Lane | Points | Status |
+|---|---|---|---|---|
+| PB-48 Photos on our own domain | #289 | main + owner | 1 | To do |
+| PB-44 Share an ask | #288 | main → ui | 2 | To do |
+| PB-20 Photo on a results update | #69 | main → ui | 2 | To do |
+| PB-52 Push notifications in the iOS app (from Sprint 7) | #261 | main → ui | 8 | Blocked: APNs key from the owner's Apple account |
+| Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
+
+**Total:** 5 points, plus 8 carried (Sprint 7: 21 of 16).
+
+## Needs the owner
+- **#289:** connect the photo domain in Cloudflare (main writes the steps).
+- **#261:** the push key from the Apple Developer account. **#225:** recheck on the phone.
+- **Next sprint's picks:** PB-13 hosting, PB-39 lawyer, #34, #36, #98, #124–#127, #146.
+
+## Daily log
+- 2026-11-19: Owner picked PB-44, PB-20, and PB-48. Opened #288 and #289, carried #261 and #225. Blocked: none.
