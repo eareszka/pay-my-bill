@@ -17,7 +17,7 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 | Support page for the App Store listing | #264 | main | 1 | To do |
 | PB-19 App Store listing and review pack | #260 | ui | 3 | Pack in review (#263); blocked on #264, #265, #257, PB-39, demo account |
 | Create a post one question per screen (owner's ask) | #275 | main → ui | — | ui done, in review |
-| Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | main done, waiting on ui |
+| Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | ui done, in review |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
 | *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | To do |
 | *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
@@ -38,3 +38,4 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18 (main): #275: new post asks one question per screen (owner's Hinge/Bumble ask), with progress bar, auto-next on picks, and errors opening on their step. Next: ui. Blocked: none.
 - 2026-11-18 (ui): #275 look: League Gothic questions (owner's pick), need/want rows that tick, emoji pills, a round → in thumb reach, slide between steps. Blocked: none.
 - 2026-11-18 (main): #279: five photo boxes on new posts, first required (ADR 0020); cover stays the feed photo, all photos deleted together. Next: ui. Blocked: none.
+- 2026-11-18 (ui): #279 look on #281: photo boxes are a 4:5 grid with a green + and a Cover tag, error and focus states, and the post's extra photos as tiles. Blocked: none.

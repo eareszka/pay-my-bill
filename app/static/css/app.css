@@ -656,16 +656,24 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .admin-item { margin-bottom: 12px; }
 .admin-item h3 { margin: 0 0 4px; font-size: 1rem; }
 .admin-item .actions { margin-top: 10px; }
-/* The new-post photo step: five boxes, the first required (#279). Each box is a file input with its picture behind it. */
+/* The new-post photo step (#279), like a dating app's photo grid: five portrait boxes, three across. Each is a file
+   input with its picture behind it; the first is the cover and required. Tapping a filled box swaps its photo. */
 .q-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.q-photo-box { position: relative; display: grid; place-items: center; aspect-ratio: 1; border: 1.5px dashed var(--edge); border-radius: var(--radius); background: var(--surface) center / cover no-repeat; cursor: pointer; }
-.q-photo-box:hover, .q-photo-box:focus-within { border-color: var(--ink); }
+.q-photo-box { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 5; overflow: hidden; border: 1.5px dashed var(--edge); border-radius: var(--radius); background: var(--surface) center / cover no-repeat; cursor: pointer; transition: border-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
+.q-photo-box:hover { border-color: var(--ink); }
+.q-photo-box:active { transform: scale(0.97); }
+.q-photo-box:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.q-photo-box:has(input[aria-invalid="true"]):not(.has-file) { border: 2px solid var(--bad); }
 .q-photo-box input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-.q-photo-add { font-size: 2rem; color: var(--muted); }
-.q-photo-box.has-file { border-style: solid; }
+.q-photo-add { display: grid; place-items: center; width: 36px; height: 36px; color: #ffffff; background: var(--press); border-radius: 50%; pointer-events: none; }
+.q-photo-add .icon { width: 20px; height: 20px; stroke-width: 2.5; }
+.q-photo-tag { position: absolute; left: 6px; bottom: 6px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; color: var(--ink); background: var(--surface); border-radius: var(--pill); pointer-events: none; }
+.q-photo-box.has-file { border: 0; }
 .q-photo-box.has-file .q-photo-add { visibility: hidden; }
-.post-photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.post-photos img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
+.q-photos:has(.q-photo-box:first-child.has-file) + .error { display: none; }
+/* The post's other photos, under its story, in the same 14px tiles. */
+.post-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 20px; }
+.post-photos img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); background: var(--info-tint); }
 .admin-photo { display: block; width: 160px; height: 200px; margin-top: 8px; object-fit: cover; border-radius: var(--radius); }
 .legal h2 { margin: 24px 0 6px; font-size: 1.125rem; font-family: var(--sans); }
 .legal h2:first-of-type { margin-top: 8px; }
