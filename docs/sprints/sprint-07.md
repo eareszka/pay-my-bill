@@ -2,8 +2,6 @@
 
 **Dates:** 2026-11-18 → 2026-11-24 · **Goal:** a blocked person disappears, reminders run on their own, failures get noticed, and the App Store pack is ready (roadmap Phase 3, plus Phase 4 ops)
 
-Draft: the owner confirms the order and the "Needs the owner" picks at planning.
-
 ## Committed
 | Story | Issue | Lane | Points | Status |
 |---|---|---|---|---|
@@ -19,6 +17,7 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 | Create a post one question per screen (owner's ask) | #275 | main → ui | — | Done |
 | Post tab lists your posts (owner's ask) | #278 | main → ui | — | Done |
 | Up to 5 photos per post, first required (owner's ask) | #279 | main → ui | — | Done |
+| Post sheet shows the whole person, Bumble-style (owner's ask) | #282 | main → ui | — | Done |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
 | *Stretch 1:* Optional tip, web only, replacing the 1% fee | #265 | main → ui | 5 | Done |
 | *Stretch 2:* PB-52 Push notifications in the iOS app | #261 | main → ui | 8 | To do |
@@ -43,5 +42,7 @@ Draft: the owner confirms the order and the "Needs the owner" picks at planning.
 - 2026-11-18 (main): #279: five photo boxes on new posts, first required (ADR 0020); cover stays the feed photo, all photos deleted together. Next: ui. Blocked: none.
 - 2026-11-18 (ui): #279 look on #281: photo boxes are a 4:5 grid with a green + and a Cover tag, error and focus states, and the post's extra photos as tiles. Blocked: none.
 - 2026-11-19 (main): Merged #280 (#278) and #281 (#279). Table: merged stories marked Done, duplicate #279 row removed. Left: #261 (Apple enrollment), #225, #282. Blocked: none.
+- 2026-11-19: Triaged #282 into Sprint 7 (main → ui, after #281). Blocked: none.
 - 2026-11-19 (main): #282: post sheet shows the whole person (bio, poster card, stats, photos interleaved) and a Chip in button for visitors. Next: ui. Blocked: none.
 - 2026-11-19 (ui): #282 look on #286: story and poster card as white bubbles, fact pills, full-width photos, a floating Chip in that hides while the panel shows. Blocked: none.
+- 2026-11-19: #282 merged (#286). Left: #261 (Apple enrollment), #225 phone recheck. Blocked: none.
