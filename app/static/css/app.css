@@ -648,7 +648,7 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .post-list-goal { font-weight: 400; color: var(--muted); }
 .post-list-actions { display: inline-flex; gap: 16px; margin-left: auto; }
 .post-list-actions a { display: inline-block; padding-block: 8px; margin-block: -8px; font-weight: 700; color: var(--ink); }
-.post-hero .post-edited, .post-hero .post-trust { margin: 4px 0 0; font-size: 0.875rem; color: var(--on-field-muted); }
+.post-hero .post-edited { margin: 4px 0 0; font-size: 0.875rem; color: var(--on-field-muted); }
 .report-link { margin-top: 28px; font-size: 0.875rem; text-align: center; }
 .report-link a { color: var(--muted); }
 /* Standalone text links keep their look; padding on an inline link grows its tap area to 44px without moving a line (#208). */
@@ -675,9 +675,31 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .q-photo-box.has-file { border: 0; }
 .q-photo-box.has-file .q-photo-add { visibility: hidden; }
 .q-photos:has(.q-photo-box:first-child.has-file) + .error { display: none; }
-/* The post's other photos, under its story, in the same 14px tiles. */
-.post-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 20px; }
-.post-photos img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); background: var(--info-tint); }
+/* The post sheet (#282), Bumble-style: the whole person in one scroll. Big photos sit between the story bubble,
+   the fact pills and the poster's card, all speaking from the right like the ask itself. */
+.post > .post-body { max-width: none; margin: 12px 0; padding: 20px 18px; font-size: 1.125rem; line-height: 1.55; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
+.post-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.post-facts > span { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font-size: 0.9375rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; background: var(--surface); border-radius: var(--pill); }
+.post-facts .chip { background: var(--field); }
+.post-facts .chip::before { content: none; }
+.post-photos { display: grid; gap: 12px; margin: 0 0 12px; }
+.post-photos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r-panel); background: var(--info-tint); }
+.poster-card { display: flex; flex-direction: column; gap: 4px; margin: 0 0 12px; padding: 22px 18px 20px; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
+.poster-card p { margin: 0; }
+.poster-card .section-title { margin: 0 0 2px; font: 700 1.75rem/1.15 var(--sans); overflow-wrap: anywhere; }
+.poster-card .post-trust { font-size: 0.9375rem; color: var(--muted); }
+.poster-card .poster-bio { margin-top: 14px; font-size: 1.0625rem; line-height: 1.55; white-space: pre-line; }
+.poster-card .poster-stats { margin-top: 14px; padding-top: 14px; font-weight: 700; font-variant-numeric: tabular-nums; border-top: 1px solid var(--line); }
+.poster-card .badge-list { margin-top: 8px; }
+.profile-bio { max-width: 60ch; margin: 10px 0 0; font-size: 1.0625rem; line-height: 1.55; white-space: pre-line; }
+/* The floating Chip in (#282): bottom right in thumb reach above the tab bar, for visitors only. A ring of ground
+   keeps it clear of the photo under it, and it steps aside (sheet.js) while the Chip in panel is on screen. */
+.chip-fab { position: fixed; right: 16px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px); z-index: 6; min-height: 60px; padding: 0 28px; font-size: 1.0625rem; background: var(--press); border: 3px solid var(--bg); transition: background-color var(--fast) ease-out, transform 280ms var(--ease-out), opacity 280ms var(--ease-out), visibility 0s; }
+.chip-fab:hover:not(:disabled) { background: var(--deep); }
+.chip-fab.is-away { visibility: hidden; opacity: 0; transform: translateY(24px); transition: transform 180ms ease-in, opacity 180ms ease-in, visibility 0s 180ms; }
+#chip-in { scroll-margin-top: calc(var(--bar-h) + 12px); }
+@media (prefers-reduced-motion: no-preference) { html:has(.chip-fab), body:has(.chip-fab) { scroll-behavior: smooth; } }
+@media (prefers-reduced-motion: reduce) { .chip-fab, .chip-fab.is-away { transition: none; } }
 .admin-photo { display: block; width: 160px; height: 200px; margin-top: 8px; object-fit: cover; border-radius: var(--radius); }
 .legal h2 { margin: 24px 0 6px; font-size: 1.125rem; font-family: var(--sans); }
 .legal h2:first-of-type { margin-top: 8px; }
@@ -759,7 +781,9 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
   .post-hero.has-photo { min-height: 520px; }
   .post:has(> .post-side > .group) { display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 28px; align-items: start; }
   .post:has(> .post-side > .group) > :not(.post-side) { grid-column: 1; }
-  .post > .post-side:has(> .group) { grid-column: 2; grid-row: 1 / span 4; }
+  .post > .post-side:has(> .group) { grid-column: 2; grid-row: 1 / span 6; }
+  .post-photos img { aspect-ratio: 4 / 3; }
+  .chip-fab { right: max(24px, calc((100vw - 1120px) / 2 + 24px)); bottom: 24px; }
   .post .post-side > .group:first-child { margin-top: 0; }
   .post-body { margin-inline: 4px; }
 }

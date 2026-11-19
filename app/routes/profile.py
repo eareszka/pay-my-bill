@@ -85,6 +85,7 @@ def edit() -> str | Response | tuple[str, int]:
                 setattr(user, field, new)
         user.city = form.city.data or None
         user.state = form.state.data or None
+        user.bio = form.bio.data or None
         if changes and not user.can_be_paid and has_live_post(user):
             db.session.rollback()
             form.cashapp_handle.errors = [KEEP_A_HANDLE]

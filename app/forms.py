@@ -24,8 +24,8 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app.models import MAX_GOAL_CENTS, Post, PostCategory, PostKind, ReportReason
-from app.moderation import update_flagged_keywords
+from app.models import MAX_BIO_CHARS, MAX_GOAL_CENTS, Post, PostCategory, PostKind, ReportReason
+from app.moderation import is_flagged, update_flagged_keywords
 from app.money import format_cents, parse_dollars
 from app.payment_links import normalize_cashapp, normalize_paypal, normalize_venmo, pay_options
 from app.photos import MAX_PHOTOS, PhotoError, process
@@ -166,6 +166,20 @@ class ProfileForm(FlaskForm):
     paypal_handle = _handle_field(
         "PayPal", normalize_paypal, "Your paypal.me name: up to 20 letters or numbers."
     )
+    bio = TextAreaField(
+        "About you",
+        filters=[_strip_to_none],
+        validators=[
+            Length(max=MAX_BIO_CHARS, message=f"Up to {MAX_BIO_CHARS} characters."),
+        ],
+        description=f"A line or two people see on your posts. Up to {MAX_BIO_CHARS} characters.",
+    )
+
+    def validate_bio(self, field: Field) -> None:
+        if field.data and is_flagged(field.data):
+            raise ValidationError(
+                "Keep it about you. Business, startup, and investment asks aren't allowed."
+            )
 
     def validate_state(self, field: Field) -> None:
         if bool(self.city.data) != bool(field.data):

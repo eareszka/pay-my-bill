@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% from "_field.html" import choice, field %}
-{% set emoji = {"rent": "🏠", "bills": "💡", "food": "🛒", "transport": "🚗", "health": "🩺", "kids": "🎒", "fun": "🎮", "other": "✨"} %}
 {% macro step(question, hint=None, optional=False) %}
   <section class="q-step" data-step{% if optional %} data-optional{% endif %}>
     <h2 class="q-question">{{ question }}</h2>
@@ -33,7 +32,7 @@
           <legend class="sr-only">{{ form.category.label.text }}</legend>
           <div class="choices q-pills">
             {% for opt in form.category.choices if opt.value %}{% set value, label = opt.value, opt.label %}
-              <label class="choice"><input type="radio" name="{{ form.category.name }}" value="{{ value }}" required{% if form.category.data == value %} checked{% endif %}{% if form.category.errors %} aria-describedby="category-error"{% if loop.first %} autofocus{% endif %}{% endif %}> {{ emoji[value] }} {{ label }}</label>
+              <label class="choice"><input type="radio" name="{{ form.category.name }}" value="{{ value }}" required{% if form.category.data == value %} checked{% endif %}{% if form.category.errors %} aria-describedby="category-error"{% if loop.first %} autofocus{% endif %}{% endif %}> {{ CATEGORY_EMOJI[value] }} {{ label }}</label>
             {% endfor %}
           </div>
           {% if form.category.errors %}<small class="error" id="category-error">{{ form.category.errors | join(" ") }}</small>{% endif %}

@@ -20,19 +20,34 @@
       {% if post.photo_key %}<img class="hero-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo from {{ post.user.username }}">{% endif %}
       <h1>{{ post.title }}</h1>
       {% include "posts/_meta.html" %}
-      {% if not post.user.is_deleted %}
-        <p class="post-trust">{% if follow_through.due %}{% include "profile/_follow_through.html" %} · {% endif %}On Yearnly since {{ "{:%b %Y}".format(post.user.created_at) }}</p>
-      {% endif %}
       {% if post.edited_at %}<p class="post-edited">Edited {{ post.edited_at | date }}</p>{% endif %}
       <p class="amounts"><strong>{{ post.raised_cents | cents }}</strong> raised of {{ post.goal_cents | cents }}</p>
       {{ meter(post.progress_percent, "Progress toward goal") }}
     </header>
-    <p class="post-body">{{ post.body }}</p>
-    {% if post.more_photo_keys %}
+    {# The whole person, Bumble-style (#282): story, facts, photo 2, poster card, photos 3-5. #}
+    {% macro photos(keys, start) %}{% if keys %}
       <div class="post-photos">
-        {% for key in post.more_photo_keys %}<img src="{{ photo_url(key) }}" alt="Photo {{ loop.index + 1 }} from {{ post.user.username }}" loading="lazy" decoding="async">{% endfor %}
+        {% for key in keys %}<img src="{{ photo_url(key) }}" alt="Photo {{ loop.index0 + start }} from {{ post.user.username }}" loading="lazy" decoding="async">{% endfor %}
       </div>
+    {% endif %}{% endmacro %}
+    <p class="post-body">{{ post.body }}</p>
+    <p class="post-facts"><span class="chip">{{ post.category.emoji }} {{ post.category.label }}</span> <span>{{ post.kind.value | capitalize }}</span> <span>Goal {{ post.goal_cents | cents }}</span></p>
+    {{ photos(post.more_photo_keys[:1], 2) }}
+    {% if not post.user.is_deleted %}
+      <section class="poster-card" aria-labelledby="poster-name">
+        <h2 class="section-title" id="poster-name">{{ post.user.username }}</h2>
+        {% if post.user.region %}<p class="muted">{{ post.user.region }}</p>{% endif %}
+        <p class="post-trust">{% if follow_through.due %}{% include "profile/_follow_through.html" %} · {% endif %}On Yearnly since {{ "{:%b %Y}".format(post.user.created_at) }}</p>
+        {% if post.user.bio %}<p class="poster-bio">{{ post.user.bio }}</p>{% endif %}
+        <p class="poster-stats">Level {{ poster_progress.level }} · {{ poster_progress.people_helped }} {{ "person" if poster_progress.people_helped == 1 else "people" }} helped</p>
+        {% if poster_badges %}
+          <ul class="badge-list" aria-label="Badges">
+            {% for badge in poster_badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
+          </ul>
+        {% endif %}
+      </section>
     {% endif %}
+    {{ photos(post.more_photo_keys[1:], 3) }}
     <div class="post-side">
     {% if post.update_body %}
       <section class="group" id="update">
@@ -58,9 +73,11 @@
     {% elif post.owes_update and not post.user.is_deleted %}
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
     {% endif %}
-    {% if post.is_open or (not is_owner and (post.takes_gifts or waiting_gift)) %}{% include "posts/_chip_in.html" %}{% endif %}
+    {% set shows_chip_in = post.is_open or (not is_owner and (post.takes_gifts or waiting_gift)) %}
+    {% if shows_chip_in %}{% include "posts/_chip_in.html" %}{% endif %}
     </div>
   </article>
+  {% if shows_chip_in and not is_owner %}<a class="btn chip-fab" href="#chip-in">Chip in</a>{% endif %}
   {% if is_owner and (not post.is_deleted or post.update_body) %}
     <section class="danger-zone" id="delete">
       {% if post.is_open and request.args.get("close") %}
