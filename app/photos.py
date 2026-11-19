@@ -19,6 +19,8 @@ MAX_PHOTOS = 5
 MAX_PHOTO_BYTES = 8 * 1024 * 1024
 # Five 8 MB photos plus the rest of the new-post form.
 MAX_UPLOAD_BYTES = MAX_PHOTOS * MAX_PHOTO_BYTES + 1024 * 1024
+# The results update takes one photo (#69).
+MAX_UPDATE_UPLOAD_BYTES = MAX_PHOTO_BYTES + 1024 * 1024
 MAX_SOURCE_PIXELS = 40_000_000  # about 7,300 x 5,500; anything bigger is refused, not decoded
 MAX_EDGE = 1600
 WEBP_QUALITY = 80

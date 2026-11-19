@@ -330,7 +330,8 @@ class ResultsUpdateForm(FlaskForm):
 
     def validate_photo(self, field: Field) -> None:
         upload = field.data
-        if not upload or not getattr(upload, "filename", ""):
+        # The note is checked first; with it refused, the photo would be dropped anyway.
+        if not upload or not getattr(upload, "filename", "") or self.note.errors:
             return
         try:
             self.photo_data = process(upload.stream)

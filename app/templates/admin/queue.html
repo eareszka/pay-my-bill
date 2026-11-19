@@ -43,7 +43,8 @@
       {{ reaction_line(report.post.user_id if report.post else report.user_id) }}
       {% if report.post %}{% for key in report.post.photo_keys %}<img class="admin-photo" src="{{ photo_url(key) }}" alt="Photo {{ loop.index }} on this post" loading="lazy">{% endfor %}{% endif %}
       <div class="actions">
-        {% if report.post and report.post.photo_keys %}{{ action("admin.remove_photo", "Remove photos" if report.post.photo_keys | length > 1 else "Remove photo", "btn btn-danger", post_id=report.post.id) }}{% endif %}
+        {% if report.post and report.post.photo_key %}{{ action("admin.remove_photo", "Remove photos" if report.post.more_photo_keys else "Remove photo", "btn btn-danger", post_id=report.post.id) }}{% endif %}
+        {% if report.post and report.post.update_photo_key %}{{ action("admin.remove_update_photo", "Remove update photo", "btn btn-danger", post_id=report.post.id) }}{% endif %}
         {% if report.post and report.post.status != PostStatus.REMOVED %}{{ action("admin.remove", "Remove post", "btn btn-danger", post_id=report.post.id) }}{% endif %}
         {% set offender = report.post.user if report.post else report.user %}
         {% if not offender.is_banned and not offender.is_admin %}{{ action("admin.ban", "Ban " ~ offender.username, "btn btn-danger", user_id=offender.id) }}{% endif %}

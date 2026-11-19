@@ -66,7 +66,7 @@ def test_update_can_carry_a_photo(
     assert stored(app, post.update_photo_key).read_bytes()[8:12] == b"WEBP"
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert f'class="update-photo" src="/media/{post.update_photo_key}"' in page
-    assert "Remove photo<" in page
+    assert "Remove update photo<" in page
 
 
 def test_photo_stays_optional(client: FlaskClient, poster: User, make_user: MakeUser) -> None:
@@ -101,31 +101,105 @@ def test_storage_failure_keeps_the_update_unposted(
     assert post.update_body is None
 
 
-@pytest.mark.parametrize("path", ["photo/delete", "delete"])
-def test_removing_photos_or_the_post_deletes_the_update_photo(
-    app: Flask, client: FlaskClient, poster: User, make_user: MakeUser, path: str
+def with_both(app: Flask, post: Post) -> tuple[Path, Path]:
+    post.photo_key = photos.save(photos.process(jpeg()))
+    post.update_body, post.update_posted_at = NOTE, utcnow()
+    post.update_photo_key = photos.save(photos.process(jpeg("plum")))
+    db.session.commit()
+    return stored(app, post.photo_key), stored(app, post.update_photo_key)
+
+
+def test_poster_removes_only_the_update_photo(
+    app: Flask, client: FlaskClient, poster: User, make_user: MakeUser
 ) -> None:
     post = owing_post(poster, make_user("dev_tom"))
-    client.post(f"/posts/{post.id}/update", data={"note": NOTE, "photo": (jpeg(), "a.jpg")})
-    file = stored(app, post.update_photo_key)
-    client.post(f"/posts/{post.id}/{path}")
-    assert post.update_photo_key is None
-    assert not file.exists()
+    cover, update = with_both(app, post)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert f'action="/posts/{post.id}/update-photo/delete"' in page
+    client.post(f"/posts/{post.id}/update-photo/delete")
+    assert post.update_photo_key is None and not update.exists()
+    assert post.photo_key and cover.exists()
 
 
-def test_admin_sees_and_removes_the_update_photo(
-    app: Flask, client: FlaskClient, make_user: MakeUser
+def test_removing_post_photos_keeps_the_update_photo(
+    app: Flask, client: FlaskClient, poster: User, make_user: MakeUser
+) -> None:
+    post = owing_post(poster, make_user("dev_tom"))
+    cover, update = with_both(app, post)
+    client.post(f"/posts/{post.id}/photo/delete")
+    assert post.photo_key is None and not cover.exists()
+    assert post.update_photo_key and update.exists()
+
+
+def test_deleting_the_post_deletes_both(
+    app: Flask, client: FlaskClient, poster: User, make_user: MakeUser
+) -> None:
+    post = owing_post(poster, make_user("dev_tom"))
+    files = with_both(app, post)
+    client.post(f"/posts/{post.id}/delete")
+    assert not any(file.exists() for file in files)
+
+
+def test_a_failed_commit_discards_the_stored_photo(
+    app: Flask,
+    client: FlaskClient,
+    poster: User,
+    make_user: MakeUser,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    post = owing_post(poster, make_user("dev_tom"))
+    keys: list[str] = []
+    save = photos.save
+    monkeypatch.setattr(photos, "save", lambda data: keys.append(save(data)) or keys[-1])
+    monkeypatch.setattr(db.session, "commit", MagicMock(side_effect=OSError("db down")))
+    with pytest.raises(OSError):
+        client.post(f"/posts/{post.id}/update", data={"note": NOTE, "photo": (jpeg(), "a.jpg")})
+    assert keys and not stored(app, keys[0]).exists()
+
+
+def test_photo_is_not_decoded_when_the_note_is_refused(
+    client: FlaskClient, poster: User, make_user: MakeUser, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app import forms
+
+    post = owing_post(poster, make_user("dev_tom"))
+    process = MagicMock()
+    monkeypatch.setattr(forms, "process", process)
+    resp = client.post(
+        f"/posts/{post.id}/update", data={"note": "Short", "photo": (jpeg(), "a.jpg")}
+    )
+    assert resp.status_code == 400
+    process.assert_not_called()
+
+
+def test_update_takes_a_one_photo_body(
+    client: FlaskClient, poster: User, make_user: MakeUser
+) -> None:
+    post = owing_post(poster, make_user("dev_tom"))
+    huge = io.BytesIO(b"\0" * (10 * 1024 * 1024))
+    resp = client.post(f"/posts/{post.id}/update", data={"note": NOTE, "photo": (huge, "a.jpg")})
+    assert resp.status_code == 413
+
+
+@pytest.mark.parametrize(
+    ("path", "gone", "kept"),
+    [
+        ("remove-update-photo", "update_photo_key", "photo_key"),
+        ("remove-photo", "photo_key", "update_photo_key"),
+    ],
+)
+def test_admin_removes_one_kind_of_photo(
+    app: Flask, client: FlaskClient, make_user: MakeUser, path: str, gone: str, kept: str
 ) -> None:
     post = owing_post(make_user("maria_g"), make_user("dev_tom"))
-    post.update_body = NOTE
-    post.update_photo_key = photos.save(photos.process(jpeg()))
+    with_both(app, post)
+    files = {name: stored(app, getattr(post, name)) for name in (gone, kept)}
     db.session.add(Report(reporter=make_user("ann"), post=post, reason=ReportReason.PHOTO))
     db.session.commit()
-    file = stored(app, post.update_photo_key)
     login_as(client, make_user("boss", is_admin=True))
     queue = client.get("/admin").get_data(as_text=True)
     assert f'src="/media/{post.update_photo_key}"' in queue
-    assert "Remove photo<" in queue
-    client.post(f"/admin/posts/{post.id}/remove-photo")
-    assert post.update_photo_key is None
-    assert not file.exists()
+    assert f'action="/admin/posts/{post.id}/remove-update-photo"' in queue
+    client.post(f"/admin/posts/{post.id}/{path}")
+    assert getattr(post, gone) is None and not files[gone].exists()
+    assert getattr(post, kept) and files[kept].exists()

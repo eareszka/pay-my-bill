@@ -148,15 +148,25 @@ def remove(post_id: int) -> Response:
 @admin_required
 def remove_photo(post_id: int) -> Response:
     post = _post(post_id)
-    photo_keys = post.take_photos()
+    return _remove_photos(post, post.take_post_photos(), "remove photo", "the photos")
+
+
+@bp.post("/posts/<int:post_id>/remove-update-photo")
+@admin_required
+def remove_update_photo(post_id: int) -> Response:
+    post = _post(post_id)
+    return _remove_photos(post, post.take_update_photo(), "remove update photo", "the update photo")
+
+
+def _remove_photos(post: Post, photo_keys: list[str], action: str, what: str) -> Response:
     _resolve(
         Report.post_id == post.id, Report.reason == ReportReason.PHOTO, resolution="photo_removed"
     )
-    _log("remove photo", _about(post))
+    _log(action, _about(post))
     db.session.commit()
     for key in photo_keys:
         photos.discard(key)
-    flash(f"Removed the photos from “{post.title}”.", "success")
+    flash(f"Removed {what} from “{post.title}”.", "success")
     return redirect(url_for("admin.queue"))
 
 

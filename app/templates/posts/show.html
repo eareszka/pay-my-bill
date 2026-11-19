@@ -104,10 +104,16 @@
         <div class="actions">
           {% if post.can_edit %}<a class="btn btn-secondary" href="{{ url_for('posts.edit', post_id=post.id) }}">Edit post</a>{% endif %}
           {% if post.is_open %}<a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, close=1) }}#delete">Close post</a>{% endif %}
-          {% if post.photo_keys %}
+          {% if post.photo_key %}
             <form method="post" action="{{ url_for('posts.delete_photo', post_id=post.id) }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-secondary">Remove {{ "photos" if post.photo_keys | length > 1 else "photo" }}</button>
+              <button type="submit" class="btn btn-secondary">Remove {{ "photos" if post.more_photo_keys else "photo" }}</button>
+            </form>
+          {% endif %}
+          {% if post.update_photo_key %}
+            <form method="post" action="{{ url_for('posts.delete_update_photo', post_id=post.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-secondary">Remove update photo</button>
             </form>
           {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('posts.show', post_id=post.id, delete=1) }}#delete">Delete {{ "update" if post.is_deleted else "post" }}</a>

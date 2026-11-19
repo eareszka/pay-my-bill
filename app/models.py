@@ -303,11 +303,21 @@ class Post(Base):
         cover = [self.photo_key, *self.more_photo_keys] if self.photo_key else []
         return cover + ([self.update_photo_key] if self.update_photo_key else [])
 
+    def take_post_photos(self) -> list[str]:
+        """Drop the post's own photos. Returns the keys, to discard once the change commits."""
+        keys = [self.photo_key, *self.more_photo_keys] if self.photo_key else []
+        self.photo_key, self.more_photo_keys = None, []
+        return keys
+
+    def take_update_photo(self) -> list[str]:
+        """Drop the results update's photo. Returns its key, to discard once it commits."""
+        keys = [self.update_photo_key] if self.update_photo_key else []
+        self.update_photo_key = None
+        return keys
+
     def take_photos(self) -> list[str]:
         """Drop every photo from the post. Returns the keys, to discard once the change commits."""
-        keys = self.photo_keys
-        self.photo_key, self.more_photo_keys, self.update_photo_key = None, [], None
-        return keys
+        return self.take_post_photos() + self.take_update_photo()
 
     @property
     def is_deleted(self) -> bool:

@@ -340,9 +340,16 @@ def update(post_id: int) -> Response | tuple[str, int]:
             db.session.rollback()
             form.photo.errors = ["We couldn't save that photo. Try again, or post without it."]
             return render_post(post, GiftForm.for_post(post), form), 503
+    saved = post.update_photo_key
     post.update_body = form.note.data
     post.update_posted_at = utcnow()
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        # The photo is already stored, and nothing would point at it.
+        db.session.rollback()
+        photos.discard(saved)
+        raise
     for donor in post.confirmed_donors:
         send_update_notice(post, donor)
     flash("Thanks for sharing how it went.", "success")
@@ -385,11 +392,21 @@ def react(post_id: int, kind: str) -> Response:
 @login_required
 def delete_photo(post_id: int) -> Response:
     post = own_post_for_update(post_id)
-    photo_keys = post.take_photos()
+    return _remove_photos(post, post.take_post_photos(), "Your photos were removed.")
+
+
+@bp.post("/<int:post_id>/update-photo/delete")
+@login_required
+def delete_update_photo(post_id: int) -> Response:
+    post = own_post_for_update(post_id)
+    return _remove_photos(post, post.take_update_photo(), "Your update's photo was removed.")
+
+
+def _remove_photos(post: Post, photo_keys: list[str], message: str) -> Response:
     db.session.commit()
     for key in photo_keys:
         photos.discard(key)
-    flash("Your photos were removed.", "success")
+    flash(message, "success")
     return redirect(url_for("posts.show", post_id=post.id))
 
 
