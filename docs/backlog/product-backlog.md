@@ -209,7 +209,7 @@ Owner request (2026-11-12), ADR 0016.
 From the #118 finish review: the full-screen feed's rail has room for Share.
 - [ ] A Share button on the rail and post page opens the phone's share sheet, or copies the post link where that isn't available.
 
-### PB-48 Photos on our own domain · #TBD · 1 pt · P1 · epic:launch
+### PB-48 Photos on our own domain · #289 · 1 pt · P1 · epic:launch
 Staging serves photos from R2's public development URL, which Cloudflare rate-limits and doesn't intend for production (ADR 0015).
 - [ ] Before launch, connect a custom domain to the production bucket, turn off its development URL, and set `R2_PUBLIC_URL` to the custom domain.
 
