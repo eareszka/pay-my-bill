@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Your posts · Yearnly{% endblock %}
+{% block content %}
+  <h1>Your posts</h1>
+  {% if at_limit %}
+    <p class="flash post-create">You have {{ MAX_OPEN_POSTS }} open posts. Close or finish one to create another.</p>
+  {% else %}
+    <a class="btn post-create" href="{{ url_for('posts.new') }}"><svg class="icon" aria-hidden="true"><use href="#i-post"/></svg>Create new post</a>
+  {% endif %}
+  {% with is_owner = True, to_confirm = [], create_above = True %}{% include "profile/_posts.html" %}{% endwith %}
+{% endblock %}
