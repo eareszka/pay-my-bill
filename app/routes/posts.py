@@ -155,15 +155,17 @@ def new() -> str | Response | tuple[str, int]:
         if form.require_rules:
             user.rules_accepted_at = utcnow()
         flagged = is_flagged(form.title.data, form.body.data)
-        photo_key = None
-        if form.photo_data:
-            try:
-                photo_key = photos.save(form.photo_data)
-            except Exception:  # storage can fail in many ways; the poster can try again
-                current_app.logger.exception("Couldn't store a post photo")
-                db.session.rollback()
-                form.photo.errors = ["We couldn't save that photo. Try again, or post without it."]
-                return render_template("posts/new.html", form=form, at_limit=at_limit), 503
+        photo_keys: list[str] = []
+        try:
+            for data in form.photo_data:
+                photo_keys.append(photos.save(data))
+        except Exception:  # storage can fail in many ways; the poster can try again
+            current_app.logger.exception("Couldn't store a post photo")
+            db.session.rollback()
+            for key in photo_keys:
+                photos.discard(key)
+            form.photos.errors = ["We couldn't save your photos. Try again."]
+            return render_template("posts/new.html", form=form, at_limit=at_limit), 503
         post = Post(
             user=user,
             kind=PostKind(form.kind.data),
@@ -172,7 +174,8 @@ def new() -> str | Response | tuple[str, int]:
             body=form.body.data,
             goal_cents=form.goal_cents,
             status=PostStatus.PENDING_REVIEW if flagged else PostStatus.OPEN,
-            photo_key=photo_key,
+            photo_key=photo_keys[0],
+            more_photo_keys=photo_keys[1:],
         )
         db.session.add(post)
         db.session.commit()
@@ -370,19 +373,21 @@ def react(post_id: int, kind: str) -> Response:
 @login_required
 def delete_photo(post_id: int) -> Response:
     post = own_post_for_update(post_id)
-    photo_key, post.photo_key = post.photo_key, None
+    photo_keys = post.take_photos()
     db.session.commit()
-    photos.discard(photo_key)
-    flash("Your photo was removed.", "success")
+    for key in photo_keys:
+        photos.discard(key)
+    flash("Your photos were removed.", "success")
     return redirect(url_for("posts.show", post_id=post.id))
 
 
 @bp.post("/<int:post_id>/delete")
 @login_required
 def delete(post_id: int) -> Response:
-    photo_key = delete_post(own_post_for_update(post_id))
+    photo_keys = delete_post(own_post_for_update(post_id))
     db.session.commit()
-    photos.discard(photo_key)
+    for key in photo_keys:
+        photos.discard(key)
     flash("Your post was deleted.", "success")
     return redirect(url_for("main.index"))
 
@@ -404,7 +409,7 @@ def edit(post_id: int) -> str | Response:
             "goal": format_cents(post.goal_cents),
         }
     )
-    del form.accept_rules, form.photo
+    del form.accept_rules, form.photos
     if post.story_only:
         del form.kind, form.title, form.goal
     if form.validate_on_submit():

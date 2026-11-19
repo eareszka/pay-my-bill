@@ -33,8 +33,12 @@ FORM = {
 
 
 def jpeg() -> io.BytesIO:
+    return jpeg_of("teal")
+
+
+def jpeg_of(color: str) -> io.BytesIO:
     out = io.BytesIO()
-    Image.new("RGB", (60, 40), "teal").save(out, "JPEG")
+    Image.new("RGB", (60, 40), color).save(out, "JPEG")
     out.seek(0)
     return out
 
@@ -71,7 +75,7 @@ def with_photo(app: Flask, user: User, title: str = "Shoes") -> Post:
 def test_new_post_with_a_photo_shows_it(app: Flask, client: FlaskClient, poster: User) -> None:
     resp = client.post(
         "/posts/new",
-        data={**FORM, "photo": (jpeg(), "shoes.jpg")},
+        data={**FORM, "photos": (jpeg(), "shoes.jpg")},
         content_type="multipart/form-data",
     )
     post = only_post()
@@ -86,24 +90,102 @@ def test_new_post_with_a_photo_shows_it(app: Flask, client: FlaskClient, poster:
     assert "has-photo" in feed
 
 
-def test_photo_is_optional(client: FlaskClient, poster: User) -> None:
-    client.post("/posts/new", data=FORM, content_type="multipart/form-data")
-    post = only_post()
-    assert post.photo_key is None
+def test_a_photo_is_required(client: FlaskClient, poster: User) -> None:
+    resp = client.post("/posts/new", data=FORM, content_type="multipart/form-data")
+    assert resp.status_code == 200
+    assert "Add at least one photo." in resp.get_data(as_text=True)
+    assert db.session.scalars(select(Post)).first() is None
+
+
+def test_old_posts_without_a_photo_still_show(client: FlaskClient, poster: User) -> None:
+    post = Post(user=poster, kind=PostKind.WANT, title="Shoes", body="For a 5K.", goal_cents=900)
+    db.session.add(post)
+    db.session.commit()
+    assert post.photo_keys == []
     assert "has-photo" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+
+
+def test_up_to_five_photos_the_first_is_the_cover(
+    app: Flask, client: FlaskClient, poster: User
+) -> None:
+    colors = ("red", "green", "blue", "white", "black")
+    uploads = [(jpeg_of(color), f"{color}.jpg") for color in colors]
+    resp = client.post(
+        "/posts/new", data={**FORM, "photos": uploads}, content_type="multipart/form-data"
+    )
+    post = only_post()
+    assert resp.location == f"/posts/{post.id}"
+    assert len(post.photo_keys) == 5 and len(set(post.photo_keys)) == 5
+    assert all((photo_dir(app) / key).exists() for key in post.photo_keys)
+    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert f'src="/media/{post.photo_key}" alt="Photo from maria_g"' in page
+    for n, key in enumerate(post.more_photo_keys, start=2):
+        assert f'src="/media/{key}" alt="Photo {n} from maria_g"' in page
+    feed = client.get("/feed").get_data(as_text=True)
+    assert f'<img class="ticket-photo" src="/media/{post.photo_key}"' in feed
+    files = [photo_dir(app) / key for key in post.photo_keys]
+    assert "Remove photos" in page
+    client.post(f"/posts/{post.id}/photo/delete")
+    assert post.photo_keys == [] and post.more_photo_keys == []
+    assert not any(file.exists() for file in files)
+
+
+def test_empty_boxes_are_skipped(client: FlaskClient, poster: User) -> None:
+    empty = (io.BytesIO(b""), "")
+    uploads = [empty, (jpeg(), "a.jpg"), empty, (jpeg(), "b.jpg"), empty]
+    client.post("/posts/new", data={**FORM, "photos": uploads}, content_type="multipart/form-data")
+    assert len(only_post().photo_keys) == 2
+
+
+def test_six_photos_are_refused(client: FlaskClient, poster: User) -> None:
+    uploads = [(jpeg(), f"{n}.jpg") for n in range(6)]
+    resp = client.post(
+        "/posts/new", data={**FORM, "photos": uploads}, content_type="multipart/form-data"
+    )
+    assert "Add up to 5 photos." in resp.get_data(as_text=True)
+    assert db.session.scalars(select(Post)).first() is None
+
+
+def test_storage_failure_drops_the_photos_already_saved(
+    app: Flask, client: FlaskClient, poster: User, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    real_save = photos.save
+    monkeypatch.setattr(
+        photos, "save", MagicMock(side_effect=[real_save(b"x"), OSError("bucket down")])
+    )
+    uploads = [(jpeg(), "a.jpg"), (jpeg(), "b.jpg")]
+    resp = client.post(
+        "/posts/new", data={**FORM, "photos": uploads}, content_type="multipart/form-data"
+    )
+    assert resp.status_code == 503
+    assert list(photo_dir(app).rglob("*.webp")) == []
+
+
+def test_deleting_a_post_deletes_all_its_photos(
+    app: Flask, client: FlaskClient, poster: User
+) -> None:
+    post = with_photo(app, poster)
+    post.more_photo_keys = [photos.save(photos.process(jpeg())) for _ in range(2)]
+    db.session.commit()
+    files = [photo_dir(app) / key for key in post.photo_keys]
+    assert all(file.exists() for file in files)
+    client.post(f"/posts/{post.id}/delete")
+    assert not any(file.exists() for file in files)
 
 
 def test_form_asks_for_a_photo_as_multipart(client: FlaskClient, poster: User) -> None:
     page = client.get("/posts/new").get_data(as_text=True)
     assert 'enctype="multipart/form-data"' in page
     assert 'accept="image/jpeg,image/png,image/webp"' in page
-    assert "We remove its location data." in page
+    assert "We remove their location data." in page
+    assert page.count('type="file" name="photos"') == 5
+    assert page.count('accept="image/jpeg,image/png,image/webp" required') == 1
 
 
 def test_unreadable_photo_keeps_the_form(client: FlaskClient, poster: User) -> None:
     resp = client.post(
         "/posts/new",
-        data={**FORM, "photo": (io.BytesIO(b"not a photo"), "shoes.jpg")},
+        data={**FORM, "photos": (io.BytesIO(b"not a photo"), "shoes.jpg")},
         content_type="multipart/form-data",
     )
     assert resp.status_code == 200
@@ -117,18 +199,18 @@ def test_storage_failure_keeps_the_form(
     monkeypatch.setattr(photos, "save", MagicMock(side_effect=OSError("bucket down")))
     resp = client.post(
         "/posts/new",
-        data={**FORM, "photo": (jpeg(), "shoes.jpg")},
+        data={**FORM, "photos": (jpeg(), "shoes.jpg")},
         content_type="multipart/form-data",
     )
     assert resp.status_code == 503
-    assert "We couldn&#39;t save that photo." in resp.get_data(as_text=True)
+    assert "We couldn&#39;t save your photos." in resp.get_data(as_text=True)
     assert db.session.scalars(select(Post)).first() is None
 
 
 def test_request_too_large_is_refused(client: FlaskClient, poster: User) -> None:
     resp = client.post(
         "/posts/new",
-        data={**FORM, "photo": (io.BytesIO(b"\0" * (10 * 1024 * 1024)), "huge.jpg")},
+        data={**FORM, "photos": (io.BytesIO(b"\0" * (42 * 1024 * 1024)), "huge.jpg")},
         content_type="multipart/form-data",
     )
     assert resp.status_code == 413
@@ -224,7 +306,7 @@ def test_admin_removes_a_reported_photo(
     assert f'class="admin-photo" src="/media/{post.photo_key}"' in queue
     assert f'action="/admin/posts/{post.id}/remove-photo"' in queue
     resp = client.post(f"/admin/posts/{post.id}/remove-photo", follow_redirects=True)
-    assert "Removed the photo from" in resp.get_data(as_text=True)
+    assert "Removed the photos from" in resp.get_data(as_text=True)
     assert post.photo_key is None
     assert not file.exists()
     open_reasons = [r.reason for r in db.session.scalars(select(Report)) if r.resolved_at is None]
@@ -318,7 +400,7 @@ def test_only_the_new_post_form_takes_a_large_body(client: FlaskClient, poster: 
     two_mb = io.BytesIO(b"\0" * (2 * 1024 * 1024))
     resp = client.post(
         "/posts/new",
-        data={**FORM, "photo": (two_mb, "big.jpg")},
+        data={**FORM, "photos": (two_mb, "big.jpg")},
         content_type="multipart/form-data",
     )
     # Read and refused as a photo, not cut off for size.
@@ -379,7 +461,7 @@ def test_large_photo_passes_csrf_on(tmp_path: Path) -> None:
     noisy.seek(0)
     resp = client.post(
         "/posts/new",
-        data={**FORM, "csrf_token": token("/posts/new"), "photo": (noisy, "big.jpg")},
+        data={**FORM, "csrf_token": token("/posts/new"), "photos": (noisy, "big.jpg")},
         content_type="multipart/form-data",
     )
     assert resp.status_code == 302

@@ -48,8 +48,16 @@
       {% call step("How much do you need?") %}
         {{ field(form.goal, inputmode="decimal", placeholder="$120", required=True) }}
       {% endcall %}
-      {% call step("Add a photo", "A picture of what it's for helps people say yes.", optional=True) %}
-        {{ field(form.photo, accept=PHOTO_ACCEPT) }}
+      {% call step("Add your photos", "At least one, up to " ~ MAX_PHOTOS ~ ". A picture of what it's for helps people say yes.") %}
+        <fieldset class="plain-group">
+          <legend class="sr-only">{{ form.photos.label.text }}</legend>
+          <div class="q-photos">
+            {% for n in range(1, MAX_PHOTOS + 1) %}
+              <label class="q-photo-box"><input type="file" name="{{ form.photos.name }}" accept="{{ PHOTO_ACCEPT }}"{% if n == 1 %} required{% endif %} aria-describedby="photos-{{ 'error' if form.photos.errors else 'hint' }}"{% if form.photos.errors and n == 1 %} aria-invalid="true" autofocus{% endif %}><span class="q-photo-add" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></span>{% if n == 1 %}<span class="q-photo-tag" aria-hidden="true">Cover</span>{% endif %}<span class="sr-only">Photo {{ n }}{% if n == 1 %}, the cover (required){% endif %}</span></label>
+            {% endfor %}
+          </div>
+          {% if form.photos.errors %}<small class="error" id="photos-error">{{ form.photos.errors | join(" ") }}</small>{% else %}<small class="hint" id="photos-hint">{{ form.photos.description }}</small>{% endif %}
+        </fieldset>
       {% endcall %}
       {% if form.require_rules %}
         {% call step("One last thing") %}

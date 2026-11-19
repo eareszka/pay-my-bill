@@ -2,6 +2,7 @@ from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     ColumnElement,
     DateTime,
@@ -265,7 +266,9 @@ class Post(Base):
     update_posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     update_reminders_sent: Mapped[int] = mapped_column(default=0, server_default="0")
     edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # The cover photo; the rest of a post's photos follow it in more_photo_keys (ADR 0020).
     photo_key: Mapped[str | None] = mapped_column(String(80))
+    more_photo_keys: Mapped[list[str]] = mapped_column(JSON, default=list, server_default="[]")
 
     user: Mapped[User] = relationship(back_populates="posts")
     donations: Mapped[list["Donation"]] = relationship(
@@ -275,6 +278,16 @@ class Post(Base):
     reports: Mapped[list["Report"]] = relationship(
         back_populates="post", cascade="all, delete-orphan"
     )
+
+    @property
+    def photo_keys(self) -> list[str]:
+        return [self.photo_key, *self.more_photo_keys] if self.photo_key else []
+
+    def take_photos(self) -> list[str]:
+        """Drop every photo from the post. Returns the keys, to discard once the change commits."""
+        keys = self.photo_keys
+        self.photo_key, self.more_photo_keys = None, []
+        return keys
 
     @property
     def is_deleted(self) -> bool:

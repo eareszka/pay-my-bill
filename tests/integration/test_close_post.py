@@ -18,7 +18,7 @@ from app.models import (
     as_utc,
     utcnow,
 )
-from tests.conftest import MakeUser, login_as
+from tests.conftest import MakeUser, login_as, with_photo
 
 
 @pytest.fixture
@@ -146,13 +146,15 @@ def test_auto_closed_post_frees_a_slot(client: FlaskClient, poster: User) -> Non
     login_as(client, poster)
     response = client.post(
         "/posts/new",
-        data={
-            "kind": "need",
-            "category": "bills",
-            "title": "Phone bill",
-            "body": "Need it for work.",
-            "goal": "20",
-        },
+        data=with_photo(
+            {
+                "kind": "need",
+                "category": "bills",
+                "title": "Phone bill",
+                "body": "Need it for work.",
+                "goal": "20",
+            }
+        ),
     )
     assert response.status_code == 302
 
@@ -174,13 +176,15 @@ def test_pending_review_post_still_takes_a_slot(client: FlaskClient, poster: Use
     login_as(client, poster)
     response = client.post(
         "/posts/new",
-        data={
-            "kind": "need",
-            "category": "bills",
-            "title": "Phone bill",
-            "body": "Need it for work.",
-            "goal": "20",
-        },
+        data=with_photo(
+            {
+                "kind": "need",
+                "category": "bills",
+                "title": "Phone bill",
+                "body": "Need it for work.",
+                "goal": "20",
+            }
+        ),
     )
     assert response.status_code == 409
 

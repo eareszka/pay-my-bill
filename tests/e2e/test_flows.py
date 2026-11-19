@@ -12,6 +12,7 @@ from sqlalchemy import select
 
 from app.extensions import db
 from app.models import Post, PostStatus, User
+from tests.conftest import jpeg
 from tests.e2e.checks import assert_clean, long_motion
 from tests.e2e.conftest import LiveServer, Ui, UiFactory
 
@@ -142,6 +143,11 @@ def test_create_a_post(ui: Ui, live_server: LiveServer) -> None:
     page.click("[data-q-next]")
     page.fill("#goal", "80")
     page.click("[data-q-next]")
+    page.locator("input[name=photos]").first.set_input_files(
+        files=[{"name": "bill.jpg", "mimeType": "image/jpeg", "buffer": jpeg().getvalue()}]
+    )
+    expect(page.locator(".q-photo-box.has-file")).to_have_count(1)
+    ui.check("photos")
     ui.submit("form:has(#title) button[type=submit]")
     expect(page.locator("h1")).to_contain_text("Help with the power bill")
     ui.check("detail")

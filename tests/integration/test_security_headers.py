@@ -23,8 +23,8 @@ def test_every_response_sends_security_headers(client: FlaskClient) -> None:
 
 def test_photos_may_come_from_the_r2_origin() -> None:
     policy = content_security_policy("https://pub-abc.r2.dev/some/path")
-    assert "img-src 'self' https://pub-abc.r2.dev;" in policy
-    assert "img-src 'self';" in content_security_policy("")
+    assert "img-src 'self' blob: https://pub-abc.r2.dev;" in policy
+    assert "img-src 'self' blob:;" in content_security_policy("")
 
 
 @pytest.mark.parametrize(

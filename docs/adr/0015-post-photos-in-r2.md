@@ -1,6 +1,6 @@
 # ADR 0015: Post photos are re-encoded and stored in Cloudflare R2
 
-**Status:** Accepted · **Date:** 2026-11-09
+**Status:** Accepted, amended by ADR 0020 (up to five photos, the first required) · **Date:** 2026-11-09
 
 ## Context
 The owner wants posters to add a photo of what they need, and chose the full upload story over a design-only preview. Render's free instance has no persistent disk, so uploads saved there vanish on every deploy. Storing images in Neon's free Postgres (0.5 GB) would fill it after about 2,000 photos and slow backups. Photos also carry risk: phone photos embed GPS location (the product promises no GPS, T10), uploads can be malformed or hostile (T7), and a photo can show something harmful (T17).

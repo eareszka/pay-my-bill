@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.extensions import db
 from app.models import Post, PostKind, PostStatus, Report, ReportReason, User, as_utc, utcnow
-from tests.conftest import PASSWORD, MakeUser, login_as
+from tests.conftest import PASSWORD, MakeUser, login_as, with_photo
 
 
 def make_post(user: User, status: PostStatus = PostStatus.OPEN, **fields: object) -> Post:
@@ -224,13 +224,15 @@ def test_flagged_post_notifies_admins(
     login_as(client, make_user("poster", cashapp_handle="poster1", rules_accepted_at=utcnow()))
     client.post(
         "/posts/new",
-        data={
-            "kind": "want",
-            "category": "bills",
-            "title": "Seed money for my startup",
-            "body": "Help me launch my business.",
-            "goal": "500",
-        },
+        data=with_photo(
+            {
+                "kind": "want",
+                "category": "bills",
+                "title": "Seed money for my startup",
+                "body": "Help me launch my business.",
+                "goal": "500",
+            }
+        ),
     )
     assert "A post is waiting for review" in caplog.text
 

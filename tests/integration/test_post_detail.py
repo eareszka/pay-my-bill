@@ -5,7 +5,7 @@ from flask.testing import FlaskClient
 
 from app.extensions import db
 from app.models import Post, PostKind, PostStatus, User, utcnow
-from tests.conftest import MakeUser, login_as
+from tests.conftest import MakeUser, login_as, with_photo
 
 
 def add_post(owner: User, status: PostStatus = PostStatus.OPEN) -> Post:
@@ -122,14 +122,16 @@ def test_new_post_redirects_to_detail(client: FlaskClient, owner: User) -> None:
     login_as(client, owner)
     resp = client.post(
         "/posts/new",
-        data={
-            "kind": "want",
-            "category": "bills",
-            "title": "Concert tickets",
-            "body": "My favorite band is touring.",
-            "goal": "80",
-            "accept_rules": "y",
-        },
+        data=with_photo(
+            {
+                "kind": "want",
+                "category": "bills",
+                "title": "Concert tickets",
+                "body": "My favorite band is touring.",
+                "goal": "80",
+                "accept_rules": "y",
+            }
+        ),
     )
     post = db.session.scalars(db.select(Post)).one()
     assert resp.location == f"/posts/{post.id}"

@@ -64,3 +64,15 @@ if (steps.length) {
     setTimeout(() => { if (current === step) next.click(); }, AUTO_NEXT_MS);
   });
 }
+
+// Each photo box shows the picture chosen for it.
+document.querySelectorAll(".q-photo-box input").forEach((input) => {
+  input.addEventListener("change", () => {
+    const box = input.closest(".q-photo-box");
+    const file = input.files[0];
+    if (box.dataset.preview) URL.revokeObjectURL(box.dataset.preview);
+    box.dataset.preview = file ? URL.createObjectURL(file) : "";
+    box.style.backgroundImage = file ? `url("${box.dataset.preview}")` : "";
+    box.classList.toggle("has-file", Boolean(file));
+  });
+});

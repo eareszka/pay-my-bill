@@ -7,7 +7,7 @@ from sqlalchemy.exc import OperationalError
 from app import create_app
 from app.extensions import db
 from app.models import Post, utcnow
-from tests.conftest import MakeUser, login_as
+from tests.conftest import MakeUser, login_as, with_photo
 
 
 def test_missing_page_is_styled(client: FlaskClient) -> None:
@@ -176,7 +176,8 @@ def test_unverified_profile_hides_the_public_link(client: FlaskClient, make_user
 def test_need_or_want_error_is_focused_and_linked(client: FlaskClient, make_user: MakeUser) -> None:
     login_as(client, make_user(venmo_handle="@maria-g", rules_accepted_at=utcnow()))
     page = client.post(
-        "/posts/new", data={"title": "Phone bill", "body": "Need it for work.", "goal": "20"}
+        "/posts/new",
+        data=with_photo({"title": "Phone bill", "body": "Need it for work.", "goal": "20"}),
     ).get_data(as_text=True)
     assert 'id="kind-error"' in page
     assert 'aria-describedby="kind-error"' in page
@@ -192,9 +193,9 @@ def test_same_post_twice_makes_one_post(client: FlaskClient, make_user: MakeUser
         "body": "Need it for work.",
         "goal": "20",
     }
-    first = client.post("/posts/new", data=form)
-    second = client.post("/posts/new", data=form)
+    first = client.post("/posts/new", data=with_photo(form))
+    second = client.post("/posts/new", data=with_photo(form))
     assert second.location == first.location
     assert db.session.scalar(select(func.count()).select_from(Post)) == 1
-    other = client.post("/posts/new", data={**form, "title": "Water bill"})
+    other = client.post("/posts/new", data=with_photo({**form, "title": "Water bill"}))
     assert other.location != first.location

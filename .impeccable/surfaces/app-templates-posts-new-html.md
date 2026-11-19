@@ -16,6 +16,8 @@ The new-post page at `/posts/new` (#275), asked one question per screen. Inherit
 - main's working version: `steps.js` shows one `[data-step]` at a time, sets `form[data-steps=on]`, moves the progress bar, and auto-advances after a single-choice pick (250 ms). A server error opens on the first step with an `.error`. Without JS the page is one long form. Keep that.
 - The form, validation, CSRF, moderation, the open-post limit and `edit.html` are unchanged.
 
+- #279 (owner, 2026-11-18): the photo step is five boxes like Hinge's photo grid (the owner's screenshot shows a 3×2 grid of rounded boxes, each with a +). The first is required and at most 5 are allowed. Each box is a `.q-photo-box` label around its own file input; `steps.js` sets the picked photo as the box's background and adds `.has-file`. Extra photos show in `.post-photos` on the post page.
+
 ## Direction contract
 
 Mode: Operate. Yearnly's world, with onboarding pacing (ui, 2026-11-18).
@@ -26,3 +28,4 @@ Mode: Operate. Yearnly's world, with onboarding pacing (ui, 2026-11-18).
 - Category: 48px emoji pills that wrap, as hidden real radios (the tip row's pattern), filling Dollar Green with white text.
 - The foot: a 60px Press Green → circle at the right (Deep on hover), a 52px outlined ← circle and Skip at the left, and on the last step a "Post →" primary pill in place of the →. On a phone the form fills the space between the bars and the footer hides, so the → is in thumb reach and nothing scrolls.
 - Motion: the step slides 32px in from the side you're heading to and fades in over 300ms on `--ease-out`; a ticked box pops in. Reduced motion cuts.
+- Photos (#279): three-across 4:5 tiles (14px, 1.5px dashed edge, white) with a 36px Press Green disc holding a drawn +, and a white "Cover" pill at the first tile's foot. A picked photo fills its tile edge to edge with no edge, and the + hides. A server error turns the empty cover tile's edge tomato, and the error line hides once a cover is picked. On the post page, the extra photos are square 14px tiles (140px min, auto-fill) under the story.

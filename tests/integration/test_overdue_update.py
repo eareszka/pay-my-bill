@@ -20,7 +20,7 @@ from app.models import (
     utcnow,
 )
 from app.routes.posts import overdue_post, send_update_reminders
-from tests.conftest import MakeUser, login_as
+from tests.conftest import MakeUser, login_as, with_photo
 
 NOTE = "Made rent on time. Thank you all so much."
 FORM = {
@@ -109,7 +109,7 @@ def test_overdue_poster_is_sent_to_the_post(
 ) -> None:
     post = closed_days_ago(poster, donor, 8)
     login_as(client, poster)
-    response = getattr(client, method)("/posts/new", data=FORM)
+    response = getattr(client, method)("/posts/new", data=with_photo(FORM))
     assert response.status_code == 302
     assert response.location.endswith(f"/posts/{post.id}#update")
     page = client.get(response.location).get_data(as_text=True)
@@ -125,7 +125,7 @@ def test_posting_the_update_lifts_the_block_right_away(
     login_as(client, poster)
     client.post(f"/posts/{post.id}/update", data={"note": NOTE})
     assert client.get("/posts/new").status_code == 200
-    assert client.post("/posts/new", data=FORM).status_code == 302
+    assert client.post("/posts/new", data=with_photo(FORM)).status_code == 302
     assert db.session.query(Post).filter_by(title="Phone bill").first() is not None
 
 

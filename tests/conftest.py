@@ -1,3 +1,4 @@
+import io
 import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
@@ -5,6 +6,7 @@ from pathlib import Path
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
+from PIL import Image
 from werkzeug.security import generate_password_hash
 
 from app import create_app
@@ -81,3 +83,15 @@ def login_as(client: FlaskClient, user: User) -> None:
     with client.session_transaction() as session:
         session["_user_id"] = user.get_id()
         session["_fresh"] = True
+
+
+def jpeg(color: str = "teal") -> io.BytesIO:
+    out = io.BytesIO()
+    Image.new("RGB", (60, 40), color).save(out, "JPEG")
+    out.seek(0)
+    return out
+
+
+def with_photo(form: dict[str, str]) -> dict[str, object]:
+    """A new-post form with its one required photo; the file is fresh for each request."""
+    return {**form, "photos": (jpeg(), "photo.jpg")}

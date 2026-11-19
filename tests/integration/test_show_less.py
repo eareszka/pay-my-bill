@@ -9,7 +9,7 @@ from app.accounts import anonymize
 from app.extensions import db
 from app.models import Post, PostCategory, PostKind, PostStatus, User, utcnow
 from app.show_less import COOKIE, parse
-from tests.conftest import PASSWORD, MakeUser, login_as
+from tests.conftest import PASSWORD, MakeUser, login_as, with_photo
 from tests.integration.test_create_post import FORM
 from tests.integration.test_signup import FORM as SIGNUP
 
@@ -67,11 +67,11 @@ def test_new_posts_need_a_category(client: FlaskClient, poster: User) -> None:
     page = client.get("/posts/new").get_data(as_text=True)
     assert 'name="category" value=""' not in page
     assert 'name="category" value="fun" required> 🎮 Fun and games' in page
-    resp = client.post("/posts/new", data={**FORM, "category": ""})
+    resp = client.post("/posts/new", data=with_photo({**FORM, "category": ""}))
     assert "Choose a category." in resp.get_data(as_text=True)
-    client.post("/posts/new", data={**FORM, "category": "loans"})
+    client.post("/posts/new", data=with_photo({**FORM, "category": "loans"}))
     assert poster.posts == []
-    client.post("/posts/new", data={**FORM, "category": "health"})
+    client.post("/posts/new", data=with_photo({**FORM, "category": "health"}))
     assert poster.posts[0].category is PostCategory.HEALTH
 
 
