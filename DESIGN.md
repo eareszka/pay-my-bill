@@ -389,6 +389,9 @@ State is a shape and a word, never a pill. A 10px ring with 2px stroke precedes 
 ### Lists
 Dense hairline rows with no cards inside cards. Gift and leader lists are bounded top and bottom by 1px lines, with 1px dividers between rows and 12px row padding. Titles are bold, amounts are right-aligned and tabular, and metadata wraps in muted 0.9375rem. Leaders use a three-column subgrid (rank, name, people), and your own row is filled with the Follow-through tint at 14px corners.
 
+### The Post Tab
+The Post tab (`/posts/`, #278) is your posts with the way to add one on top: "Your posts" in Display, then **Create new post** as the primary pill with the post icon, full width and 52px tall on a phone (its own width from 960px), then the same hairline post list as You. At the open-post limit the pill is replaced by an info notice saying why. With no posts, the list just says "You haven't posted yet." because the pill is right above it. The tab stays lit on the questions at `/posts/new`.
+
 ### The You Page
 Your own profile is the home for your stuff (#132). The header is your name in Display with an outlined Settings button on the right, your region, the rewards panel, and your handles. Below, pill tabs (real links) switch between **Posts** and **Chipped in**. Posts starts with To confirm when gifts are waiting, then your posts as hairline rows: the bold title, "$X of $Y" on the right, the meter while open, and "Need · " plus one state mark that says what's next (Open until a date, Update due by a date, Update overdue as the disputed mark, Funded, In review, Closed), with small Post update, Edit, and Delete links. Chipped in lists your gifts with their state marks. Visitors see the header, handles, and public posts only, never what you gave. Settings (`/profile`) is a form page with a "← Your profile" link.
 
