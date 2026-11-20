@@ -1,4 +1,5 @@
-@font-face { font-family: "League Gothic"; src: url("../fonts/league-gothic-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+/* The display face waits for itself (#297): a headline painted in the fallback, then swapped, reads as a flicker. It is preloaded, so the wait is short. */
+@font-face { font-family: "League Gothic"; src: url("../fonts/league-gothic-400.woff2") format("woff2"); font-weight: 400; font-display: block; }
 @font-face { font-family: "Public Sans"; src: url("../fonts/public-sans-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Public Sans"; src: url("../fonts/public-sans-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 
@@ -971,9 +972,11 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .join-login a { color: var(--on-field); font-weight: 700; }
 .join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; width: 100%; max-width: 480px; margin: auto auto 0; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
 .join-back .icon { width: 20px; height: 20px; }
-/* On a phone the Log in bubble fills the screen like the home bubbles (#237, after #218), its form at the foot in thumb reach. */
+/* On a phone the Log in bubble fills the screen like the home bubbles (#237, after #218), its form at the foot in thumb reach.
+   Its title holds the top (#297), so the room left over sits between the two instead of above the title. */
 @media (max-width: 959px) {
   .join-page .join-step { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; }
+  .join-page .join-line:has(+ .join-card) { margin-bottom: auto; }
 }
 
 /* Every bubble keeps its own shape through a move (#217): nothing morphs size, so no frame is a plain rounded box.
