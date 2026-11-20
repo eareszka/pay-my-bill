@@ -218,7 +218,7 @@ def test_close_date_shown_is_the_last_full_day(client: FlaskClient, poster: User
     post = add_post(poster)
     assert post.last_open_day == post.closes_at - timedelta(days=1)
     day = post.last_open_day
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert f"Open until {day:%b} {day.day}, {day.year}." in page
 
 

@@ -11,6 +11,7 @@ from app.models import (
     Post,
     PostCategory,
     PostKind,
+    PostStatus,
     User,
     utcnow,
 )
@@ -84,21 +85,22 @@ def test_sheet_shows_the_whole_person_in_order(client: FlaskClient, make_user: M
     order = [
         'class="hero-photo"',
         post.body,
-        "💡 Bills and utilities",
-        "🙏 Need",
-        "🎯 Goal $80",
-        "📍 Tampa, FL",
+        '<span aria-hidden="true">💡</span> Bills and utilities',
+        '<span aria-hidden="true">🙏</span> Need',
+        '<span aria-hidden="true">🎯</span> Goal $80',
+        '<span aria-hidden="true">📍</span> Tampa, FL',
         "Photo 2 from maria_g",
         'class="poster-card"',
         BIO,
-        "⭐ Level 1",
-        "🤝 1 person helped",
-        "📅 Joined",
+        '<span aria-hidden="true">⭐</span> Level 1',
+        '<span aria-hidden="true">🤝</span> 1 person helped',
+        '<span aria-hidden="true">📅</span> Joined',
         "Photo 3 from maria_g",
         "Photo 5 from maria_g",
-        'id="chip-in"',
-        'class="chip-fab" href="#chip-in" aria-label="Chip in"',
+        f'href="/posts/{post.id}/chat" aria-label="Chat with maria_g"',
+        f'href="/posts/{post.id}/chip-in" aria-label="Chip in"',
     ]
+    assert 'id="chip-in"' not in page
     spots = [page.index(text) for text in order]
     assert spots == sorted(spots)
 
@@ -110,3 +112,34 @@ def test_no_chip_in_button_for_the_poster(client: FlaskClient, make_user: MakeUs
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert 'class="poster-card"' in page
     assert "chip-fab" not in page
+
+
+def test_chip_in_and_chat_are_their_own_pages(client: FlaskClient, make_user: MakeUser) -> None:
+    poster = make_user("maria_g")
+    post = make_post(poster)
+    login_as(client, make_user("dev_tom"))
+    chip_in = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
+    assert 'id="chip-in"' in chip_in
+    assert "Chip in to maria_g" in chip_in
+    assert f'href="/posts/{post.id}">' in chip_in
+    chat = client.get(f"/posts/{post.id}/chat").get_data(as_text=True)
+    assert "Chat is coming soon" in chat
+    assert "<textarea" in chat and " disabled" in chat
+    assert "<form" not in chat.split('class="chat"')[1]
+
+
+def test_poster_has_no_chip_in_or_chat_page(client: FlaskClient, make_user: MakeUser) -> None:
+    poster = make_user("maria_g")
+    post = make_post(poster)
+    login_as(client, poster)
+    assert client.get(f"/posts/{post.id}/chip-in").status_code == 404
+    assert client.get(f"/posts/{post.id}/chat").status_code == 404
+
+
+def test_hidden_post_has_no_chip_in_or_chat_page(client: FlaskClient, make_user: MakeUser) -> None:
+    post = make_post(make_user("maria_g"))
+    post.status = PostStatus.REMOVED
+    db.session.commit()
+    login_as(client, make_user("dev_tom"))
+    assert client.get(f"/posts/{post.id}/chip-in").status_code == 404
+    assert client.get(f"/posts/{post.id}/chat").status_code == 404

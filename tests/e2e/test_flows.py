@@ -160,6 +160,10 @@ def test_chip_in_with_an_app(ui: Ui, live_server: LiveServer) -> None:
     ui.login(donor)
     ui.goto(f"/posts/{post_id}")
     page = ui.page
+    ui.check("post")
+    # Chip in is its own page behind the round gift button (#295).
+    page.click(".chip-fab")
+    page.wait_for_url(re.compile(r"/posts/\d+/chip-in$"))
     # Stripe is off in e2e, so the pay-app path is the one shown.
     expect(page.locator("form.chip-in")).to_be_visible()
     ui.check("chip-in")
@@ -174,9 +178,19 @@ def test_chip_in_with_an_app(ui: Ui, live_server: LiveServer) -> None:
 
 
 def test_chip_in_logged_out(ui: Ui, live_server: LiveServer) -> None:
-    ui.goto(f"/posts/{open_post_by_someone_else(live_server)}")
+    ui.goto(f"/posts/{open_post_by_someone_else(live_server)}/chip-in")
     expect(ui.page.locator("#chip-in")).to_be_visible()
     ui.check("chip-in")
+    assert_clean(ui)
+
+
+def test_chat_mock(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("chatter"))
+    ui.goto(f"/posts/{open_post_by_someone_else(live_server)}")
+    ui.page.click(".sheet-chat")
+    ui.page.wait_for_url(re.compile(r"/posts/\d+/chat$"))
+    expect(ui.page.locator(".chat-compose textarea")).to_be_disabled()
+    ui.check("chat")
     assert_clean(ui)
 
 
@@ -235,7 +249,7 @@ def test_swipe_up_opens_the_post(ui: Ui, live_server: LiveServer) -> None:
     ui.goto("/feed")
     drag(ui, 0, -200)
     ui.page.wait_for_url(re.compile(r"/posts/\d+$"))
-    expect(ui.page.locator("#chip-in")).to_be_attached()
+    expect(ui.page.locator(".post-hero")).to_be_attached()
 
 
 def test_swipe_down_shows_less_of_that_kind(ui: Ui, live_server: LiveServer) -> None:

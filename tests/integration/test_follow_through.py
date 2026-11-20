@@ -142,8 +142,8 @@ def test_post_page_shows_follow_through_and_since(
     add_post(poster, donor, updated=True)
     post = add_post(poster, donor)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
-    assert "<li>✅ Updated 1 of 2 posts</li>" in page
-    assert f"<li>📅 Joined {poster.created_at:%b %Y}</li>" in page
+    assert '<span aria-hidden="true">📝</span> Updated 1 of 2 posts</li>' in page
+    assert f'<span aria-hidden="true">📅</span> Joined {poster.created_at:%b %Y}</li>' in page
 
 
 def test_post_page_shows_only_since_before_anything_came_due(
@@ -152,7 +152,7 @@ def test_post_page_shows_only_since_before_anything_came_due(
     post = add_post(poster, donor, closed_days_ago=1)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
     assert "Updated " not in page
-    assert "📅 Joined " in page
+    assert "</span> Joined " in page
 
 
 def test_profile_lists_posts_before_rewards(client: FlaskClient, poster: User, donor: User) -> None:

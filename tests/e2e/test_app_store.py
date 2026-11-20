@@ -52,9 +52,9 @@ def test_app_store_screenshots(browser: Browser, live_server: LiveServer, size: 
     page.locator(".deck > .deck-ticket .ticket-more").click()
     settle(page)
     page.screenshot(path=out / "4-post.png")
-    # Chip in just under the bar, clear of the sheet's Close in the hero's corner.
-    page.evaluate("document.body.scrollTop = document.querySelector('#chip-in').offsetTop - 70")
-    page.wait_for_timeout(400)
+    # Chip in is its own page behind the round gift button (#295).
+    page.locator(".chip-fab").click()
+    settle(page)
     page.screenshot(path=out / "5-chip-in.png")
     shot("6-you", f"/u/{DONOR}?tab=chipped")
     shot("7-leaders", "/leaders")

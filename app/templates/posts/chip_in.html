@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "posts/_progress.html" import meter %}
+{% block title %}Chip in to {{ post.user.username }} · Yearnly{% endblock %}
+{% block body_class %}page stage-page post-page reply-page{% endblock %}
+{% block main_class %} container-wide{% endblock %}
+{% block content %}
+  <a class="reply-back" href="{{ url_for('posts.show', post_id=post.id) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to the post</a>
+  <h1 class="sr-only">Chip in to {{ post.user.username }}</h1>
+  {% include "posts/_ask_strip.html" %}
+  {% set is_owner = false %}
+  {% include "posts/_chip_in.html" %}
+  <p class="report-link"><a href="{{ url_for('reports.post', post_id=post.id) }}">Report this post</a></p>
+{% endblock %}

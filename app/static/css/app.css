@@ -360,9 +360,11 @@ h3.section-title { font-size: 1rem; }
 .post-hero :focus-visible { outline-color: var(--on-field); }
 /* With a cover photo (#295, owner's Bumble ask) the photo owns the first screen, edge to edge between the bars, and
    fades into the field just above the title, so the words still sit on solid field. */
-.post-hero.has-photo { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); margin: 0 -16px; padding-top: 0; border-radius: 0 0 var(--r-tail) var(--r-bubble); overflow: hidden; }
-.sheet-top:first-child + .post > .post-hero.has-photo { margin-top: -16px; }
-.hero-photo { flex: 1 0 0; width: calc(100% + 36px); min-height: 280px; margin: 0 -18px 4px; object-fit: cover; -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent); mask-image: linear-gradient(to bottom, #000 82%, transparent); }
+/* It stops 88px short of the tab bar, so the meter clears the Chat and Chip in discs and the story peeks in below. */
+.post-hero { position: relative; }
+.post-hero.has-photo { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom) - 88px); margin: 0 -16px; padding-top: 0; border-radius: 0 0 var(--r-tail) var(--r-bubble); overflow: hidden; }
+.container-wide > .post:first-child > .post-hero.has-photo { margin-top: -16px; }
+.hero-photo { flex: 1 0 0; width: calc(100% + 36px); min-height: min(280px, 32svh); margin: 0 -18px 4px; object-fit: cover; -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent); mask-image: linear-gradient(to bottom, #000 82%, transparent); }
 .card-head a { font-weight: 700; text-decoration: none; }
 .card-head a:hover { text-decoration: underline; }
 .post-body { max-width: 68ch; margin: 20px 0; font-size: 1.0625rem; white-space: pre-line; }
@@ -699,15 +701,52 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .poster-facts > li { background: var(--info-tint); }
 .poster-card .badge-list { margin-top: 10px; }
 .profile-bio { max-width: 60ch; margin: 10px 0 0; font-size: 1.0625rem; line-height: 1.55; white-space: pre-line; }
-/* The floating Chip in (#282, round since #295): a 64px gift disc bottom right in thumb reach above the tab bar, like a
-   dating app's like button. It never leaves, for visitors only. A ring of ground keeps it clear of the photo under it. */
-.chip-fab { position: fixed; right: 16px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px); z-index: 6; display: grid; place-items: center; width: 64px; height: 64px; color: var(--action-fg); background: var(--press); border: 3px solid var(--bg); border-radius: 50%; transition: background-color var(--fast) ease-out, transform 160ms var(--ease-out); }
+/* Chat and Chip in (#295): two discs bottom right in thumb reach above the tab bar, like a dating app's buttons, for
+   visitors only. They never leave. Chip in is the one filled disc; a ring of ground keeps both clear of the photo. */
+.sheet-actions { position: fixed; right: 16px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px); z-index: 6; display: flex; align-items: center; gap: 12px; }
+.sheet-chat { display: grid; place-items: center; width: 52px; height: 52px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 50%; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, transform 160ms var(--ease-out); }
+.sheet-chat .icon { width: 24px; height: 24px; }
+.sheet-chat:hover { color: var(--action-fg); background: var(--press); border-color: var(--press); }
+.sheet-chat:active { transform: scale(0.92); }
+.chip-fab { display: grid; place-items: center; width: 64px; height: 64px; color: var(--action-fg); background: var(--press); border: 3px solid var(--bg); border-radius: 50%; transition: background-color var(--fast) ease-out, transform 160ms var(--ease-out); }
 .chip-fab .icon { width: 28px; height: 28px; }
 .chip-fab:hover { background: var(--deep); }
 .chip-fab:active { transform: scale(0.92); }
-#chip-in { scroll-margin-top: calc(var(--bar-h) + 12px); }
-@media (prefers-reduced-motion: no-preference) { html:has(.chip-fab), body:has(.chip-fab) { scroll-behavior: smooth; } }
-@media (prefers-reduced-motion: reduce) { .chip-fab { transition: none; } }
+.chip-fab:focus-visible { outline: 2px solid var(--action-fg); outline-offset: -7px; }
+.sheet-chat:focus-visible { outline-offset: -5px; }
+/* The page ends above the discs, so Report, Block and the footer are never under them. */
+body:has(.sheet-actions) { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 96px); }
+@media (prefers-reduced-motion: reduce) { .chip-fab, .sheet-chat { transition: none; } }
+
+/* Chip in and chat pages (#295): the ask in brief speaks from the right in its field color, and the reply answers
+   under it, the Chip in panel or the chat, with its tail on the left. */
+.reply-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: -4px 0 8px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.reply-back .icon { width: 20px; height: 20px; }
+.reply-back:hover { text-decoration: underline; }
+.ask-strip { --field: var(--need); display: flex; gap: 14px; align-items: center; margin-left: 28px; padding: 12px 16px 14px 12px; color: var(--on-field); text-decoration: none; background: var(--field); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
+.ask-strip.post-want { --field: var(--want); }
+.ask-strip:not(:has(img)) { padding-left: 18px; }
+.ask-strip img { flex: none; width: 64px; height: 80px; object-fit: cover; border-radius: var(--radius); }
+.ask-strip-words { display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0; }
+.ask-strip-title { font: 400 1.75rem/0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; overflow-wrap: anywhere; }
+.ask-strip-meta { font-size: 0.875rem; color: var(--on-field-muted); overflow-wrap: anywhere; }
+.ask-strip .amounts { margin-top: 4px; font-size: 0.875rem; }
+.ask-strip .amounts strong { font-size: 1.125rem; }
+.ask-strip .meter { height: 3px; background: var(--field-track); }
+.ask-strip:focus-visible { outline-color: var(--deep); outline-offset: 3px; }
+.chat { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; padding: 18px 16px; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
+.chat-title { margin: 0; font: 700 1.375rem/1.2 var(--sans); text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+.chat-preview { margin: 0; padding: 10px 14px; font-size: 0.875rem; font-weight: 700; color: var(--on-field); background: var(--want); border-radius: var(--radius); }
+.chat-thread { display: flex; flex-direction: column; gap: 8px; margin: 4px 0; padding: 0; list-style: none; }
+.chat-msg { max-width: 82%; padding: 10px 14px; font-size: 1rem; line-height: 1.45; overflow-wrap: anywhere; }
+.chat-theirs { align-self: flex-start; background: var(--info-tint); border-radius: 18px 18px 18px var(--r-tail); }
+.chat-mine { align-self: flex-end; color: var(--action-fg); background: var(--press); border-radius: 18px 18px var(--r-tail) 18px; }
+.chat-compose { display: flex; gap: 8px; align-items: center; padding-top: 12px; border-top: 1px solid var(--line); }
+.chat-compose textarea { flex: 1; min-width: 0; min-height: 48px; padding: 12px 16px; font: inherit; color: var(--muted); resize: none; background: var(--bg); border: 1.5px solid var(--line); border-radius: var(--pill); cursor: not-allowed; }
+.chat-compose textarea::placeholder { color: var(--muted); }
+.chat-send { display: grid; flex: none; place-items: center; width: 48px; height: 48px; padding: 0; color: var(--muted); background: var(--mark-empty); border: 0; border-radius: 50%; cursor: not-allowed; }
+.chat-send .icon { width: 22px; height: 22px; }
+.chat .hint { color: var(--muted); }
 .admin-photo { display: block; width: 160px; height: 200px; margin-top: 8px; object-fit: cover; border-radius: var(--radius); }
 .legal h2 { margin: 24px 0 6px; font-size: 1.125rem; font-family: var(--sans); }
 .legal h2:first-of-type { margin-top: 8px; }
@@ -785,15 +824,17 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
   .deck-hint { display: inline; font-weight: 400; }
   .stage-page .container-wide:not(:has(> .feed)) { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
   .post-hero { margin: 0; padding: 36px 32px 28px; }
+  .post-hero:not(.has-photo) { padding-top: 84px; }
   .post-hero h1 { font-size: 5rem; }
-  .post-hero.has-photo { min-height: min(calc(100svh - var(--bar-h) - 56px), 760px); margin: 0; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
-  .sheet-top:first-child + .post > .post-hero.has-photo { margin-top: 0; }
+  .post-hero.has-photo { min-height: min(calc(100svh - var(--bar-h) - 56px - 88px), 760px); margin: 0; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
+  .container-wide > .post:first-child > .post-hero.has-photo { margin-top: 0; }
   .hero-photo { width: calc(100% + 64px); margin: 0 -32px 4px; }
   .post:has(> .post-side > .group) { display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 28px; align-items: start; }
   .post:has(> .post-side > .group) > :not(.post-side) { grid-column: 1; }
   .post > .post-side:has(> .group) { grid-column: 2; grid-row: 1 / span 6; }
   .post-photos img { aspect-ratio: 4 / 3; }
-  .chip-fab { right: max(24px, calc((100vw - 1120px) / 2 + 24px)); bottom: 24px; }
+  .sheet-actions { right: max(24px, calc((100vw - 1120px) / 2 + 24px)); bottom: 24px; }
+  .reply-page .container-wide:not(:has(> .feed)) { max-width: 640px; }
   .post .post-side > .group:first-child { margin-top: 0; }
   .post-body { margin-inline: 4px; }
 }
@@ -1100,10 +1141,12 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .ticket-more .icon { width: 20px; height: 20px; }
 .ticket-more:hover { text-decoration: underline; }
 .ticket-more:focus-visible { outline-color: var(--on-field); }
-.sheet-top { --sheet-right: 12px; position: sticky; top: var(--bar-h); z-index: 5; height: 0; }
+/* Close and Share sit in the hero's top corner and scroll away with it (#295, owner): they never float over text. On a
+   photo they sit on the photo; without one the hero opens with room for them above the title. */
+.sheet-top { --sheet-right: 12px; position: absolute; top: 0; right: 0; left: 0; z-index: 5; height: 0; }
+.post-hero:not(.has-photo) { padding-top: 76px; }
 .sheet-close { position: absolute; top: 14px; right: var(--sheet-right); display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 50%; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out; }
 /* Beside the Chip in panel on a wide screen, Close sits in the post's own corner, not on the panel. */
-@media (min-width: 960px) { main:has(.post > .post-side > .group) .sheet-top { --sheet-right: calc(400px + 28px + 14px); } }
 .sheet-close .icon { width: 20px; height: 20px; }
 .sheet-close:hover { color: #ffffff; background: var(--press); border-color: var(--press); }
 

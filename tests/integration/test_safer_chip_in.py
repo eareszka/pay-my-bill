@@ -43,9 +43,9 @@ def add_post(owner: User, closed_hours_ago: float | None = None) -> Post:
 
 def test_visitor_is_warned_before_the_pay_buttons(client: FlaskClient, poster: User) -> None:
     post = add_post(poster)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert page.index("Log in first") < page.index('class="pay-buttons"')
-    assert f'href="/login?next=/posts/{post.id}">Log in first' in page
+    assert f'href="/login?next=/posts/{post.id}/chip-in">Log in first' in page
     assert "Already paid?" in page
 
 
@@ -93,7 +93,7 @@ def test_signup_ignores_an_off_site_next(client: FlaskClient) -> None:
 def test_placeholder_is_replaced_by_a_hint(client: FlaskClient, poster: User, donor: User) -> None:
     post = add_post(poster)
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "placeholder" not in page
     assert "Any amount up to $300." in page
     assert '<label for="method">Paid with</label>' in page
@@ -111,7 +111,7 @@ def test_waiting_gift_replaces_the_form(client: FlaskClient, poster: User, donor
     db.session.add(Donation(post=post, donor=donor, amount_cents=2_000, method=PaymentMethod.VENMO))
     db.session.commit()
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Your $20 gift is waiting for maria_g to confirm." in page
     assert 'class="pay-buttons"' not in page
 
@@ -132,7 +132,7 @@ def test_finished_gift_does_not_block_another(
     )
     db.session.commit()
     login_as(client, donor)
-    assert 'class="pay-buttons"' in client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert 'class="pay-buttons"' in client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
 
 
 def test_gift_can_be_recorded_within_a_day_of_closing(
@@ -140,7 +140,7 @@ def test_gift_can_be_recorded_within_a_day_of_closing(
 ) -> None:
     post = add_post(poster, closed_hours_ago=23)
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "This post just closed." in page
     assert 'class="pay-buttons"' not in page
     assert client.post(f"/posts/{post.id}/gifts", data=GIFT).status_code == 302
@@ -192,7 +192,7 @@ def test_owner_gets_no_late_form(client: FlaskClient, poster: User) -> None:
 
 def test_late_visitor_is_told_to_log_in(client: FlaskClient, poster: User) -> None:
     post = add_post(poster, closed_hours_ago=1)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Log in first" not in page
     assert "to record your gift so it counts." in page
 
@@ -202,7 +202,7 @@ def test_unverified_donor_is_told_before_paying(
 ) -> None:
     post = add_post(poster)
     login_as(client, make_user("new_one", verified=False))
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert page.index("Verify your email first") < page.index('class="pay-buttons"')
 
 
@@ -220,7 +220,7 @@ def test_waiting_gift_stays_visible_after_the_window(
     db.session.add(Donation(post=post, donor=donor, amount_cents=2_000, method=PaymentMethod.VENMO))
     db.session.commit()
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "gift is waiting for maria_g" in page
     assert "You can chip in again" not in page
 
@@ -250,7 +250,7 @@ def test_closed_post_without_handles_does_not_promise_a_return(
 ) -> None:
     post = add_post(make_user("no_handles"), closed_hours_ago=1)
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "no longer lists a payment app" in page
     assert "Check back soon" not in page
 
@@ -265,4 +265,6 @@ def test_update_and_waiting_gift_share_the_side_column(
     db.session.commit()
     login_as(client, donor)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
-    assert page.index('class="post-side"') < page.index('id="update"') < page.index('id="chip-in"')
+    assert page.index('class="post-side"') < page.index('id="update"') < page.index("chip-fab")
+    chip_in = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
+    assert "is waiting for maria_g to confirm" in chip_in

@@ -36,7 +36,7 @@ def test_donor_can_add_the_name_on_their_app(
 ) -> None:
     post = add_post(poster)
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Name on your app (optional)" in page
     assert "Only maria_g sees it, to find your payment." in page
     with caplog.at_level(logging.INFO):

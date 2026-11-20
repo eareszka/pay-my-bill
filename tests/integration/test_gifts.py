@@ -52,7 +52,7 @@ def test_record_gift_emails_poster(
     with caplog.at_level(logging.INFO):
         resp = send(client, post, "$12.50")
     assert resp.status_code == 302
-    assert resp.location == f"/posts/{post.id}"
+    assert resp.location == f"/posts/{post.id}/chip-in"
     [gift] = gifts()
     assert (gift.donor, gift.amount_cents, gift.method, gift.status) == (
         donor,
@@ -68,7 +68,7 @@ def test_record_gift_emails_poster(
 
 def test_form_shown_to_logged_in_donor(client: FlaskClient, post: Post, donor: User) -> None:
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert f'action="/posts/{post.id}/gifts"' in page
     assert '<select id="method" name="method" required><option value="">Choose app</option>' in page
     assert '<option value="cashapp">Cash App</option>' in page
@@ -78,8 +78,8 @@ def test_form_shown_to_logged_in_donor(client: FlaskClient, post: Post, donor: U
 
 
 def test_logged_out_visitor_gets_login_link(client: FlaskClient, post: Post) -> None:
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
-    assert f"/login?next=/posts/{post.id}" in page
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
+    assert f"/login?next=/posts/{post.id}/chip-in" in page
     assert "I sent it" not in page
     assert send(client, post).location.startswith("/login")
     assert gifts() == []
@@ -170,7 +170,7 @@ def test_one_pending_gift_per_donor_per_post(client: FlaskClient, post: Post, do
     login_as(client, donor)
     assert send(client, post, "10").status_code == 302
     resp = send(client, post, "5")
-    assert resp.location == f"/posts/{post.id}"
+    assert resp.location == f"/posts/{post.id}/chip-in"
     assert len(gifts()) == 1
     assert "already have a gift waiting" in client.get(resp.location).get_data(as_text=True)
     gifts()[0].status = DonationStatus.CONFIRMED

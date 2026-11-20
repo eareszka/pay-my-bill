@@ -28,3 +28,4 @@
 - 2026-11-19 (ui): #69 look on #293: update photo is one box from the new-post grid; a posted one fills the panel width (no sideways scroll). Blocked: none.
 - 2026-11-19: #69 merged (#293). 4 of 5 points done; #289 waits on the owner's Cloudflare steps, #261 on the APNs key, #225 on the recheck. Blocked: owner.
 - 2026-11-19: #295: post sheet photo fills the first screen, facts and poster stats are emoji pills, Chip in is a round gift button that stays put. Blocked: none.
+- 2026-11-19: #295 owner follow-up: Chip in is its own page; a chat disc beside it opens a labeled mock chat. Both discs stay put. Blocked: none.
