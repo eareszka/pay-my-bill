@@ -6,7 +6,7 @@
 | Story | Issue | Lane | Points | Status |
 |---|---|---|---|---|
 | PB-48 Photos on our own domain | #289 | main + owner | 1 | Steps in README; waiting on the owner |
-| PB-44 Share an ask | #288 | main → ui | 2 | Done (#292) |
+| PB-44 Share an ask | #288 | main → ui | 2 | Removed for now by the owner (#298) |
 | PB-20 Photo on a results update | #69 | main → ui | 2 | Done (#293) |
 | PB-52 Push notifications in the iOS app (from Sprint 7) | #261 | main → ui | 8 | Blocked: APNs key from the owner's Apple account |
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
@@ -26,3 +26,4 @@
 - 2026-11-19 (main): #69: optional photo on a results update (same checks as post photos, never a receipt). Next: ui; #261 waits on the APNs key. Blocked: none.
 - 2026-11-19 (ui): #69 look on #293: update photo is one box from the new-post grid; a posted one fills the panel width (no sideways scroll). Blocked: none.
 - 2026-11-19: #69 merged (#293). 4 of 5 points done; #289 waits on the owner's Cloudflare steps, #261 on the APNs key, #225 on the recheck. Blocked: owner.
+- 2026-11-20 (main): #298: reverted #292, so Share is gone from the rail and post page (owner: not for now). Next: merge #296/#297. Blocked: none.
