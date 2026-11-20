@@ -137,7 +137,7 @@ def test_platform_fee_can_be_turned_off(app: Flask) -> None:
 
 def test_post_page_offers_instant_card_gift(client: FlaskClient, post: Post, donor: User) -> None:
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Chip in instantly" in page
     assert "You pay exactly what you enter" in page
     assert "Yearnly takes no fee." in page
@@ -155,23 +155,23 @@ def test_card_form_hidden_without_stripe_or_when_not_ready(
     recipient.stripe_ready = False
     recipient.cashapp_handle = "$mariag"
     db.session.commit()
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Chip in instantly" not in page
     assert "Cash App" in page
     # With no card option, the app buttons are the main action and stay filled.
     assert '<a class="btn" href="https://cash.app/' in page
     recipient.stripe_ready = True
     db.session.commit()
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Or pay in an app" in page
     # Next to "Chip in instantly", they're outlined so the card stays the one fill.
     assert '<a class="btn btn-secondary" href="https://cash.app/' in page
     app.config["STRIPE_SECRET_KEY"] = ""
-    assert "Chip in instantly" not in client.get(f"/posts/{post.id}").get_data(as_text=True)
+    assert "Chip in instantly" not in client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
 
 
 def test_logged_out_visitor_is_asked_to_log_in(client: FlaskClient, post: Post) -> None:
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Chip in instantly" in page
     assert "Log in first" in page
 
@@ -533,7 +533,7 @@ def test_card_option_shows_beside_a_waiting_app_gift(
     db.session.add(Donation(post=post, donor=donor, amount_cents=500, method=PaymentMethod.CASHAPP))
     db.session.commit()
     login_as(client, donor)
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "waiting for maria_g to confirm" in page
     assert "You can still chip in instantly by card" in page
     assert "Chip in instantly" in page

@@ -1,0 +1,10 @@
+{# The ask in brief at the top of Chip in and chat (#295): it speaks from the right, as on the feed. #}
+<a class="ask-strip post-{{ post.kind.value }}" href="{{ url_for('posts.show', post_id=post.id) }}">
+  {% if post.photo_key %}<img src="{{ photo_url(post.photo_key) }}" alt="" width="64" height="80">{% endif %}
+  <span class="ask-strip-words">
+    <strong class="ask-strip-title">{{ post.title }}</strong>
+    <span class="ask-strip-meta">{{ post.user.username }}{% if post.user.region %} · {{ post.user.region }}{% endif %}</span>
+    <span class="amounts"><strong>{{ post.raised_cents | cents }}</strong> of {{ post.goal_cents | cents }}</span>
+    {{ meter(post.progress_percent) }}
+  </span>
+</a>

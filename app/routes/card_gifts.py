@@ -29,14 +29,14 @@ from app.models import (
 from app.money import format_cents, parse_dollars
 from app.routes.admin import notify_admins
 from app.routes.gifts import count_confirmed
-from app.routes.posts import can_view, render_post
+from app.routes.posts import can_view, render_chip_in
 from app.urls import site_url
 
 bp = Blueprint("card", __name__)
 
 
 def _card_error(post: Post, message: str) -> tuple[str, int]:
-    return render_post(post, GiftForm.for_post(post), card_error=message), 400
+    return render_chip_in(post, GiftForm.for_post(post), card_error=message), 400
 
 
 @bp.post("/posts/<int:post_id>/card")
@@ -52,7 +52,7 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
         abort(404)
     if not (post.is_open and recipient.stripe_ready and recipient.stripe_account_id):
         flash("This post isn't taking card gifts right now.", "info")
-        return redirect(url_for("posts.show", post_id=post.id))
+        return redirect(url_for("posts.chip_in", post_id=post.id))
     limits = f"Enter an amount from {format_cents(MIN_CARD_GIFT_CENTS)} up to " + format_cents(
         post.goal_cents
     )
@@ -67,7 +67,7 @@ def checkout(post_id: int) -> Response | tuple[str, int]:
         return _card_error(
             post, f"A tip can be up to {format_cents(stripe_pay.MAX_TIP_CENTS)}, or none."
         )
-    back = site_url("posts.show", post_id=post.id)
+    back = site_url("posts.chip_in", post_id=post.id)
     try:
         url = stripe_pay.checkout_url(
             post_id=post.id,

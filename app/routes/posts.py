@@ -200,8 +200,7 @@ def can_view(post: Post) -> bool:
     return viewer is not None and (viewer.id == post.user_id or viewer.is_admin)
 
 
-@bp.get("/<int:post_id>")
-def show(post_id: int) -> str:
+def viewable_post(post_id: int) -> Post:
     post = (
         db.session.get(Post, post_id, options=[joinedload(Post.user)])
         if post_id <= MAX_DB_INT
@@ -209,7 +208,32 @@ def show(post_id: int) -> str:
     )
     if post is None or not can_view(post) or viewer_apart(post.user_id):
         abort(404)
-    return render_post(post, GiftForm.for_post(post))
+    return post
+
+
+def visitor_post(post_id: int) -> Post:
+    # Chip in and chat are for visitors; the poster has neither (#295).
+    post = viewable_post(post_id)
+    if post.user.is_deleted or (current_user.is_authenticated and current_user.id == post.user_id):
+        abort(404)
+    return post
+
+
+@bp.get("/<int:post_id>")
+def show(post_id: int) -> str:
+    return render_post(viewable_post(post_id))
+
+
+@bp.get("/<int:post_id>/chip-in")
+def chip_in(post_id: int) -> str:
+    post = visitor_post(post_id)
+    return render_chip_in(post, GiftForm.for_post(post))
+
+
+@bp.get("/<int:post_id>/chat")
+def chat(post_id: int) -> str:
+    # A mock until messaging has its guardrails (#124 to #127): nothing is sent or stored.
+    return render_template("posts/chat.html", post=visitor_post(post_id))
 
 
 def gave_to(post: Post, user: User) -> bool:
@@ -254,24 +278,26 @@ def chip_in_context(post: Post, form: GiftForm | None = None) -> dict[str, objec
     }
 
 
-def render_post(
-    post: Post,
-    form: GiftForm,
-    update_form: ResultsUpdateForm | None = None,
-    card_error: str | None = None,
-) -> str:
+def render_chip_in(post: Post, form: GiftForm, card_error: str | None = None) -> str:
+    return render_template(
+        "posts/chip_in.html", post=post, card_error=card_error, **chip_in_context(post, form)
+    )
+
+
+def render_post(post: Post, update_form: ResultsUpdateForm | None = None) -> str:
     gifts = confirmed_gifts(post.user)
     stats = progress(gifts)
     return render_template(
         "posts/show.html",
         post=post,
-        card_error=card_error,
+        waiting_gift=(
+            post.pending_gift_from(current_user.id) if current_user.is_authenticated else None
+        ),
         poster_progress=stats,
         poster_badges=badges(post.user, gifts, stats.people_helped),
         reactions=reaction_view(post) if post.update_body else None,
         follow_through=follow_through(post.user),
         update_form=update_form or ResultsUpdateForm(formdata=None),
-        **chip_in_context(post, form),
     )
 
 
@@ -331,7 +357,7 @@ def update(post_id: int) -> Response | tuple[str, int]:
     form = ResultsUpdateForm()
     if not form.validate_on_submit():
         db.session.rollback()
-        return render_post(post, GiftForm.for_post(post), form), 400
+        return render_post(post, form), 400
     if form.photo_data:
         try:
             post.update_photo_key = photos.save(form.photo_data)
@@ -339,7 +365,7 @@ def update(post_id: int) -> Response | tuple[str, int]:
             current_app.logger.exception("Couldn't store a results update photo")
             db.session.rollback()
             form.photo.errors = ["We couldn't save that photo. Try again, or post without it."]
-            return render_post(post, GiftForm.for_post(post), form), 503
+            return render_post(post, form), 503
     saved = post.update_photo_key
     post.update_body = form.note.data
     post.update_posted_at = utcnow()

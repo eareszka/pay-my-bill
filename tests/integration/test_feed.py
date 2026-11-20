@@ -222,7 +222,7 @@ def test_logging_in_from_the_panel_returns_to_that_post(
 ) -> None:
     post = add_post(make_user(venmo_handle="@maria-g"), "Only post")
     page = client.get("/feed").get_data(as_text=True)
-    assert f'href="/login?next=/posts/{post.id}">Log in first' in page
+    assert f'href="/login?next=/posts/{post.id}/chip-in">Log in first' in page
 
 
 def test_lone_ticket_does_not_use_the_stack(client: FlaskClient, make_user: MakeUser) -> None:

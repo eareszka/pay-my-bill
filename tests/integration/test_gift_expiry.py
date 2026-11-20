@@ -99,7 +99,7 @@ def test_expired_gift_does_not_block_a_new_one(
     add_gift(post, donor, days_old=15)
     login_as(client, donor)
     resp = client.post(f"/posts/{post.id}/gifts", data={"amount": "10", "method": "venmo"})
-    assert resp.location == f"/posts/{post.id}"
+    assert resp.location == f"/posts/{post.id}/chip-in"
     assert len(post.donations) == 2
 
 

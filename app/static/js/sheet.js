@@ -68,12 +68,6 @@
     if (!isPost(window.location.pathname)) return;
     const page = document.querySelector("main");
 
-    // The floating Chip in (#282) steps aside while the Chip in panel itself is on screen.
-    const fab = document.querySelector(".chip-fab");
-    const panel = document.getElementById("chip-in");
-    if (fab && panel && "IntersectionObserver" in window) {
-      new IntersectionObserver(([entry]) => fab.classList.toggle("is-away", entry.isIntersecting)).observe(panel);
-    }
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
     const top = () => Math.max(document.body.scrollTop, document.documentElement.scrollTop) <= 0;
     let pull = null;

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "posts/_progress.html" import meter %}
+{% block title %}Chat with {{ post.user.username }} · Yearnly{% endblock %}
+{% block body_class %}page stage-page post-page reply-page{% endblock %}
+{% block main_class %} container-wide{% endblock %}
+{% block content %}
+  {# A mock until messaging has its guardrails (#124 to #127). Nothing here is sent or stored. #}
+  {% set name = post.user.username %}
+  <a class="reply-back" href="{{ url_for('posts.show', post_id=post.id) }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back to the post</a>
+  {% include "posts/_ask_strip.html" %}
+  <section class="chat" aria-labelledby="chat-title">
+    <h1 class="chat-title" id="chat-title">Chat with {{ name }}</h1>
+    <p class="chat-preview" role="note">Preview. Chat is coming soon, so these messages are an example.</p>
+    <ol class="chat-thread" aria-label="Example messages">
+      <li class="chat-msg chat-mine"><span class="sr-only">You: </span>Hi {{ name }}! Is this still open? I'd like to chip in.</li>
+      <li class="chat-msg chat-theirs"><span class="sr-only">{{ name }}: </span>It is! Thank you so much, it means a lot.</li>
+      <li class="chat-msg chat-mine"><span class="sr-only">You: </span>Sending it now. Good luck!</li>
+    </ol>
+    <div class="chat-compose">
+      <label class="sr-only" for="chat-message">Message to {{ name }}</label>
+      <textarea id="chat-message" rows="1" placeholder="Messages aren't live yet" disabled aria-describedby="chat-hint"></textarea>
+      <button type="button" class="chat-send" disabled aria-label="Send"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></button>
+    </div>
+    <p class="hint" id="chat-hint">You'll be able to message {{ name }} here once chat is live. Until then, <a href="{{ url_for('posts.chip_in', post_id=post.id) }}">chip in</a> from their post.</p>
+  </section>
+{% endblock %}

@@ -41,7 +41,7 @@ from app.models import (
 )
 from app.money import format_cents
 from app.rewards import confirmed_gifts, progress
-from app.routes.posts import render_post, send_update_notice
+from app.routes.posts import render_chip_in, send_update_notice
 from app.tokens import GIFT_ANSWER, make_token, read_token
 from app.urls import site_url
 
@@ -134,11 +134,11 @@ def create(post_id: int) -> Response | tuple[str, int]:
     if post.pending_gift_from(donor.id):
         db.session.rollback()
         flash(f"You already have a gift waiting for {post.user.username} to confirm.", "info")
-        return redirect(url_for("posts.show", post_id=post.id))
+        return redirect(url_for("posts.chip_in", post_id=post.id))
     form = GiftForm.for_post(post)
     if not form.validate_on_submit():
         db.session.rollback()
-        return render_post(post, form), 400
+        return render_chip_in(post, form), 400
     donation = Donation(
         post=post,
         donor=donor,
@@ -152,7 +152,7 @@ def create(post_id: int) -> Response | tuple[str, int]:
     flash(
         f"Thanks! Your gift counts once {post.user.username} confirms it came through.", "success"
     )
-    return redirect(url_for("posts.show", post_id=post.id))
+    return redirect(url_for("posts.chip_in", post_id=post.id))
 
 
 MY_GIFTS_LIMIT = 50

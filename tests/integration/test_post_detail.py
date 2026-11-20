@@ -39,7 +39,9 @@ def test_open_post_shows_story_poster_goal_progress_and_handles(
     assert 'href="/u/maria_g">maria_g</a> · Tampa, FL' in page
     assert "<strong>$0</strong> raised of $250" in page
     assert 'aria-valuenow="0"' in page
-    assert "Chip in" in page
+    assert f'href="/posts/{post.id}/chip-in" aria-label="Chip in"' in page
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
+    assert "<strong>$0</strong> of $250" in page
     assert 'href="https://cash.app/$mariag" data-amount-sep="/"' in page
     assert 'href="https://paypal.me/MariaG" data-amount-sep="/"' in page
     assert "venmo.com" not in page
@@ -104,7 +106,7 @@ def test_missing_post_404(client: FlaskClient) -> None:
 
 def test_open_post_without_handles(client: FlaskClient, make_user: MakeUser) -> None:
     post = add_post(make_user("bob"))
-    page = client.get(f"/posts/{post.id}").get_data(as_text=True)
+    page = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert "Chip in" in page
     assert "hasn't added a way to get paid yet" in page
     assert "Send money straight" not in page
@@ -141,5 +143,6 @@ def test_owner_sees_no_pay_buttons(client: FlaskClient, owner: User) -> None:
     post = add_post(owner)
     login_as(client, owner)
     page = client.get(f"/posts/{post.id}").get_data(as_text=True)
-    assert "This is your post" in page
+    assert "chip-fab" not in page
     assert "cash.app" not in page
+    assert client.get(f"/posts/{post.id}/chip-in").status_code == 404

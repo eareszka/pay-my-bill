@@ -5,8 +5,6 @@
 {% block body_class %}page stage-page post-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
 {% block content %}
-  {# The sheet's way back to the feed ticket (#252); sheet.js returns to the same ticket. #}
-  <div class="sheet-top"><a class="sheet-close" href="{{ url_for('main.index') }}" aria-label="Close, back to the feed"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></a></div>
   {% set is_owner = current_user.is_authenticated and current_user.id == post.user_id %}
   {% if post.status == PostStatus.PENDING_REVIEW %}
     <p class="notice">{% if is_owner %}Your post is waiting for review. Only you and moderators can see it until then.{% else %}Pending review: hidden from everyone except the poster and moderators.{% endif %}</p>
@@ -17,6 +15,8 @@
   {% endif %}
   <article class="post post-{{ post.kind.value }}">
     <header class="post-hero{% if post.photo_key %} has-photo{% endif %}">
+      {# The way back to the feed ticket (#252), in the hero's corner so it never covers text (#295). #}
+      <div class="sheet-top"><a class="sheet-close" href="{{ url_for('main.index') }}" aria-label="Close, back to the feed"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></a></div>
       {% if post.photo_key %}<img class="hero-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo from {{ post.user.username }}">{% endif %}
       <h1>{{ post.title }}</h1>
       {% include "posts/_meta.html" %}
@@ -31,15 +31,24 @@
       </div>
     {% endif %}{% endmacro %}
     <p class="post-body">{{ post.body }}</p>
-    <p class="post-facts"><span class="chip">{{ post.category.emoji }} {{ post.category.label }}</span> <span>{{ post.kind.value | capitalize }}</span> <span>Goal {{ post.goal_cents | cents }}</span></p>
+    <ul class="post-facts" aria-label="About this ask">
+      <li class="chip"><span aria-hidden="true">{{ post.category.emoji }}</span> {{ post.category.label }}</li>
+      <li>{% if post.kind.value == "need" %}<span aria-hidden="true">🙏</span> Need{% else %}<span aria-hidden="true">🎁</span> Want{% endif %}</li>
+      <li><span aria-hidden="true">🎯</span> Goal {{ post.goal_cents | cents }}</li>
+      {% if post.is_open %}<li><span aria-hidden="true">⏳</span> Open until {{ post.last_open_day | date }}</li>{% endif %}
+      {% if post.user.region and not post.user.is_deleted %}<li><span aria-hidden="true">📍</span> {{ post.user.region }}</li>{% endif %}
+    </ul>
     {{ photos(post.more_photo_keys[:1], 2) }}
     {% if not post.user.is_deleted %}
       <section class="poster-card" aria-labelledby="poster-name">
         <h2 class="section-title" id="poster-name">{{ post.user.username }}</h2>
-        {% if post.user.region %}<p class="muted">{{ post.user.region }}</p>{% endif %}
-        <p class="post-trust">{% if follow_through.due %}{% include "profile/_follow_through.html" %} · {% endif %}On Yearnly since {{ "{:%b %Y}".format(post.user.created_at) }}</p>
         {% if post.user.bio %}<p class="poster-bio">{{ post.user.bio }}</p>{% endif %}
-        <p class="poster-stats">Level {{ poster_progress.level }} · {{ poster_progress.people_helped }} {{ "person" if poster_progress.people_helped == 1 else "people" }} helped</p>
+        <ul class="post-facts poster-facts" aria-label="About {{ post.user.username }}">
+          <li><span aria-hidden="true">⭐</span> Level {{ poster_progress.level }}</li>
+          <li><span aria-hidden="true">🤝</span> {{ poster_progress.people_helped }} {{ "person" if poster_progress.people_helped == 1 else "people" }} helped</li>
+          <li><span aria-hidden="true">📅</span> Joined {{ "{:%b %Y}".format(post.user.created_at) }}</li>
+          {% if follow_through.due %}<li><span aria-hidden="true">{{ "✅" if follow_through.updated == follow_through.due else "📝" }}</span> {% include "profile/_follow_through.html" %}</li>{% endif %}
+        </ul>
         {% if poster_badges %}
           <ul class="badge-list" aria-label="Badges">
             {% for badge in poster_badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
@@ -82,11 +91,15 @@
     {% elif post.owes_update and not post.user.is_deleted %}
       <p class="hint">{% if post.update_overdue %}{{ post.user.username }} hasn't shared how it went yet. It was due {{ post.update_last_day | date }}.{% else %}{{ post.user.username }} has until {{ post.update_last_day | date }} to share how it went.{% endif %}</p>
     {% endif %}
-    {% set shows_chip_in = post.is_open or (not is_owner and (post.takes_gifts or waiting_gift)) %}
-    {% if shows_chip_in %}{% include "posts/_chip_in.html" %}{% endif %}
     </div>
   </article>
-  {% if shows_chip_in and not is_owner %}<a class="btn chip-fab" href="#chip-in">Chip in</a>{% endif %}
+  {# Chip in and chat are their own pages (#295); these two discs stay bottom right, like a dating app's buttons. #}
+  {% if not is_owner and not post.user.is_deleted and (post.takes_gifts or waiting_gift) %}
+    <nav class="sheet-actions" aria-label="Reach {{ post.user.username }}">
+      <a class="sheet-chat" href="{{ url_for('posts.chat', post_id=post.id) }}" aria-label="Chat with {{ post.user.username }}"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></a>
+      <a class="chip-fab" href="{{ url_for('posts.chip_in', post_id=post.id) }}" aria-label="Chip in"><svg class="icon" aria-hidden="true"><use href="#i-gift"/></svg></a>
+    </nav>
+  {% endif %}
   {% if is_owner and (not post.is_deleted or post.update_body) %}
     <section class="danger-zone" id="delete">
       {% if post.is_open and request.args.get("close") %}
