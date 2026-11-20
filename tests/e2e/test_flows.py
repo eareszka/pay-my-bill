@@ -411,16 +411,3 @@ def test_block_asks_first_then_blocks(ui: Ui, live_server: LiveServer) -> None:
     ui.goto("/profile#blocked")
     expect(ui.page.locator(".blocked-list li")).to_have_count(1)
     ui.check("blocked-list")
-
-
-def test_share_copies_the_bare_link(ui: Ui, live_server: LiveServer) -> None:
-    # Without a share sheet, Share copies the post's link (#288).
-    post_id = open_post_by_someone_else(live_server)
-    ui.page.context.grant_permissions(["clipboard-read", "clipboard-write"])
-    ui.page.add_init_script("delete Navigator.prototype.share")
-    ui.goto(f"/posts/{post_id}")
-    ui.page.click(".sheet-share .share-btn")
-    expect(ui.page.locator(".sheet-share .share-status")).to_have_text("Link copied")
-    copied = ui.page.evaluate("navigator.clipboard.readText()")
-    assert copied.endswith(f"/posts/{post_id}")
-    assert "?" not in copied

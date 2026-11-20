@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% from "_field.html" import field %}
 {% from "posts/_progress.html" import meter %}
-{% from "posts/_share.html" import share_button %}
 {% block title %}{{ post.title }} · Yearnly{% endblock %}
 {% block body_class %}page stage-page post-page{% endblock %}
 {% block main_class %} container-wide{% endblock %}
@@ -17,7 +16,7 @@
   <article class="post post-{{ post.kind.value }}">
     <header class="post-hero{% if post.photo_key %} has-photo{% endif %}">
       {# The way back to the feed ticket (#252), in the hero's corner so it never covers text (#295). #}
-      <div class="sheet-top">{% if post.status in PUBLIC_STATUSES and not post.is_deleted %}{{ share_button(post, "sheet-share", "btn btn-secondary") }}<script src="{{ url_for('static', filename='js/share.js') }}" defer></script>{% endif %}<a class="sheet-close" href="{{ url_for('main.index') }}" aria-label="Close, back to the feed"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></a></div>
+      <div class="sheet-top"><a class="sheet-close" href="{{ url_for('main.index') }}" aria-label="Close, back to the feed"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></a></div>
       {% if post.photo_key %}<img class="hero-photo" src="{{ photo_url(post.photo_key) }}" alt="Photo from {{ post.user.username }}">{% endif %}
       <h1>{{ post.title }}</h1>
       {% include "posts/_meta.html" %}
