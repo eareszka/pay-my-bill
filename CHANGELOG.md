@@ -21,6 +21,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Block another user (#257, App Store Guideline 1.2). Block from someone's profile or post, and unblock from Settings → Blocked. A block works both ways: neither of you sees the other's posts in the feed or can open, chip in on, or react to them. It's silent, so they're never told. Deleting an account drops its blocks, and the Privacy page lists them. Migration 0021 adds `blocks`.
 
 ### Fixed
+- Log in (#297, owner's pick): titles in League Gothic no longer flicker on a first visit (they wait for the font instead of painting a fallback and swapping), and on a phone "Log in" sits at the top of its bubble, so there's no empty space above it.
 - Gift news on You (#80 review): it's marked seen only after the page renders, only up to the newest gift shown, and a visit with no news writes nothing. Before, it committed partway through the page and reloaded rows one by one.
 - Show less (#119 review): signing up now merges a logged-out choice too, account deletion clears it, the Privacy page names its cookie, the follow-through first ticket has no Show less (it always stays first), and moving a post to another category no longer marks it Edited or sends it back to review.
 
