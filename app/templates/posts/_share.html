@@ -1,8 +1,0 @@
-{# Share an ask (#288). The link is the bare post address: no sharer, no tracking token.
-   share.js shows the button where the phone's share sheet or the clipboard is there; each page loads it once. #}
-{% macro share_button(post, class, button) %}
-  <span class="share {{ class }}">
-    <button type="button" class="{{ button }} share-btn" data-share="{{ site_url('posts.show', post_id=post.id) }}" data-share-title="{{ post.title }}" hidden><svg class="icon" aria-hidden="true"><use href="#i-share"/></svg><span>Share<span class="sr-only"> {{ post.title }}</span></span></button>
-    <span class="share-status" role="status"></span>
-  </span>
-{% endmacro %}
