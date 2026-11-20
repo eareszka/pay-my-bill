@@ -32,15 +32,23 @@
       </div>
     {% endif %}{% endmacro %}
     <p class="post-body">{{ post.body }}</p>
-    <p class="post-facts"><span class="chip">{{ post.category.emoji }} {{ post.category.label }}</span> <span>{{ post.kind.value | capitalize }}</span> <span>Goal {{ post.goal_cents | cents }}</span></p>
+    <ul class="post-facts" aria-label="About this ask">
+      <li class="chip">{{ post.category.emoji }} {{ post.category.label }}</li>
+      <li>{{ "🙏 Need" if post.kind.value == "need" else "🎁 Want" }}</li>
+      <li>🎯 Goal {{ post.goal_cents | cents }}</li>
+      {% if post.user.region and not post.user.is_deleted %}<li>📍 {{ post.user.region }}</li>{% endif %}
+    </ul>
     {{ photos(post.more_photo_keys[:1], 2) }}
     {% if not post.user.is_deleted %}
       <section class="poster-card" aria-labelledby="poster-name">
         <h2 class="section-title" id="poster-name">{{ post.user.username }}</h2>
-        {% if post.user.region %}<p class="muted">{{ post.user.region }}</p>{% endif %}
-        <p class="post-trust">{% if follow_through.due %}{% include "profile/_follow_through.html" %} · {% endif %}On Yearnly since {{ "{:%b %Y}".format(post.user.created_at) }}</p>
         {% if post.user.bio %}<p class="poster-bio">{{ post.user.bio }}</p>{% endif %}
-        <p class="poster-stats">Level {{ poster_progress.level }} · {{ poster_progress.people_helped }} {{ "person" if poster_progress.people_helped == 1 else "people" }} helped</p>
+        <ul class="post-facts poster-facts" aria-label="About {{ post.user.username }}">
+          <li>⭐ Level {{ poster_progress.level }}</li>
+          <li>🤝 {{ poster_progress.people_helped }} {{ "person" if poster_progress.people_helped == 1 else "people" }} helped</li>
+          <li>📅 Joined {{ "{:%b %Y}".format(post.user.created_at) }}</li>
+          {% if follow_through.due %}<li>✅ {% include "profile/_follow_through.html" %}</li>{% endif %}
+        </ul>
         {% if poster_badges %}
           <ul class="badge-list" aria-label="Badges">
             {% for badge in poster_badges %}<li title="{{ badge.description }}">{{ badge.name }}<span class="sr-only">: {{ badge.description }}</span></li>{% endfor %}
@@ -87,7 +95,7 @@
     {% if shows_chip_in %}{% include "posts/_chip_in.html" %}{% endif %}
     </div>
   </article>
-  {% if shows_chip_in and not is_owner %}<a class="btn chip-fab" href="#chip-in">Chip in</a>{% endif %}
+  {% if shows_chip_in and not is_owner %}<a class="chip-fab" href="#chip-in" aria-label="Chip in"><svg class="icon" aria-hidden="true"><use href="#i-gift"/></svg></a>{% endif %}
   {% if is_owner and (not post.is_deleted or post.update_body) %}
     <section class="danger-zone" id="delete">
       {% if post.is_open and request.args.get("close") %}

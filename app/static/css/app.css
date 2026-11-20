@@ -358,9 +358,11 @@ h3.section-title { font-size: 1rem; }
 .post-hero .amounts strong { font-size: 2rem; }
 .post-hero .meter { height: 4px; }
 .post-hero :focus-visible { outline-color: var(--on-field); }
-.post-hero.has-photo { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: min(72vh, 600px); overflow: hidden; }
-.post-hero.has-photo > :not(.hero-photo) { position: relative; z-index: 1; }
-.hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 62%); mask-image: linear-gradient(to bottom, #000 30%, transparent 62%); }
+/* With a cover photo (#295, owner's Bumble ask) the photo owns the first screen, edge to edge between the bars, and
+   fades into the field just above the title, so the words still sit on solid field. */
+.post-hero.has-photo { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar-h) - var(--nav-h) - env(safe-area-inset-bottom)); margin: 0 -16px; padding-top: 0; border-radius: 0 0 var(--r-tail) var(--r-bubble); overflow: hidden; }
+.sheet-top:first-child + .post > .post-hero.has-photo { margin-top: -16px; }
+.hero-photo { flex: 1 0 0; width: calc(100% + 36px); min-height: 280px; margin: 0 -18px 4px; object-fit: cover; -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent); mask-image: linear-gradient(to bottom, #000 82%, transparent); }
 .card-head a { font-weight: 700; text-decoration: none; }
 .card-head a:hover { text-decoration: underline; }
 .post-body { max-width: 68ch; margin: 20px 0; font-size: 1.0625rem; white-space: pre-line; }
@@ -682,8 +684,8 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 /* The post sheet (#282), Bumble-style: the whole person in one scroll. Big photos sit between the story bubble,
    the fact pills and the poster's card, all speaking from the right like the ask itself. */
 .post > .post-body { max-width: none; margin: 12px 0; padding: 20px 18px; font-size: 1.125rem; line-height: 1.55; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
-.post-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
-.post-facts > span { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font-size: 0.9375rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; background: var(--surface); border-radius: var(--pill); }
+.post-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; padding: 0; list-style: none; }
+.post-facts > li { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font-size: 0.9375rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; background: var(--surface); border-radius: var(--pill); }
 .post-facts .chip { background: var(--field); }
 .post-facts .chip::before { content: none; }
 .post-photos { display: grid; gap: 12px; margin: 0 0 12px; }
@@ -693,17 +695,19 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .poster-card .section-title { margin: 0 0 2px; font: 700 1.75rem/1.15 var(--sans); overflow-wrap: anywhere; }
 .poster-card .post-trust { font-size: 0.9375rem; color: var(--muted); }
 .poster-card .poster-bio { margin-top: 14px; font-size: 1.0625rem; line-height: 1.55; white-space: pre-line; }
-.poster-card .poster-stats { margin-top: 14px; padding-top: 14px; font-weight: 700; font-variant-numeric: tabular-nums; border-top: 1px solid var(--line); }
-.poster-card .badge-list { margin-top: 8px; }
+.poster-card .poster-facts { margin: 14px 0 0; }
+.poster-facts > li { background: var(--info-tint); }
+.poster-card .badge-list { margin-top: 10px; }
 .profile-bio { max-width: 60ch; margin: 10px 0 0; font-size: 1.0625rem; line-height: 1.55; white-space: pre-line; }
-/* The floating Chip in (#282): bottom right in thumb reach above the tab bar, for visitors only. A ring of ground
-   keeps it clear of the photo under it, and it steps aside (sheet.js) while the Chip in panel is on screen. */
-.chip-fab { position: fixed; right: 16px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px); z-index: 6; min-height: 60px; padding: 0 28px; font-size: 1.0625rem; background: var(--press); border: 3px solid var(--bg); transition: background-color var(--fast) ease-out, transform 280ms var(--ease-out), opacity 280ms var(--ease-out), visibility 0s; }
-.chip-fab:hover:not(:disabled) { background: var(--deep); }
-.chip-fab.is-away { visibility: hidden; opacity: 0; transform: translateY(24px); transition: transform 180ms ease-in, opacity 180ms ease-in, visibility 0s 180ms; }
+/* The floating Chip in (#282, round since #295): a 64px gift disc bottom right in thumb reach above the tab bar, like a
+   dating app's like button. It never leaves, for visitors only. A ring of ground keeps it clear of the photo under it. */
+.chip-fab { position: fixed; right: 16px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px); z-index: 6; display: grid; place-items: center; width: 64px; height: 64px; color: var(--action-fg); background: var(--press); border: 3px solid var(--bg); border-radius: 50%; transition: background-color var(--fast) ease-out, transform 160ms var(--ease-out); }
+.chip-fab .icon { width: 28px; height: 28px; }
+.chip-fab:hover { background: var(--deep); }
+.chip-fab:active { transform: scale(0.92); }
 #chip-in { scroll-margin-top: calc(var(--bar-h) + 12px); }
 @media (prefers-reduced-motion: no-preference) { html:has(.chip-fab), body:has(.chip-fab) { scroll-behavior: smooth; } }
-@media (prefers-reduced-motion: reduce) { .chip-fab, .chip-fab.is-away { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .chip-fab { transition: none; } }
 .admin-photo { display: block; width: 160px; height: 200px; margin-top: 8px; object-fit: cover; border-radius: var(--radius); }
 .legal h2 { margin: 24px 0 6px; font-size: 1.125rem; font-family: var(--sans); }
 .legal h2:first-of-type { margin-top: 8px; }
@@ -782,7 +786,9 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
   .stage-page .container-wide:not(:has(> .feed)) { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
   .post-hero { margin: 0; padding: 36px 32px 28px; }
   .post-hero h1 { font-size: 5rem; }
-  .post-hero.has-photo { min-height: 520px; }
+  .post-hero.has-photo { min-height: min(calc(100svh - var(--bar-h) - 56px), 760px); margin: 0; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); }
+  .sheet-top:first-child + .post > .post-hero.has-photo { margin-top: 0; }
+  .hero-photo { width: calc(100% + 64px); margin: 0 -32px 4px; }
   .post:has(> .post-side > .group) { display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 28px; align-items: start; }
   .post:has(> .post-side > .group) > :not(.post-side) { grid-column: 1; }
   .post > .post-side:has(> .group) { grid-column: 2; grid-row: 1 / span 6; }

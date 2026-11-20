@@ -85,16 +85,19 @@ def test_sheet_shows_the_whole_person_in_order(client: FlaskClient, make_user: M
         'class="hero-photo"',
         post.body,
         "💡 Bills and utilities",
-        "Goal $80",
+        "🙏 Need",
+        "🎯 Goal $80",
+        "📍 Tampa, FL",
         "Photo 2 from maria_g",
         'class="poster-card"',
-        '<p class="muted">Tampa, FL</p>',
         BIO,
-        "Level 1 · 1 person helped",
+        "⭐ Level 1",
+        "🤝 1 person helped",
+        "📅 Joined",
         "Photo 3 from maria_g",
         "Photo 5 from maria_g",
         'id="chip-in"',
-        'class="btn chip-fab" href="#chip-in"',
+        'class="chip-fab" href="#chip-in" aria-label="Chip in"',
     ]
     spots = [page.index(text) for text in order]
     assert spots == sorted(spots)
