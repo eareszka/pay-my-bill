@@ -30,7 +30,7 @@ from tests.e2e import checks
 
 ARTIFACTS = Path(__file__).parent / "artifacts"
 FINDINGS = ARTIFACTS / "findings.jsonl"
-# Let a page transition (a sheet sliding up) finish, so the screenshot shows the page and not the move.
+# Let a page transition (a sheet sliding up) finish, so the screenshot shows the page.
 SETTLE = """() => Promise.all(document.documentElement.getAnimations({subtree: true})
   .filter((a) => a.effect?.pseudoElement?.startsWith("::view-transition"))
   .map((a) => a.finished.catch(() => {})))"""
