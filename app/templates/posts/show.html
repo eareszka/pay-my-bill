@@ -32,7 +32,7 @@
     {% endif %}{% endmacro %}
     <p class="post-body">{{ post.body }}</p>
     <ul class="post-facts" aria-label="About this ask">
-      <li class="chip"><span aria-hidden="true">{{ post.category.emoji }}</span> {{ post.category.label }}</li>
+      <li class="post-fact-kind"><span aria-hidden="true">{{ post.category.emoji }}</span> {{ post.category.label }}</li>
       <li>{% if post.kind.value == "need" %}<span aria-hidden="true">🙏</span> Need{% else %}<span aria-hidden="true">🎁</span> Want{% endif %}</li>
       <li><span aria-hidden="true">🎯</span> Goal {{ post.goal_cents | cents }}</li>
       {% if post.is_open %}<li><span aria-hidden="true">⏳</span> Open until {{ post.last_open_day | date }}</li>{% endif %}

@@ -12,6 +12,7 @@
   --shell-deep: #2f6249;
   --on-shell: #ffffff;
   --on-shell-muted: #e8f2eb;
+  --on-shell-hover: #e2eee6;
   --need: #8fcfc0;
   --want: #b9dcc3;
   --deep: #16261d;
@@ -25,7 +26,7 @@
   --ink: #16261d;
   --muted: #4d5c52;
   --line: #dbe2d8;
-  --edge: #86958a;
+  --edge: #7e8e82;
   --action-bg: #3a7558;
   --action-fg: #ffffff;
   --action-hover: #2f6249;
@@ -142,7 +143,7 @@ h3.section-title { font-size: 1rem; }
 .brand { padding-block: 8px; font: 400 1.75rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; }
 /* Logged out, the one filled action in the bar. */
 .topbar .topbar-signup { min-height: 44px; margin-left: auto; padding: 6px 14px; color: var(--deep); background: var(--on-shell); }
-.topbar .topbar-signup:hover { background: #e2eee6; }
+.topbar .topbar-signup:hover { background: var(--on-shell-hover); }
 /* The front door (home and the How stories, logged out) has no bar and no nav (#196, #205). */
 .front-door { --nav-h: 0px; }
 .topbar > nav {
@@ -229,7 +230,7 @@ h3.section-title { font-size: 1rem; }
   pointer-events: auto;
 }
 .deck-layout > .tabs a:hover, .deck-layout > .tabs a[aria-current="page"] { color: var(--on-field); }
-.deck-layout > .tabs a[aria-current="page"] { color: #ffffff; }
+.deck-layout > .tabs a[aria-current="page"] { color: var(--on-shell); }
 .deck-layout > .tabs a[aria-current="page"]::before { background: var(--press); }
 .deck-layout > .tabs :focus-visible { outline-color: var(--on-field); }
 
@@ -298,17 +299,17 @@ h3.section-title { font-size: 1rem; }
   border-radius: 50%;
   transition: background-color var(--fast) ease-out, color var(--fast) ease-out, transform var(--fast) var(--ease-out);
 }
-.rail-btn:hover .icon { color: #ffffff; background: var(--press); }
+.rail-btn:hover .icon { color: var(--on-shell); background: var(--press); }
 .rail-btn:focus-visible { outline: none; }
-.rail-btn:focus-visible .icon { color: #ffffff; background: var(--press); outline: 2px solid var(--press); outline-offset: 2px; }
-.deck-layout[data-toward="next"] .deck-next .icon, .deck-layout[data-toward="back"] .deck-back .icon { color: #ffffff; background: var(--press); transform: scale(1.08); }
+.rail-btn:focus-visible .icon { color: var(--on-shell); background: var(--press); outline: 2px solid var(--press); outline-offset: 2px; }
+.deck-layout[data-toward="next"] .deck-next .icon, .deck-layout[data-toward="back"] .deck-back .icon { color: var(--on-shell); background: var(--press); transform: scale(1.08); }
 .deck-back { order: 1; }
 .deck-next { order: 2; }
 .deck-hint { display: none; }
 .deck-count { order: 3; font-size: 0.75rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--on-field); }
 /* Next is the one filled glyph on the phone: the circle, its label and the count read as a single control (#208). */
 .deck-next { gap: 0; }
-.deck-next .icon { color: #ffffff; background: var(--press); }
+.deck-next .icon { color: var(--on-shell); background: var(--press); }
 .deck-next:hover .icon, .deck-next:focus-visible .icon { background: var(--deep); }
 .deck-next + .deck-count { margin-top: -12px; font-weight: 400; color: var(--on-field-muted); }
 /* Show less (#119): a rail glyph like Back. The full "Show less <Category>" is its name; the rail shows "Less". */
@@ -393,7 +394,7 @@ h3.section-title { font-size: 1rem; }
 /* New post, one question per screen (#275), like dating-app onboarding: a thin bar, one big question, rows or
    pills to tap, and a round → at the foot. steps.js sets data-steps=on; without it the page is one plain form. */
 .q-progress { height: 4px; background: var(--mark-empty); border-radius: var(--pill); overflow: hidden; }
-.q-progress-bar { width: 0; height: 100%; background: var(--shell); border-radius: var(--pill); transition: width 320ms var(--ease-out); }
+.q-progress-bar { height: 100%; background: var(--shell); border-radius: var(--pill); transform: scaleX(var(--done, 0)); transform-origin: left; transition: transform 320ms var(--ease-out); }
 .q-question { margin: 0; font: 400 clamp(2.5rem, 11vw, 3.25rem) / 0.95 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
 .q-step { display: flex; flex-direction: column; gap: 12px; }
 .q-step > .hint { margin-top: -2px; font-size: 1rem; }
@@ -402,7 +403,7 @@ h3.section-title { font-size: 1rem; }
 .q-round { display: grid; place-items: center; flex: none; width: 52px; height: 52px; padding: 0; color: var(--ink); background: transparent; border: 1.5px solid var(--edge); border-radius: 50%; cursor: pointer; transition: background-color var(--fast) ease-out, border-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
 .q-round:hover { border-color: var(--ink); }
 .q-round:active { transform: scale(0.94); }
-.q-next { width: 60px; height: 60px; color: #ffffff; background: var(--press); border-color: var(--press); }
+.q-next { width: 60px; height: 60px; color: var(--action-fg); background: var(--press); border-color: var(--press); }
 .q-next:hover, .q-next:focus-visible { background: var(--deep); border-color: var(--deep); }
 .q-post { min-height: 56px; padding-inline: 24px 20px; font-size: 1.0625rem; }
 /* Need or want: full-width hairline rows with the box on the right, ticked when picked. */
@@ -411,14 +412,14 @@ h3.section-title { font-size: 1rem; }
 .q-options .choice input[type="radio"] { width: 26px; height: 26px; border-radius: 7px; }
 .q-options .choice input:focus-visible { outline: none; }
 .q-options .choice:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--radius); }
-.q-options .choice input[type="radio"]:checked::after { content: ""; width: 12px; height: 7px; margin-top: -3px; background: none; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; border-radius: 0; rotate: -45deg; }
+.q-options .choice input[type="radio"]:checked::after { content: ""; width: 12px; height: 7px; margin-top: -3px; background: none; border: solid var(--on-shell); border-width: 0 0 2.5px 2.5px; border-radius: 0; rotate: -45deg; }
 /* What it's for: emoji pills that wrap. The radios stay real but hidden, as on the tip row. */
 .q-pills { gap: 10px; }
 .q-pills .choice { position: relative; gap: 0; min-height: 48px; padding: 0 18px 0 14px; font-weight: 700; border: 1.5px solid var(--edge); border-radius: var(--pill); cursor: pointer; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
 .q-pills .choice input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
 .q-pills .choice:hover { border-color: var(--ink); }
 .q-pills .choice:active, .q-options .choice:active { transform: scale(0.98); }
-.q-pills .choice:has(input:checked) { color: #ffffff; background: var(--shell); border-color: var(--shell); }
+.q-pills .choice:has(input:checked) { color: var(--on-shell); background: var(--shell); border-color: var(--shell); }
 .q-pills .choice:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 .q-form[data-steps="on"] { gap: 28px; }
 /* The question names the field, so the page title and the field's label are for screen readers only. */
@@ -487,8 +488,8 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .choice input[type="radio"] { border-radius: 50%; }
 .choice input:hover { border-color: var(--ink); }
 .choice input:checked { background: var(--shell); border-color: var(--shell); }
-.choice input[type="checkbox"]:checked::after { content: ""; width: 10px; height: 6px; margin-top: -3px; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; rotate: -45deg; }
-.choice input[type="radio"]:checked::after { content: ""; width: 8px; height: 8px; background: #ffffff; border-radius: 50%; }
+.choice input[type="checkbox"]:checked::after { content: ""; width: 10px; height: 6px; margin-top: -3px; border: solid var(--on-shell); border-width: 0 0 2.5px 2.5px; rotate: -45deg; }
+.choice input[type="radio"]:checked::after { content: ""; width: 8px; height: 8px; background: var(--on-shell); border-radius: 50%; }
 
 .flash, .notice { margin: 0 0 14px; padding: 12px 14px; color: var(--ink); background: var(--info-tint); border-radius: var(--radius); }
 .flash-success { background: var(--good-tint); }
@@ -525,7 +526,7 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-secondary { color: var(--ink); background: transparent; border-color: var(--edge); }
 .btn-secondary:hover:not(:disabled) { background: transparent; border-color: var(--ink); }
-.btn-danger { color: #ffffff; background: var(--bad); }
+.btn-danger { color: var(--action-fg); background: var(--bad); }
 .btn-danger:hover:not(:disabled) { background: var(--bad-text); }
 
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -546,7 +547,8 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .chip-in[data-step="sent"] button[type="submit"] { color: var(--action-fg); background: var(--action-bg); border-color: transparent; }
 .pay-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 .pay-buttons .btn { flex: 1 1 96px; flex-direction: column; gap: 0; }
-.pay-buttons small { display: block; font-size: 0.8125rem; font-weight: 400; opacity: 0.8; }
+.pay-buttons small { display: block; font-size: 0.8125rem; font-weight: 400; color: var(--on-shell-muted); }
+.pay-buttons .btn-secondary small { color: var(--muted); }
 .sent-row { display: flex; align-items: flex-end; gap: 8px; }
 .sent-row .field { flex: 1; }
 .sent-row .btn { min-height: 48px; }
@@ -555,7 +557,7 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 
 .reactions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
 .reactions form { margin: 0; }
-.react { min-height: 40px; padding: 6px 14px; font-variant-numeric: tabular-nums; }
+.react { min-height: 44px; padding: 6px 14px; font-variant-numeric: tabular-nums; }
 .react[aria-pressed="true"] { background: var(--good-tint); border-color: var(--good); }
 .reaction-count { color: var(--muted); font-variant-numeric: tabular-nums; }
 .reactions-hint { margin-top: 8px; }
@@ -600,7 +602,7 @@ h1:has(+ .q-form[data-steps="on"]), .q-form[data-steps="on"] .q-step .field > la
 .tabs + .tabs { margin-top: -4px; }
 .tabs a { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; font-weight: 700; color: var(--muted); text-decoration: none; border-radius: var(--pill); transition: background-color var(--fast) ease-out, color var(--fast) ease-out; }
 .tabs a:hover { color: var(--ink); background: var(--info-tint); }
-.tabs a[aria-current="page"] { color: #ffffff; background: none; }
+.tabs a[aria-current="page"] { color: var(--on-shell); background: none; }
 .tabs a[aria-current="page"]::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--shell); border-radius: var(--pill); }
 .leaders-hint { margin: -6px 0 16px; }
 .leader-list .is-you { font-weight: 700; background: var(--good-tint); border-radius: var(--radius); }
@@ -674,7 +676,7 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .q-photo-box:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 .q-photo-box:has(input[aria-invalid="true"]):not(.has-file) { border: 2px solid var(--bad); }
 .q-photo-box input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-.q-photo-add { display: grid; place-items: center; width: 36px; height: 36px; color: #ffffff; background: var(--press); border-radius: 50%; pointer-events: none; }
+.q-photo-add { display: grid; place-items: center; width: 36px; height: 36px; color: var(--on-shell); background: var(--press); border-radius: 50%; pointer-events: none; }
 .q-photo-add .icon { width: 20px; height: 20px; stroke-width: 2.5; }
 .q-photo-tag { position: absolute; left: 6px; bottom: 6px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; color: var(--ink); background: var(--surface); border-radius: var(--pill); pointer-events: none; }
 .q-photo-box.has-file { border: 0; }
@@ -689,14 +691,12 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .post > .post-body { max-width: none; margin: 12px 0; padding: 20px 18px; font-size: 1.125rem; line-height: 1.55; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
 .post-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; padding: 0; list-style: none; }
 .post-facts > li { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; font-size: 0.9375rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; background: var(--surface); border-radius: var(--pill); }
-.post-facts .chip { background: var(--field); }
-.post-facts .chip::before { content: none; }
+.post-facts .post-fact-kind { background: var(--field); }
 .post-photos { display: grid; gap: 12px; margin: 0 0 12px; }
 .post-photos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r-panel); background: var(--info-tint); }
 .poster-card { display: flex; flex-direction: column; gap: 4px; margin: 0 0 12px; padding: 22px 18px 20px; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
 .poster-card p { margin: 0; }
 .poster-card .section-title { margin: 0 0 2px; font: 700 1.75rem/1.15 var(--sans); overflow-wrap: anywhere; }
-.poster-card .post-trust { font-size: 0.9375rem; color: var(--muted); }
 .poster-card .poster-bio { margin-top: 14px; font-size: 1.0625rem; line-height: 1.55; white-space: pre-line; }
 .poster-card .poster-facts { margin: 14px 0 0; }
 .poster-facts > li { background: var(--info-tint); }
@@ -717,6 +717,8 @@ a.post-create { display: flex; width: 100%; min-height: 52px; font-size: 1.0625r
 .sheet-chat:focus-visible { outline-offset: -5px; }
 /* The page ends above the discs, so Report, Block and the footer are never under them. */
 body:has(.sheet-actions) { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 96px); }
+/* On a phone the discs sit in a band of ground above the tab bar (#305), so the story scrolls under the band, never under a disc. */
+@media (max-width: 959px) { .sheet-actions { right: 0; left: 0; justify-content: flex-end; padding: 12px 16px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); background: var(--bg); } }
 @media (prefers-reduced-motion: reduce) { .chip-fab, .sheet-chat { transition: none; } }
 
 /* Chip in and chat pages (#295): the ask in brief speaks from the right in its field color, and the reply answers
@@ -737,7 +739,8 @@ body:has(.sheet-actions) { padding-bottom: calc(var(--nav-h) + env(safe-area-ins
 .ask-strip:focus-visible { outline-color: var(--deep); outline-offset: 3px; }
 .chat { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; padding: 18px 16px; background: var(--surface); border-radius: var(--r-panel) var(--r-panel) var(--r-panel) var(--r-tail); }
 .chat-title { margin: 0; font: 700 1.375rem/1.2 var(--sans); text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
-.chat-preview { margin: 0; padding: 10px 14px; font-size: 0.875rem; font-weight: 700; color: var(--on-field); background: var(--want); border-radius: var(--radius); }
+.chat-preview { margin: 0; font-size: 0.875rem; color: var(--muted); }
+.chat-preview .how-example { margin: 0 6px 0 0; color: var(--ink); border-color: var(--ink); }
 .chat-thread { display: flex; flex-direction: column; gap: 8px; margin: 4px 0; padding: 0; list-style: none; }
 .chat-msg { max-width: 82%; padding: 10px 14px; font-size: 1rem; line-height: 1.45; overflow-wrap: anywhere; }
 .chat-theirs { align-self: flex-start; background: var(--info-tint); border-radius: 18px 18px 18px var(--r-tail); }
@@ -780,7 +783,6 @@ body:has(.sheet-actions) { padding-bottom: calc(var(--nav-h) + env(safe-area-ins
   .topbar > nav a > * { position: static; }
   .topbar > nav .icon { width: 20px; height: 20px; }
   .topbar > nav { margin-left: auto; }
-  .topbar > nav a[href="/signup"] { display: none; }
   .topbar .topbar-signup { margin-left: 12px; }
   .nav-user .nav-label { max-width: 14ch; }
   .badge { position: static; margin-left: -2px; }
@@ -803,6 +805,8 @@ body:has(.sheet-actions) { padding-bottom: calc(var(--nav-h) + env(safe-area-ins
   .deck .deck-ticket { inset: 0; border-radius: 0; }
   .deck .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) 0 0 calc(var(--r-bubble) - 6px); }
   .deck-layout:not(:has(.deck-side)) .card-title a:focus-visible::after { border-radius: calc(var(--r-bubble) - 6px) calc(var(--r-bubble) - 6px) 0 calc(var(--r-bubble) - 6px); }
+  /* While more of the panel waits below, its foot fades into its own white (#306). */
+  .deck-side::after { content: ""; position: sticky; bottom: 0; flex: none; height: 48px; margin: -20px -28px -28px; background: linear-gradient(to bottom, transparent, var(--surface)); pointer-events: none; }
   .deck-side .group, .post .post-side > .group { padding: 0; background: none; border-radius: 0; }
   .deck-side .group { margin: 0; }
   .card-body { padding: 32px; }
@@ -1150,7 +1154,7 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .post-hero:not(.has-photo) { padding-top: 76px; }
 .sheet-close { position: absolute; top: 14px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 50%; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out; }
 .sheet-close .icon { width: 20px; height: 20px; }
-.sheet-close:hover { color: #ffffff; background: var(--press); border-color: var(--press); }
+.sheet-close:hover { color: var(--on-shell); background: var(--press); border-color: var(--press); }
 
 /* The optional web tip (#265): No tip, $1, $2, or Other as one row of pills. The radios stay real but hidden.
    No tip is picked by default, and the Other amount shows only when Other is picked. */
@@ -1159,7 +1163,7 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .tip-row .choice { position: relative; gap: 0; min-height: 44px; padding: 0 16px; font-weight: 700; border: 1.5px solid var(--edge); border-radius: var(--pill); cursor: pointer; transition: background-color var(--fast) ease-out, color var(--fast) ease-out, border-color var(--fast) ease-out; }
 .tip-row .choice input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .tip-row .choice:hover { border-color: var(--ink); }
-.tip-row .choice:has(input:checked) { color: #ffffff; background: var(--shell); border-color: var(--shell); }
+.tip-row .choice:has(input:checked) { color: var(--on-shell); background: var(--shell); border-color: var(--shell); }
 .tip-row .choice:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 .tip-row #tip-other { width: 7.5rem; min-height: 48px; padding: 11px 13px; font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--edge); border-radius: var(--radius); transition: border-color var(--fast) ease-out; }
 .tip-row #tip-other:hover, .tip-row #tip-other:focus-visible { border-color: var(--ink); }
