@@ -721,9 +721,9 @@ body:has(.sheet-actions) { padding-bottom: calc(var(--nav-h) + env(safe-area-ins
 
 /* Chip in and chat pages (#295): the ask in brief speaks from the right in its field color, and the reply answers
    under it, the Chip in panel or the chat, with its tail on the left. */
-.reply-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: -4px 0 8px; font-weight: 700; color: var(--ink); text-decoration: none; }
-.reply-back .icon { width: 20px; height: 20px; }
-.reply-back:hover { text-decoration: underline; }
+/* Chip in and Chat are sheets over the post (#302): × sits top right, above the ask strip. */
+.reply-top { display: flex; justify-content: flex-end; margin: -4px 0 8px; }
+.reply-top .sheet-close { position: static; }
 .ask-strip { --field: var(--need); display: flex; gap: 14px; align-items: center; margin-left: 28px; padding: 12px 16px 14px 12px; color: var(--on-field); text-decoration: none; background: var(--field); border-radius: var(--r-panel) var(--r-panel) var(--r-tail) var(--r-panel); }
 .ask-strip.post-want { --field: var(--want); }
 .ask-strip:not(:has(img)) { padding-left: 18px; }

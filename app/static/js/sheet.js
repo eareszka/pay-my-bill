@@ -1,12 +1,19 @@
-// A post is a sheet on the feed (#248): it slides up over the feed, and pulling it down at the top
-// slides it back off. While you're on a post the Feed tab stays home, so tapping Feed from another
-// tab brings you back to that post. Loaded in <head> without defer, so pagereveal is heard in time.
+// Sheets stack (#248, #302): a post slides up over the feed, and its Chip in and Chat slide up over the
+// post. Pulling a sheet down at the top slides it back off to the page under it. While you're on a post
+// the Feed tab stays home, so tapping Feed from another tab brings you back to that post. Loaded in
+// <head> without defer, so pagereveal is heard in time.
 {
   const HOME = "feed-home"; // the post you were on, for the Feed tab
   const AT = "feed-at"; // where in the feed you were, for pulling the post back down
   const PULL_PX = 100;
   const isPost = (path) => /^\/posts\/\d+$/.test(path);
   const isFeed = (path) => path === "/feed";
+  // The page a sheet sits on, or null when the page isn't a sheet.
+  const parentOf = (path) => {
+    if (isPost(path)) return "/feed";
+    const child = /^(\/posts\/\d+)\/(chip-in|chat)$/.exec(path);
+    return child ? child[1] : null;
+  };
   const read = (key) => { try { return sessionStorage.getItem(key); } catch { return null; } };
   const write = (key, value) => {
     try {
@@ -33,16 +40,20 @@
     let from;
     try { from = new URL(window.navigation?.activation?.from?.url ?? document.referrer).pathname; } catch { return; }
     const to = window.location.pathname;
-    if (isFeed(from) && isPost(to)) event.viewTransition.types.add("sheet-open");
-    else if (isPost(from) && isFeed(to)) event.viewTransition.types.add("sheet-close");
+    if (parentOf(to) === from) event.viewTransition.types.add("sheet-open");
+    else if (parentOf(from) === to) event.viewTransition.types.add("sheet-close");
   });
 
-  // Back to the same feed ticket: Back in history when you came from the feed, else the feed you last saw.
+  // Back to the page under the sheet: Back in history when you came from it, else load it (for a post,
+  // the feed you last saw, so you land on the same ticket). A gift error lands on Chip in again, so its
+  // referrer is itself and it loads the post instead of stepping back through the form.
   const back = () => {
+    const parent = parentOf(window.location.pathname);
+    if (!parent) return;
     let from = null;
     try { from = new URL(document.referrer); } catch {}
-    if (from?.origin === window.location.origin && isFeed(from.pathname)) window.history.back();
-    else window.location.assign(read(AT) || "/feed");
+    if (from?.origin === window.location.origin && from.pathname === parent) window.history.back();
+    else window.location.assign(isFeed(parent) ? read(AT) || parent : parent);
   };
 
   const plain = (event) => !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0);
@@ -63,9 +74,9 @@
     window.location.assign(home);
   });
 
-  // Pull the post down from its top to go back to the feed.
+  // Pull a sheet down from its top to go back to the page under it.
   document.addEventListener("DOMContentLoaded", () => {
-    if (!isPost(window.location.pathname)) return;
+    if (!parentOf(window.location.pathname)) return;
     const page = document.querySelector("main");
 
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");

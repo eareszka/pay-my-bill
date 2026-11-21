@@ -121,8 +121,10 @@ def test_chip_in_and_chat_are_their_own_pages(client: FlaskClient, make_user: Ma
     chip_in = client.get(f"/posts/{post.id}/chip-in").get_data(as_text=True)
     assert 'id="chip-in"' in chip_in
     assert "Chip in to maria_g" in chip_in
-    assert f'href="/posts/{post.id}">' in chip_in
+    close = f'class="sheet-close" href="/posts/{post.id}" aria-label="Close, back to the post"'
+    assert close in chip_in
     chat = client.get(f"/posts/{post.id}/chat").get_data(as_text=True)
+    assert close in chat
     assert "Chat is coming soon" in chat
     assert "<textarea" in chat and " disabled" in chat
     assert "<form" not in chat.split('class="chat"')[1]
