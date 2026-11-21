@@ -379,6 +379,27 @@ def test_see_more_opens_the_sheet_and_close_puts_it_back(ui: Ui, live_server: Li
     ui.page.wait_for_url(re.compile(r"/feed\?n=2$"))  # the same ticket, not the top of the feed
 
 
+@pytest.mark.parametrize("size", ["mobile"])
+def test_chip_in_and_chat_are_sheets_over_the_post(ui: Ui, live_server: LiveServer) -> None:
+    ui.login(live_server.make_user("stacker"))
+    ui.goto("/feed?n=2")
+    ui.page.locator(".deck > .deck-ticket .ticket-more").click()
+    ui.page.wait_for_url(re.compile(r"/posts/\d+$"))
+    post = ui.path()
+    ui.page.click(".chip-fab")
+    ui.page.wait_for_url(re.compile(r"/chip-in$"))
+    ui.page.evaluate(PULL_DOWN)
+    ui.page.wait_for_url(re.compile(re.escape(post) + "$"))  # pulled down to the post, not the feed
+    ui.page.click(".sheet-chat")
+    ui.page.wait_for_url(re.compile(r"/chat$"))
+    ui.page.locator(".reply-top .sheet-close").click()
+    ui.page.wait_for_url(re.compile(re.escape(post) + "$"))
+    ui.page.locator(".sheet-close").click()
+    ui.page.wait_for_url(
+        re.compile(r"/feed\?n=2$")
+    )  # and the post still goes back to the same ticket
+
+
 def test_a_lone_ticket_still_swipes_down(make_ui: UiFactory, live_server: LiveServer) -> None:
     # The service worker would answer the feed before the route could strip its neighbors.
     ui = make_ui(service_workers="block")

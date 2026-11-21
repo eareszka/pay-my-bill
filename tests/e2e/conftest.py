@@ -30,6 +30,10 @@ from tests.e2e import checks
 
 ARTIFACTS = Path(__file__).parent / "artifacts"
 FINDINGS = ARTIFACTS / "findings.jsonl"
+# Let a page transition (a sheet sliding up) finish, so the screenshot shows the page.
+SETTLE = """() => Promise.all(document.documentElement.getAnimations({subtree: true})
+  .filter((a) => a.effect?.pseudoElement?.startsWith("::view-transition"))
+  .map((a) => a.finished.catch(() => {})))"""
 
 DEVICES: dict[str, dict[str, Any]] = {
     # iPhone 15-ish: the iOS shell is the final target.
@@ -141,6 +145,7 @@ class Ui:
         """Screenshot this page and run every design check on it."""
         slug = f"{self.test_name}-{step}-{self.device}".replace("/", "_")
         shot = ARTIFACTS / f"{slug}.png"
+        self.page.evaluate(SETTLE)
         self.page.screenshot(path=str(shot), full_page=True)
         problems = [
             *(extra or []),

@@ -12,6 +12,7 @@
 | Bubble tails flicker (from Sprint 6) | #225 | ui | — | Waiting on the owner's phone recheck |
 | Post sheet: full-screen photo, emoji pills, round Chip in (owner's ask) | #295 | ui | — | Done (#296) |
 | Log in title flickers, space above it | #297 | ui | — | Done (#300) |
+| Chip in and Chat as a sheet over the post (owner's ask) | #302 | ui | — | In review |
 
 **Total:** 5 points, plus 8 carried (Sprint 7: 21 of 16).
 
@@ -33,3 +34,4 @@
 - 2026-11-20 (main): #298: reverted #292, so Share is gone from the rail and post page (owner: not for now). Next: merge #296/#297. Blocked: none.
 - 2026-11-20 (ui): #297: League Gothic loads with font-display block (no fallback flash); on a phone Log in's title holds the bubble top (owner's pick). Blocked: none.
 - 2026-11-20: #296, #299, and #300 merged. All owner fixes are in; left: #289 Cloudflare steps, #261 APNs key, #225 recheck. Blocked: owner.
+- 2026-11-20 (ui): #302: Chip in and Chat slide up over the post; pull down or × goes back to the post. Next: owner's phone check. Blocked: none.
