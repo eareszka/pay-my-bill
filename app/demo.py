@@ -13,9 +13,11 @@ from flask.cli import AppGroup
 from sqlalchemy import delete, func, select
 from werkzeug.security import generate_password_hash
 
+from app import photos
 from app.extensions import db
 from app.models import Post, PostKind, Report, User, utcnow
 from app.moderation import is_flagged
+from app.seed import add_photos
 
 DEMO_EMAIL_DOMAIN = "@demo.yearnly.invalid"
 DEMO_LABEL = "Test post for trying out Yearnly. Don't send real money."
@@ -30,22 +32,42 @@ DEMO_POSTERS = [
     ("demo_nina", "Portland", "OR"),
 ]
 DEMO_WANTS = [
-    ("Concert tickets for my sister", "Her favorite band plays here in March.", 12_000),
-    ("New running shoes", "Training for my first 5K and my shoes are done.", 9_000),
-    ("Art supplies", "Getting back into painting this winter.", 6_000),
-    ("Dinosaur birthday cake", "My son turns 7 and loves dinosaurs.", 4_500),
-    ("Guitar strings and a tuner", "Teaching myself guitar from videos.", 3_500),
-    ("A board game for game night", "Our group has played the same one for a year.", 5_000),
-    ("Tickets to the aquarium", "Taking my niece for her first visit.", 7_000),
-    ("Noise-canceling headphones", "My roommate works nights and I study days.", 15_000),
-    ("Yarn for a winter blanket", "Knitting one for my grandma.", 4_000),
-    ("A good chef's knife", "Learning to cook real meals this year.", 8_000),
-    ("Bike tune-up", "The brakes squeak and the chain slips.", 6_500),
-    ("Movie night for the family", "Tickets and popcorn for four.", 6_000),
-    ("Plants for my first apartment", "It's very beige in here.", 3_000),
-    ("Camping gear for a weekend trip", "First trip with friends since college.", 20_000),
-    ("Swim lessons for my daughter", "She wants to join her friends at the pool.", 18_000),
-    ("Sketchbook and pens", "Drawing on my lunch break.", 2_500),
+    ("Concert tickets for my sister", "Her favorite band plays here in March.", 12_000, "concert"),
+    (
+        "New running shoes",
+        "Training for my first 5K and my shoes are done.",
+        9_000,
+        "running-shoes",
+    ),
+    ("Art supplies", "Getting back into painting this winter.", 6_000, "art-supplies"),
+    ("Dinosaur birthday cake", "My son turns 7 and loves dinosaurs.", 4_500, "cake"),
+    ("Guitar strings and a tuner", "Teaching myself guitar from videos.", 3_500, "guitar"),
+    (
+        "A board game for game night",
+        "Our group has played the same one for a year.",
+        5_000,
+        "board-game",
+    ),
+    ("Tickets to the aquarium", "Taking my niece for her first visit.", 7_000, "aquarium"),
+    (
+        "Noise-canceling headphones",
+        "My roommate works nights and I study days.",
+        15_000,
+        "headphones",
+    ),
+    ("Yarn for a winter blanket", "Knitting one for my grandma.", 4_000, "yarn"),
+    ("A good chef's knife", "Learning to cook real meals this year.", 8_000, "chef-knife"),
+    ("Bike tune-up", "The brakes squeak and the chain slips.", 6_500, "bike"),
+    ("Movie night for the family", "Tickets and popcorn for four.", 6_000, "movie-night"),
+    ("Plants for my first apartment", "It's very beige in here.", 3_000, "plants"),
+    (
+        "Camping gear for a weekend trip",
+        "First trip with friends since college.",
+        20_000,
+        "camping",
+    ),
+    ("Swim lessons for my daughter", "She wants to join her friends at the pool.", 18_000, "swim"),
+    ("Sketchbook and pens", "Drawing on my lunch break.", 2_500, "sketchbook"),
 ]
 
 
@@ -90,10 +112,12 @@ def seed_demo() -> int:
             goal_cents=goal,
             created_at=now - timedelta(hours=3 * i + 1),
         )
-        for i, (title, body, goal) in enumerate(DEMO_WANTS)
+        for i, (title, body, goal, _) in enumerate(DEMO_WANTS)
     ]
     if any(is_flagged(p.title, p.body) for p in posts):
         raise DemoError("a demo want trips the fundraising filter")
+    for post, (*_, subject) in zip(posts, DEMO_WANTS, strict=True):
+        add_photos(post, subject)
     db.session.add_all([*users, *posts])
     db.session.commit()
     return len(posts)
@@ -105,13 +129,17 @@ def clear_demo() -> int:
     if not ids:
         return 0
     posts = list(db.session.scalars(select(Post).where(Post.user_id.in_(ids))))
+    keys = []
     for post in posts:
+        keys += post.take_photos()
         db.session.delete(post)  # gifts, reactions, and reports on it go with it
     db.session.execute(delete(Report).where(Report.user_id.in_(ids)))
     db.session.flush()
     for user in users:
         db.session.delete(user)
     db.session.commit()
+    for key in keys:
+        photos.discard(key)
     return len(posts)
 
 

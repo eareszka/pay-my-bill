@@ -13,7 +13,8 @@
 | Post sheet: full-screen photo, emoji pills, round Chip in (owner's ask) | #295 | ui | — | Done (#296) |
 | Log in title flickers, space above it | #297 | ui | — | Done (#300) |
 | Chip in and Chat as a sheet over the post (owner's ask) | #302 | ui | — | In review |
-| Impeccable audit fixes (owner's ask) | #304–#310 | ui | — | In review |
+| Impeccable audit fixes (owner's ask) | #304–#310 | ui | — | Done |
+| Log in gap, story nav, test photos (owner's ask) | #312 | ui | — | In review |
 
 **Total:** 5 points, plus 8 carried (Sprint 7: 21 of 16).
 
@@ -37,3 +38,4 @@
 - 2026-11-20: #296, #299, and #300 merged. All owner fixes are in; left: #289 Cloudflare steps, #261 APNs key, #225 recheck. Blocked: owner.
 - 2026-11-20 (ui): #302: Chip in and Chat slide up over the post; pull down or × goes back to the post. Next: owner's phone check. Blocked: none.
 - 2026-11-21 (ui): #304–#310: audit fixes in one PR (contrast, edge stroke, disc band, panel fade, taps, status bar, cleanup). Detector 0 anti-patterns. Blocked: owner checks the iPhone status bar.
+- 2026-11-22 (ui): #312: Log in form under its title, story Back/Next bottom right, up to 5 CC0 photos per test post. Next: owner reseeds demo on Render. Blocked: none.

@@ -1,4 +1,5 @@
 from collections import Counter
+from pathlib import Path
 
 import pytest
 from flask import Flask
@@ -17,6 +18,7 @@ from app.models import (
     ReportReason,
     User,
 )
+from app.photos import MAX_PHOTOS
 from tests.conftest import MakeUser
 
 
@@ -34,6 +36,7 @@ def test_seed_adds_labeled_open_wants(app: Flask) -> None:
     users = db.session.scalars(select(User)).all()
     assert len(users) == len(DEMO_POSTERS)
     assert all(u.is_verified and u.has_payment_handle for u in users)
+    assert all(1 <= len(p.photo_keys) <= MAX_PHOTOS for p in posts)
 
 
 def test_seed_twice_is_refused(app: Flask) -> None:
@@ -67,7 +70,14 @@ def test_clear_removes_demo_data_and_keeps_real_users(app: Flask, make_user: Mak
         ]
     )
     db.session.commit()
+    stored = [
+        Path(app.config["PHOTO_DIR"]) / k
+        for p in db.session.scalars(select(Post))
+        for k in p.photo_keys
+    ]
+    assert stored and all(f.exists() for f in stored)
     assert clear_demo() == len(DEMO_WANTS)
+    assert not any(f.exists() for f in stored)
     assert (count(Post), count(Donation), count(Report)) == (0, 0, 0)
     assert db.session.scalars(select(User.username)).all() == ["emery"]
     assert clear_demo() == 0
