@@ -980,9 +980,11 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 /* The feed's gestures in one quiet line under the example card (#236). */
 .how-hint { margin: 10px 0 0; font-size: 0.9375rem; color: var(--on-field-muted); }
 .how-thanks { display: flex; flex-direction: column; gap: 6px; }
-.how-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
+/* Back and Next sit together at the bubble's bottom right, the count at the left (#312). */
+.how-nav { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-height: 52px; }
+.how-nav .how-count { margin-right: auto; }
 .how-nav a { min-height: 48px; text-decoration: none; }
-.how-nav .how-back { min-height: 48px; padding-left: 12px; }
+.how-nav .how-back { align-self: center; min-height: 48px; padding-left: 12px; }
 .how-nav .how-next { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px 8px 20px; font-weight: 700; color: var(--action-fg); background: var(--action-bg); border-radius: var(--pill); transition: background-color var(--fast) ease-out, transform var(--fast) var(--ease-out); }
 .how-nav .how-next:hover { background: var(--action-hover); }
 .how-nav .icon { width: 20px; height: 20px; }
@@ -1023,11 +1025,10 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .join-login a { color: var(--on-field); font-weight: 700; }
 .join-back { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px); z-index: 3; width: 100%; max-width: 480px; margin: auto auto 0; justify-content: flex-start; gap: 8px; min-height: 56px; font-weight: 700; }
 .join-back .icon { width: 20px; height: 20px; }
-/* On a phone the Log in bubble fills the screen like the home bubbles (#237, after #218), its form at the foot in thumb reach.
-   Its title holds the top (#297), so the room left over sits between the two instead of above the title. */
+/* On a phone the Log in bubble fills the screen like the home bubbles (#237, after #218).
+   The form sits right under its title (#312, replacing the form at the foot), so the room left over falls below the links. */
 @media (max-width: 959px) {
-  .join-page .join-step { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; }
-  .join-page .join-line:has(+ .join-card) { margin-bottom: auto; }
+  .join-page .join-step { display: flex; flex: 1; flex-direction: column; }
 }
 
 /* Every bubble keeps its own shape through a move (#217): nothing morphs size, so no frame is a plain rounded box.

@@ -18,8 +18,8 @@
     </ol>
     <div class="how-step">{{ step_body(path, step) }}</div>
     <nav class="how-nav" aria-label="Steps">
-      <a class="how-back" href="{{ url_for('main.how', path=path, step=step - 1) if step > 1 else url_for('main.home') }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back</a>
       <span class="how-count">{{ step }} of {{ total }}</span>
+      <a class="how-back" href="{{ url_for('main.how', path=path, step=step - 1) if step > 1 else url_for('main.home') }}"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>Back</a>
       {% if step < total %}
         <a class="how-next" rel="next" href="{{ url_for('main.how', path=path, step=step + 1) }}">Next<svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></a>
       {% elif current_user.is_authenticated %}

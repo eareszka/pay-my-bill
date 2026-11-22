@@ -64,15 +64,39 @@ WANTS = [
     ("Guitar strings and a tuner", "Teaching myself guitar."),
     ("Board game for game night", "Our group has played the same game for a year."),
 ]
-# Placeholder photos for some posts, so the photo state can be seen locally (SOURCES.md).
+# Free photos for each test post, up to five, so the photo states can be seen (SOURCES.md).
 SEED_PHOTO_DIR = Path(__file__).parent / "seed_photos"
 SEED_PHOTOS = {
-    "Art supplies": "art-supplies.jpg",
-    "Birthday cake for my son": "birthday-cake.jpg",
-    "Groceries until payday": "groceries.jpg",
-    "Guitar strings and a tuner": "guitar.jpg",
-    "New running shoes": "running-shoes.jpg",
+    "Short on rent this month": "rent",
+    "Electric bill help": "electric-bill",
+    "Car battery died": "car-battery",
+    "Groceries until payday": "groceries",
+    "Textbook for class": "textbook",
+    "Vet visit for my dog": "vet",
+    "Phone bill past due": "phone-bill",
+    "Want the new Zelda": "video-game",
+    "Concert tickets": "concert",
+    "New running shoes": "running-shoes",
+    "Art supplies": "art-supplies",
+    "Birthday cake for my son": "cake",
+    "Guitar strings and a tuner": "guitar",
+    "Board game for game night": "board-game",
 }
+
+
+def seed_photo_keys(subject: str) -> list[str]:
+    """Store a subject's photos the way an upload is stored; returns their keys, cover first."""
+    keys = []
+    for path in sorted((SEED_PHOTO_DIR / subject).glob("*.jpg"))[: photos.MAX_PHOTOS]:
+        with path.open("rb") as source:
+            keys.append(photos.save(photos.process(source)))
+    return keys
+
+
+def add_photos(post: Post, subject: str) -> None:
+    keys = seed_photo_keys(subject)
+    post.photo_key, post.more_photo_keys = keys[0], keys[1:]
+
 
 FLAGGED = ("Help launch my startup", "Looking for seed money for my small business LLC.")
 SECONDARY_STATUSES = [PostStatus.FUNDED, PostStatus.CLOSED, PostStatus.PENDING_REVIEW]
@@ -166,8 +190,7 @@ def seed(n_users: int = 10, posts_per_user: int = 2, rng_seed: int = 42) -> tupl
             )
     for post in posts:
         if post.title in SEED_PHOTOS:
-            with (SEED_PHOTO_DIR / SEED_PHOTOS[post.title]).open("rb") as source:
-                post.photo_key = photos.save(photos.process(source))
+            add_photos(post, SEED_PHOTOS[post.title])
     db.session.add_all([*users, *posts, *seed_donations(users, posts)])
     db.session.commit()
     return len(users), len(posts)

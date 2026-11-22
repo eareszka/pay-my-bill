@@ -5,9 +5,11 @@ import pytest
 from flask import Flask
 from sqlalchemy import select
 
+from app.demo import DEMO_WANTS
 from app.extensions import db
 from app.models import MAX_GOAL_CENTS, Donation, DonationStatus, Post, PostStatus, User
-from app.seed import SEED_PHOTOS, SeedError, seed
+from app.photos import MAX_PHOTOS
+from app.seed import SEED_PHOTO_DIR, SEED_PHOTOS, SeedError, seed
 
 
 def test_seed_creates_users_and_posts(app: Flask) -> None:
@@ -79,10 +81,22 @@ def test_seeded_closed_posts_have_a_close_date(app: Flask) -> None:
     )
 
 
-def test_seed_gives_some_posts_placeholder_photos(app: Flask) -> None:
+def test_seed_gives_each_known_post_its_photos(app: Flask) -> None:
     seed()
-    with_photo = [p for p in db.session.scalars(select(Post)) if p.photo_key]
-    assert {p.title for p in with_photo} <= set(SEED_PHOTOS)
-    assert with_photo
-    for post in with_photo:
-        assert (Path(app.config["PHOTO_DIR"]) / str(post.photo_key)).exists()
+    posts = db.session.scalars(select(Post)).all()
+    assert all(bool(p.photo_key) == (p.title in SEED_PHOTOS) for p in posts)
+    with_photos = [p for p in posts if p.photo_key]
+    assert with_photos
+    for post in with_photos:
+        assert 1 <= len(post.photo_keys) <= MAX_PHOTOS
+        assert all((Path(app.config["PHOTO_DIR"]) / key).exists() for key in post.photo_keys)
+
+
+def test_every_photo_subject_has_up_to_five_credited_photos() -> None:
+    sources = (SEED_PHOTO_DIR / "SOURCES.md").read_text(encoding="utf-8")
+    subjects = {p.name for p in SEED_PHOTO_DIR.iterdir() if p.is_dir()}
+    assert set(SEED_PHOTOS.values()) | set(s for *_, s in DEMO_WANTS) == subjects
+    for subject in subjects:
+        files = sorted((SEED_PHOTO_DIR / subject).glob("*.jpg"))
+        assert 1 <= len(files) <= MAX_PHOTOS, subject
+        assert all(f"{subject}/{f.name}" in sources for f in files), subject
