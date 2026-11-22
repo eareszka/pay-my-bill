@@ -279,8 +279,8 @@
       "edge": {
         "role": "neutral",
         "displayName": "Edge",
-        "canonical": "#86958a",
-        "oklch": "oklch(65.4% 0.024 153.9)",
+        "canonical": "#7e8e82",
+        "oklch": "oklch(63.0% 0.026 153.2)",
         "tonalRamp": [
           "#090c0a",
           "#212723",
@@ -775,7 +775,7 @@
       "refersTo": "button-secondary",
       "description": "Outlined; every action that isn't the main one. A pill.",
       "html": "<button class=\"ds-btn-o\">Cancel</button>",
-      "css": ".ds-btn-o { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 999px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #16261d; background: transparent; border-color: #86958a; } .ds-btn-o:hover { border-color: #16261d; } .ds-btn-o:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+      "css": ".ds-btn-o { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 18px; font: 700 1rem/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; border: 1.5px solid transparent; border-radius: 999px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1); color: #16261d; background: transparent; border-color: #7e8e82; } .ds-btn-o:hover { border-color: #16261d; } .ds-btn-o:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
     },
     {
       "name": "Danger Button",
@@ -791,7 +791,7 @@
       "refersTo": "input",
       "description": "Bold label, 1.5px edge stroke, hint below; tomato stroke on error.",
       "html": "<label class=\"ds-field\">Goal amount<input class=\"ds-input\" value=\"$120\"><small>Up to $1,000.</small></label>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font: 700 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-field small { font-size: 0.875rem; font-weight: 400; color: #4d5c52; } .ds-input { min-height: 48px; padding: 11px 13px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; background: #ffffff; border: 1.5px solid #86958a; border-radius: 14px; transition: border-color 140ms ease-out; } .ds-input:hover { border-color: #16261d; } .ds-input:focus-visible { outline: 2px solid #16261d; outline-offset: 1px; border-color: #16261d; }"
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font: 700 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-field small { font-size: 0.875rem; font-weight: 400; color: #4d5c52; } .ds-input { min-height: 48px; padding: 11px 13px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; background: #ffffff; border: 1.5px solid #7e8e82; border-radius: 14px; transition: border-color 140ms ease-out; } .ds-input:hover { border-color: #16261d; } .ds-input:focus-visible { outline: 2px solid #16261d; outline-offset: 1px; border-color: #16261d; }"
     },
     {
       "name": "Ask Ticket",
@@ -847,7 +847,7 @@
       "refersTo": "checkbox",
       "description": "Drawn controls: 22px, 1.5px edge stroke on surface, a 7px box or a round radio; checked fills Dollar Green with a white check or dot.",
       "html": "<label class=\"ds-choice\"><input type=\"checkbox\" checked> I'm 18 or older</label> <label class=\"ds-choice\"><input type=\"radio\" name=\"k\" checked> Need</label> <label class=\"ds-choice\"><input type=\"radio\" name=\"k\"> Want</label>",
-      "css": ".ds-choice { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-right: 18px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-choice input { display: grid; place-content: center; flex: none; width: 22px; height: 22px; margin: 0; appearance: none; background: #ffffff; border: 1.5px solid #86958a; border-radius: 7px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out; } .ds-choice input[type=radio] { border-radius: 50%; } .ds-choice input:hover { border-color: #16261d; } .ds-choice input:checked { background: #3a7558; border-color: #3a7558; } .ds-choice input[type=checkbox]:checked::after { content: ''; width: 10px; height: 6px; margin-top: -3px; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; rotate: -45deg; } .ds-choice input[type=radio]:checked::after { content: ''; width: 8px; height: 8px; background: #ffffff; border-radius: 50%; } .ds-choice input:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
+      "css": ".ds-choice { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-right: 18px; font: 400 1rem/1.5 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #16261d; } .ds-choice input { display: grid; place-content: center; flex: none; width: 22px; height: 22px; margin: 0; appearance: none; background: #ffffff; border: 1.5px solid #7e8e82; border-radius: 7px; cursor: pointer; transition: background-color 140ms ease-out, border-color 140ms ease-out; } .ds-choice input[type=radio] { border-radius: 50%; } .ds-choice input:hover { border-color: #16261d; } .ds-choice input:checked { background: #3a7558; border-color: #3a7558; } .ds-choice input[type=checkbox]:checked::after { content: ''; width: 10px; height: 6px; margin-top: -3px; border: solid #ffffff; border-width: 0 0 2.5px 2.5px; rotate: -45deg; } .ds-choice input[type=radio]:checked::after { content: ''; width: 8px; height: 8px; background: #ffffff; border-radius: 50%; } .ds-choice input:focus-visible { outline: 2px solid #16261d; outline-offset: 2px; }"
     },
     {
       "name": "Helper Panel",

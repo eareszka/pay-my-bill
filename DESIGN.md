@@ -19,7 +19,7 @@ colors:
   deep: "#16261d"
   muted: "#4d5c52"
   line: "#dbe2d8"
-  edge: "#86958a"
+  edge: "#7e8e82"
   action-bg: "#3a7558"
   action-fg: "#ffffff"
   action-hover: "#2f6249"
@@ -70,6 +70,31 @@ typography:
     fontSize: "0.75rem"
     fontWeight: 700
     lineHeight: 1.2
+  lead:
+    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontSize: "1.0625rem"
+    fontWeight: 400
+    lineHeight: 1.55
+  subhead:
+    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 700
+    lineHeight: 1.25
+  small:
+    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 400
+    lineHeight: 1.4
+  fine:
+    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.4
+  figure-lg:
+    fontFamily: "Public Sans, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontSize: "2rem"
+    fontWeight: 700
+    lineHeight: 1
 rounded:
   hairline: "2px"
   tail: "6px"
@@ -270,7 +295,7 @@ These two fields are provisional category colors. Story #119 replaces them with 
 - **Green-Black Ink** (ink, deep): body text, focus rings, the meter fill, text on white controls set on the shell. It is the darkest color in the system.
 - **Moss Gray** (muted): hints, metadata, ranks, counts, inactive tabs, and the front door's "Already have an account?" line.
 - **Hairline** (line): row dividers, section rules, and the sign-up card's edge.
-- **Edge** (edge): input, checkbox, radio, and secondary-button strokes, the desktop rail circles, and the scrollbar thumb.
+- **Edge** (edge, 3.17:1 on the ground and 3.45:1 on white, so control strokes meet WCAG 1.4.11): input, checkbox, radio, and secondary-button strokes, the desktop rail circles, and the scrollbar thumb.
 - **Info Tint** (info-tint) and **Meter Track** (mark-empty): info flashes and notices and a tab's hover pill, and the empty meter and expired mark.
 
 ### Status
@@ -302,6 +327,7 @@ These two fields are provisional category colors. Story #119 replaces them with 
 - **Figure** (Public Sans 700, 1.75rem, tabular numerals): raised amounts and gift amounts. It grows to 2rem in the post hero and the side panel.
 - **Body** (Public Sans 400, 1rem, line-height 1.5): everything else. Post stories run at 1.0625rem and max 68ch.
 - **Label** (Public Sans 700, 0.75rem): nav and rail labels and the deck count.
+- **Small steps** (Public Sans): Lead 1.0625rem for stories, bios, and big buttons; Subhead 700 1.25rem for a step question or a need/want row; Small 0.9375rem for card meta, hints, and fact pills; Fine 0.875rem for state marks, field notes, legal notes, and the footer; Figure Large 2rem for the hero and side-panel amounts.
 
 ### Named Rules
 **The Two Voices Rule.** League Gothic is only for titles and the wordmark, always uppercase. Every sentence, label, number, and control is Public Sans. Don't use a system face for display. League Gothic loads with `font-display: block` (#297), so a title waits a moment for its face rather than painting in Arial Narrow and swapping.

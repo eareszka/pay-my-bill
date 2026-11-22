@@ -20,7 +20,7 @@ if (steps.length) {
     current = index;
     steps.forEach((step, i) => { step.hidden = i !== index; });
     const last = index === steps.length - 1;
-    bar.style.width = `${((index + 1) / steps.length) * 100}%`;
+    bar.style.setProperty("--done", (index + 1) / steps.length);
     back.hidden = index === 0;
     skip.hidden = last || !("optional" in steps[index].dataset);
     next.hidden = last;
