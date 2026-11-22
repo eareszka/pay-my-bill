@@ -915,7 +915,9 @@ body.stage-page .container-wide:has(> .home, > .how, > .join) { max-width: none;
 .home-door:hover .home-door-go, .how-other:hover .how-other-go, .how-nav .how-back:hover { background: var(--info-tint); }
 .home-door:active .home-door-go, .how-other:active .how-other-go, .how-nav a:active { transform: scale(0.98); }
 .home-door:hover .home-door-go .icon, .how-other:hover .how-other-go .icon { transform: translateX(4px); }
-.home-door:focus-visible, .how-other:focus-visible { outline: 2px solid var(--on-field); outline-offset: -6px; }
+.how-other:focus-visible { outline: 2px solid var(--on-field); outline-offset: -6px; }
+/* A door's photos and their fade paint over anything inside its edge, so its ring sits just outside (#312). */
+.home-door:focus-visible { outline: 2px solid var(--on-field); outline-offset: 3px; }
 .home-way-in { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 8px; }
 .home-signup { width: 100%; min-height: 52px; font-size: 1.0625rem; }
 .home-login { margin: 0; text-align: center; color: var(--muted); }
